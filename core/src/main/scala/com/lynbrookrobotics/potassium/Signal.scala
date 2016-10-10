@@ -12,7 +12,7 @@ abstract class Signal[T] { self =>
     override def get: (T, O) = (self.get, other.get)
   }
 
-  def toController: Controller[T] = new Controller[T] {
+  def toPeriodic: PeriodicSignal[T] = new PeriodicSignal[T] {
     val parent = None
 
     override def currentValue(dt: Time): T = get

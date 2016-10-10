@@ -2,21 +2,21 @@ package com.lynbrookrobotics.potassium
 
 import squants.Time
 
-abstract class Controller[T] { self =>
+abstract class PeriodicSignal[T] { self =>
   private var currentTickSource: Option[AnyRef] = None
 
-  val parent: Option[Controller[_]]
+  val parent: Option[PeriodicSignal[_]]
 
   def currentValue(dt: Time): T
 
-  def map[U](f: (T, Time) => U): Controller[U] = new Controller[U] {
+  def map[U](f: (T, Time) => U): PeriodicSignal[U] = new PeriodicSignal[U] {
     val parent = Some(self)
     override def currentValue(dt: Time): U = {
       f(self.currentValue(dt), dt)
     }
   }
 
-  def zip[O](other: Controller[O]): Controller[(T, O)] = new Controller[(T, O)] {
+  def zip[O](other: PeriodicSignal[O]): PeriodicSignal[(T, O)] = new PeriodicSignal[(T, O)] {
     val parent = Some(self)
     override def currentValue(dt: Time): (T, O) = {
       (self.currentValue(dt), other.currentValue(dt))

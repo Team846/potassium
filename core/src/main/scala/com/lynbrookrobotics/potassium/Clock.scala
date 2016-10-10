@@ -12,7 +12,7 @@ trait Clock {
 }
 
 object Clock {
-  val javaTicker = new Clock {
+  val javaClock = new Clock {
     override def apply(period: Time)(thunk: Time => Unit): Cancel = {
       val scheduler = Executors.newScheduledThreadPool(1)
 

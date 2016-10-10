@@ -3,10 +3,10 @@ package com.lynbrookrobotics.potassium
 import squants.Time
 
 abstract class Component[T](period: Time)(implicit val clock: Clock) {
-  def defaultController: Controller[T]
-  private var currentController: Controller[T] = defaultController
+  def defaultController: PeriodicSignal[T]
+  private var currentController: PeriodicSignal[T] = defaultController
 
-  def setController(controller: Controller[T]): Unit = {
+  def setController(controller: PeriodicSignal[T]): Unit = {
     currentController.detachTickSource(this)
     controller.attachTickSource(this)
     currentController = controller
