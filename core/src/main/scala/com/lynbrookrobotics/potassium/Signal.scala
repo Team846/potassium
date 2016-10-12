@@ -9,13 +9,14 @@ abstract class Signal[T] { self =>
   }
 
   def zip[O](other: Signal[O]): Signal[(T, O)] = new Signal[(T, O)] {
-    override def get: (T, O) = (self.get, other.get)
+    def get = (self.get, other.get)
   }
 
   def toPeriodic: PeriodicSignal[T] = new PeriodicSignal[T] {
+    val check = None
     val parent = None
 
-    override def currentValue(dt: Time): T = get
+    def calculateValue(dt: Time): T = get
   }
 }
 

@@ -2,7 +2,6 @@ package com.lynbrookrobotics.potassium
 
 import org.scalacheck.Prop.forAll
 import org.scalatest.FunSuite
-import org.scalatest.prop.Checkers._
 import squants.time.Milliseconds
 
 class PeriodicSignalTest extends FunSuite {
@@ -24,5 +23,17 @@ class PeriodicSignalTest extends FunSuite {
     value = 2
 
     assert(periodicSignal.currentValue(Milliseconds(5)) == 2)
+  }
+
+  test("Checks get executed on every calculation") {
+    var checkResult = 0
+
+    val signal = Signal.constant(1)
+    val periodicSignal = signal.toPeriodic.withCheck { v =>
+      checkResult = v
+    }
+
+    assert(periodicSignal.currentValue(Milliseconds(5)) == 1)
+    assert(checkResult == 1)
   }
 }
