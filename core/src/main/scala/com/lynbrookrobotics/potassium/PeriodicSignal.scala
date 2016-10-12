@@ -28,7 +28,7 @@ abstract class PeriodicSignal[T] { self =>
       currentTickSource = Some(source)
       parent.foreach(_.attachTickSource(source))
     } else if (!currentTickSource.get.eq(source)) {
-      throw new IllegalStateException("Cannot attach a controller to two different clocks")
+      throw new IllegalStateException("Cannot attach a periodic signal to two different clocks")
     }
   }
 
