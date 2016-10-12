@@ -49,4 +49,8 @@ abstract class FiniteTask extends Task {
       running = false
     }
   }
+
+  def then(that: FiniteTask): FiniteTask = {
+    new SequentialTask(this, that)
+  }
 }
