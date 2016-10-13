@@ -1,4 +1,5 @@
 package com.lynbrookrobotics.potassium
+import com.lynbrookrobotics.potassium.events.{ContinuousEvent, EventPolling}
 import squants.Time
 
 abstract class Signal[T] { self =>
@@ -10,6 +11,10 @@ abstract class Signal[T] { self =>
 
   def zip[O](other: Signal[O]): Signal[(T, O)] = new Signal[(T, O)] {
     def get = (self.get, other.get)
+  }
+
+  def filter(condition: T => Boolean)(implicit polling: EventPolling): ContinuousEvent = {
+    new ContinuousEvent(condition(get))
   }
 
   def toPeriodic: PeriodicSignal[T] = new PeriodicSignal[T] {
