@@ -9,3 +9,8 @@ scalaVersion in ThisBuild := "2.11.8"
 lazy val core = project
 
 lazy val testing = project.dependsOn(core)
+
+publishArtifact := false
+
+publishMavenStyle := true
+publishTo in ThisBuild := Some(Resolver.file("gh-pages-repo", baseDirectory.value / "repo"))
