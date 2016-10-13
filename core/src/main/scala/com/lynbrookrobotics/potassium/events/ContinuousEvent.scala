@@ -1,6 +1,7 @@
 package com.lynbrookrobotics.potassium.events
 
 import com.lynbrookrobotics.potassium.Clock
+import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, Task}
 import squants.Time
 
 case class EventPolling(clock: Clock, period: Time)
@@ -32,5 +33,10 @@ class ContinuousEvent(condition: => Boolean)(implicit polling: EventPolling) {
 
   def foreach(onTicking: () => Unit): Unit = {
     tickingCallbacks = onTicking :: tickingCallbacks
+  }
+
+  def foreach(task: ContinuousTask): Unit = {
+    onStart.foreach(() => Task.executeTask(task))
+    onEnd.foreach(() => Task.abortTask(task))
   }
 }
