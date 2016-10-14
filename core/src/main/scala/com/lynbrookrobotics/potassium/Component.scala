@@ -19,6 +19,10 @@ abstract class Component[T](period: Time)(implicit val clock: Clock) {
   def applySignal(signal: T): Unit
 
   clock(period) { dt =>
+    if (currentController == null) {
+      currentController = defaultController
+    }
+
     applySignal(currentController.currentValue(dt))
   }
 }
