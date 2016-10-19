@@ -8,21 +8,29 @@ abstract class PeriodicSignal[T] { self =>
   val parent: Option[PeriodicSignal[_]]
   val check: Option[T => Unit]
 
-  protected def calculateValue(dt: Time): T
+  private var lastCalculated: Option[(T, Int)] = None
 
-  def currentValue(dt: Time): T = {
-    val ret = calculateValue(dt)
-    check.foreach(_(ret))
+  protected def calculateValue(dt: Time, token: Int): T
 
-    ret
+  def currentValue(dt: Time, requestToken: Int = PeriodicSignal.requestTokens.next()): T = {
+    lastCalculated match {
+      case Some((v, t)) if t == requestToken =>
+        v
+      case _ =>
+        val ret = calculateValue(dt, requestToken)
+        check.foreach(_(ret))
+        lastCalculated = Some((ret, requestToken))
+
+        ret
+    }
   }
 
   def map[U](f: (T, Time) => U): PeriodicSignal[U] = new PeriodicSignal[U] {
     val parent = Some(self)
     val check = None
 
-    def calculateValue(dt: Time): U = {
-      f(self.currentValue(dt), dt)
+    def calculateValue(dt: Time, token: Int): U = {
+      f(self.currentValue(dt, token), dt)
     }
   }
 
@@ -30,8 +38,8 @@ abstract class PeriodicSignal[T] { self =>
     val parent = Some(self)
     val check = None
 
-    def calculateValue(dt: Time): (T, O) = {
-      (self.currentValue(dt), other.currentValue(dt))
+    def calculateValue(dt: Time, token: Int): (T, O) = {
+      (self.currentValue(dt, token), other.currentValue(dt, token))
     }
   }
 
@@ -39,7 +47,7 @@ abstract class PeriodicSignal[T] { self =>
     val parent = Some(self)
     val check = Some(checkCallback)
 
-    def calculateValue(dt: Time): T = self.currentValue(dt)
+    def calculateValue(dt: Time, token: Int): T = self.currentValue(dt, token)
   }
 
   def attachTickSource(source: AnyRef): Unit = {
@@ -59,4 +67,8 @@ abstract class PeriodicSignal[T] { self =>
       }
     }
   }
+}
+
+object PeriodicSignal {
+  private[PeriodicSignal] val requestTokens = Iterator.from(1)
 }

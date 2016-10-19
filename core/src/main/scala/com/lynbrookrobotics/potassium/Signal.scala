@@ -21,7 +21,7 @@ abstract class Signal[T] { self =>
     val check = None
     val parent = None
 
-    def calculateValue(dt: Time): T = get
+    def calculateValue(dt: Time, token: Int): T = get
   }
 }
 

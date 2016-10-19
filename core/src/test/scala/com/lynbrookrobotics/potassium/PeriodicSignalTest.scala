@@ -36,4 +36,17 @@ class PeriodicSignalTest extends FunSuite {
     assert(periodicSignal.currentValue(Milliseconds(5)) == 1)
     assert(checkResult == 1)
   }
+
+  test("Each periodic signal requested only once per request") {
+    var numRequests = 0
+    val signal = Signal {
+      numRequests += 1
+      0
+    }.toPeriodic
+
+    val periodicCombined = signal.zip(signal)
+
+    assert(periodicCombined.currentValue(Milliseconds(5)) == (0, 0))
+    assert(numRequests == 1)
+  }
 }
