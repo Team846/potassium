@@ -10,6 +10,8 @@ lazy val core = project
 
 lazy val testing = project.dependsOn(core)
 
+lazy val frc = project.dependsOn(core)
+
 publishArtifact := false
 
 publishMavenStyle := true
