@@ -2,7 +2,7 @@ package com.lynbrookrobotics.potassium.frc
 
 import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.events.{ContinuousEvent, EventPolling}
-import edu.wpi.first.wpilibj.{AnalogInput, Counter, Joystick}
+import edu.wpi.first.wpilibj.{AnalogInput, Counter, DigitalInput, Joystick}
 import squants.{Dimensionless, Each, Time}
 import squants.electro.Volts
 import squants.time.{Frequency, Seconds}
@@ -30,6 +30,11 @@ object Implicits {
   implicit class CounterSignals(val counter: Counter) extends AnyVal {
     def period: Signal[Time] = Signal(Seconds(counter.getPeriod))
     def frequency: Signal[Frequency] = period.map(t => Each(1) / t)
+  }
+
+  // interface conversions
+  implicit class DigitalInputConversions(val in: DigitalInput) {
+    def toCounter = new Counter(in)
   }
 
   implicit val clock = WPIClock
