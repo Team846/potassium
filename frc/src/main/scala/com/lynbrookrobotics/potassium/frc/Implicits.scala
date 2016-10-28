@@ -1,8 +1,9 @@
 package com.lynbrookrobotics.potassium.frc
 
 import com.lynbrookrobotics.potassium.Signal
+import com.lynbrookrobotics.potassium.events.{ContinuousEvent, EventPolling}
 import edu.wpi.first.wpilibj.{AnalogInput, Joystick}
-import squants.Each
+import squants.{Dimensionless, Each}
 import squants.electro.Volts
 
 object Implicits {
@@ -16,8 +17,14 @@ object Implicits {
   }
 
   implicit class JoystickSignals(val joystick: Joystick) extends AnyVal {
-    def x = Signal(Each(joystick.getX()))
-    def y = Signal(Each(joystick.getY()))
-    def z = Signal(Each(joystick.getZ()))
+    def x: Signal[Dimensionless] = Signal(Each(joystick.getX()))
+    def y: Signal[Dimensionless] = Signal(Each(joystick.getY()))
+    def z: Signal[Dimensionless] = Signal(Each(joystick.getZ()))
+
+    def buttonPressed(button: Int)(implicit polling: EventPolling): ContinuousEvent = {
+      Signal(joystick.getRawButton(button)).filter(down => down)
+    }
   }
+
+  implicit val clock = WPIClock
 }
