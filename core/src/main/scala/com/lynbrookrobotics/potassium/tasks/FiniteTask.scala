@@ -1,5 +1,8 @@
 package com.lynbrookrobotics.potassium.tasks
 
+import com.lynbrookrobotics.potassium.Clock
+import squants.Time
+
 import scala.ref.WeakReference
 
 trait FiniteTaskFinishedListener {
@@ -52,5 +55,9 @@ abstract class FiniteTask extends Task {
 
   def then(that: FiniteTask): FiniteTask = {
     new SequentialTask(this, that)
+  }
+
+  def withTimeout(timeout: Time)(implicit clock: Clock): FiniteTask = {
+    new TimeoutFiniteTask(this, timeout, clock)
   }
 }
