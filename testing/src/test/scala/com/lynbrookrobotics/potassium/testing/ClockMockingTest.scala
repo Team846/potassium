@@ -1,7 +1,5 @@
 package com.lynbrookrobotics.potassium.testing
 
-import com.lynbrookrobotics.potassium.Clock
-
 import squants.Time
 import squants.time.Milliseconds
 
@@ -34,5 +32,23 @@ class ClockMockingTest extends FunSuite {
     trigger(Milliseconds(5))
 
     assert(dtProduced == Milliseconds(5))
+  }
+
+  test("Single execution is correclty executed") {
+    val (mockedClock, trigger) = ClockMocking.mockedClockTicker
+
+    var executed = false
+
+    mockedClock.singleExecution(Milliseconds(5)) {
+      executed = true
+    }
+
+    trigger(Milliseconds(1))
+
+    assert(!executed)
+
+    trigger(Milliseconds(5))
+
+    assert(executed)
   }
 }

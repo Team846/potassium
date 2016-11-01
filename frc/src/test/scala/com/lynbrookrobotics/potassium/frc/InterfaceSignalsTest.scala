@@ -14,10 +14,21 @@ class InterfaceSignalsTest extends FunSuite with MockitoSugar {
     val mockedAnalogIn = mock[AnalogInput]
     val voltageSignal = mockedAnalogIn.voltage
 
-    implicit val tolerance = Volts(0.01)
     check(forAll { d: Double =>
       when(mockedAnalogIn.getVoltage).thenReturn(d)
-      (voltageSignal.get - Volts(d)).abs < tolerance
+
+      voltageSignal.get.toVolts == d
+    })
+  }
+
+  test("Analog input produces correct average voltage") {
+    val mockedAnalogIn = mock[AnalogInput]
+    val voltageSignal = mockedAnalogIn.averageVoltage
+
+    check(forAll { d: Double =>
+      when(mockedAnalogIn.getAverageVoltage).thenReturn(d)
+
+      voltageSignal.get.toVolts == d
     })
   }
 }

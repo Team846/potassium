@@ -24,4 +24,14 @@ object WPIClock extends Clock {
 
     () => notifier.stop()
   }
+
+  override def singleExecution(delay: Time)(thunk: => Unit): Unit = {
+    val notifier = new Notifier(new Runnable {
+      override def run(): Unit = {
+        thunk
+      }
+    })
+
+    notifier.startSingle(delay.to(Seconds))
+  }
 }
