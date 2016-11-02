@@ -12,6 +12,10 @@ lazy val testing = project.dependsOn(core)
 
 lazy val frc = project.dependsOn(core)
 
+lazy val sensors = project.dependsOn(core)
+
+lazy val commons = project.dependsOn(sensors)
+
 publishArtifact := false
 
 publishMavenStyle := true
