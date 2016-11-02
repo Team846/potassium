@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.commons.drivetrain
 
-import com.lynbrookrobotics.potassium.Signal
+import com.lynbrookrobotics.potassium.{Component, Signal}
 import squants.Dimensionless
 
 trait UnicycleDrive {
@@ -14,4 +14,6 @@ trait UnicycleDrive {
   def forwardAndTurnControl(forwardSpeed: Signal[Dimensionless], turnSpeed: Signal[Dimensionless]): Signal[DriveSignal] = {
     forwardControl(forwardSpeed).zip(turnControl(turnSpeed)).map(t => addDriveSignal(t._1, t._2))
   }
+
+  type Drivetrain <: Component[DriveSignal]
 }
