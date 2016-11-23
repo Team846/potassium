@@ -1,34 +1,83 @@
 package com.lynbrookrobotics.commons.drivetrain
 
-import com.lynbrookrobotics.potassium.{Component, PeriodicSignal}
-import squants.Time
+import com.lynbrookrobotics.potassium.units._
+import com.lynbrookrobotics.potassium.{Clock, Component, PeriodicSignal, Signal}
+import squants.{Dimensionless, Each, Time, Velocity}
 import squants.electro.ElectricPotential
+import squants.motion.MetersPerSecond
 
 /**
   * A drivetrain with two side control (such as a tank drive)
   */
 trait TwoSidedDrive extends UnicycleDrive {
-  case class DriveSignal(leftPower: ElectricPotential, rightPower: ElectricPotential)
+  self =>
 
+  case class TwoSidedSignal(left: Dimensionless, right: Dimensionless)
+
+  case class TwoSidedVelocity(left: Velocity, right: Velocity)
+
+  type DriveSignal = TwoSidedSignal
+  type DriveVelocity = TwoSidedVelocity
+
+  protected implicit val clock: Clock
   protected val updatePeriod: Time
-  protected val motorVoltageScale: ElectricPotential
+  protected val motorVoltageScale: Ratio[ElectricPotential, Dimensionless]
 
   protected def outputLeft(left: ElectricPotential): Unit
+
   protected def outputRight(right: ElectricPotential): Unit
 
-  protected def convertToDrive(uni: UnicycleSignal): DriveSignal = {
-    DriveSignal(
-      motorVoltageScale * (uni.forward + uni.turn).toEach,
-      motorVoltageScale * (uni.forward - uni.turn).toEach
+  protected def convertToDrive(uni: UnicycleSignal): TwoSidedSignal = {
+    TwoSidedSignal(
+      uni.forward + uni.turn,
+      uni.forward - uni.turn
     )
   }
 
-  class Drivetrain extends Component[DriveSignal](updatePeriod) {
-    override def defaultController: PeriodicSignal[DriveSignal] = defaultController
+  protected def expectedVelocity(drive: TwoSidedSignal): TwoSidedVelocity = {
+    TwoSidedVelocity(maxLeftVelocity * drive.left, maxRightVelocity * drive.right)
+  }
 
-    override def applySignal(signal: DriveSignal): Unit = {
-      outputLeft(signal.leftPower)
-      outputRight(signal.rightPower)
+  protected def driveVelocityControl(signal: Signal[TwoSidedVelocity]): Signal[TwoSidedSignal] =
+    TwoSidedControllers.velocity(signal)
+
+  protected val maxLeftVelocity: Velocity
+  protected val maxRightVelocity: Velocity
+
+  // TODO: replace with configuration object from control module
+  protected val leftProportionalGain: Ratio[Dimensionless, Velocity]
+  protected val rightProportionalGain: Ratio[Dimensionless, Velocity]
+
+  protected val leftFeedForwardGain: Ratio[Dimensionless, Velocity]
+  protected val rightFeedForwardGain: Ratio[Dimensionless, Velocity]
+
+  // disable unicycle forward control because we already control that here
+  override protected val forwardProportionalGain: Ratio[Dimensionless, Velocity] =
+    Each(0) / MetersPerSecond(1)
+
+  protected val leftVelocity: Signal[Velocity]
+  protected val rightVelocity: Signal[Velocity]
+
+  override protected val forwardVelocity: Signal[Velocity] =
+    leftVelocity.zip(rightVelocity).map(t => (t._1 + t._2) / 2)
+
+  object TwoSidedControllers {
+    def velocity(twoSided: Signal[TwoSidedVelocity]): Signal[TwoSidedSignal] = {
+      twoSided.zip(leftVelocity).zip(rightVelocity).map { case ((target, curLeft), curRight) =>
+        TwoSidedSignal(
+          (target.left ** leftFeedForwardGain) + ((target.left - curLeft) ** leftProportionalGain),
+          (target.right ** rightFeedForwardGain) + ((target.right - curRight) ** rightProportionalGain)
+        )
+      }
+    }
+  }
+
+  class Drivetrain extends Component[TwoSidedSignal](updatePeriod) {
+    override def defaultController: PeriodicSignal[TwoSidedSignal] = self.defaultController
+
+    override def applySignal(signal: TwoSidedSignal): Unit = {
+      outputLeft(signal.left ** motorVoltageScale)
+      outputRight(signal.right ** motorVoltageScale)
     }
   }
 }
