@@ -6,6 +6,8 @@ version in ThisBuild := "0.1.0-SNAPSHOT"
 
 scalaVersion in ThisBuild := "2.11.8"
 
+coverageEnabled in ThisBuild := true
+
 lazy val core = project
 
 lazy val testing = project.dependsOn(core)

@@ -9,5 +9,5 @@ package object units {
     def **[Q <: Quantity[Q]](ratio: Ratio[Q, N]): Q = ratio * num
   }
 
-  implicit def quant2Ratio[N <: Quantity[N]](num: N): Ratio[N, Dimensionless] = num / Each(1)
+  implicit def quant2Ratio[N <: Quantity[N]](num: N): Ratio[N, Dimensionless] = new Ratio(num, Each(1))
 }
