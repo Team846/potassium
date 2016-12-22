@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.frc
 
-import com.lynbrookrobotics.potassium.Clock
+import com.lynbrookrobotics.potassium.clock.Clock
 import edu.wpi.first.wpilibj.{Notifier, Utility}
 import squants.Time
 import squants.time.{Microseconds, Seconds}

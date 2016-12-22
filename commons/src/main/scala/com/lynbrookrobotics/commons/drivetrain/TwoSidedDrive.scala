@@ -1,7 +1,8 @@
 package com.lynbrookrobotics.commons.drivetrain
 
+import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.units._
-import com.lynbrookrobotics.potassium.{Clock, Component, PeriodicSignal, Signal}
+import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal}
 import squants.{Dimensionless, Each, Time, Velocity}
 import squants.electro.ElectricPotential
 import squants.motion.MetersPerSecond

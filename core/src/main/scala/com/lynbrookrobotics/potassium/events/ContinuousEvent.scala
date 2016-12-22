@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.events
 
-import com.lynbrookrobotics.potassium.Clock
+import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, Task}
 import squants.Time
 

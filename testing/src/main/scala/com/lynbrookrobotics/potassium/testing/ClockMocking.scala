@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.testing
 
-import com.lynbrookrobotics.potassium.Clock
+import com.lynbrookrobotics.potassium.clock.Clock
 import squants.Time
 
 object ClockMocking {

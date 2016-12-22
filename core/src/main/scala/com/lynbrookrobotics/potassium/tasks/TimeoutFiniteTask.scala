@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.tasks
 
-import com.lynbrookrobotics.potassium.Clock
+import com.lynbrookrobotics.potassium.clock.Clock
 import squants.Time
 
 class TimeoutFiniteTask(task: FiniteTask, timeout: Time, clock: Clock) extends FiniteTask with FiniteTaskFinishedListener {
