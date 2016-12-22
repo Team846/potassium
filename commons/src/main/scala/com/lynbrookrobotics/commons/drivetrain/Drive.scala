@@ -9,10 +9,10 @@ trait Drive {
   type DriveSignal
   type DriveVelocity
 
-  protected def driveExpectedVelocity(drive: DriveSignal): DriveVelocity
+  protected def driveClosedLoop(drive: Signal[DriveSignal]): Signal[DriveSignal]
   protected def driveVelocityControl(signal: Signal[DriveVelocity]): Signal[DriveSignal]
 
-  protected val defaultController: PeriodicSignal[DriveSignal]
+  protected def defaultController: PeriodicSignal[DriveSignal]
 
   type Drivetrain <: Component[DriveSignal]
 }

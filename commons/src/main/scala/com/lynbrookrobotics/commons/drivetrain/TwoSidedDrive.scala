@@ -10,11 +10,8 @@ import squants.motion.MetersPerSecond
 /**
   * A drivetrain with two side control (such as a tank drive)
   */
-trait TwoSidedDrive extends UnicycleDrive {
-  self =>
-
+trait TwoSidedDrive extends UnicycleDrive { self =>
   case class TwoSidedSignal(left: Dimensionless, right: Dimensionless)
-
   case class TwoSidedVelocity(left: Velocity, right: Velocity)
 
   type DriveSignal = TwoSidedSignal
@@ -22,13 +19,10 @@ trait TwoSidedDrive extends UnicycleDrive {
 
   protected implicit val clock: Clock
   protected val updatePeriod: Time
-  protected val motorVoltageScale: Ratio[ElectricPotential, Dimensionless]
 
-  protected def outputLeft(left: ElectricPotential): Unit
+  protected def output(signal: TwoSidedSignal): Unit
 
-  protected def outputRight(right: ElectricPotential): Unit
-
-  protected def convertToDrive(uni: UnicycleSignal): TwoSidedSignal = {
+  protected def convertUnicycleToDrive(uni: UnicycleSignal): TwoSidedSignal = {
     TwoSidedSignal(
       uni.forward + uni.turn,
       uni.forward - uni.turn
@@ -41,6 +35,9 @@ trait TwoSidedDrive extends UnicycleDrive {
 
   protected def driveVelocityControl(signal: Signal[TwoSidedVelocity]): Signal[TwoSidedSignal] =
     TwoSidedControllers.velocity(signal)
+
+  protected def driveClosedLoop(signal: Signal[TwoSidedSignal]): Signal[TwoSidedSignal] =
+    TwoSidedControllers.velocity(signal.map(expectedVelocity))
 
   protected val maxLeftVelocity: Velocity
   protected val maxRightVelocity: Velocity
@@ -77,8 +74,7 @@ trait TwoSidedDrive extends UnicycleDrive {
     override def defaultController: PeriodicSignal[TwoSidedSignal] = self.defaultController
 
     override def applySignal(signal: TwoSidedSignal): Unit = {
-      outputLeft(signal.left ** motorVoltageScale)
-      outputRight(signal.right ** motorVoltageScale)
+      output(signal)
     }
   }
 }
