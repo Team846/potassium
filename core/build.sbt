@@ -1,2 +1,0 @@
-name := "potassium-core"
-
