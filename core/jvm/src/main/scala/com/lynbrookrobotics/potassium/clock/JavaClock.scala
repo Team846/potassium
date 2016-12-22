@@ -22,9 +22,8 @@ object JavaClock extends Clock {
         }
 
         lastTime = Some(currentTime)
-
       }
-    }, 0, period.to(Milliseconds).toLong, TimeUnit.MILLISECONDS)
+    }, 0, period.toMilliseconds.toLong, TimeUnit.MILLISECONDS)
 
     () => {
       scheduledFuture.cancel(true)

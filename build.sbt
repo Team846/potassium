@@ -6,6 +6,8 @@ version in ThisBuild := "0.1.0-SNAPSHOT"
 
 scalaVersion in ThisBuild := "2.12.1"
 
+crossScalaVersions in ThisBuild := Seq("2.11.8", "2.12.1")
+
 coverageEnabled in ThisBuild := true
 
 lazy val sharedDependencies = Def.setting(Seq(
