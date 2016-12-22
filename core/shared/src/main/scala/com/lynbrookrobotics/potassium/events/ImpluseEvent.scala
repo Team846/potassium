@@ -9,7 +9,7 @@ package com.lynbrookrobotics.potassium.events
   */
 class ImpulseEventSource {
   /**
-    * An event thats is triggered when `fire()` is called
+    * An event that is triggered when `fire()` is called
     */
   val event = new ImpulseEvent
 

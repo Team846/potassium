@@ -4,17 +4,17 @@ import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.events.{ContinuousEvent, EventPolling}
 import edu.wpi.first.wpilibj.{AnalogInput, Counter, DigitalInput, Joystick}
 import squants.{Dimensionless, Each, Time}
-import squants.electro.Volts
+import squants.electro.{ElectricPotential, Volts}
 import squants.time.{Frequency, Seconds}
 
 object Implicits {
   // Interface -> signals
   implicit class AnalogInSignals(val analog: AnalogInput) extends AnyVal {
-    def voltage = Signal(Volts(analog.getVoltage))
-    def averageVoltage = Signal(Volts(analog.getAverageVoltage))
+    def voltage: Signal[ElectricPotential] = Signal(Volts(analog.getVoltage))
+    def averageVoltage: Signal[ElectricPotential] = Signal(Volts(analog.getAverageVoltage))
 
-    def value = Signal(analog.getValue)
-    def averageValue = Signal(analog.getAverageValue)
+    def value: Signal[Int] = Signal(analog.getValue)
+    def averageValue: Signal[Int] = Signal(analog.getAverageValue)
   }
 
   implicit class JoystickSignals(val joystick: Joystick) extends AnyVal {
@@ -34,7 +34,7 @@ object Implicits {
 
   // interface conversions
   implicit class DigitalInputConversions(val in: DigitalInput) {
-    def toCounter = new Counter(in)
+    def toCounter: Counter = new Counter(in)
   }
 
   implicit val clock = WPIClock

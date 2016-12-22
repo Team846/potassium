@@ -9,8 +9,8 @@ class SequentialTaskTest extends FunSuite with BeforeAndAfter {
   }
 
   test("Sequential task goes through correct flow") {
-    var task1FinishTrigger: () => Unit = null
-    var task2FinishTrigger: () => Unit = null
+    var task1FinishTrigger: Option[() => Unit] = None
+    var task2FinishTrigger: Option[() => Unit] = None
 
     var task1Started = false
     var task1Ended = false
@@ -27,7 +27,7 @@ class SequentialTaskTest extends FunSuite with BeforeAndAfter {
         task1Ended = true
       }
 
-      task1FinishTrigger = () => finished()
+      task1FinishTrigger = Some(() => finished())
     }
 
     val task2 = new FiniteTask {
@@ -39,7 +39,7 @@ class SequentialTaskTest extends FunSuite with BeforeAndAfter {
         task2Ended = true
       }
 
-      task2FinishTrigger = () => finished()
+      task2FinishTrigger = Some(() => finished())
     }
 
     val sequential = task1 then task2
@@ -50,11 +50,11 @@ class SequentialTaskTest extends FunSuite with BeforeAndAfter {
 
     assert(task1Started && !task1Ended && !task2Started && !task2Ended)
 
-    task1FinishTrigger()
+    task1FinishTrigger.get.apply()
 
     assert(task1Started && task1Ended && task2Started && !task2Ended)
 
-    task2FinishTrigger()
+    task2FinishTrigger.get.apply()
 
     assert(task1Started && task1Ended && task2Started && task2Ended)
     assert(!sequential.isRunning)

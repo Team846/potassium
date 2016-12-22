@@ -11,7 +11,7 @@ class ClockMockingTest extends FunSuite {
 
     val (mockedClock, trigger) = ClockMocking.mockedClockTicker
 
-    mockedClock(Milliseconds(5)) { dt =>
+    mockedClock(Milliseconds(5)) { _ =>
       periodicRun = true
     }
 
@@ -23,18 +23,18 @@ class ClockMockingTest extends FunSuite {
   test("Single tick produces correct dt") {
     val (mockedClock, trigger) = ClockMocking.mockedClockTicker
 
-    var dtProduced: Time = null
+    var dtProduced: Option[Time] = None
 
     mockedClock(Milliseconds(5)) { dt =>
-      dtProduced = dt
+      dtProduced = Some(dt)
     }
 
     trigger(Milliseconds(5))
 
-    assert(dtProduced == Milliseconds(5))
+    assert(dtProduced.contains(Milliseconds(5)))
   }
 
-  test("Single execution is correclty executed") {
+  test("Single execution is correctly executed") {
     val (mockedClock, trigger) = ClockMocking.mockedClockTicker
 
     var executed = false

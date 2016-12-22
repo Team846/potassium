@@ -33,7 +33,7 @@ class ContinuousEvent(condition: => Boolean)(implicit polling: EventPolling) {
   private var tickingCallbacks: List[() => Unit] = List.empty
   private var isRunning = false
 
-  polling.clock(polling.period) { dt =>
+  polling.clock(polling.period) { _ =>
     if (condition) {
       tickingCallbacks.foreach(_.apply())
 
