@@ -11,6 +11,8 @@ coverageEnabled in ThisBuild := true
 libraryDependencies in ThisBuild +=
   "com.storm-enroute" %% "scalameter-core" % "0.7" % Test
 
+parallelExecution in ThisBuild := false
+
 lazy val core = project
 
 lazy val testing = project.dependsOn(core)
