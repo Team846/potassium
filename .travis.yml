@@ -1,6 +1,7 @@
 language: scala
 scala:
   - 2.11.8
+script: 'sbt ++$TRAVIS_SCALA_VERSION "testOnly * -- -l com.lynbrookrobotics.potassium.PerfTest"'
 jdk: oraclejdk8
 after_success:
   - 'if [[ $TRAVIS_PULL_REQUEST == "false" ]]; then bash ./deploy.sh; fi'

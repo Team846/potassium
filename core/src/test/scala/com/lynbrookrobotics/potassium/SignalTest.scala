@@ -88,7 +88,7 @@ class SignalTest extends FunSuite {
     assert(zipped.get == (2, 4))
   }
 
-  test("50 values from chain of maps takes less than 5ms") {
+  test("50 values from chain of maps takes less than 5ms", PerfTest) {
     case class ValuesWrapper(v1: Int, v2: Int)
     val signal = Signal(ValuesWrapper(1, 1)).
       map(v => v.copy(v.v1 + 1, v.v2 + 1)).
