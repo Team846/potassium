@@ -19,24 +19,38 @@ abstract class Component[T](period: Time)(implicit val clock: Clock) {
   def defaultController: PeriodicSignal[T]
   private var currentController: PeriodicSignal[T] = defaultController
 
+  /**
+    * Sets the controller to be used by the component during updates.
+    * @param controller the new controller to use
+    */
   def setController(controller: PeriodicSignal[T]): Unit = {
     currentController.detachTickSource(this)
     controller.attachTickSource(this)
     currentController = controller
   }
 
+  /**
+    * Resets the component to use its default controller.
+    */
   def resetToDefault(): Unit = {
     setController(defaultController)
   }
 
+  /**
+    * Applies the latest control signal value.
+    * @param signal the signal value to act on
+    */
   def applySignal(signal: T): Unit
 
   clock(period) { dt =>
     // Because of unusual initialization orders, currentController may sometimes be null,
     // so we make sure to have it initialized here.
+
+    // scalastyle:off
     if (currentController == null) {
       currentController = defaultController
     }
+    // scalastyle:on
 
     applySignal(currentController.currentValue(dt))
   }

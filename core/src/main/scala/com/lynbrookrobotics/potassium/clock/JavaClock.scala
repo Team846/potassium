@@ -5,6 +5,9 @@ import java.util.concurrent.{Executors, TimeUnit}
 import squants.Time
 import squants.time.Milliseconds
 
+/**
+  * An implementation of a clock for the JVM that uses a scheduled thread pool
+  */
 object JavaClock extends Clock {
   private val scheduler = Executors.newScheduledThreadPool(1)
 
