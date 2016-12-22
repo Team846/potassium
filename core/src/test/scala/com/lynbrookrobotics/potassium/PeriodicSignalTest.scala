@@ -1,6 +1,7 @@
 package com.lynbrookrobotics.potassium
 
 import org.scalacheck.Prop.forAll
+import org.scalameter._
 import org.scalatest.FunSuite
 import squants.time.Milliseconds
 
@@ -48,5 +49,21 @@ class PeriodicSignalTest extends FunSuite {
 
     assert(periodicCombined.currentValue(Milliseconds(5)) == (0, 0))
     assert(numRequests == 1)
+  }
+
+  test("250 values from chain of maps takes less than 5ms") {
+    case class ValuesWrapper(v1: Int, v2: Int)
+    val signal = Signal(ValuesWrapper(1, 1)).toPeriodic.
+      map((v, dt) => v.copy(v.v1 + 1, v.v2 + 1)).
+      map((v, dt) => v.copy(v.v1 * 1, v.v2 * 1)).
+      map((v, dt) => v.copy(v.v1 / 1, v.v2 / 1)).
+      map((v, dt) => v.copy(v.v1 - 1, v.v2 - 1)).
+      map((v, dt) => v.copy(v.v1 % 1, v.v2 % 1))
+
+    val time = measure {
+      (1 to 250).map(_ => signal.currentValue(Milliseconds(5)))
+    }
+
+    assert(time.value <= 5 && time.units == "ms")
   }
 }

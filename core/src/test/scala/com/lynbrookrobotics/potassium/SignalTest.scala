@@ -4,6 +4,7 @@ import org.scalacheck.Prop.forAll
 
 import org.scalatest.FunSuite
 import org.scalatest.prop.Checkers._
+import org.scalameter._
 
 class SignalTest extends FunSuite {
   test("Constant value signal") {
@@ -85,5 +86,21 @@ class SignalTest extends FunSuite {
     valueB = 4
 
     assert(zipped.get == (2, 4))
+  }
+
+  test("250 values from chain of maps takes less than 5ms") {
+    case class ValuesWrapper(v1: Int, v2: Int)
+    val signal = Signal(ValuesWrapper(1, 1)).
+      map(v => v.copy(v.v1 + 1, v.v2 + 1)).
+      map(v => v.copy(v.v1 * 1, v.v2 * 1)).
+      map(v => v.copy(v.v1 / 1, v.v2 / 1)).
+      map(v => v.copy(v.v1 - 1, v.v2 - 1)).
+      map(v => v.copy(v.v1 % 1, v.v2 % 1))
+
+    val time = measure {
+      (1 to 250).map(_ => signal.get)
+    }
+
+    assert(time.value <= 5 && time.units == "ms")
   }
 }

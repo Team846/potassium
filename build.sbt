@@ -8,6 +8,9 @@ scalaVersion in ThisBuild := "2.11.8"
 
 coverageEnabled in ThisBuild := true
 
+libraryDependencies in ThisBuild +=
+  "com.storm-enroute" %% "scalameter-core" % "0.7" % Test
+
 lazy val core = project
 
 lazy val testing = project.dependsOn(core)
