@@ -1,6 +1,9 @@
 package com.lynbrookrobotics.potassium
 
-import squants.Time
+import squants.{Quantity, Time}
+import squants.time.{TimeDerivative, TimeIntegral}
+
+import scala.collection.immutable.Queue
 
 /**
   * Represents a signal that requires a fixed update interval
@@ -69,6 +72,78 @@ abstract class PeriodicSignal[T] { self =>
     def calculateValue(dt: Time, token: Int): (T, O) = {
       (self.currentValue(dt, token), other.currentValue(dt, token))
     }
+  }
+
+  /**
+    * Applies a fixed size sliding window over the signal
+    * @param size the size of the window
+    * @param filler the element to use to fill the window until elements are available
+    * @return
+    */
+  def sliding(size: Int, filler: T): PeriodicSignal[Queue[T]] = {
+    var last = Queue.fill(size)(filler)
+
+    new PeriodicSignal[Queue[T]] {
+      val parent = Some(self)
+      val check = None
+
+      def calculateValue(dt: Time, token: Int): Queue[T] = {
+        last = last.tail :+ self.currentValue(dt, token)
+        last
+      }
+    }
+  }
+
+  def scanLeft[U](initialValue: U)(f: (U, T, Time) => U): PeriodicSignal[U] = new PeriodicSignal[U] {
+    val parent = Some(self)
+    val check = None
+
+    var latest = initialValue
+
+    def calculateValue(dt: Time, token: Int): U = {
+      latest = f(latest, self.currentValue(dt, token), dt)
+      latest
+    }
+  }
+
+  /**
+    * Calculates the derivative of the signal, producing units of
+    * the derivative of the signal's units
+    * @return a signal producing values that are the derivative of the signal
+    */
+  def derivative[D <: Quantity[D] with TimeDerivative[_], U <: Quantity[U]](implicit unitEv: T <:< U, intEv: U <:< TimeIntegral[D]): PeriodicSignal[D] = {
+    // We use null here for a cheap way to handle non-complete sliding windows without a perf hit
+    // from mapping to Options first
+
+    // scalastyle:off
+    sliding(2, null.asInstanceOf[T]).map { (q, dt) =>
+      if (q.head != null && q.last != null) {
+        (q.last - q.head) / dt
+      } else {
+        (q.last * 0) / dt
+      }
+    }
+    // scalastyle:on
+  }
+
+  /**
+    * Calculates the integral of the signal, producing units of
+    * the integral of the signal's units
+    * @return a signal producing values that are the integral of the signal
+    */
+  def integral[I <: Quantity[I] with TimeIntegral[_], U <: Quantity[U]](implicit unitEv: T <:< U, intEv: U <:< TimeDerivative[I]): PeriodicSignal[I] = {
+    // Just like derivative, we use null as a cheap way to handle the initial value since there is
+    // no way to get a "zero" for I
+
+    // scalastyle:off
+    scanLeft(null.asInstanceOf[I]) { (acc, cur, dt) =>
+      if (acc != null) {
+        acc + (cur: U) * dt
+      } else {
+        (cur: U) * dt
+      }
+    }
+    // scalastyle:on
   }
 
   /**
