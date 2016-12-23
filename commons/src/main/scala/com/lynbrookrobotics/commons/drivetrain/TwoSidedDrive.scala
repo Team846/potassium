@@ -1,17 +1,19 @@
 package com.lynbrookrobotics.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.clock.Clock
+import com.lynbrookrobotics.potassium.control.{PID, PIDConfig}
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal}
-import squants.{Dimensionless, Each, Time, Velocity}
-import squants.electro.ElectricPotential
-import squants.motion.MetersPerSecond
+import squants.{Acceleration, Dimensionless, Each, Length, Time, Velocity}
+import squants.motion.{MetersPerSecond, MetersPerSecondSquared}
+import squants.space.Meters
 
 /**
   * A drivetrain with two side control (such as a tank drive)
   */
 trait TwoSidedDrive extends UnicycleDrive { self =>
   case class TwoSidedSignal(left: Dimensionless, right: Dimensionless)
+
   case class TwoSidedVelocity(left: Velocity, right: Velocity)
 
   type DriveSignal = TwoSidedSignal
@@ -33,25 +35,25 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
     TwoSidedVelocity(maxLeftVelocity * drive.left, maxRightVelocity * drive.right)
   }
 
-  protected def driveVelocityControl(signal: Signal[TwoSidedVelocity]): Signal[TwoSidedSignal] =
+  protected def driveVelocityControl(signal: Signal[TwoSidedVelocity]): PeriodicSignal[TwoSidedSignal] =
     TwoSidedControllers.velocity(signal)
 
-  protected def driveClosedLoop(signal: Signal[TwoSidedSignal]): Signal[TwoSidedSignal] =
+  protected def driveClosedLoop(signal: Signal[TwoSidedSignal]): PeriodicSignal[TwoSidedSignal] =
     TwoSidedControllers.velocity(signal.map(expectedVelocity))
 
   protected val maxLeftVelocity: Velocity
   protected val maxRightVelocity: Velocity
 
-  // TODO: replace with configuration object from control module
-  protected val leftProportionalGain: Ratio[Dimensionless, Velocity]
-  protected val rightProportionalGain: Ratio[Dimensionless, Velocity]
-
-  protected val leftFeedForwardGain: Ratio[Dimensionless, Velocity]
-  protected val rightFeedForwardGain: Ratio[Dimensionless, Velocity]
+  protected val leftControlGains: PIDConfig[Velocity, Acceleration, Length, Dimensionless]
+  protected val rightControlGains: PIDConfig[Velocity, Acceleration, Length, Dimensionless]
 
   // disable unicycle forward control because we already control that here
-  override protected val forwardProportionalGain: Ratio[Dimensionless, Velocity] =
-    Each(0) / MetersPerSecond(1)
+  override protected val forwardControlGains: PIDConfig[Velocity, Acceleration, Length, Dimensionless] = PIDConfig(
+    Each(0) / MetersPerSecond(1),
+    Each(0) / MetersPerSecondSquared(1),
+    Each(0) / Meters(1),
+    Each(0) / MetersPerSecond(0)
+  )
 
   protected val leftVelocity: Signal[Velocity]
   protected val rightVelocity: Signal[Velocity]
@@ -60,13 +62,11 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
     leftVelocity.zip(rightVelocity).map(t => (t._1 + t._2) / 2)
 
   object TwoSidedControllers {
-    def velocity(twoSided: Signal[TwoSidedVelocity]): Signal[TwoSidedSignal] = {
-      twoSided.zip(leftVelocity).zip(rightVelocity).map { case ((target, curLeft), curRight) =>
-        TwoSidedSignal(
-          (target.left ** leftFeedForwardGain) + ((target.left - curLeft) ** leftProportionalGain),
-          (target.right ** rightFeedForwardGain) + ((target.right - curRight) ** rightProportionalGain)
-        )
-      }
+    def velocity(target: Signal[TwoSidedVelocity]): PeriodicSignal[TwoSidedSignal] = {
+      val leftControl = PID.pid(leftVelocity.toPeriodic, target.map(_.left).toPeriodic, leftControlGains)
+      val rightControl = PID.pid(rightVelocity.toPeriodic, target.map(_.right).toPeriodic, rightControlGains)
+
+      leftControl.zip(rightControl).map((s, _) => TwoSidedSignal(s._1, s._2))
     }
   }
 
@@ -77,4 +77,5 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
       output(signal)
     }
   }
+
 }

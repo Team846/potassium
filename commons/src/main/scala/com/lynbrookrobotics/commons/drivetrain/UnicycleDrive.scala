@@ -1,10 +1,11 @@
 package com.lynbrookrobotics.commons.drivetrain
 
+import com.lynbrookrobotics.potassium.control.{PID, PIDConfig}
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
 import com.lynbrookrobotics.potassium.tasks.ContinuousTask
 import com.lynbrookrobotics.potassium.units._
 import squants.motion.AngularVelocity
-import squants.{Dimensionless, Percent, Velocity}
+import squants.{Acceleration, Dimensionless, Length, Percent, Velocity}
 
 /**
   * A drivetrain that has forward-backward and turning control in the unicycle model
@@ -18,11 +19,9 @@ trait UnicycleDrive extends Drive {
   protected val maxForwardVelocity: Velocity
   protected val maxTurnVelocity: AngularVelocity
 
-  // TODO: replace with configuration object from control module
-  protected val forwardProportionalGain: Ratio[Dimensionless, Velocity]
-  protected val turnProportionalGain: Ratio[Dimensionless, AngularVelocity]
+  protected val forwardControlGains: PIDConfig[Velocity, Acceleration, Length, Dimensionless]
 
-  protected val forwardFeedForwardGain: Ratio[Dimensionless, Velocity]
+  protected val turnProportionalGain: Ratio[Dimensionless, AngularVelocity]
   protected val turnFeedForwardGain: Ratio[Dimensionless, AngularVelocity]
 
   protected val forwardVelocity: Signal[Velocity]
@@ -32,29 +31,33 @@ trait UnicycleDrive extends Drive {
     unicycle.map(convertUnicycleToDrive)
   }
 
-  private def toClosedDrive(unicycle: Signal[UnicycleSignal]): Signal[DriveSignal] = {
-    driveClosedLoop(unicycle.map(convertUnicycleToDrive))
+  private def toClosedDrive(unicycle: Signal[UnicycleSignal]): PeriodicSignal[DriveSignal] = {
+    driveClosedLoop(unicycle.map(convertUnicycleToDrive).toPeriodic)
+  }
+
+  private def toClosedDrive(unicycle: PeriodicSignal[UnicycleSignal]): PeriodicSignal[DriveSignal] = {
+    driveClosedLoop(unicycle.map((s, _) => convertUnicycleToDrive(s)))
   }
 
   object UnicycleControllers {
-    def forward(forwardSpeed: Signal[Dimensionless]): Signal[DriveSignal] = {
+    def forward(forwardSpeed: Signal[Dimensionless]): PeriodicSignal[DriveSignal] = {
       toClosedDrive(forwardSpeed.map(f => UnicycleSignal(f, Percent(0))))
     }
 
-    def turn(turnSpeed: Signal[Dimensionless]): Signal[DriveSignal] = {
+    def turn(turnSpeed: Signal[Dimensionless]): PeriodicSignal[DriveSignal] = {
       toClosedDrive(turnSpeed.map(t => UnicycleSignal(Percent(0), t)))
     }
 
-    def velocity(unicycle: Signal[UnicycleVelocity]): Signal[UnicycleSignal] = {
-      unicycle.zip(forwardVelocity).zip(turnVelocity).map { case ((target, fwdVel), turnVel) =>
-        UnicycleSignal(
-          (target.forward ** forwardFeedForwardGain) + ((target.forward - fwdVel) ** forwardProportionalGain),
-          (target.turn ** turnFeedForwardGain) + ((target.turn - turnVel) ** turnProportionalGain)
-        )
-      }
+    def velocity(target: Signal[UnicycleVelocity]): PeriodicSignal[UnicycleSignal] = {
+      val forwardControl = PID.pid(forwardVelocity.toPeriodic, target.map(_.forward).toPeriodic, forwardControlGains)
+      val turnControl = turnVelocity.zip(target.map(_.turn)).map { case (cur, tar) =>
+        (tar ** turnFeedForwardGain) + ((tar - cur) ** turnProportionalGain)
+      }.toPeriodic
+
+      forwardControl.zip(turnControl).map((s, _) => UnicycleSignal(s._1, s._2))
     }
 
-    def expectedVelocity(unicycle: Signal[UnicycleSignal]): Signal[UnicycleSignal] = {
+    def expectedVelocity(unicycle: Signal[UnicycleSignal]): PeriodicSignal[UnicycleSignal] = {
       velocity(unicycle.map(s => UnicycleVelocity(
         maxForwardVelocity * s.forward, maxTurnVelocity * s.turn
       )))
@@ -68,7 +71,7 @@ trait UnicycleDrive extends Drive {
                          (implicit drive: Drivetrain) extends ContinuousTask {
       override def onStart(): Unit = {
         val combined = forward.zip(turn).map(t => UnicycleSignal(t._1, t._2))
-        drive.setController(toClosedDrive(combined).toPeriodic)
+        drive.setController(toClosedDrive(combined))
       }
 
       override def onEnd(): Unit = {
@@ -80,7 +83,7 @@ trait UnicycleDrive extends Drive {
                                  (implicit drive: Drivetrain) extends ContinuousTask {
       override def onStart(): Unit = {
         val combined = forward.zip(turn).map(t => UnicycleVelocity(t._1, t._2))
-        drive.setController(toClosedDrive(velocity(combined)).toPeriodic)
+        drive.setController(toClosedDrive(velocity(combined)))
       }
 
       override def onEnd(): Unit = {
@@ -91,11 +94,11 @@ trait UnicycleDrive extends Drive {
 
   protected def controlMode: UnicycleControlMode
 
-  override protected def defaultController: PeriodicSignal[DriveSignal] = (controlMode match {
+  override protected def defaultController: PeriodicSignal[DriveSignal] = controlMode match {
     case NoOperation =>
-      toOpenDrive(Signal.constant(UnicycleSignal(Percent(0), Percent(0))))
+      toOpenDrive(Signal.constant(UnicycleSignal(Percent(0), Percent(0)))).toPeriodic
 
     case ArcadeControls(forward, turn) =>
       toClosedDrive(expectedVelocity(forward.zip(turn).map(t => UnicycleSignal(t._1, t._2))))
-  }).toPeriodic
+  }
 }

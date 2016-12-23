@@ -26,6 +26,7 @@ parallelExecution in ThisBuild := false
 lazy val potassium = project.in(file(".")).
   aggregate(
     coreJVM, coreJS,
+    controlJVM, controlJS,
     testingJVM, testingJS,
     frc,
     sensorsJVM, sensorsJS,
@@ -51,6 +52,14 @@ lazy val testing = crossProject.crossType(CrossType.Pure).dependsOn(core).settin
   libraryDependencies ++= sharedDependencies.value
 )
 
+lazy val control = crossProject.crossType(CrossType.Pure).dependsOn(core).settings(
+  name := "potassium-control",
+  libraryDependencies ++= sharedDependencies.value
+)
+
+lazy val controlJVM = control.jvm
+lazy val controlJS = control.js
+
 lazy val testingJVM = testing.jvm
 lazy val testingJS = testing.js
 
@@ -68,7 +77,7 @@ lazy val sensors = crossProject.crossType(CrossType.Pure).dependsOn(core).settin
 lazy val sensorsJVM = sensors.jvm
 lazy val sensorsJS = sensors.js
 
-lazy val commons = crossProject.crossType(CrossType.Pure).dependsOn(sensors).settings(
+lazy val commons = crossProject.crossType(CrossType.Pure).dependsOn(control, sensors).settings(
   name := "potassium-commons",
   libraryDependencies ++= sharedDependencies.value
 )
