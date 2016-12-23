@@ -20,3 +20,4 @@ projectFilesBackup/
 .classpath
 version.properties
 RUNNING_PID
+node_modules/

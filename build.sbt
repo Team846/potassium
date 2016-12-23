@@ -38,7 +38,11 @@ lazy val potassium = project.in(file(".")).
 lazy val core = crossProject.crossType(CrossType.Full).settings(
   name := "potassium-core",
   libraryDependencies ++= sharedDependencies.value
-).jvmSettings(libraryDependencies ++= jvmDependencies)
+).jvmSettings(libraryDependencies ++= jvmDependencies).jsSettings(
+  requiresDOM := true,
+  coverageEnabled := false
+)
+
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 
@@ -46,6 +50,7 @@ lazy val testing = crossProject.crossType(CrossType.Pure).dependsOn(core).settin
   name := "potassium-testing",
   libraryDependencies ++= sharedDependencies.value
 )
+
 lazy val testingJVM = testing.jvm
 lazy val testingJS = testing.js
 
@@ -59,6 +64,7 @@ lazy val sensors = crossProject.crossType(CrossType.Pure).dependsOn(core).settin
   name := "potassium-sensors",
   libraryDependencies ++= sharedDependencies.value
 )
+
 lazy val sensorsJVM = sensors.jvm
 lazy val sensorsJS = sensors.js
 
@@ -66,6 +72,7 @@ lazy val commons = crossProject.crossType(CrossType.Pure).dependsOn(sensors).set
   name := "potassium-commons",
   libraryDependencies ++= sharedDependencies.value
 )
+
 lazy val commonsJVM = commons.jvm
 lazy val commonsJS = commons.js
 
