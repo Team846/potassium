@@ -5,7 +5,10 @@ install:
   - nvm use stable
   - npm install
   - npm install jsdom
-script: 'sbt "+ testOnly * -- -l com.lynbrookrobotics.potassium.PerfTest"'
+script:
+  - 'sbt "+ testOnly * -- -l com.lynbrookrobotics.potassium.PerfTest" "coverageReport"'
+  - 'sbt coverageAggregate'
 jdk: oraclejdk8
 after_success:
+  - 'sbt coveralls'
   - 'if [[ $TRAVIS_PULL_REQUEST == "false" ]]; then bash ./deploy.sh; fi'
