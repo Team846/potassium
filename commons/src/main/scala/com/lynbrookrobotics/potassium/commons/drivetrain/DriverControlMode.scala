@@ -1,4 +1,4 @@
-package com.lynbrookrobotics.commons.drivetrain
+package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.Signal
 import squants.Dimensionless

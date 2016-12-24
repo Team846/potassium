@@ -1,7 +1,7 @@
-package com.lynbrookrobotics.commons.drivetrain
+package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.control.{PID, PIDConfig}
-import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
+import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal, SignalLike}
 import com.lynbrookrobotics.potassium.tasks.ContinuousTask
 import com.lynbrookrobotics.potassium.units._
 import squants.motion.AngularVelocity
@@ -31,12 +31,8 @@ trait UnicycleDrive extends Drive {
     unicycle.map(convertUnicycleToDrive)
   }
 
-  private def toClosedDrive(unicycle: Signal[UnicycleSignal]): PeriodicSignal[DriveSignal] = {
-    driveClosedLoop(unicycle.map(convertUnicycleToDrive).toPeriodic)
-  }
-
-  private def toClosedDrive(unicycle: PeriodicSignal[UnicycleSignal]): PeriodicSignal[DriveSignal] = {
-    driveClosedLoop(unicycle.map((s, _) => convertUnicycleToDrive(s)))
+  private def toClosedDrive[C[_]](unicycle: SignalLike[UnicycleSignal, C]): PeriodicSignal[DriveSignal] = {
+    driveClosedLoop(unicycle.map(convertUnicycleToDrive))
   }
 
   object UnicycleControllers {
@@ -48,16 +44,16 @@ trait UnicycleDrive extends Drive {
       toClosedDrive(turnSpeed.map(t => UnicycleSignal(Percent(0), t)))
     }
 
-    def velocity(target: Signal[UnicycleVelocity]): PeriodicSignal[UnicycleSignal] = {
+    def velocity[C[_]](target: SignalLike[UnicycleVelocity, C]): PeriodicSignal[UnicycleSignal] = {
       val forwardControl = PID.pid(forwardVelocity.toPeriodic, target.map(_.forward).toPeriodic, forwardControlGains)
-      val turnControl = turnVelocity.zip(target.map(_.turn)).map { case (cur, tar) =>
+      val turnControl = turnVelocity.toPeriodic.zip(target.map(_.turn).toPeriodic).map { case ((cur, tar), _) =>
         (tar ** turnFeedForwardGain) + ((tar - cur) ** turnProportionalGain)
-      }.toPeriodic
+      }
 
       forwardControl.zip(turnControl).map((s, _) => UnicycleSignal(s._1, s._2))
     }
 
-    def expectedVelocity(unicycle: Signal[UnicycleSignal]): PeriodicSignal[UnicycleSignal] = {
+    def expectedVelocity[C[_]](unicycle: SignalLike[UnicycleSignal, C]): PeriodicSignal[UnicycleSignal] = {
       velocity(unicycle.map(s => UnicycleVelocity(
         maxForwardVelocity * s.forward, maxTurnVelocity * s.turn
       )))

@@ -1,9 +1,9 @@
-package com.lynbrookrobotics.commons.drivetrain
+package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.control.{PID, PIDConfig}
 import com.lynbrookrobotics.potassium.units._
-import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal}
+import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, SignalLike}
 import squants.{Acceleration, Dimensionless, Each, Length, Time, Velocity}
 import squants.motion.{MetersPerSecond, MetersPerSecondSquared}
 import squants.space.Meters
@@ -13,7 +13,6 @@ import squants.space.Meters
   */
 trait TwoSidedDrive extends UnicycleDrive { self =>
   case class TwoSidedSignal(left: Dimensionless, right: Dimensionless)
-
   case class TwoSidedVelocity(left: Velocity, right: Velocity)
 
   type DriveSignal = TwoSidedSignal
@@ -35,11 +34,11 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
     TwoSidedVelocity(maxLeftVelocity * drive.left, maxRightVelocity * drive.right)
   }
 
-  protected def driveVelocityControl(signal: Signal[TwoSidedVelocity]): PeriodicSignal[TwoSidedSignal] =
-    TwoSidedControllers.velocity(signal)
-
-  protected def driveClosedLoop(signal: Signal[TwoSidedSignal]): PeriodicSignal[TwoSidedSignal] =
+  protected def driveClosedLoop[C[_]](signal: SignalLike[TwoSidedSignal, C]): PeriodicSignal[TwoSidedSignal] =
     TwoSidedControllers.velocity(signal.map(expectedVelocity))
+
+  protected def driveVelocityControl[C[_]](signal: SignalLike[TwoSidedVelocity, C]): PeriodicSignal[TwoSidedSignal] =
+    TwoSidedControllers.velocity(signal)
 
   protected val maxLeftVelocity: Velocity
   protected val maxRightVelocity: Velocity
@@ -62,7 +61,7 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
     leftVelocity.zip(rightVelocity).map(t => (t._1 + t._2) / 2)
 
   object TwoSidedControllers {
-    def velocity(target: Signal[TwoSidedVelocity]): PeriodicSignal[TwoSidedSignal] = {
+    def velocity[C[_]](target: SignalLike[TwoSidedVelocity, C]): PeriodicSignal[TwoSidedSignal] = {
       val leftControl = PID.pid(leftVelocity.toPeriodic, target.map(_.left).toPeriodic, leftControlGains)
       val rightControl = PID.pid(rightVelocity.toPeriodic, target.map(_.right).toPeriodic, rightControlGains)
 
@@ -77,5 +76,4 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
       output(signal)
     }
   }
-
 }
