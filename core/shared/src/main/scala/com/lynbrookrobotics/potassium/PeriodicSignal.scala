@@ -111,7 +111,7 @@ abstract class PeriodicSignal[T] { self =>
     * the derivative of the signal's units
     * @return a signal producing values that are the derivative of the signal
     */
-  def derivative[D <: Quantity[D] with TimeDerivative[_], U <: Quantity[U]](implicit unitEv: T <:< U, intEv: U <:< TimeIntegral[D]): PeriodicSignal[D] = {
+  def derivative[D <: Quantity[D] with TimeDerivative[_], U <: Quantity[U]](implicit unitEv: T => U, intEv: U => TimeIntegral[D]): PeriodicSignal[D] = {
     // We use null here for a cheap way to handle non-complete sliding windows without a perf hit
     // from mapping to Options first
 
@@ -131,16 +131,16 @@ abstract class PeriodicSignal[T] { self =>
     * the integral of the signal's units
     * @return a signal producing values that are the integral of the signal
     */
-  def integral[I <: Quantity[I] with TimeIntegral[_], U <: Quantity[U]](implicit unitEv: T <:< U, intEv: U <:< TimeDerivative[I]): PeriodicSignal[I] = {
+  def integral[I <: Quantity[I] with TimeIntegral[_]](implicit derivEv: T => TimeDerivative[I]): PeriodicSignal[I] = {
     // Just like derivative, we use null as a cheap way to handle the initial value since there is
     // no way to get a "zero" for I
 
     // scalastyle:off
     scanLeft(null.asInstanceOf[I]) { (acc, cur, dt) =>
       if (acc != null) {
-        acc + (cur: U) * dt
+        acc + (cur: TimeDerivative[I]) * dt
       } else {
-        (cur: U) * dt
+        (cur: TimeDerivative[I]) * dt
       }
     }
     // scalastyle:on

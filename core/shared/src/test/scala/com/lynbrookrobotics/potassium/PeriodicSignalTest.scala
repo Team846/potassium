@@ -2,10 +2,11 @@ package com.lynbrookrobotics.potassium
 
 import org.scalacheck.Prop.forAll
 import org.scalatest.FunSuite
+import squants.{Dimension, Length, Quantity, UnitOfMeasure}
 import squants.electro.Volts
 import squants.motion.MetersPerSecond
-import squants.space.{Feet, Meters}
-import squants.time.Milliseconds
+import squants.space.{Degrees, Feet, Meters}
+import squants.time.{Milliseconds, Time, TimeDerivative, TimeIntegral}
 
 class PeriodicSignalTest extends FunSuite {
   test("Converted from constant signal") {
@@ -112,4 +113,6 @@ class PeriodicSignalTest extends FunSuite {
       assert(shouldBeSame.currentValue(Milliseconds(5)) ~= MetersPerSecond(1))
     }
   }
+
+
 }
