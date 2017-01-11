@@ -18,10 +18,12 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
   type DriveSignal = TwoSidedSignal
   type DriveVelocity = TwoSidedVelocity
 
+  type DrivetrainHardware
+
   protected implicit val clock: Clock
   protected val updatePeriod: Time
 
-  protected def output(signal: TwoSidedSignal): Unit
+  protected def output(hardware: DrivetrainHardware, signal: TwoSidedSignal): Unit
 
   protected def convertUnicycleToDrive(uni: UnicycleSignal): TwoSidedSignal = {
     TwoSidedSignal(
@@ -69,11 +71,11 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
     }
   }
 
-  class Drivetrain extends Component[TwoSidedSignal](updatePeriod) {
+  class Drivetrain(implicit hardware: DrivetrainHardware) extends Component[TwoSidedSignal](updatePeriod) {
     override def defaultController: PeriodicSignal[TwoSidedSignal] = self.defaultController
 
     override def applySignal(signal: TwoSidedSignal): Unit = {
-      output(signal)
+      output(hardware, signal)
     }
   }
 }
