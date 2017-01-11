@@ -1,7 +1,7 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.clock.Clock
-import com.lynbrookrobotics.potassium.control.{PID, PIDConfig}
+import com.lynbrookrobotics.potassium.control.{PIDF, PIDFConfig, PIDFProperUnitsConfig}
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, SignalLike}
 import squants.{Acceleration, Dimensionless, Each, Length, Time, Velocity}
@@ -45,11 +45,11 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
   protected val maxLeftVelocity: Velocity
   protected val maxRightVelocity: Velocity
 
-  protected val leftControlGains: PIDConfig[Velocity, Acceleration, Length, Dimensionless]
-  protected val rightControlGains: PIDConfig[Velocity, Acceleration, Length, Dimensionless]
+  protected val leftControlGains: PIDFProperUnitsConfig[Velocity, Acceleration, Length, Dimensionless]
+  protected val rightControlGains: PIDFProperUnitsConfig[Velocity, Acceleration, Length, Dimensionless]
 
   // disable unicycle forward control because we already control that here
-  override protected val forwardControlGains: PIDConfig[Velocity, Acceleration, Length, Dimensionless] = PIDConfig(
+  override protected val forwardControlGains: PIDFConfig[Velocity, Velocity, Acceleration, Length, Dimensionless] = PIDFConfig(
     Each(0) / MetersPerSecond(1),
     Each(0) / MetersPerSecondSquared(1),
     Each(0) / Meters(1),
@@ -64,8 +64,8 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
 
   object TwoSidedControllers {
     def velocity[C[_]](target: SignalLike[TwoSidedVelocity, C]): PeriodicSignal[TwoSidedSignal] = {
-      val leftControl = PID.pid(leftVelocity.toPeriodic, target.map(_.left).toPeriodic, leftControlGains)
-      val rightControl = PID.pid(rightVelocity.toPeriodic, target.map(_.right).toPeriodic, rightControlGains)
+      val leftControl = PIDF.pidf(leftVelocity.toPeriodic, target.map(_.left).toPeriodic, leftControlGains)
+      val rightControl = PIDF.pidf(rightVelocity.toPeriodic, target.map(_.right).toPeriodic, rightControlGains)
 
       leftControl.zip(rightControl).map((s, _) => TwoSidedSignal(s._1, s._2))
     }

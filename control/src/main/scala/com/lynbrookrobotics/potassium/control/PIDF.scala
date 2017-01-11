@@ -5,12 +5,13 @@ import com.lynbrookrobotics.potassium.units._
 import squants.Quantity
 import squants.time.{TimeDerivative, TimeIntegral}
 
-case class PIDConfig[S <: Quantity[S] with TimeDerivative[_] with TimeIntegral[_],
-                     D <: Quantity[D] with TimeDerivative[S],
-                     I <: Quantity[I] with TimeIntegral[S],
-                     U <: Quantity[U]](kp: Ratio[U, S], kd: Ratio[U, D], ki: Ratio[U, I], kf: Ratio[U, S])
+case class PIDFConfig[S <: Quantity[S],
+                      SWithDI <: Quantity[SWithDI] with TimeIntegral[D] with TimeDerivative[I],
+                      D <: Quantity[D] with TimeDerivative[SWithDI],
+                      I <: Quantity[I] with TimeIntegral[SWithDI],
+                      U <: Quantity[U]](kp: Ratio[U, S], kd: Ratio[U, D], ki: Ratio[U, I], kf: Ratio[U, S])
 
-object PID {
+object PIDF {
   def proportionalControl[S <: Quantity[S], U <: Quantity[U]](signal: PeriodicSignal[S], target: PeriodicSignal[S], gain: Ratio[U, S]): PeriodicSignal[U] = {
     signal.zip(target).map((p, _) => (p._2 - p._1) ** gain)
   }
@@ -33,13 +34,14 @@ object PID {
     signal.map((v, _) => v ** gain)
   }
 
-  def pid[S <: Quantity[S] with TimeDerivative[I] with TimeIntegral[D],
-          D <: Quantity[D] with TimeDerivative[S],
-          I <: Quantity[I] with TimeIntegral[S],
-          U <: Quantity[U]](signal: PeriodicSignal[S], target: PeriodicSignal[S], config: PIDConfig[S, D, I, U]): PeriodicSignal[U] = {
+  def pidf[S <: Quantity[S],
+           SWithDI <: Quantity[SWithDI] with TimeIntegral[D] with TimeDerivative[I],
+           D <: Quantity[D] with TimeDerivative[SWithDI],
+           I <: Quantity[I] with TimeIntegral[SWithDI],
+           U <: Quantity[U]](signal: PeriodicSignal[S], target: PeriodicSignal[S], config: PIDFConfig[S, SWithDI, D, I, U])(implicit ex: S => SWithDI): PeriodicSignal[U] = {
     proportionalControl(signal, target, config.kp).
-      zip(integralControl(signal, config.ki)).
-      zip(derivativeControl(signal, config.kd)).
+      zip(integralControl(signal.map((x, _) => ex(x)), config.ki)).
+      zip(derivativeControl(signal.map((x, _) => ex(x)), config.kd)).
       zip(feedForwardControl(signal, config.kf)).map { case ((((p, i), d), f), _) =>
       p + i + d + f
     }

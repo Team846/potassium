@@ -1,11 +1,12 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
-import com.lynbrookrobotics.potassium.control.{PID, PIDConfig}
+import com.lynbrookrobotics.potassium.control.{PIDF, PIDFConfig, PIDFProperUnitsConfig}
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal, SignalLike}
 import com.lynbrookrobotics.potassium.tasks.ContinuousTask
 import com.lynbrookrobotics.potassium.units._
 import squants.motion.AngularVelocity
 import squants.{Acceleration, Dimensionless, Length, Percent, Velocity}
+import GenericValue._
 
 /**
   * A drivetrain that has forward-backward and turning control in the unicycle model
@@ -19,10 +20,9 @@ trait UnicycleDrive extends Drive {
   protected val maxForwardVelocity: Velocity
   protected val maxTurnVelocity: AngularVelocity
 
-  protected val forwardControlGains: PIDConfig[Velocity, Acceleration, Length, Dimensionless]
+  protected val forwardControlGains: PIDFProperUnitsConfig[Velocity, Acceleration, Length, Dimensionless]
 
-  protected val turnProportionalGain: Ratio[Dimensionless, AngularVelocity]
-  protected val turnFeedForwardGain: Ratio[Dimensionless, AngularVelocity]
+  protected val turnControlGains: PIDFConfig[AngularVelocity, GenericValue[AngularVelocity], GenericDerivative[AngularVelocity], GenericIntegral[AngularVelocity], Dimensionless]
 
   protected val forwardVelocity: Signal[Velocity]
   protected val turnVelocity: Signal[AngularVelocity]
@@ -45,10 +45,8 @@ trait UnicycleDrive extends Drive {
     }
 
     def velocity[C[_]](target: SignalLike[UnicycleVelocity, C]): PeriodicSignal[UnicycleSignal] = {
-      val forwardControl = PID.pid(forwardVelocity.toPeriodic, target.map(_.forward).toPeriodic, forwardControlGains)
-      val turnControl = turnVelocity.toPeriodic.zip(target.map(_.turn).toPeriodic).map { case ((cur, tar), _) =>
-        (tar ** turnFeedForwardGain) + ((tar - cur) ** turnProportionalGain)
-      }
+      val forwardControl = PIDF.pidf(forwardVelocity.toPeriodic, target.map(_.forward).toPeriodic, forwardControlGains)
+      val turnControl = PIDF.pidf(turnVelocity.toPeriodic, target.map(_.turn).toPeriodic, turnControlGains)
 
       forwardControl.zip(turnControl).map((s, _) => UnicycleSignal(s._1, s._2))
     }
