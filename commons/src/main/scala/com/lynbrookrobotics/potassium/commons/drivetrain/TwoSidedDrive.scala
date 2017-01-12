@@ -39,7 +39,7 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
   protected def driveClosedLoop[C[_]](signal: SignalLike[TwoSidedSignal, C]): PeriodicSignal[TwoSidedSignal] =
     TwoSidedControllers.velocity(signal.map(expectedVelocity))
 
-  protected def driveVelocityControl[C[_]](signal: SignalLike[TwoSidedVelocity, C]): PeriodicSignal[TwoSidedSignal] =
+  protected def driveVelocity[C[_]](signal: SignalLike[TwoSidedVelocity, C]): PeriodicSignal[TwoSidedSignal] =
     TwoSidedControllers.velocity(signal)
 
   protected val maxLeftVelocity: Velocity

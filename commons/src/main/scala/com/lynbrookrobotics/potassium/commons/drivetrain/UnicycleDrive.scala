@@ -22,7 +22,11 @@ trait UnicycleDrive extends Drive {
 
   protected val forwardControlGains: PIDFProperUnitsConfig[Velocity, Acceleration, Length, Dimensionless]
 
-  protected val turnControlGains: PIDFConfig[AngularVelocity, GenericValue[AngularVelocity], GenericDerivative[AngularVelocity], GenericIntegral[AngularVelocity], Dimensionless]
+  protected val turnControlGains: PIDFConfig[AngularVelocity,
+                                             GenericValue[AngularVelocity],
+                                             GenericDerivative[AngularVelocity],
+                                             GenericIntegral[AngularVelocity],
+                                             Dimensionless]
 
   protected val forwardVelocity: Signal[Velocity]
   protected val turnVelocity: Signal[AngularVelocity]
@@ -36,11 +40,11 @@ trait UnicycleDrive extends Drive {
   }
 
   object UnicycleControllers {
-    def forward(forwardSpeed: Signal[Dimensionless]): PeriodicSignal[DriveSignal] = {
+    def forwardOpen(forwardSpeed: Signal[Dimensionless]): PeriodicSignal[DriveSignal] = {
       toClosedDrive(forwardSpeed.map(f => UnicycleSignal(f, Percent(0))))
     }
 
-    def turn(turnSpeed: Signal[Dimensionless]): PeriodicSignal[DriveSignal] = {
+    def turnOpen(turnSpeed: Signal[Dimensionless]): PeriodicSignal[DriveSignal] = {
       toClosedDrive(turnSpeed.map(t => UnicycleSignal(Percent(0), t)))
     }
 

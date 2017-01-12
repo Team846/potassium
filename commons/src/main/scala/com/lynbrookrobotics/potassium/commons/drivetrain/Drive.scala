@@ -9,8 +9,8 @@ trait Drive {
   type DriveSignal
   type DriveVelocity
 
-  protected def driveClosedLoop[C[_]](drive: SignalLike[DriveSignal, C]): PeriodicSignal[DriveSignal]
-  protected def driveVelocityControl[C[_]](signal: SignalLike[DriveVelocity, C]): PeriodicSignal[DriveSignal]
+  protected def driveClosedLoop[C[_]](signal: SignalLike[DriveSignal, C]): PeriodicSignal[DriveSignal]
+  protected def driveVelocity[C[_]](velocity: SignalLike[DriveVelocity, C]): PeriodicSignal[DriveSignal]
 
   protected def defaultController: PeriodicSignal[DriveSignal]
 
