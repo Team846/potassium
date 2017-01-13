@@ -52,6 +52,12 @@ lazy val testing = crossProject.crossType(CrossType.Pure).dependsOn(core).settin
   libraryDependencies ++= sharedDependencies.value
 )
 
+lazy val model = project.dependsOn(coreJVM).settings(
+  name := "potassium-model",
+  libraryDependencies ++= sharedDependencies.value,
+  libraryDependencies ++= jvmDependencies
+)
+
 lazy val control = crossProject.crossType(CrossType.Pure).dependsOn(core).settings(
   name := "potassium-control",
   libraryDependencies ++= sharedDependencies.value
