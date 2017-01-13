@@ -42,7 +42,7 @@ object PIDF {
     proportionalControl(signal, target, config.kp).
       zip(integralControl(signal.map((x, _) => ex(x)), config.ki)).
       zip(derivativeControl(signal.map((x, _) => ex(x)), config.kd)).
-      zip(feedForwardControl(signal, config.kf)).map { case ((((p, i), d), f), _) =>
+      zip(feedForwardControl(target, config.kf)).map { case ((((p, i), d), f), _) =>
       p + i + d + f
     }
   }

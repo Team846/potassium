@@ -11,4 +11,8 @@ import squants.Quantity
   */
 class Ratio[N <: Quantity[N], D <: Quantity[D]](num: N, den: D) {
   def *(value: D): N = value / den * num
+
+  override def toString: String = {
+    num.toString() + " / " + den.toString()
+  }
 }

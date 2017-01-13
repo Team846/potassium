@@ -46,6 +46,10 @@ object GenericValue {
   implicit def toGenericValue[T <: Quantity[T]](l: T): GenericValue[T] = new GenericValue[T](l.value, l.unit)
   implicit def fromGenericValue[T <: Quantity[T]](v: GenericValue[T]): T = v.uom.apply(v.value)
 
+  implicit class ToGeneric[T <: Quantity[T]](l: T) {
+    def toGeneric: GenericValue[T] = toGenericValue(l)
+  }
+
   implicit def fromSignalLike[T <: Quantity[T]](target: PeriodicSignal[T]): PeriodicSignal[GenericValue[T]] = {
     target.map((x, _) => toGenericValue(x))
   }
