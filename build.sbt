@@ -8,8 +8,6 @@ scalaVersion in ThisBuild := "2.12.1"
 
 crossScalaVersions in ThisBuild := Seq("2.12.1")
 
-coverageEnabled in ThisBuild := true
-
 lazy val sharedDependencies = Def.setting(Seq(
   "org.typelevel"  %%% "squants"  % "1.0.0",
   "org.scalatest" %%% "scalatest" % "3.0.1" % Test,
