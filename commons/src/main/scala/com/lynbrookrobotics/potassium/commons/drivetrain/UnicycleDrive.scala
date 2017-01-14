@@ -28,14 +28,14 @@ trait UnicycleDrive extends Drive {
                                              GenericIntegral[AngularVelocity],
                                              Dimensionless]
 
-  protected val forwardVelocity: Signal[Velocity]
-  protected val turnVelocity: Signal[AngularVelocity]
+  protected val forwardVelocity: PeriodicSignal[Velocity]
+  protected val turnVelocity: PeriodicSignal[AngularVelocity]
 
   private def toOpenDrive(unicycle: Signal[UnicycleSignal]): Signal[DriveSignal] = {
     unicycle.map(convertUnicycleToDrive)
   }
 
-  private def toClosedDrive[C[_]](unicycle: SignalLike[UnicycleSignal, C]): PeriodicSignal[DriveSignal] = {
+  private def toClosedDrive(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal] = {
     driveClosedLoop(unicycle.map(convertUnicycleToDrive))
   }
 
@@ -48,14 +48,14 @@ trait UnicycleDrive extends Drive {
       toClosedDrive(turnSpeed.map(t => UnicycleSignal(Percent(0), t)))
     }
 
-    def velocity[C[_]](target: SignalLike[UnicycleVelocity, C]): PeriodicSignal[UnicycleSignal] = {
-      val forwardControl = PIDF.pidf(forwardVelocity.toPeriodic, target.map(_.forward).toPeriodic, forwardControlGains)
-      val turnControl = PIDF.pidf(turnVelocity.toPeriodic, target.map(_.turn).toPeriodic, turnControlGains)
+    def velocity(target: SignalLike[UnicycleVelocity]): PeriodicSignal[UnicycleSignal] = {
+      val forwardControl = PIDF.pidf(forwardVelocity, target.map(_.forward).toPeriodic, forwardControlGains)
+      val turnControl = PIDF.pidf(turnVelocity, target.map(_.turn).toPeriodic, turnControlGains)
 
-      forwardControl.zip(turnControl).map((s, _) => UnicycleSignal(s._1, s._2))
+      forwardControl.zip(turnControl).map(s => UnicycleSignal(s._1, s._2))
     }
 
-    def expectedVelocity[C[_]](unicycle: SignalLike[UnicycleSignal, C]): PeriodicSignal[UnicycleSignal] = {
+    def expectedVelocity(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[UnicycleSignal] = {
       velocity(unicycle.map(s => UnicycleVelocity(
         maxForwardVelocity * s.forward, maxTurnVelocity * s.turn
       )))

@@ -36,10 +36,10 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
     TwoSidedVelocity(maxLeftVelocity * drive.left, maxRightVelocity * drive.right)
   }
 
-  protected def driveClosedLoop[C[_]](signal: SignalLike[TwoSidedSignal, C]): PeriodicSignal[TwoSidedSignal] =
+  protected def driveClosedLoop(signal: SignalLike[TwoSidedSignal]): PeriodicSignal[TwoSidedSignal] =
     TwoSidedControllers.velocity(signal.map(expectedVelocity))
 
-  protected def driveVelocity[C[_]](signal: SignalLike[TwoSidedVelocity, C]): PeriodicSignal[TwoSidedSignal] =
+  protected def driveVelocity(signal: SignalLike[TwoSidedVelocity]): PeriodicSignal[TwoSidedSignal] =
     TwoSidedControllers.velocity(signal)
 
   protected val maxLeftVelocity: Velocity
@@ -56,18 +56,18 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
     Each(0) / MetersPerSecond(0)
   )
 
-  protected val leftVelocity: Signal[Velocity]
-  protected val rightVelocity: Signal[Velocity]
+  protected val leftVelocity: PeriodicSignal[Velocity]
+  protected val rightVelocity: PeriodicSignal[Velocity]
 
-  override protected val forwardVelocity: Signal[Velocity] =
+  override protected val forwardVelocity: PeriodicSignal[Velocity] =
     leftVelocity.zip(rightVelocity).map(t => (t._1 + t._2) / 2)
 
   object TwoSidedControllers {
-    def velocity[C[_]](target: SignalLike[TwoSidedVelocity, C]): PeriodicSignal[TwoSidedSignal] = {
-      val leftControl = PIDF.pidf(leftVelocity.toPeriodic, target.map(_.left).toPeriodic, leftControlGains)
-      val rightControl = PIDF.pidf(rightVelocity.toPeriodic, target.map(_.right).toPeriodic, rightControlGains)
+    def velocity(target: SignalLike[TwoSidedVelocity]): PeriodicSignal[TwoSidedSignal] = {
+      val leftControl = PIDF.pidf(leftVelocity, target.map(_.left).toPeriodic, leftControlGains)
+      val rightControl = PIDF.pidf(rightVelocity, target.map(_.right).toPeriodic, rightControlGains)
 
-      leftControl.zip(rightControl).map((s, _) => TwoSidedSignal(s._1, s._2))
+      leftControl.zip(rightControl).map(s => TwoSidedSignal(s._1, s._2))
     }
   }
 

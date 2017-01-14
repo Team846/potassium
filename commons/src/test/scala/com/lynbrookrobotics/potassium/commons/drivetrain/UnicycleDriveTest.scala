@@ -21,17 +21,17 @@ class UnicycleDriveTest extends FunSuite {
 
     override protected val controlMode: UnicycleControlMode = NoOperation
 
-    override protected def driveClosedLoop[C[_]](signal: SignalLike[DriveSignal, C]): PeriodicSignal[DriveSignal] = signal.toPeriodic
+    override protected def driveClosedLoop(signal: SignalLike[DriveSignal]): PeriodicSignal[DriveSignal] = signal.toPeriodic
 
-    override protected def driveVelocity[C[_]](velocity: SignalLike[DriveVelocity, C]): PeriodicSignal[DriveSignal] = velocity.toPeriodic
+    override protected def driveVelocity(velocity: SignalLike[DriveVelocity]): PeriodicSignal[DriveSignal] = velocity.toPeriodic
 
     override type Drivetrain = Nothing
 
     var currentForwardVelocity: Velocity = MetersPerSecond(0)
     var currentTurnVelocity: AngularVelocity = DegreesPerSecond(0)
 
-    override protected val forwardVelocity: Signal[Velocity] = Signal(currentForwardVelocity)
-    override protected val turnVelocity: Signal[AngularVelocity] = Signal(currentTurnVelocity)
+    override protected val forwardVelocity: PeriodicSignal[Velocity] = Signal(currentForwardVelocity).toPeriodic
+    override protected val turnVelocity: PeriodicSignal[AngularVelocity] = Signal(currentTurnVelocity).toPeriodic
 
     override protected val maxForwardVelocity: Velocity = MetersPerSecond(10)
     override protected val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)

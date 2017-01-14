@@ -60,6 +60,21 @@ abstract class PeriodicSignal[T] { self =>
   }
 
   /**
+    * Transforms the periodic signal by applying a function to all values
+    * @param f the function to transform values with
+    * @tparam U the type of the resulting signal
+    * @return a new signal with values transformed by the function
+    */
+  def map[U](f: T => U): PeriodicSignal[U] = new PeriodicSignal[U] {
+    val parent = Some(self)
+    val check = None
+
+    def calculateValue(dt: Time, token: Int): U = {
+      f(self.currentValue(dt, token))
+    }
+  }
+
+  /**
     * Combines the signal with another signal into a signal of tuples
     * @param other the signal to combine with
     * @tparam O the type of values of the other signal
