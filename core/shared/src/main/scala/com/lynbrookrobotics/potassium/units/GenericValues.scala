@@ -51,7 +51,7 @@ object GenericValue {
   }
 
   implicit def fromSignalLike[T <: Quantity[T]](target: PeriodicSignal[T]): PeriodicSignal[GenericValue[T]] = {
-    target.map((x, _) => toGenericValue(x))
+    target.map(x => toGenericValue(x))
   }
 }
 
