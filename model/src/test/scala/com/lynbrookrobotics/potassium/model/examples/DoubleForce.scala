@@ -7,7 +7,7 @@ import squants.mass.Kilograms
 import squants.motion.MetersPerSecondSquared
 import squants.time.Milliseconds
 
-object FallingMass extends App {
+object DoubleForce extends App {
   val NumIterations = 100
 
   val times     = new Array[Double](NumIterations)
@@ -17,7 +17,7 @@ object FallingMass extends App {
   val GravityForce = Mass * MetersPerSecondSquared(9.8) // N
   val dt = Milliseconds(5)
 
-  val input = DenseVector(GravityForce.toNewtons)
+  val input = DenseVector(5.0, 100.0)
 
   val stateSpace = new StateSpace(
     DenseMatrix(
@@ -25,8 +25,8 @@ object FallingMass extends App {
       (0.0, 0.0)
     ),
     DenseMatrix(
-      0.0,
-      -1.0
+      (0.0, 0.0),
+      (1.0, -1.0)
     )
   )
 
