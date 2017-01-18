@@ -6,9 +6,8 @@ import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
 import squants.motion._
 import squants.space.Feet
 
-trait UnicycleMotionProfileControllers[DriveSignal, DrivetrainHardware <: UnicycleHardware, DrivetrainProperties <: UnicycleProperties]
-  extends UnicycleCoreControllers[DriveSignal, DrivetrainHardware, DrivetrainProperties] {
-
+trait UnicycleMotionProfileControllers
+  extends UnicycleCoreControllers {
   /**
     * Uses a control loop that results in constant acceleration,
     * then constant cruising velocity, and then constant deceleration to the

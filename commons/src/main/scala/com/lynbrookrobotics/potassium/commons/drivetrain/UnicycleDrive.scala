@@ -1,38 +1,57 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
-import com.lynbrookrobotics.potassium.control.{PIDF, PIDFConfig, PIDFProperUnitsConfig}
-import com.lynbrookrobotics.potassium.tasks.ContinuousTask
-import com.lynbrookrobotics.potassium.units.GenericValue._
+import com.lynbrookrobotics.potassium.control.{PIDFConfig, PIDFProperUnitsConfig}
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal, SignalLike}
-
 import squants.motion.AngularVelocity
-import squants.{Acceleration, Dimensionless, Length, Percent, Velocity}
+import squants.{Acceleration, Angle, Dimensionless, Length, Percent, Velocity}
 
 trait UnicycleProperties {
-  val maxForwardVelocity: Velocity
-  val maxTurnVelocity: AngularVelocity
+  def maxForwardVelocity: Velocity
+  def maxTurnVelocity: AngularVelocity
 
-  val forwardControlGains: PIDFProperUnitsConfig[Velocity, Acceleration, Length, Dimensionless]
-  val turnControlGains: PIDFConfig[AngularVelocity,
+  def forwardControlGains: PIDFProperUnitsConfig[Velocity, Acceleration, Length, Dimensionless]
+  def turnControlGains: PIDFConfig[AngularVelocity,
+                                   GenericValue[AngularVelocity],
                                    GenericValue[AngularVelocity],
                                    GenericDerivative[AngularVelocity],
                                    GenericIntegral[AngularVelocity],
                                    Dimensionless]
+
+  def forwardPositionControlGains: PIDFConfig[Length,
+                                              Length,
+                                              GenericValue[Length],
+                                              Velocity,
+                                              GenericIntegral[Length],
+                                              Dimensionless]
+
+  def turnPositionControlGains: PIDFConfig[Angle,
+                                           Angle,
+                                           GenericValue[Angle],
+                                           AngularVelocity,
+                                           GenericIntegral[Angle],
+                                           Dimensionless]
 }
 
 trait UnicycleHardware {
-  val forwardVelocity: Signal[Velocity]
-  val turnVelocity: Signal[AngularVelocity]
+  def forwardVelocity: Signal[Velocity]
+  def turnVelocity: Signal[AngularVelocity]
+
+  def forwardPosition: Signal[Length]
+  def turnPosition: Signal[Angle]
 }
 
-case class UnicycleSignal(forward: Dimensionless, turn: Dimensionless)
+case class UnicycleSignal(forward: Dimensionless, turn: Dimensionless) {
+  def +(that: UnicycleSignal): UnicycleSignal =
+    UnicycleSignal(this.forward + that.forward, this.turn + that.turn)
+}
+
 case class UnicycleVelocity(forward: Velocity, turn: AngularVelocity)
 
 /**
   * A drivetrain that has forward-backward and turning control in the unicycle model
   */
-trait UnicycleDrive extends Drive {
+trait UnicycleDrive extends Drive { self =>
   type DrivetrainHardware <: UnicycleHardware
   type DrivetrainProperties <: UnicycleProperties
 
@@ -52,8 +71,12 @@ trait UnicycleDrive extends Drive {
     unicycle.map(convertUnicycleToDrive).toPeriodic
   }
 
-  object UnicycleControllers extends UnicycleCoreControllers[DriveSignal, DrivetrainHardware, DrivetrainProperties]
-    with UnicycleMotionProfileControllers[DriveSignal, DrivetrainHardware, DrivetrainProperties] {
+  object UnicycleControllers extends UnicycleCoreControllers
+    with UnicycleMotionProfileControllers {
+    type DriveSignal = self.DriveSignal
+    type DrivetrainHardware = self.DrivetrainHardware
+    type DrivetrainProperties = self.DrivetrainProperties
+
     /**
       * Uses the parent's closed loop control for the drive signal for the unicycle signal
       * @param unicycle the unicycle signal to closed-loop drive with
@@ -66,32 +89,9 @@ trait UnicycleDrive extends Drive {
 
   import UnicycleControllers._
 
-  object unicycleTasks {
-    class ContinuousClosedDrive(forward: Signal[Dimensionless], turn: Signal[Dimensionless])
-                               (implicit drive: Drivetrain) extends ContinuousTask {
-      override def onStart(): Unit = {
-        val combined = forward.zip(turn).map(t => UnicycleSignal(t._1, t._2))
-        drive.setController(parentClosedLoop(combined))
-      }
-
-      override def onEnd(): Unit = {
-        drive.resetToDefault()
-      }
-    }
-
-    class ContinuousVelocityDrive(forward: Signal[Velocity], turn: Signal[AngularVelocity])
-                                 (implicit drive: Drivetrain,
-                                  hardware: DrivetrainHardware,
-                                  props: DrivetrainProperties) extends ContinuousTask {
-      override def onStart(): Unit = {
-        val combined = forward.zip(turn).map(t => UnicycleVelocity(t._1, t._2))
-        drive.setController(parentClosedLoop(velocityControl(combined)))
-      }
-
-      override def onEnd(): Unit = {
-        drive.resetToDefault()
-      }
-    }
+  object unicycleTasks extends UnicycleCoreTasks {
+    type Drivetrain = self.Drivetrain
+    override val controllers = UnicycleControllers
   }
 
   protected def controlMode: UnicycleControlMode
@@ -104,7 +104,7 @@ trait UnicycleDrive extends Drive {
 
       case ArcadeControls(forward, turn) =>
         val combinedSignal = forward.zip(turn).map(t => UnicycleSignal(t._1, t._2))
-        parentClosedLoop(closedLoopControl(combinedSignal))
+        parentClosedLoop(speedControl(combinedSignal))
     }
   }
 }
