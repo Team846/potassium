@@ -56,8 +56,8 @@ abstract class FiniteTask extends Task {
 
   override def init(): Unit = {
     if (!running) {
-      onStart()
       running = true
+      onStart()
     }
   }
 
@@ -85,5 +85,13 @@ abstract class FiniteTask extends Task {
     */
   def withTimeout(timeout: Time)(implicit clock: Clock): FiniteTask = {
     new TimeoutFiniteTask(this, timeout, clock)
+  }
+}
+object FiniteTask {
+  def empty: FiniteTask = new FiniteTask {
+    override def onStart(): Unit = finished()
+
+    override def onEnd(): Unit = {}
+
   }
 }
