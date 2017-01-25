@@ -77,8 +77,7 @@ lazy val frc = project.dependsOn(coreJVM).settings(
 lazy val config = project.dependsOn(coreJVM).settings(
   name := "potassium-config",
   libraryDependencies ++= sharedDependencies.value,
-  libraryDependencies ++= jvmDependencies,
-  libraryDependencies += "com.lihaoyi" %% "upickle" % "0.4.4"
+  libraryDependencies ++= jvmDependencies
 )
 
 lazy val sensors = crossProject.crossType(CrossType.Pure).dependsOn(core).settings(

@@ -5,7 +5,7 @@ trait TwoWaySignal[T] { self =>
 
   def reversePropagate(newValue: T): Unit
 
-  def map[U](transform: T => U, reverseTransform: (T, U) => T): TwoWaySignal[U] = {
+  def map[U](transform: T => U)(reverseTransform: (T, U) => T): TwoWaySignal[U] = {
     new TwoWaySignal[U] {
       override def reversePropagate(newValue: U): Unit = {
         self.reversePropagate(reverseTransform(self.value, newValue))
