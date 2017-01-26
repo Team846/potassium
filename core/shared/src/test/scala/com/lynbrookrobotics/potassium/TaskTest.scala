@@ -73,6 +73,7 @@ class TaskTest extends FunSuite with BeforeAndAfter {
 
     assert(firstStarted && firstAborted && secondStarted && secondAborted)
   }
+
   test("FiniteTask.empty immediately finishes"){
     val task = FiniteTask.empty
 

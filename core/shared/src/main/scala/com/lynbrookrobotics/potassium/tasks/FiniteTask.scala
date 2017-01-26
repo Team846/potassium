@@ -87,11 +87,11 @@ abstract class FiniteTask extends Task {
     new TimeoutFiniteTask(this, timeout, clock)
   }
 }
+
 object FiniteTask {
   def empty: FiniteTask = new FiniteTask {
     override def onStart(): Unit = finished()
 
     override def onEnd(): Unit = {}
-
   }
 }
