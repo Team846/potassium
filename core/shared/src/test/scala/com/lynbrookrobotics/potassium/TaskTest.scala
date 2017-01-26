@@ -1,7 +1,6 @@
 package com.lynbrookrobotics.potassium
 
-import com.lynbrookrobotics.potassium.tasks.Task
-
+import com.lynbrookrobotics.potassium.tasks.{FiniteTask, Task}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
 class TaskTest extends FunSuite with BeforeAndAfter {
@@ -73,5 +72,13 @@ class TaskTest extends FunSuite with BeforeAndAfter {
     Task.abortCurrentTask()
 
     assert(firstStarted && firstAborted && secondStarted && secondAborted)
+  }
+
+  test("FiniteTask.empty immediately finishes"){
+    val task = FiniteTask.empty
+
+    Task.executeTask(task)
+
+    assert(!task.isRunning)
   }
 }
