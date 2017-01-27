@@ -26,13 +26,13 @@ trait UnicycleHardware {
   val turnVelocity: Signal[AngularVelocity]
 }
 
+case class UnicycleSignal(forward: Dimensionless, turn: Dimensionless)
+case class UnicycleVelocity(forward: Velocity, turn: AngularVelocity)
+
 /**
   * A drivetrain that has forward-backward and turning control in the unicycle model
   */
 trait UnicycleDrive extends Drive {
-  case class UnicycleSignal(forward: Dimensionless, turn: Dimensionless)
-  case class UnicycleVelocity(forward: Velocity, turn: AngularVelocity)
-
   type DrivetrainHardware <: UnicycleHardware
   type DrivetrainProperties <: UnicycleProperties
 
@@ -52,53 +52,15 @@ trait UnicycleDrive extends Drive {
     unicycle.map(convertUnicycleToDrive).toPeriodic
   }
 
-  /**
-    * Uses the parent's closed loop control for the drive signal for the unicycle signal
-    * @param unicycle the unicycle signal to closed-loop drive with
-    * @return a signal controlled with closed-loop on the parent
-    */
-  private def parentClosedLoop(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal] = {
-    driveClosedLoop(unicycle.map(convertUnicycleToDrive))
-  }
-
-  object UnicycleControllers {
-    def openForwardClosedDrive(forwardSpeed: Signal[Dimensionless]): PeriodicSignal[DriveSignal] = {
-      parentClosedLoop(forwardSpeed.map(f => UnicycleSignal(f, Percent(0))))
-    }
-
-    def openTurnClosedDrive(turnSpeed: Signal[Dimensionless]): PeriodicSignal[DriveSignal] = {
-      parentClosedLoop(turnSpeed.map(t => UnicycleSignal(Percent(0), t)))
-    }
-
-    def velocityControl(target: SignalLike[UnicycleVelocity])
-                       (implicit hardware: DrivetrainHardware,
-                        props: DrivetrainProperties): PeriodicSignal[UnicycleSignal] = {
-      import hardware._
-      import props._
-
-      val forwardControl = PIDF.pidf(
-        forwardVelocity.toPeriodic,
-        target.map(_.forward).toPeriodic,
-        forwardControlGains
-      )
-
-      val turnControl = PIDF.pidf(
-        turnVelocity.toPeriodic,
-        target.map(_.turn).toPeriodic,
-        turnControlGains
-      )
-
-      forwardControl.zip(turnControl).map(s => UnicycleSignal(s._1, s._2))
-    }
-
-    def closedLoopControl(unicycle: SignalLike[UnicycleSignal])
-                         (implicit hardware: DrivetrainHardware,
-                          props: DrivetrainProperties): PeriodicSignal[UnicycleSignal] = {
-      import props._
-
-      velocityControl(unicycle.map(s => UnicycleVelocity(
-        maxForwardVelocity * s.forward, maxTurnVelocity * s.turn
-      )))
+  object UnicycleControllers extends UnicycleCoreControllers[DriveSignal, DrivetrainHardware, DrivetrainProperties]
+    with UnicycleMotionProfileControllers {
+    /**
+      * Uses the parent's closed loop control for the drive signal for the unicycle signal
+      * @param unicycle the unicycle signal to closed-loop drive with
+      * @return a signal controlled with closed-loop on the parent
+      */
+    def parentClosedLoop(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal] = {
+      driveClosedLoop(unicycle.map(convertUnicycleToDrive))
     }
   }
 
