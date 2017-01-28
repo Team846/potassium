@@ -8,8 +8,10 @@ scalaVersion in ThisBuild := "2.12.1"
 
 crossScalaVersions in ThisBuild := Seq("2.12.1")
 
+resolvers in ThisBuild += "Funky-Repo" at "http://team846.github.io/repo"
+
 lazy val sharedDependencies = Def.setting(Seq(
-  "org.typelevel"  %%% "squants"  % "1.0.0",
+  "org.typelevel"  %%% "squants"  % "1.2.0-SNAPSHOT",
   "org.scalatest" %%% "scalatest" % "3.0.1" % Test,
   "org.scalacheck" %%% "scalacheck" % "1.13.4" % Test
 ))
@@ -88,7 +90,8 @@ lazy val sensors = crossProject.crossType(CrossType.Pure).dependsOn(core).settin
 lazy val sensorsJVM = sensors.jvm
 lazy val sensorsJS = sensors.js
 
-lazy val commons = crossProject.crossType(CrossType.Pure).dependsOn(control, sensors).settings(
+lazy val commons = crossProject.crossType(CrossType.Pure).
+  dependsOn(control, sensors, testing % Test).settings(
   name := "potassium-commons",
   libraryDependencies ++= sharedDependencies.value
 )

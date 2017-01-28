@@ -49,6 +49,7 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
   protected implicit val clock: Clock
   protected val updatePeriod: Time
 
+  //TODO: add docs
   protected def output(hardware: DrivetrainHardware, signal: TwoSidedSignal): Unit
 
   protected def convertUnicycleToDrive(uni: UnicycleSignal): TwoSidedSignal = {
