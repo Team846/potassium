@@ -82,7 +82,7 @@ class UnicycleDriveTest extends FunSuite {
     val drive = new TestDrivetrain
 
     check(forAll { (fwd: Double, turn: Double) =>
-      val in = Signal.constant(drive.UnicycleVelocity(MetersPerSecond(fwd), DegreesPerSecond(turn)))
+      val in = Signal.constant(UnicycleVelocity(MetersPerSecond(fwd), DegreesPerSecond(turn)))
       val out = drive.UnicycleControllers.
         velocityControl(in).
         currentValue(Milliseconds(5))
