@@ -53,7 +53,7 @@ trait UnicycleDrive extends Drive {
   }
 
   object UnicycleControllers extends UnicycleCoreControllers[DriveSignal, DrivetrainHardware, DrivetrainProperties]
-    with UnicycleMotionProfileControllers {
+    with UnicycleMotionProfileControllers[DriveSignal, DrivetrainHardware, DrivetrainProperties] {
     /**
       * Uses the parent's closed loop control for the drive signal for the unicycle signal
       * @param unicycle the unicycle signal to closed-loop drive with
