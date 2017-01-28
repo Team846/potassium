@@ -30,12 +30,12 @@ lazy val potassium = project.in(file(".")).
     testingJVM, testingJS,
     frc,
     config,
-    sensorsJVM, sensorsJS,
+    sensors,
     commonsJVM, commonsJS
   ).settings(
-    publish := {},
-    publishLocal := {}
-  )
+  publish := {},
+  publishLocal := {}
+)
 
 lazy val core = crossProject.crossType(CrossType.Full).settings(
   name := "potassium-core",
@@ -83,16 +83,14 @@ lazy val config = project.dependsOn(coreJVM).settings(
   libraryDependencies += "com.lihaoyi" %% "upickle" % "0.4.4"
 )
 
-lazy val sensors = crossProject.crossType(CrossType.Pure).dependsOn(core).settings(
+lazy val sensors = project.dependsOn(coreJVM).settings(
   name := "potassium-sensors",
-  libraryDependencies ++= sharedDependencies.value
+  libraryDependencies ++= sharedDependencies.value,
+  libraryDependencies ++= jvmDependencies
 )
 
-lazy val sensorsJVM = sensors.jvm
-lazy val sensorsJS = sensors.js
-
 lazy val commons = crossProject.crossType(CrossType.Pure).
-  dependsOn(control, sensors, testing % Test).settings(
+  dependsOn(control, testing % Test).settings(
   name := "potassium-commons",
   libraryDependencies ++= sharedDependencies.value
 )
