@@ -28,6 +28,7 @@ lazy val potassium = project.in(file(".")).
     coreJVM, coreJS,
     controlJVM, controlJS,
     testingJVM, testingJS,
+    remote,
     frc,
     config,
     sensors,
@@ -69,6 +70,12 @@ lazy val controlJS = control.js
 
 lazy val testingJVM = testing.jvm
 lazy val testingJS = testing.js
+
+lazy val remote = project.dependsOn(coreJVM).settings(
+  name := "potassium-remote",
+  libraryDependencies ++= sharedDependencies.value,
+  libraryDependencies ++= jvmDependencies
+)
 
 lazy val frc = project.dependsOn(coreJVM).settings(
   name := "potassium-frc",
