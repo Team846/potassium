@@ -1,22 +1,13 @@
 package com.lynbrookrobotics.potassium.events
 
-import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, Task}
-import squants.Time
-
-/**
-  * Contains configuration for continuous event condition polling
-  * @param clock the clock to use to periodically check the condition
-  * @param period the period to check the condition at
-  */
-case class EventPolling(clock: Clock, period: Time)
 
 /**
   * An event that has a start, running, and ending phase.
   * @param condition a boolean condition for when the event should be active
-  * @param polling the configuration for periodically checking if the event should be active
+  * @param polling the event that is called each time the event should be updated
   */
-class ContinuousEvent(condition: => Boolean)(implicit polling: EventPolling) {
+class ContinuousEvent(condition: => Boolean)(implicit polling: ImpulseEvent) {
   private val onStartSource = new ImpulseEventSource
   private val onEndSource = new ImpulseEventSource
 
@@ -33,7 +24,7 @@ class ContinuousEvent(condition: => Boolean)(implicit polling: EventPolling) {
   private var tickingCallbacks: List[() => Unit] = List.empty
   private var isRunning = false
 
-  polling.clock(polling.period) { _ =>
+  polling.foreach { () =>
     if (condition) {
       tickingCallbacks.foreach(_.apply())
 

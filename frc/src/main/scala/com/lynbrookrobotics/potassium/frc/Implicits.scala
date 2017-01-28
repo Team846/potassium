@@ -1,8 +1,8 @@
 package com.lynbrookrobotics.potassium.frc
 
 import com.lynbrookrobotics.potassium.Signal
-import com.lynbrookrobotics.potassium.events.{ContinuousEvent, EventPolling}
-import edu.wpi.first.wpilibj.{AnalogInput, Counter, DigitalInput, Joystick}
+import com.lynbrookrobotics.potassium.events.{ContinuousEvent, ImpulseEvent, ImpulseEventSource}
+import edu.wpi.first.wpilibj._
 import squants.{Dimensionless, Each, Time}
 import squants.electro.{ElectricPotential, Volts}
 import squants.time.{Frequency, Seconds}
@@ -22,7 +22,7 @@ object Implicits {
     def y: Signal[Dimensionless] = Signal(Each(joystick.getY()))
     def z: Signal[Dimensionless] = Signal(Each(joystick.getZ()))
 
-    def buttonPressed(button: Int)(implicit polling: EventPolling): ContinuousEvent = {
+    def buttonPressed(button: Int)(implicit polling: ImpulseEvent): ContinuousEvent = {
       Signal(joystick.getRawButton(button)).filter(down => down)
     }
   }
@@ -35,6 +35,21 @@ object Implicits {
   // interface conversions
   implicit class DigitalInputConversions(val in: DigitalInput) {
     def toCounter: Counter = new Counter(in)
+  }
+
+  implicit class RichDriverStation(val ds: DriverStation) {
+    def onDataReceived: ImpulseEvent = {
+      val source = new ImpulseEventSource
+
+      new Thread(() => {
+        while (!Thread.interrupted()) {
+          ds.waitForData()
+          source.fire()
+        }
+      }).start()
+
+      source.event
+    }
   }
 
   implicit val clock = WPIClock

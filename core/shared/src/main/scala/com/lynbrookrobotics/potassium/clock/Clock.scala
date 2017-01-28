@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.clock
 
+import com.lynbrookrobotics.potassium.events.{ImpulseEvent, ImpulseEventSource}
 import squants.Time
 
 /**
@@ -22,4 +23,19 @@ trait Clock {
     * @param thunk the function to execute after the delay
     */
   def singleExecution(delay: Time)(thunk: => Unit): Unit
+
+  /**
+    * Creates an impule event that fires at a fixed rate
+    * @param period the period to fire the event at
+    * @return an event that fires at the given rate
+    */
+  def periodicEvent(period: Time): ImpulseEvent = {
+    val source = new ImpulseEventSource
+
+    apply(period) { _ =>
+      source.fire()
+    }
+
+    source.event
+  }
 }
