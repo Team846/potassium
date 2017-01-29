@@ -85,15 +85,12 @@ lazy val remote = project.dependsOn(coreJVM).settings(
   libraryDependencies ++= jvmDependencies
 )
 
-<<<<<<< HEAD
 lazy val vision = project.dependsOn(coreJVM).settings(
   name := "potassium-vision",
   libraryDependencies ++= sharedDependencies.value,
   libraryDependencies ++= jvmDependencies
 )
 
-=======
->>>>>>> Uses WPILIB with SPI trait
 lazy val frc = project.dependsOn(coreJVM, sensors).settings(
   name := "potassium-frc",
   libraryDependencies ++= sharedDependencies.value,
