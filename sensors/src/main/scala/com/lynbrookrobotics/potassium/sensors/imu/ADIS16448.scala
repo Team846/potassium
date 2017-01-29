@@ -45,11 +45,12 @@ class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePer
   spi.setClockActiveLow()
   spi.setChipSelectActiveLow()
 
-  Registers.PROD_ID.read(spi)
+//  Registers.PROD_ID.read(spi)
+  val idNum = Registers.PROD_ID.read(spi)
 
   // Checks whether or not the IMU connected is the ADIS16448
-  if (Registers.PROD_ID.read(spi) != 16448) {
-    throw new IllegalStateException("The device in the MXP port is not an ADIS16448 IMU")
+  if (idNum != 16448) {
+    throw new IllegalStateException("The device in the MXP port is not an ADIS16448 IMU    " + idNum)
   }
   // Saves the com.lynbrookrobotics.potassium.sensors.SPI being used (16448) to the various registers
   Registers.SMPL_PRD.write(1, spi) // 1 Means use default period

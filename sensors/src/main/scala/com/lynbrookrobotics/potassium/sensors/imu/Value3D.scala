@@ -11,11 +11,19 @@ case class Value3D[Q <: Quantity[Q]](x: Q, y: Q, z: Q) {
     * @param toAdd the 3D value to add
     * @return the combined 3D value
     */
-  def + (toAdd: Value3D[Q]): Value3D[Q] = {
+  def +(toAdd: Value3D[Q]): Value3D[Q] = {
     Value3D(
       x + toAdd.x,
       y + toAdd.y,
       z + toAdd.z
+    )
+  }
+
+  def -(toAdd: Value3D[Q]): Value3D[Q] = {
+    Value3D(
+      x - toAdd.x,
+      y - toAdd.y,
+      z - toAdd.z
     )
   }
 

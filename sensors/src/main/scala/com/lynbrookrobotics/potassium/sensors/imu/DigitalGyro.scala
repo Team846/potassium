@@ -11,11 +11,10 @@ import squants.{Angle, Time}
   */
 abstract class DigitalGyro(tickPeriod: Time) {
   // Tick Period of the robot
-  var currentVelocity: Value3D[AngularVelocity] = Value3D[AngularVelocity](DegreesPerSecond(0), DegreesPerSecond(0), DegreesPerSecond(0))
   var currentDrift: Value3D[AngularVelocity] = null
 
   // List of velocities used for calibration of IMU
-  var calibrationVelocities: util.ArrayList[Value3D[AngularVelocity]] = new util.ArrayList(200)
+  var calibrationVelocities: Array[Value3D[AngularVelocity]] = new Array(200)
 
   // Current index in calibrationVelocities
   var index: Int = 0
@@ -28,36 +27,38 @@ abstract class DigitalGyro(tickPeriod: Time) {
 
   // Update velocity stored calibrationVelocities at index
   def calibrateUpdate(): Unit = {
-    currentVelocity = retrieveVelocity
-    calibrationVelocities.set(index, currentVelocity)
-    index += 1
+    if (calibrating) {
+      calibrationVelocities(index) = retrieveVelocity
+      index += 1
 
-    if (index >= 200) index = 0
+      if (index >= 200) index = 0
+    }
   }
 
   // Updates values for the angle on the gyro.
   def angleUpdate(): Unit = {
     if (calibrating) {
-      val sum = Value3D[AngularVelocity](DegreesPerSecond(0), DegreesPerSecond(0), DegreesPerSecond(0))
-      calibrationVelocities.forEach(
-        v => sum + v
-      )
+      val sum = calibrationVelocities.reduceLeft { (cur, acc) =>
+        acc + cur
+      }
 
-      currentDrift = sum.times(-1D / calibrationVelocities.size())
+      currentDrift = sum.times(1D / calibrationVelocities.length)
+
       calibrationVelocities = null
       calibrating = false
     }
 
-    // Stores the value as a form of memory
-    // Modifies velocity according to drift and change in position
-    currentVelocity = retrieveVelocity + currentDrift
+
+//    // Stores the value as a form of memory
+//    // Modifies velocity according to drift and change in position
+//    currentVelocity = retrieveVelocity + currentDrift
   }
 
   val velocity: PeriodicSignal[Value3D[AngularVelocity]] = Signal {
     if (calibrating) {
       Value3D[AngularVelocity](DegreesPerSecond(0), DegreesPerSecond(0), DegreesPerSecond(0))
     } else {
-      retrieveVelocity + currentDrift
+      retrieveVelocity - currentDrift
     }
   }.toPeriodic
 
