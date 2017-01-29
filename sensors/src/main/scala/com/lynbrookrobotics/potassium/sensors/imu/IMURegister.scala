@@ -1,7 +1,7 @@
 package com.lynbrookrobotics.potassium.sensors.imu
 
-import com.lynbrookrobotics.potassium.sensors.SPITrait
 import java.nio.ByteBuffer
+import com.lynbrookrobotics.potassium.sensors.SPITrait
 
 /**
   * Represents a register on the ADIS16448 IMU.
@@ -36,7 +36,7 @@ class IMURegister(register: Int) {
   def write(value: Int, spi: SPITrait): Unit = {
     val valueWriter1: Array[Byte] = Array(writeMessage1, value.asInstanceOf[Byte])
     val valueWriter2: Array[Byte] = Array(writeMessage2, (value >> 8).asInstanceOf[Byte])
-    spi.write(ByteBuffer.wrap(valueWriter1), 2.asInstanceOf[Byte])
-    spi.write(ByteBuffer.wrap(valueWriter2), 2.asInstanceOf[Byte])
+    spi.write(ByteBuffer.wrap(valueWriter1), 2)
+    spi.write(ByteBuffer.wrap(valueWriter2), 2)
   }
 }

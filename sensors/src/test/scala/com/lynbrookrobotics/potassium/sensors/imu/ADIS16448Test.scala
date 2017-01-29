@@ -16,6 +16,7 @@ class ADIS16448Test extends FunSuite with BeforeAndAfterEach with MockitoSugar {
   when(spi.read(same(false), any[ByteBuffer], same(2))).thenAnswer((inv) => {
     val byteBuffer = inv.getArguments.apply(1).asInstanceOf[ByteBuffer]
     byteBuffer.putShort(0, 16448)
+    0
   })
 
   val aDIS16448: ADIS16448 = new ADIS16448(spi, Milliseconds(5))
@@ -24,6 +25,7 @@ class ADIS16448Test extends FunSuite with BeforeAndAfterEach with MockitoSugar {
     when(spi.read(same(false), any[ByteBuffer], same(2))).thenAnswer((inv) => {
       val byteBuffer = inv.getArguments.apply(1).asInstanceOf[ByteBuffer]
       byteBuffer.putShort(0, out)
+      0
     })
   }
 
@@ -38,6 +40,8 @@ class ADIS16448Test extends FunSuite with BeforeAndAfterEach with MockitoSugar {
         case 0x08 =>
           configureSPIResponse(100)
       }
+
+      0
     })
 
     val velocity = aDIS16448.retrieveVelocity
