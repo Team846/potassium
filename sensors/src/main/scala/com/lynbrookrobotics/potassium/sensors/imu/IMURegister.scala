@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.sensors.imu
 
+>>>>>>> bc8452c... Uses WPILIB with SPI trait
 import java.nio.ByteBuffer
 import com.lynbrookrobotics.potassium.sensors.SPITrait
 
