@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.sensors.imu
 
-import com.lynbrookrobotics.potassium.sensors.SPI
+import com.lynbrookrobotics.potassium.sensors.SPITrait
 import java.nio.ByteBuffer
 
 /**
@@ -19,7 +19,7 @@ class IMURegister(register: Int) {
     * @param spi the interface to use for communication
     * @return a single value from the register
     */
-  def read(spi: SPI): Int = {
+  def read(spi: SPITrait): Int = {
     readBuffer.clear()
     spi.write(ByteBuffer.wrap(readMessage), 2)
     spi.read(false, readBuffer, 2)
@@ -33,7 +33,7 @@ class IMURegister(register: Int) {
     * @param value the value to write
     * @param spi   the interface to use for communication
     */
-  def write(value: Int, spi: SPI): Unit = {
+  def write(value: Int, spi: SPITrait): Unit = {
     val valueWriter1: Array[Byte] = Array(writeMessage1, value.asInstanceOf[Byte])
     val valueWriter2: Array[Byte] = Array(writeMessage2, (value >> 8).asInstanceOf[Byte])
     spi.write(ByteBuffer.wrap(valueWriter1), 2.asInstanceOf[Byte])

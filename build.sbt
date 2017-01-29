@@ -77,7 +77,7 @@ lazy val remote = project.dependsOn(coreJVM).settings(
   libraryDependencies ++= jvmDependencies
 )
 
-lazy val frc = project.dependsOn(coreJVM).settings(
+lazy val frc = project.dependsOn(coreJVM, sensors).settings(
   name := "potassium-frc",
   libraryDependencies ++= sharedDependencies.value,
   libraryDependencies ++= jvmDependencies
