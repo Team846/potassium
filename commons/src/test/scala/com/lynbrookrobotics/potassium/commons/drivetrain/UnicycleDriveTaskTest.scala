@@ -31,9 +31,12 @@ class UnicycleDriveTaskTest extends FunSuite {
 
     override protected def convertUnicycleToDrive(uni: UnicycleSignal): DriveSignal = uni
 
-    override protected val controlMode: UnicycleControlMode = NoOperation
+    override protected def controlMode(implicit hardware: DrivetrainHardware,
+                                       props: DrivetrainProperties): UnicycleControlMode = NoOperation
 
-    override protected def driveClosedLoop(signal: SignalLike[DriveSignal]): PeriodicSignal[DriveSignal] = signal.toPeriodic
+    override protected def driveClosedLoop(signal: SignalLike[DriveSignal])
+                                          (implicit hardware: DrivetrainHardware,
+                                           props: DrivetrainProperties): PeriodicSignal[DriveSignal] = signal.toPeriodic
 
     override type Drivetrain = Component[DriveSignal]
   }

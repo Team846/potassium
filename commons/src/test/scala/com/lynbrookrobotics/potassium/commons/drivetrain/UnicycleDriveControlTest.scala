@@ -31,9 +31,13 @@ class UnicycleDriveControlTest extends FunSuite {
 
     override protected def convertUnicycleToDrive(uni: UnicycleSignal): DriveSignal = uni
 
-    override protected val controlMode: UnicycleControlMode = NoOperation
+    override protected def controlMode(implicit hardware: DrivetrainHardware,
+                                       props: DrivetrainProperties): UnicycleControlMode = NoOperation
 
-    override protected def driveClosedLoop(signal: SignalLike[DriveSignal]): PeriodicSignal[DriveSignal] = signal.toPeriodic
+    override protected def driveClosedLoop(signal: SignalLike[DriveSignal])
+                                          (implicit hardware: DrivetrainHardware,
+                                           props: DrivetrainProperties): PeriodicSignal[DriveSignal] =
+      signal.toPeriodic
 
     override type Drivetrain = Nothing
   }
@@ -51,7 +55,7 @@ class UnicycleDriveControlTest extends FunSuite {
 
     check(forAll { x: Double =>
       val out = drive.UnicycleControllers.
-        openForwardClosedDrive(Signal.constant(Each(x))).
+        openForwardOpenDrive(Signal.constant(Each(x))).
         currentValue(Milliseconds(5))
       out.forward.toEach == x && out.turn.toEach == 0
     })
@@ -62,7 +66,7 @@ class UnicycleDriveControlTest extends FunSuite {
 
     check(forAll { x: Double =>
       val out = drive.UnicycleControllers.
-        openTurnClosedDrive(Signal.constant(Each(x))).
+        openTurnOpenDrive(Signal.constant(Each(x))).
         currentValue(Milliseconds(5))
       out.turn.toEach == x && out.forward.toEach == 0
     })

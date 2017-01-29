@@ -8,19 +8,11 @@ import squants.motion.AngularVelocity
 import squants.time.Seconds
 
 class TalonEncoder(talon: CANTalon, conversionFactor: Ratio[Angle, Dimensionless]) {
-  def getAngle(): Angle = {
-    conversionFactor * Each(talon.getPosition()) * 10
-  }
-
   val angle: Signal[Angle] = Signal {
-    getAngle()
+    conversionFactor * Each(talon.getPosition)
   }
 
   val angularVelocity: Signal[AngularVelocity] = Signal {
-    getAngularVelocity()
-  }
-
-  def getAngularVelocity(): AngularVelocity = {
-    (conversionFactor * Each(talon.getSpeed()) * 10) / Seconds(1)
+    (conversionFactor * Each(talon.getSpeed) * 10) / Seconds(1)
   }
 }
