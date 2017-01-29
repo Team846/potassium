@@ -1,4 +1,4 @@
-package com.lynbrookrobotics.potassium.sensors.imu
+package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import squants.Quantity
 
@@ -25,6 +25,20 @@ case class Value3D[Q <: Quantity[Q]](x: Q, y: Q, z: Q) {
       y - toSub.y,
       z - toSub.z
     )
+  }
+
+  def min(other: Value3D[Q]): Value3D[Q] = {
+    val magnitudeOther =
+      other.x.value * other.x.value +
+      other.y.value * other.y.value +
+      other.z.value * other.z.value
+    val magnitudeThis =
+      x.value * x.value +
+      y.value * y.value +
+      z.value * z.value
+
+    if (magnitudeOther >= magnitudeThis) other
+    else this
   }
 
   /**

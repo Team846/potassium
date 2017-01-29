@@ -1,10 +1,13 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
-import java.lang.Math._
-
+import com.lynbrookrobotics.potassium.control.PIDF
+import com.lynbrookrobotics.potassium.units.Ratio
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
+import squants.{Angle, Quantity}
 import squants.motion._
-import squants.space.Feet
+
+import squants.space.{Degrees, Feet, Length, Area}
+//case class Point[Q <: Quantity[Q]](x: Q, y: Q)
 
 trait UnicycleMotionProfileControllers
   extends UnicycleCoreControllers {
@@ -34,6 +37,8 @@ trait UnicycleMotionProfileControllers
                               initPosition: Distance,
                               target: Distance,
                               position: Signal[Distance]): PeriodicSignal[Velocity] = {
+    import java.lang.Math._
+
     val error            = position.map(target - _)
     val signError        = error.map(error => Math.signum(error.toFeet))
     val distanceTraveled = position.map(_ - initPosition)
@@ -92,4 +97,5 @@ trait UnicycleMotionProfileControllers
       case ((velDec, velAcc), sign) => sign * velDec min cruisingVelocity min velAcc
     }.toPeriodic
   }
+
 }
