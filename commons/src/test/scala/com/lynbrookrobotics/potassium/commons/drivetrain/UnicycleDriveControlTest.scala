@@ -4,12 +4,11 @@ import com.lynbrookrobotics.potassium.control.PIDFConfig
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal, SignalLike}
-
+import org.scalacheck.{Arbitrary, Gen}
 import squants.motion.{AngularVelocity, DegreesPerSecond, MetersPerSecond, MetersPerSecondSquared}
 import squants.space.{Degrees, Meters}
 import squants.time.{Milliseconds, Seconds}
 import squants.{Angle, Each, Length, Percent, Velocity}
-
 import org.scalacheck.Prop.forAll
 import org.scalatest.FunSuite
 import org.scalatest.prop.Checkers._
@@ -38,6 +37,14 @@ class UnicycleDriveControlTest extends FunSuite {
 
     override type Drivetrain = Nothing
   }
+
+  implicit val arbitraryVelocity: Arbitrary[Velocity] = Arbitrary(
+    Gen.chooseNum[Double](-100D, 100D).map(d => MetersPerSecond(d))
+  )
+
+  implicit val arbitraryAngularVelocity: Arbitrary[AngularVelocity] = Arbitrary(
+    Gen.chooseNum[Double](-100D, 100D).map(d => DegreesPerSecond(d))
+  )
 
   test("Open forward loop produces same forward speed as input and zero turn speed") {
     val drive = new TestDrivetrain
@@ -86,14 +93,14 @@ class UnicycleDriveControlTest extends FunSuite {
 
     val drive = new TestDrivetrain
 
-    check(forAll { (fwd: Double, turn: Double) =>
-      val in = Signal.constant(UnicycleVelocity(MetersPerSecond(fwd), DegreesPerSecond(turn)))
+    check(forAll { (fwd: Velocity, turn: AngularVelocity) =>
+      val in = Signal.constant(UnicycleVelocity(fwd, turn))
       val out = drive.UnicycleControllers.
         velocityControl(in).
         currentValue(Milliseconds(5))
 
-      (math.abs(out.forward.toEach - (fwd / 10)) / out.forward.toEach <= 0.0000001) &&
-        (math.abs(out.turn.toEach - (turn / 10)) / out.turn.toEach <= 0.0000001)
+      (math.abs(out.forward.toEach - (fwd.toMetersPerSecond / 10)) <= 0.01) &&
+        (math.abs(out.turn.toEach - (turn.toDegreesPerSecond / 10)) <= 0.01)
     })
   }
 
