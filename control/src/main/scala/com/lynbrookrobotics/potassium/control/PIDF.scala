@@ -10,7 +10,7 @@ case class PIDFConfig[S <: Quantity[S],
                       SWithI <: Quantity[SWithI] with TimeDerivative[I],
                       D <: Quantity[D] with TimeDerivative[SWithD],
                       I <: Quantity[I] with TimeIntegral[SWithI],
-                      U <: Quantity[U]](kp: Ratio[U, S], kd: Ratio[U, D], ki: Ratio[U, I], kf: Ratio[U, S])
+                      U <: Quantity[U]](kp: Ratio[U, S], ki: Ratio[U, I], kd: Ratio[U, D], kf: Ratio[U, S])
 
 object PIDF {
   def proportionalControl[S <: Quantity[S], U <: Quantity[U]](signal: PeriodicSignal[S], target: PeriodicSignal[S], gain: Ratio[U, S]): PeriodicSignal[U] = {
