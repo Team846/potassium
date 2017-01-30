@@ -16,7 +16,7 @@ trait FiniteTaskFinishedListener {
 /**
   * A task that can stop itself by calling `finished()` when it is done
   */
-abstract class FiniteTask extends Task {
+abstract class FiniteTask extends Task { self =>
   private var running = false
   private var listeners: List[WeakReference[FiniteTaskFinishedListener]] = List.empty
 
@@ -85,6 +85,12 @@ abstract class FiniteTask extends Task {
     */
   def withTimeout(timeout: Time)(implicit clock: Clock): FiniteTask = {
     new TimeoutFiniteTask(this, timeout, clock)
+  }
+
+  def toContinuous: ContinuousTask = new ContinuousTask {
+    override def onStart() = self.init()
+
+    override def onEnd() = self.abort()
   }
 }
 

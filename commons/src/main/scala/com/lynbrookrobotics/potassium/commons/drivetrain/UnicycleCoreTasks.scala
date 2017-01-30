@@ -13,7 +13,8 @@ trait UnicycleCoreTasks {
   import controllers._
 
   class ContinuousClosedDrive(forward: Signal[Dimensionless], turn: Signal[Dimensionless])
-                             (implicit drive: Drivetrain) extends ContinuousTask {
+                             (implicit drive: Drivetrain, hardware: DrivetrainHardware,
+                              props: DrivetrainProperties) extends ContinuousTask {
     override def onStart(): Unit = {
       val combined = forward.zip(turn).map(t => UnicycleSignal(t._1, t._2))
       drive.setController(parentClosedLoop(combined))

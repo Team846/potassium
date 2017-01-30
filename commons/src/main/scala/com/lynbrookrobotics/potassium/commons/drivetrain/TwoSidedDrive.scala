@@ -10,10 +10,10 @@ import squants.space.Meters
 import squants.{Dimensionless, Each, Time, Velocity}
 
 trait TwoSidedDriveHardware extends UnicycleHardware {
-  val leftVelocity: Signal[Velocity]
-  val rightVelocity: Signal[Velocity]
+  def leftVelocity: Signal[Velocity]
+  def rightVelocity: Signal[Velocity]
 
-  val forwardVelocity: Signal[Velocity] =
+  lazy val forwardVelocity: Signal[Velocity] =
     leftVelocity.zip(rightVelocity).map(t => (t._1 + t._2) / 2)
 }
 
