@@ -10,12 +10,26 @@ trait UnicycleCoreControllers {
   type DrivetrainHardware <: UnicycleHardware
   type DrivetrainProperties <: UnicycleProperties
 
-  def parentClosedLoop(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal]
-  def openForwardClosedDrive(forwardSpeed: Signal[Dimensionless]): PeriodicSignal[DriveSignal] = {
+  def parentOpenLoop(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal]
+
+  def parentClosedLoop(unicycle: SignalLike[UnicycleSignal])(implicit hardware: DrivetrainHardware,
+                                                             props: DrivetrainProperties): PeriodicSignal[DriveSignal]
+
+  def openForwardOpenDrive(forwardSpeed: Signal[Dimensionless]): PeriodicSignal[DriveSignal] = {
+    parentOpenLoop(forwardSpeed.map(f => UnicycleSignal(f, Percent(0))))
+  }
+
+  def openForwardClosedDrive(forwardSpeed: Signal[Dimensionless])(implicit hardware: DrivetrainHardware,
+                                                                  props: DrivetrainProperties): PeriodicSignal[DriveSignal] = {
     parentClosedLoop(forwardSpeed.map(f => UnicycleSignal(f, Percent(0))))
   }
 
-  def openTurnClosedDrive(turnSpeed: Signal[Dimensionless]): PeriodicSignal[DriveSignal] = {
+  def openTurnOpenDrive(turnSpeed: Signal[Dimensionless]): PeriodicSignal[DriveSignal] = {
+    parentOpenLoop(turnSpeed.map(t => UnicycleSignal(Percent(0), t)))
+  }
+
+  def openTurnClosedDrive(turnSpeed: Signal[Dimensionless])(implicit hardware: DrivetrainHardware,
+                                                            props: DrivetrainProperties): PeriodicSignal[DriveSignal] = {
     parentClosedLoop(turnSpeed.map(t => UnicycleSignal(Percent(0), t)))
   }
 

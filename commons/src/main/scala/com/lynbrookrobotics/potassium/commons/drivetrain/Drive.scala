@@ -17,7 +17,8 @@ trait Drive {
     * @param signal the signal to drive with
     * @return
     */
-  protected def driveClosedLoop(signal: SignalLike[DriveSignal]): PeriodicSignal[DriveSignal]
+  protected def driveClosedLoop(signal: SignalLike[DriveSignal])(implicit hardware: DrivetrainHardware,
+                                                                 props: DrivetrainProperties): PeriodicSignal[DriveSignal]
 
   protected def defaultController(implicit hardware: DrivetrainHardware,
                                   props: DrivetrainProperties): PeriodicSignal[DriveSignal]

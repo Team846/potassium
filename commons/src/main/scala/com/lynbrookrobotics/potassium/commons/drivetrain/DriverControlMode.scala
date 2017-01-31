@@ -7,4 +7,6 @@ trait UnicycleControlMode
 
 case object NoOperation extends UnicycleControlMode
 
-case class ArcadeControls(forward: Signal[Dimensionless], turn: Signal[Dimensionless]) extends UnicycleControlMode
+case class ArcadeControlsOpen(forward: Signal[Dimensionless], turn: Signal[Dimensionless]) extends UnicycleControlMode
+
+case class ArcadeControlsClosed(forward: Signal[Dimensionless], turn: Signal[Dimensionless]) extends UnicycleControlMode

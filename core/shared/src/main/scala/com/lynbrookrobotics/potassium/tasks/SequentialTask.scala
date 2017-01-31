@@ -32,6 +32,12 @@ class SequentialTask private[tasks] (first: FiniteTask, second: FiniteTask)
   }
 
   override def onEnd(): Unit = {
+    if (currentPhase == RunningFirst) {
+      first.abort()
+    } else if (currentPhase == RunningSecond) {
+      second.abort()
+    }
+
     currentPhase = Stopped
   }
 }
