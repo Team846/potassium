@@ -7,9 +7,6 @@ import squants.{Angle, Quantity}
 import squants.motion._
 import squants.space.{Area, Degrees, Feet, Length}
 
-import scala.annotation.tailrec
-//case class Point[Q <: Quantity[Q]](x: Q, y: Q)
-
 trait UnicycleMotionProfileControllers
   extends UnicycleCoreControllers {
   /**
