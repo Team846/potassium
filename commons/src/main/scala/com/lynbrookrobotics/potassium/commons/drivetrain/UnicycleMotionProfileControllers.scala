@@ -5,8 +5,9 @@ import com.lynbrookrobotics.potassium.units.Ratio
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
 import squants.{Angle, Quantity}
 import squants.motion._
+import squants.space.{Area, Degrees, Feet, Length}
 
-import squants.space.{Degrees, Feet, Length, Area}
+import scala.annotation.tailrec
 //case class Point[Q <: Quantity[Q]](x: Q, y: Q)
 
 trait UnicycleMotionProfileControllers
@@ -97,5 +98,5 @@ trait UnicycleMotionProfileControllers
       case ((velDec, velAcc), sign) => sign * velDec min cruisingVelocity min velAcc
     }.toPeriodic
   }
-
+  
 }
