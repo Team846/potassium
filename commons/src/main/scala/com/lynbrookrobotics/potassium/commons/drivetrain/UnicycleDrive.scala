@@ -61,16 +61,7 @@ trait UnicycleDrive extends Drive { self =>
     * @return the parent's equivalent signal
     */
   protected def convertUnicycleToDrive(uni: UnicycleSignal): DriveSignal
-
-  /**
-    * Uses the parent's open loop control for the equivalent drive signal for the unicycle signal
-    * @param unicycle the unicycle signal to drive with
-    * @return a signal controlled with open-loop on the parent
-    */
-  private def parentOpenLoop(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal] = {
-    unicycle.map(convertUnicycleToDrive).toPeriodic
-  }
-
+  
   object UnicycleControllers extends UnicycleCoreControllers
     with UnicycleMotionProfileControllers {
     type DriveSignal = self.DriveSignal
@@ -78,11 +69,21 @@ trait UnicycleDrive extends Drive { self =>
     type DrivetrainProperties = self.DrivetrainProperties
 
     /**
+      * Uses the parent's open loop control for the equivalent drive signal for the unicycle signal
+      * @param unicycle the unicycle signal to drive with
+      * @return a signal controlled with open-loop on the parent
+      */
+    def parentOpenLoop(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal] = {
+      unicycle.map(convertUnicycleToDrive).toPeriodic
+    }
+
+    /**
       * Uses the parent's closed loop control for the drive signal for the unicycle signal
       * @param unicycle the unicycle signal to closed-loop drive with
       * @return a signal controlled with closed-loop on the parent
       */
-    def parentClosedLoop(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal] = {
+    def parentClosedLoop(unicycle: SignalLike[UnicycleSignal])(implicit hardware: DrivetrainHardware,
+                                                               props: DrivetrainProperties): PeriodicSignal[DriveSignal] = {
       driveClosedLoop(unicycle.map(convertUnicycleToDrive))
     }
   }
@@ -94,7 +95,8 @@ trait UnicycleDrive extends Drive { self =>
     override val controllers = UnicycleControllers
   }
 
-  protected def controlMode: UnicycleControlMode
+  protected def controlMode(implicit hardware: DrivetrainHardware,
+                            props: DrivetrainProperties): UnicycleControlMode
 
   override protected def defaultController(implicit hardware: DrivetrainHardware,
                                            props: DrivetrainProperties): PeriodicSignal[DriveSignal] = {
@@ -102,7 +104,11 @@ trait UnicycleDrive extends Drive { self =>
       case NoOperation =>
         parentOpenLoop(Signal.constant(UnicycleSignal(Percent(0), Percent(0))))
 
-      case ArcadeControls(forward, turn) =>
+      case ArcadeControlsOpen(forward, turn) =>
+        val combinedSignal = forward.zip(turn).map(t => UnicycleSignal(t._1, t._2))
+        parentOpenLoop(combinedSignal)
+
+      case ArcadeControlsClosed(forward, turn) =>
         val combinedSignal = forward.zip(turn).map(t => UnicycleSignal(t._1, t._2))
         parentClosedLoop(speedControl(combinedSignal))
     }
