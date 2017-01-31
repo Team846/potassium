@@ -20,5 +20,8 @@ object Test extends App{
 
   maxFwdSpeed.value = MetersPerSecond(16.0)
 
-  println(maxFwdSpeed.value)
+  while (true) {
+    println(maxFwdSpeed.value.toMetersPerSecond)
+    Thread.sleep(1000)
+  }
 }
