@@ -83,7 +83,7 @@ trait UnicycleDrive extends Drive { self =>
       * @return a signal controlled with closed-loop on the parent
       */
     def parentClosedLoop(unicycle: SignalLike[UnicycleSignal])(implicit hardware: DrivetrainHardware,
-                                                               props: DrivetrainProperties): PeriodicSignal[DriveSignal] = {
+                                                               props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal] = {
       driveClosedLoop(unicycle.map(convertUnicycleToDrive))
     }
   }
@@ -99,8 +99,8 @@ trait UnicycleDrive extends Drive { self =>
                             props: DrivetrainProperties): UnicycleControlMode
 
   override protected def defaultController(implicit hardware: DrivetrainHardware,
-                                           props: DrivetrainProperties): PeriodicSignal[DriveSignal] = {
-    controlMode match {
+                                           props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal] = {
+    controlMode(hardware, props.get) match {
       case NoOperation =>
         parentOpenLoop(Signal.constant(UnicycleSignal(Percent(0), Percent(0))))
 
