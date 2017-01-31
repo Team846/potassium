@@ -1,16 +1,14 @@
 package com.lynbrookrobotics.potassium.sensors.imu
 
-import com.lynbrookrobotics.potassium.sensors.SPI
-import squants.motion.AngularVelocity
 import java.nio.ByteBuffer
-
+import com.lynbrookrobotics.potassium.sensors.SPITrait
 import squants.Time
 import squants.motion.{AngularVelocity, DegreesPerSecond}
 
 /**
   * An interface for communicating with the ADIS16448 IMU.
   */
-class ADIS16448(spi: SPI, updatePeriod: Time) extends DigitalGyro(updatePeriod) {
+class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePeriod) {
   private object Registers {
     // List of register addresses on the IMU
     // Sample period

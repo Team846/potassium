@@ -52,5 +52,7 @@ object Implicits {
     }
   }
 
+  implicit def spiToWrapper(spi: SPI): SPIWrapper = new SPIWrapper(spi)
+
   implicit val clock = WPIClock
 }
