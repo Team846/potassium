@@ -41,6 +41,30 @@ class PeriodicSignalTest extends FunSuite {
     assert(checkResult == 1)
   }
 
+  test("Peek returns None until value is calculated") {
+    val periodicSignal = Signal(0).toPeriodic
+    val peekedSignal = periodicSignal.peek
+
+    assert(peekedSignal.get.isEmpty)
+
+    periodicSignal.currentValue(Milliseconds(5))
+
+    assert(peekedSignal.get.contains(0))
+  }
+
+  test("Polling signal correctly updates value") {
+    implicit val (clock, ticker) = ClockMocking.mockedClockTicker
+    val periodicSignal = Signal(0).toPeriodic
+
+    val polled = periodicSignal.toPollingSignal(Milliseconds(5))
+
+    assert(polled.get.isEmpty)
+
+    ticker(Milliseconds(5))
+
+    assert(polled.get.contains(0))
+  }
+
   test("Derivative of constant signal is always zero") {
     val sig = Signal(Feet(0)).toPeriodic.derivative
     (1 to 100).foreach { _ =>
@@ -113,6 +137,4 @@ class PeriodicSignalTest extends FunSuite {
       assert(shouldBeSame.currentValue(Milliseconds(5)) ~= MetersPerSecond(1))
     }
   }
-
-
 }
