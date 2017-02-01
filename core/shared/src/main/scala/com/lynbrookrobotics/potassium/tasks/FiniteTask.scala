@@ -32,7 +32,7 @@ abstract class FiniteTask extends Task { self =>
     * Marks the task as finished. This should be called inside an implementation
     * of FiniteTask when the task is complete.
     */
-  protected def finished(): Unit = {
+  protected final def finished(): Unit = {
     if (running) {
       onEnd()
       running = false
@@ -95,7 +95,7 @@ abstract class FiniteTask extends Task { self =>
 }
 
 object FiniteTask {
-  def empty: FiniteTask = new FiniteTask {
+  final def empty: FiniteTask = new FiniteTask {
     override def onStart(): Unit = finished()
 
     override def onEnd(): Unit = {}
