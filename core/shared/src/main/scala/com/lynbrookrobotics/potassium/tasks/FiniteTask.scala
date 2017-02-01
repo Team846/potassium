@@ -49,8 +49,8 @@ abstract class FiniteTask extends Task { self =>
     }
   }
 
-  def onStart(): Unit
-  def onEnd(): Unit
+  protected def onStart(): Unit
+  protected def onEnd(): Unit
 
   def isRunning: Boolean = running
 
@@ -75,6 +75,24 @@ abstract class FiniteTask extends Task { self =>
     */
   def then(that: FiniteTask): FiniteTask = {
     new SequentialTask(this, that)
+  }
+
+  /**
+    * Creates a task that runs this task and the given task in parallel
+    * @param that the other task to run
+    * @return a parallel task combining both tasks
+    */
+  def and(that: FiniteTask): FiniteTask = {
+    new ParallelFiniteTask(this, that)
+  }
+
+  /**
+    * Creates a task that runs a continuous task while this task is running
+    * @param that the continuous task to run
+    * @return a finite task that runs this and the continuous task
+    */
+  def andUntilDone(that: ContinuousTask): FiniteTask = {
+    new AndUntilDoneTask(this, that)
   }
 
   /**
