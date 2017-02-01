@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium
 
+import com.lynbrookrobotics.potassium.clock.Clock
 import squants.{Quantity, Time}
 import squants.time.{TimeDerivative, TimeIntegral}
 
@@ -200,6 +201,28 @@ abstract class PeriodicSignal[T] { self =>
         parent.foreach(_.detachTickSource(source))
       }
     }
+  }
+
+  /**
+    * Gives a signal returning the (optional) last calculated value
+    */
+  def peek: Signal[Option[T]] = Signal {
+    lastCalculated.map(_._1)
+  }
+
+  /**
+    * Converts the periodic signal to a signal by polling at a fixed rate
+    * @param period the interval to poll at
+    * @param clock the clock to use to register periodic updates
+    * @return a signal return the (optional) last polled value
+    */
+  def toPollingSignal(period: Time)(implicit clock: Clock): Signal[Option[T]] = {
+    attachTickSource(this)
+    clock(period) { dt =>
+      currentValue(dt)
+    }
+
+    peek
   }
 }
 
