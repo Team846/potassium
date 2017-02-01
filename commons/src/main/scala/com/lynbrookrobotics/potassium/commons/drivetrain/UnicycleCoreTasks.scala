@@ -14,7 +14,7 @@ trait UnicycleCoreTasks {
 
   class ContinuousClosedDrive(forward: Signal[Dimensionless], turn: Signal[Dimensionless])
                              (implicit drive: Drivetrain, hardware: DrivetrainHardware,
-                              props: DrivetrainProperties) extends ContinuousTask {
+                              props: Signal[DrivetrainProperties]) extends ContinuousTask {
     override def onStart(): Unit = {
       val combined = forward.zip(turn).map(t => UnicycleSignal(t._1, t._2))
       drive.setController(parentClosedLoop(combined))
@@ -28,7 +28,7 @@ trait UnicycleCoreTasks {
   class ContinuousVelocityDrive(forward: Signal[Velocity], turn: Signal[AngularVelocity])
                                (implicit drive: Drivetrain,
                                 hardware: DrivetrainHardware,
-                                props: DrivetrainProperties) extends ContinuousTask {
+                                props: Signal[DrivetrainProperties]) extends ContinuousTask {
     override def onStart(): Unit = {
       val combined = forward.zip(turn).map(t => UnicycleVelocity(t._1, t._2))
       drive.setController(parentClosedLoop(velocityControl(combined)))
@@ -42,7 +42,7 @@ trait UnicycleCoreTasks {
   class DriveDistance(distance: Length, tolerance: Length)
                      (implicit drive: Drivetrain,
                       hardware: DrivetrainHardware,
-                      props: DrivetrainProperties) extends FiniteTask {
+                      props: Signal[DrivetrainProperties]) extends FiniteTask {
     override def onStart(): Unit = {
       val absoluteDistance = hardware.forwardPosition.get + distance
       val (controller, error) = forwardPositionControl(absoluteDistance)
@@ -64,7 +64,7 @@ trait UnicycleCoreTasks {
   class DriveDistanceStraight(distance: Length, toleranceForward: Length, toleranceAngle: Angle)
                              (implicit drive: Drivetrain,
                               hardware: DrivetrainHardware,
-                              props: DrivetrainProperties) extends FiniteTask {
+                              props: Signal[DrivetrainProperties]) extends FiniteTask {
     override def onStart(): Unit = {
       val absoluteDistance = hardware.forwardPosition.get + distance
       val (forwardController, forwardError) = forwardPositionControl(absoluteDistance)
@@ -91,7 +91,7 @@ trait UnicycleCoreTasks {
   class RotateByAngle(relativeAngle: Angle, tolerance: Angle)
                      (implicit drive: Drivetrain,
                       hardware: DrivetrainHardware,
-                      props: DrivetrainProperties) extends FiniteTask {
+                      props: Signal[DrivetrainProperties]) extends FiniteTask {
     override def onStart(): Unit = {
       val absoluteAngle = hardware.turnPosition.get + relativeAngle
       val (controller, error) = turnPositionControl(absoluteAngle)

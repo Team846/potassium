@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
-import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, SignalLike}
+import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, SignalLike}
 
 /**
   * Represents a drivetrain container with a signal type, default controller, and component
@@ -18,10 +18,10 @@ trait Drive {
     * @return
     */
   protected def driveClosedLoop(signal: SignalLike[DriveSignal])(implicit hardware: DrivetrainHardware,
-                                                                 props: DrivetrainProperties): PeriodicSignal[DriveSignal]
+                                                                 props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal]
 
   protected def defaultController(implicit hardware: DrivetrainHardware,
-                                  props: DrivetrainProperties): PeriodicSignal[DriveSignal]
+                                  props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal]
 
   type Drivetrain <: Component[DriveSignal]
 }
