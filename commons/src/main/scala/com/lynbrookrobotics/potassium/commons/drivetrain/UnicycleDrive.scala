@@ -3,11 +3,12 @@ package com.lynbrookrobotics.potassium.commons.drivetrain
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal, SignalLike}
 import squants.motion.AngularVelocity
-import squants.{Angle, Dimensionless, Length, Percent, Velocity}
+import squants.{Acceleration, Angle, Dimensionless, Length, Percent, Velocity}
 
 trait UnicycleProperties {
   val maxForwardVelocity: Velocity
   val maxTurnVelocity: AngularVelocity
+  val maxAcceleration: Acceleration
 
   val forwardControlGains: ForwardVelocityGains
 
@@ -75,8 +76,8 @@ trait UnicycleDrive extends Drive { self =>
       * @param unicycle the unicycle signal to closed-loop drive with
       * @return a signal controlled with closed-loop on the parent
       */
-    def parentClosedLoop(unicycle: SignalLike[UnicycleSignal])(implicit hardware: DrivetrainHardware,
-                                                               props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal] = {
+    def lowerLevelVelocityControl(unicycle: SignalLike[UnicycleSignal])(implicit hardware: DrivetrainHardware,
+                                                                        props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal] = {
       driveClosedLoop(unicycle.map(convertUnicycleToDrive))
     }
   }
@@ -103,7 +104,7 @@ trait UnicycleDrive extends Drive { self =>
 
       case ArcadeControlsClosed(forward, turn) =>
         val combinedSignal = forward.zip(turn).map(t => UnicycleSignal(t._1, t._2))
-        parentClosedLoop(speedControl(combinedSignal))
+        lowerLevelVelocityControl(speedControl(combinedSignal))
     }
   }
 }

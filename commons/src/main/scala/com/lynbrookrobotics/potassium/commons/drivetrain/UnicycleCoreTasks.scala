@@ -1,9 +1,12 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
+import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.{Component, Signal}
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask}
-import squants.{Angle, Dimensionless, Length, Velocity}
-import squants.motion.AngularVelocity
+import squants.{Acceleration, Angle, Dimensionless, Length, Velocity}
+import squants.motion.{AngularVelocity, DegreesPerSecond, Distance, FeetPerSecond}
+import squants.space.Feet
+import squants.time.Milliseconds
 
 trait UnicycleCoreTasks {
   val controllers: UnicycleCoreControllers with UnicycleMotionProfileControllers
@@ -17,7 +20,7 @@ trait UnicycleCoreTasks {
                               props: Signal[DrivetrainProperties]) extends ContinuousTask {
     override def onStart(): Unit = {
       val combined = forward.zip(turn).map(t => UnicycleSignal(t._1, t._2))
-      drive.setController(parentClosedLoop(combined))
+      drive.setController(lowerLevelVelocityControl(combined))
     }
 
     override def onEnd(): Unit = {
@@ -31,7 +34,7 @@ trait UnicycleCoreTasks {
                                 props: Signal[DrivetrainProperties]) extends ContinuousTask {
     override def onStart(): Unit = {
       val combined = forward.zip(turn).map(t => UnicycleVelocity(t._1, t._2))
-      drive.setController(parentClosedLoop(velocityControl(combined)))
+      drive.setController(lowerLevelVelocityControl(velocityControl(combined)))
     }
 
     override def onEnd(): Unit = {
@@ -53,13 +56,78 @@ trait UnicycleCoreTasks {
         }
       }
 
-      drive.setController(parentClosedLoop(speedControl(checkedController)))
+      drive.setController(lowerLevelVelocityControl(speedControl(checkedController)))
     }
 
     override def onEnd(): Unit = {
       drive.resetToDefault()
     }
   }
+
+  class DriveDistanceWithTrapazoidalProfile(cruisingVelocity: Velocity,
+                                            finalVelocity: Velocity,
+                                            acceleration: Acceleration,
+                                            targetDistance: Length,
+                                            position: Signal[Length])
+                                           (implicit drive: Drivetrain,
+                                            hardware: DrivetrainHardware,
+                                            properties: Signal[DrivetrainProperties],
+                                            clock: Clock) extends FiniteTask {
+    if (cruisingVelocity.abs > properties.get.maxForwardVelocity) {
+      throw new IllegalArgumentException("Input speed: " +
+        cruisingVelocity.abs.toFeetPerSecond +
+        " ft/s is greater than max speed")
+    }
+
+    override final def onStart(): Unit = {
+      val (velocity, error) = trapezoidalDriveControl(
+        hardware.forwardVelocity.get, // not map because we need position at this time
+        cruisingVelocity,
+        finalVelocity,
+        acceleration,
+        hardware.forwardPosition.get, // not map because we need position at this time
+        targetDistance,
+        position)
+
+      val unicycleOutput = velocity.map(UnicycleVelocity(_, DegreesPerSecond(0)))
+
+      drive.setController(
+        lowerLevelVelocityControl(velocityControl(unicycleOutput).withCheck { _ =>
+          val velocityVal = velocity.toPollingSignal(Milliseconds(20)).get.getOrElse(FeetPerSecond(-20.0))
+          println("curr pos: ", hardware.forwardPosition.get.toFeet, " ft", " error: ", error.get.toFeet, " ft", "velocity output: " + velocityVal.toFeetPerSecond , "ft/s")
+
+          if (error.get.abs < Feet(0.1)) {
+            println("finished!")
+            finished()
+          }
+        })
+      )
+    }
+
+    override def onEnd(): Unit = {
+      drive.resetToDefault()
+    }
+  }
+
+  /**
+    * drives the target distance with default values for acceleration and cruising velocity
+    * TODO: finish adding docs
+    * @param targetForwardDistance
+    * @param finalVelocity
+    * @param drive
+    * @param hardware
+    * @param properties
+    */
+  class DriveDistanceSmooth(targetForwardDistance: Length, finalVelocity: Velocity)
+                           (implicit drive: Drivetrain,
+                            hardware: DrivetrainHardware,
+                            properties: Signal[DrivetrainProperties], // TODO: clock is temporary for loggin reasons
+                            clock: Clock) extends DriveDistanceWithTrapazoidalProfile(
+                                0.5 * properties.get.maxForwardVelocity,
+                                finalVelocity,
+                                properties.get.maxAcceleration,
+                                targetForwardDistance,
+                                hardware.forwardPosition)
 
   class DriveDistanceStraight(distance: Length, toleranceForward: Length, toleranceAngle: Angle)
                              (implicit drive: Drivetrain,
@@ -75,12 +143,13 @@ trait UnicycleCoreTasks {
       val combinedController = forwardController.zip(turnController).map(t => t._1 + t._2)
 
       val checkedController = combinedController.withCheck { _ =>
+        println("in driveDistance straight Controller")
         if (forwardError.get.abs < toleranceForward && turnError.get.abs < toleranceAngle) {
           finished()
         }
       }
 
-      drive.setController(parentClosedLoop(speedControl(checkedController)))
+      drive.setController(lowerLevelVelocityControl(speedControl(checkedController)))
     }
 
     override def onEnd(): Unit = {
@@ -101,7 +170,7 @@ trait UnicycleCoreTasks {
         }
       }
 
-      drive.setController(parentClosedLoop(speedControl(checkedController)))
+      drive.setController(lowerLevelVelocityControl(speedControl(checkedController)))
     }
 
     override def onEnd(): Unit = {

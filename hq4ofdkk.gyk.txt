@@ -1,0 +1,12 @@
+﻿
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch trapezoidal-drive-task
+# Your branch is up-to-date with 'origin/trapezoidal-drive-task'.
+#
+# Changes to be committed:
+#	modified:   commons/src/main/scala/com/lynbrookrobotics/potassium/commons/drivetrain/UnicycleCoreTasks.scala
+#	modified:   commons/src/main/scala/com/lynbrookrobotics/potassium/commons/drivetrain/UnicycleDrive.scala
+#	modified:   commons/src/main/scala/com/lynbrookrobotics/potassium/commons/drivetrain/UnicycleMotionProfileControllers.scala
+#
+

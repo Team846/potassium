@@ -16,10 +16,16 @@ scalaVersion in ThisBuild := "2.12.1"
 resolvers in ThisBuild += "Funky-Repo" at "http://team846.github.io/repo"
 
 lazy val sharedDependencies = Def.setting(Seq(
+<<<<<<< HEAD
   "org.typelevel"  %%% "squants"  % "1.2.0-1",
   "org.scalatest" %%% "scalatest" % "3.0.1" % Test,
   "org.scalacheck" %%% "scalacheck" % "1.13.4" % Test
 ))
+=======
+  "org.typelevel"  %% "squants"  % "1.2.0-SNAPSHOT",
+  "org.scalatest" %% "scalatest" % "3.0.1" % Test,
+  "org.scalacheck" %% "scalacheck" % "1.13.4" % Test))
+>>>>>>> Add a controller to drive a distance with  a trapazoidal motion profile. Also add a task to use this controller, including a task with default values such as max acceleration and cruising velocity already set.
 
 lazy val jvmDependencies = Seq(
   "org.mockito" % "mockito-core" % "2.3.11" % Test,

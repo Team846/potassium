@@ -21,7 +21,7 @@ trait UnicycleMotionProfileControllers
     * @param finalVelocity desired final velocity when target is reached
     * @param acceleration desired magnitude of acceleration of the system
     * @param initPosition initial position of the system
-    * @param target target position
+    * @param targetForwardTravel target position
     * @param position current position
     * @return velocity to travel at to achieve a trapezoidal motion profile.
     *         This value must be used a well tuned velocity controller to result
@@ -32,9 +32,10 @@ trait UnicycleMotionProfileControllers
                               finalVelocity: Velocity,
                               acceleration: Acceleration,
                               initPosition: Distance,
-                              target: Distance,
-                              position: Signal[Distance]): PeriodicSignal[Velocity] = {
-    val error            = position.map(target - _)
+                              targetForwardTravel: Distance,
+                              position: Signal[Distance]): (PeriodicSignal[Velocity], Signal[Distance]) = {
+    val targetPosition   = initPosition + targetForwardTravel
+    val error            = position.map(targetPosition - _)
     val signError        = error.map(error => Math.signum(error.toFeet))
     val distanceTraveled = position.map(_ - initPosition)
 
@@ -88,8 +89,10 @@ trait UnicycleMotionProfileControllers
     }
 
     // Ensure that motion is in the direction of the error
-    velocityDeccel.zip(velocityAccel).zip(signError).map {
+    val velocityOutput = velocityDeccel.zip(velocityAccel).zip(signError).map {
       case ((velDec, velAcc), sign) => sign * velDec min cruisingVelocity min velAcc
     }.toPeriodic
+
+    (velocityOutput, error)
   }
 }

@@ -6,9 +6,11 @@ import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, SignalLike}
 import squants.motion.{AngularVelocity, DegreesPerSecond, MetersPerSecond, MetersPerSecondSquared}
+import squants.motion._
 import squants.space.{Degrees, Meters}
 import squants.time.{Milliseconds, Seconds}
-import squants.{Angle, Length, Percent, Velocity}
+
+import squants.{Acceleration, Angle, Length, Percent, Velocity}
 import org.scalatest.FunSuite
 
 class UnicycleDriveTaskTest extends FunSuite {
@@ -45,6 +47,7 @@ class UnicycleDriveTaskTest extends FunSuite {
     val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = MetersPerSecond(10)
       override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
+      override val maxAcceleration: Acceleration = FeetPerSecondSquared(15)
 
       override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
@@ -122,6 +125,7 @@ class UnicycleDriveTaskTest extends FunSuite {
     val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = MetersPerSecond(10)
       override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
+      override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
 
       override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
@@ -218,6 +222,7 @@ class UnicycleDriveTaskTest extends FunSuite {
     val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = MetersPerSecond(10)
       override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
+      override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
 
       override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
