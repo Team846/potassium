@@ -36,7 +36,7 @@ class UnicycleDriveTaskTest extends FunSuite {
 
     override protected def driveClosedLoop(signal: SignalLike[DriveSignal])
                                           (implicit hardware: DrivetrainHardware,
-                                           props: DrivetrainProperties): PeriodicSignal[DriveSignal] = signal.toPeriodic
+                                           props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal] = signal.toPeriodic
 
     override type Drivetrain = Component[DriveSignal]
   }
@@ -44,7 +44,7 @@ class UnicycleDriveTaskTest extends FunSuite {
   test("Drive distance task sets up correct relative position and ends at target") {
     val drive = new TestDrivetrain
 
-    val props = new UnicycleProperties {
+    val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = MetersPerSecond(10)
       override def maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
 
@@ -70,7 +70,7 @@ class UnicycleDriveTaskTest extends FunSuite {
       )
 
       override def turnPositionControlGains = ???
-    }
+    })
 
     var lastAppliedSignal: UnicycleSignal = null
 
@@ -124,7 +124,7 @@ class UnicycleDriveTaskTest extends FunSuite {
   test("Drive distance straight task sets up correct relative position and ends at target") {
     val drive = new TestDrivetrain
 
-    val props = new UnicycleProperties {
+    val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = MetersPerSecond(10)
       override def maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
 
@@ -155,7 +155,7 @@ class UnicycleDriveTaskTest extends FunSuite {
         Percent(0) / DegreesPerSecond(1),
         Percent(0) / Degrees(1)
       )
-    }
+    })
 
     var lastAppliedSignal: UnicycleSignal = null
 
@@ -224,7 +224,7 @@ class UnicycleDriveTaskTest extends FunSuite {
   test("Turn angle task sets up correct relative position and ends at target") {
     val drive = new TestDrivetrain
 
-    val props = new UnicycleProperties {
+    val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = MetersPerSecond(10)
       override def maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
 
@@ -250,7 +250,7 @@ class UnicycleDriveTaskTest extends FunSuite {
         Percent(0) / DegreesPerSecond(1),
         Percent(0) / Degrees(1)
       )
-    }
+    })
 
     var lastAppliedSignal: UnicycleSignal = null
 

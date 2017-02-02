@@ -13,14 +13,14 @@ trait UnicycleCoreControllers {
   def parentOpenLoop(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal]
 
   def parentClosedLoop(unicycle: SignalLike[UnicycleSignal])(implicit hardware: DrivetrainHardware,
-                                                             props: DrivetrainProperties): PeriodicSignal[DriveSignal]
+                                                             props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal]
 
   def openForwardOpenDrive(forwardSpeed: Signal[Dimensionless]): PeriodicSignal[DriveSignal] = {
     parentOpenLoop(forwardSpeed.map(f => UnicycleSignal(f, Percent(0))))
   }
 
   def openForwardClosedDrive(forwardSpeed: Signal[Dimensionless])(implicit hardware: DrivetrainHardware,
-                                                                  props: DrivetrainProperties): PeriodicSignal[DriveSignal] = {
+                                                                  props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal] = {
     parentClosedLoop(forwardSpeed.map(f => UnicycleSignal(f, Percent(0))))
   }
 
@@ -29,26 +29,25 @@ trait UnicycleCoreControllers {
   }
 
   def openTurnClosedDrive(turnSpeed: Signal[Dimensionless])(implicit hardware: DrivetrainHardware,
-                                                            props: DrivetrainProperties): PeriodicSignal[DriveSignal] = {
+                                                            props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal] = {
     parentClosedLoop(turnSpeed.map(t => UnicycleSignal(Percent(0), t)))
   }
 
   def velocityControl(target: SignalLike[UnicycleVelocity])
                      (implicit hardware: DrivetrainHardware,
-                      props: DrivetrainProperties): PeriodicSignal[UnicycleSignal] = {
+                      props: Signal[DrivetrainProperties]): PeriodicSignal[UnicycleSignal] = {
     import hardware._
-    import props._
 
     val forwardControl = PIDF.pidf(
       forwardVelocity.toPeriodic,
       target.map(_.forward).toPeriodic,
-      forwardControlGains
+      props.map(_.forwardControlGains)
     )
 
     val turnControl = PIDF.pidf(
       turnVelocity.toPeriodic,
       target.map(_.turn).toPeriodic,
-      turnControlGains
+      props.map(_.turnControlGains)
     )
 
     forwardControl.zip(turnControl).map(s => UnicycleSignal(s._1, s._2))
@@ -56,23 +55,21 @@ trait UnicycleCoreControllers {
 
   def speedControl(unicycle: SignalLike[UnicycleSignal])
                        (implicit hardware: DrivetrainHardware,
-                        props: DrivetrainProperties): PeriodicSignal[UnicycleSignal] = {
-    import props._
-
+                        props: Signal[DrivetrainProperties]): PeriodicSignal[UnicycleSignal] = {
     velocityControl(unicycle.map(s => UnicycleVelocity(
-      maxForwardVelocity * s.forward, maxTurnVelocity * s.turn
+      props.get.maxForwardVelocity * s.forward, props.get.maxTurnVelocity * s.turn
     )))
   }
 
   def forwardPositionControl(targetAbsolute: Length)
                             (implicit hardware: DrivetrainHardware,
-                             props: DrivetrainProperties): (PeriodicSignal[UnicycleSignal], Signal[Length]) = {
+                             props: Signal[DrivetrainProperties]): (PeriodicSignal[UnicycleSignal], Signal[Length]) = {
     val error = hardware.forwardPosition.map(targetAbsolute - _)
 
     val control = PIDF.pidf(
       hardware.forwardPosition.toPeriodic,
       Signal.constant(targetAbsolute).toPeriodic,
-      props.forwardPositionControlGains
+      props.map(_.forwardPositionControlGains)
     ).map(s => UnicycleSignal(s, Percent(0)))
 
     (control, error)
@@ -80,13 +77,13 @@ trait UnicycleCoreControllers {
 
   def turnPositionControl(targetAbsolute: Angle)
                          (implicit hardware: DrivetrainHardware,
-                          props: DrivetrainProperties): (PeriodicSignal[UnicycleSignal], Signal[Angle]) = {
+                          props: Signal[DrivetrainProperties]): (PeriodicSignal[UnicycleSignal], Signal[Angle]) = {
     val error = hardware.turnPosition.map(targetAbsolute - _)
 
     val control = PIDF.pidf(
       hardware.turnPosition.toPeriodic,
       Signal.constant(targetAbsolute).toPeriodic,
-      props.turnPositionControlGains
+      props.map(_.turnPositionControlGains)
     ).map(s => UnicycleSignal(Percent(0), s))
 
     (control, error)

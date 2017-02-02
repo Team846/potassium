@@ -34,14 +34,14 @@ trait Position[S <: Quantity[S],
   def outputSignal(s: S)(implicit hardware: Hardware): Unit
 
   object positionControllers {
-    def positionControl(target: S)(implicit properties: Properties, hardware: Hardware): (Signal[S], PeriodicSignal[U]) = {
+    def positionControl(target: S)(implicit properties: Signal[Properties], hardware: Hardware): (Signal[S], PeriodicSignal[U]) = {
       val error = hardware.position.map(target - _)
-      (error, PIDF.pidf(hardware.position.toPeriodic, Signal.constant(target).toPeriodic, properties.positionGains))
+      (error, PIDF.pidf(hardware.position.toPeriodic, Signal.constant(target).toPeriodic, properties.map(_.positionGains)))
     }
   }
 
   object positionTasks {
-    class MoveToPosition(pos: S, tolerance: S)(implicit properties: Properties, hardware: Hardware, comp: Comp) extends FiniteTask {
+    class MoveToPosition(pos: S, tolerance: S)(implicit properties: Signal[Properties], hardware: Hardware, comp: Comp) extends FiniteTask {
       override def onStart(): Unit = {
         val (error, control) = positionControllers.positionControl(pos)
         comp.setController(control.withCheck { _ =>
@@ -56,7 +56,7 @@ trait Position[S <: Quantity[S],
       }
     }
 
-    class HoldPosition(pos: S)(implicit properties: Properties, hardware: Hardware, comp: Comp) extends ContinuousTask {
+    class HoldPosition(pos: S)(implicit properties: Signal[Properties], hardware: Hardware, comp: Comp) extends ContinuousTask {
       override def onStart(): Unit = {
         val (_, control) = positionControllers.positionControl(pos)
         comp.setController(control)
