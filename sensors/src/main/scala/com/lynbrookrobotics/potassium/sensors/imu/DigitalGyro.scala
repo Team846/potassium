@@ -1,7 +1,8 @@
 package com.lynbrookrobotics.potassium.sensors.imu
 
 import java.util
-import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
+
+import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal, Value3D}
 import squants.motion.{AngularVelocity, DegreesPerSecond}
 import squants.{Angle, Time}
 

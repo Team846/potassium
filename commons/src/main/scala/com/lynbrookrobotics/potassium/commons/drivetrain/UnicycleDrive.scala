@@ -8,6 +8,7 @@ import squants.{Angle, Dimensionless, Length, Percent, Velocity}
 trait UnicycleProperties {
   val maxForwardVelocity: Velocity
   val maxTurnVelocity: AngularVelocity
+  val defaultLookAheadDistance: Length
 
   val forwardControlGains: ForwardVelocityGains
 
@@ -55,8 +56,7 @@ trait UnicycleDrive extends Drive { self =>
     */
   protected def convertUnicycleToDrive(uni: UnicycleSignal): DriveSignal
   
-  object UnicycleControllers extends UnicycleCoreControllers
-    with UnicycleMotionProfileControllers {
+  object UnicycleControllers extends UnicycleCoreControllers {
     type DriveSignal = self.DriveSignal
     type DrivetrainHardware = self.Hardware
     type DrivetrainProperties = self.Properties

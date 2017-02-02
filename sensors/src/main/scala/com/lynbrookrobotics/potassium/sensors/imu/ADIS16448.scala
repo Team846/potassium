@@ -1,10 +1,11 @@
 package com.lynbrookrobotics.potassium.sensors.imu
 
 import java.nio.ByteBuffer
+
+import com.lynbrookrobotics.potassium.Value3D
 import com.lynbrookrobotics.potassium.sensors.SPITrait
 import squants.Time
 import squants.motion.{AngularVelocity, DegreesPerSecond}
-
 /**
   * An interface for communicating with the ADIS16448 IMU.
   */

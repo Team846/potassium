@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.sensors.imu
 
+import com.lynbrookrobotics.potassium.Value3D
 import squants.Acceleration
 import squants.electro.MagneticFlux
 import squants.motion.AngularVelocity

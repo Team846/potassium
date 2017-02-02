@@ -6,7 +6,7 @@ import squants.{Angle, Dimensionless, Length, Velocity}
 import squants.motion.AngularVelocity
 
 trait UnicycleCoreTasks {
-  val controllers: UnicycleCoreControllers with UnicycleMotionProfileControllers
+  val controllers: UnicycleCoreControllers
 
   type Drivetrain <: Component[controllers.DriveSignal]
 
