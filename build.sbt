@@ -29,6 +29,7 @@ lazy val potassium = project.in(file(".")).
     controlJVM, controlJS,
     testingJVM, testingJS,
     remote,
+    vision,
     frc,
     config,
     sensors,
