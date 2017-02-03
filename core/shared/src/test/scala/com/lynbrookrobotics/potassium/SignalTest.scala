@@ -86,4 +86,26 @@ class SignalTest extends FunSuite {
 
     assert(zipped.get == (2, 4))
   }
+
+  test("Signals are covariant") {
+    assertCompiles(
+      """
+        |import com.lynbrookrobotics.potassium.Signal
+        |class A
+        |class B extends A
+        |val signalB: Signal[B] = Signal(new B)
+        |val signal: Signal[A] = signalB
+      """.stripMargin)
+  }
+
+  test("Signals not contravariant") {
+    assertDoesNotCompile(
+      """
+        |import com.lynbrookrobotics.potassium.Signal
+        |class A
+        |class B extends A
+        |val signalA: Signal[A] = Signal(new A)
+        |val signal: Signal[B] = signalA
+      """.stripMargin)
+  }
 }

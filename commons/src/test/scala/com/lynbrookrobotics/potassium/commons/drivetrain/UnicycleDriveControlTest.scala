@@ -36,7 +36,7 @@ class UnicycleDriveControlTest extends FunSuite {
 
     override protected def driveClosedLoop(signal: SignalLike[DriveSignal])
                                           (implicit hardware: DrivetrainHardware,
-                                           props: DrivetrainProperties): PeriodicSignal[DriveSignal] =
+                                           props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal] =
       signal.toPeriodic
 
     override type Drivetrain = Nothing
@@ -73,27 +73,27 @@ class UnicycleDriveControlTest extends FunSuite {
   }
 
   test("Closed loop with only feed-forward is essentially open loop") {
-    implicit val props = new UnicycleProperties {
+    implicit val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = MetersPerSecond(10)
       override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
 
       override val forwardControlGains = PIDFConfig(
         Percent(0) / MetersPerSecond(1),
-        Percent(0) / MetersPerSecondSquared(1),
         Percent(0) / Meters(1),
+        Percent(0) / MetersPerSecondSquared(1),
         Percent(100) / maxForwardVelocity
       )
 
       override val turnControlGains = PIDFConfig(
         Percent(0) / DegreesPerSecond(1),
-        Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)),
         Percent(0) / (DegreesPerSecond(1).toGeneric * Seconds(1)),
+        Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)),
         Percent(100) / maxTurnVelocity
       )
 
       override def forwardPositionControlGains = ???
       override def turnPositionControlGains = ???
-    }
+    })
 
     val drive = new TestDrivetrain
 
@@ -111,7 +111,7 @@ class UnicycleDriveControlTest extends FunSuite {
   test("Forward position control when relative distance is zero returns zero speed") {
     val drive = new TestDrivetrain
 
-    val props = new UnicycleProperties {
+    val props = Signal.constant(new UnicycleProperties {
       override def maxForwardVelocity: Velocity = ???
       override def maxTurnVelocity: AngularVelocity = ???
 
@@ -120,13 +120,13 @@ class UnicycleDriveControlTest extends FunSuite {
 
       override def forwardPositionControlGains = PIDFConfig(
         Percent(100) / Meters(1),
-        Percent(0) / MetersPerSecond(1),
         Percent(0) / (Meters(1).toGeneric * Seconds(1)),
+        Percent(0) / MetersPerSecond(1),
         Percent(0) / Meters(1)
       )
 
       override def turnPositionControlGains = ???
-    }
+    })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
       override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
@@ -145,7 +145,7 @@ class UnicycleDriveControlTest extends FunSuite {
   test("Forward position control returns correct proportional control (forward)") {
     val drive = new TestDrivetrain
 
-    val props = new UnicycleProperties {
+    val props = Signal.constant(new UnicycleProperties {
       override def maxForwardVelocity: Velocity = ???
       override def maxTurnVelocity: AngularVelocity = ???
 
@@ -154,13 +154,13 @@ class UnicycleDriveControlTest extends FunSuite {
 
       override def forwardPositionControlGains = PIDFConfig(
         Percent(100) / Meters(10),
-        Percent(0) / MetersPerSecond(1),
         Percent(0) / (Meters(1).toGeneric * Seconds(1)),
+        Percent(0) / MetersPerSecond(1),
         Percent(0) / Meters(1)
       )
 
       override def turnPositionControlGains = ???
-    }
+    })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
       override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
@@ -179,7 +179,7 @@ class UnicycleDriveControlTest extends FunSuite {
   test("Forward position control returns correct proportional control (reverse)") {
     val drive = new TestDrivetrain
 
-    val props = new UnicycleProperties {
+    val props = Signal.constant(new UnicycleProperties {
       override def maxForwardVelocity: Velocity = ???
       override def maxTurnVelocity: AngularVelocity = ???
 
@@ -188,13 +188,13 @@ class UnicycleDriveControlTest extends FunSuite {
 
       override def forwardPositionControlGains = PIDFConfig(
         Percent(100) / Meters(10),
-        Percent(0) / MetersPerSecond(1),
         Percent(0) / (Meters(1).toGeneric * Seconds(1)),
+        Percent(0) / MetersPerSecond(1),
         Percent(0) / Meters(1)
       )
 
       override def turnPositionControlGains = ???
-    }
+    })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
       override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
@@ -213,7 +213,7 @@ class UnicycleDriveControlTest extends FunSuite {
   test("Turn position control when relative angle is zero returns zero speed") {
     val drive = new TestDrivetrain
 
-    val props = new UnicycleProperties {
+    val props = Signal.constant(new UnicycleProperties {
       override def maxForwardVelocity: Velocity = ???
       override def maxTurnVelocity: AngularVelocity = ???
 
@@ -224,11 +224,11 @@ class UnicycleDriveControlTest extends FunSuite {
 
       override def turnPositionControlGains = PIDFConfig(
         Percent(100) / Degrees(1),
-        Percent(0) / DegreesPerSecond(1),
         Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
+        Percent(0) / DegreesPerSecond(1),
         Percent(0) / Degrees(1)
       )
-    }
+    })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
       override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
@@ -247,7 +247,7 @@ class UnicycleDriveControlTest extends FunSuite {
   test("Turn position control returns correct proportional control (clockwise)") {
     val drive = new TestDrivetrain
 
-    val props = new UnicycleProperties {
+    val props = Signal.constant(new UnicycleProperties {
       override def maxForwardVelocity: Velocity = ???
       override def maxTurnVelocity: AngularVelocity = ???
 
@@ -258,11 +258,11 @@ class UnicycleDriveControlTest extends FunSuite {
 
       override def turnPositionControlGains = PIDFConfig(
         Percent(100) / Degrees(10),
-        Percent(0) / DegreesPerSecond(1),
         Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
+        Percent(0) / DegreesPerSecond(1),
         Percent(0) / Degrees(1)
       )
-    }
+    })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
       override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
@@ -281,7 +281,7 @@ class UnicycleDriveControlTest extends FunSuite {
   test("Turn position control returns correct proportional control (counterclockwise)") {
     val drive = new TestDrivetrain
 
-    val props = new UnicycleProperties {
+    val props = Signal.constant(new UnicycleProperties {
       override def maxForwardVelocity: Velocity = ???
       override def maxTurnVelocity: AngularVelocity = ???
 
@@ -292,11 +292,11 @@ class UnicycleDriveControlTest extends FunSuite {
 
       override def turnPositionControlGains = PIDFConfig(
         Percent(100) / Degrees(10),
-        Percent(0) / DegreesPerSecond(1),
         Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
+        Percent(0) / DegreesPerSecond(1),
         Percent(0) / Degrees(1)
       )
-    }
+    })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
       override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))

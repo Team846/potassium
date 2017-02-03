@@ -27,8 +27,8 @@ trait TwoSidedDriveProperties extends UnicycleProperties {
 
   val forwardControlGains: VelocityGains = PIDFConfig(
     Each(0) / MetersPerSecond(1),
-    Each(0) / MetersPerSecondSquared(1),
     Each(0) / Meters(1),
+    Each(0) / MetersPerSecondSquared(1),
     Each(1) / maxForwardVelocity
   )
 }
@@ -65,26 +65,25 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
 
   protected def driveClosedLoop(signal: SignalLike[TwoSidedSignal])
                                (implicit hardware: DrivetrainHardware,
-                                         props: DrivetrainProperties): PeriodicSignal[TwoSidedSignal] =
+                                         props: Signal[DrivetrainProperties]): PeriodicSignal[TwoSidedSignal] =
     TwoSidedControllers.closedLoopControl(signal)
 
   object TwoSidedControllers {
     def velocityControl(target: SignalLike[TwoSidedVelocity])
                        (implicit hardware: DrivetrainHardware,
-                                 props: DrivetrainProperties): PeriodicSignal[TwoSidedSignal] = {
+                                 props: Signal[DrivetrainProperties]): PeriodicSignal[TwoSidedSignal] = {
       import hardware._
-      import props._
 
       val leftControl = PIDF.pidf(
         leftVelocity.toPeriodic,
         target.map(_.left).toPeriodic,
-        leftControlGains
+        props.map(_.leftControlGains)
       )
 
       val rightControl = PIDF.pidf(
         rightVelocity.toPeriodic,
         target.map(_.right).toPeriodic,
-        rightControlGains
+        props.map(_.rightControlGains)
       )
 
       leftControl.zip(rightControl).map(s => TwoSidedSignal(s._1, s._2))
@@ -92,12 +91,12 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
 
     def closedLoopControl(signal: SignalLike[TwoSidedSignal])
                          (implicit hardware: DrivetrainHardware,
-                                   props: DrivetrainProperties): PeriodicSignal[TwoSidedSignal] = {
-      velocityControl(signal.map(expectedVelocity))
+                                   props: Signal[DrivetrainProperties]): PeriodicSignal[TwoSidedSignal] = {
+      velocityControl(signal.map(s => expectedVelocity(s)(props.get)))
     }
   }
 
-  class Drivetrain(implicit hardware: DrivetrainHardware, props: DrivetrainProperties) extends Component[TwoSidedSignal](updatePeriod) {
+  class Drivetrain(implicit hardware: DrivetrainHardware, props: Signal[DrivetrainProperties]) extends Component[TwoSidedSignal](updatePeriod) {
     override def defaultController: PeriodicSignal[TwoSidedSignal] = self.defaultController
 
     override def applySignal(signal: TwoSidedSignal): Unit = {

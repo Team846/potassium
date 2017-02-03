@@ -2,7 +2,7 @@ package com.lynbrookrobotics.potassium.sensors.imu
 
 import java.nio.ByteBuffer
 
-import com.lynbrookrobotics.potassium.sensors.SPI
+import com.lynbrookrobotics.potassium.sensors.SPITrait
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
@@ -11,11 +11,12 @@ import squants.motion.DegreesPerSecond
 import squants.time.Milliseconds
 
 class ADIS16448Test extends FunSuite with BeforeAndAfterEach with MockitoSugar {
-  private val spi = mock[SPI]
+  private val spi = mock[SPITrait]
 
   when(spi.read(same(false), any[ByteBuffer], same(2))).thenAnswer((inv) => {
     val byteBuffer = inv.getArguments.apply(1).asInstanceOf[ByteBuffer]
     byteBuffer.putShort(0, 16448)
+    0
   })
 
   val aDIS16448: ADIS16448 = new ADIS16448(spi, Milliseconds(5))
@@ -24,6 +25,7 @@ class ADIS16448Test extends FunSuite with BeforeAndAfterEach with MockitoSugar {
     when(spi.read(same(false), any[ByteBuffer], same(2))).thenAnswer((inv) => {
       val byteBuffer = inv.getArguments.apply(1).asInstanceOf[ByteBuffer]
       byteBuffer.putShort(0, out)
+      0
     })
   }
 
@@ -38,6 +40,8 @@ class ADIS16448Test extends FunSuite with BeforeAndAfterEach with MockitoSugar {
         case 0x08 =>
           configureSPIResponse(100)
       }
+
+      0
     })
 
     val velocity = aDIS16448.retrieveVelocity

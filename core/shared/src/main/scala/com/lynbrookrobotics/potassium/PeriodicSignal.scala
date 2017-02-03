@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium
 
+import com.lynbrookrobotics.potassium.clock.Clock
 import squants.{Quantity, Time}
 import squants.time.{TimeDerivative, TimeIntegral}
 
@@ -14,13 +15,13 @@ import scala.collection.immutable.Queue
   *
   * @tparam T the type of values the signal will produce
   */
-abstract class PeriodicSignal[T] { self =>
+abstract class PeriodicSignal[+T] { self =>
   private var currentTickSource: Option[AnyRef] = None
 
   protected val parent: Option[PeriodicSignal[_]]
-  protected val check: Option[T => Unit]
+  protected val check: Option[Any => Unit]
 
-  private var lastCalculated: Option[(T, Int)] = None
+  private var lastCalculated: Option[(Any, Int)] = None
 
   protected def calculateValue(dt: Time, token: Int): T
 
@@ -34,7 +35,7 @@ abstract class PeriodicSignal[T] { self =>
   def currentValue(dt: Time, requestToken: Int = PeriodicSignal.requestTokens.next()): T = {
     lastCalculated match {
       case Some((v, t)) if t == requestToken =>
-        v
+        v.asInstanceOf[T]
       case _ =>
         val ret = calculateValue(dt, requestToken)
         check.foreach(_(ret))
@@ -95,14 +96,14 @@ abstract class PeriodicSignal[T] { self =>
     * @param filler the element to use to fill the window until elements are available
     * @return
     */
-  def sliding(size: Int, filler: T): PeriodicSignal[Queue[T]] = {
+  def sliding[U >: T](size: Int, filler: U): PeriodicSignal[Queue[U]] = {
     var last = Queue.fill(size)(filler)
 
-    new PeriodicSignal[Queue[T]] {
+    new PeriodicSignal[Queue[U]] {
       val parent = Some(self)
       val check = None
 
-      def calculateValue(dt: Time, token: Int): Queue[T] = {
+      def calculateValue(dt: Time, token: Int): Queue[U] = {
         last = last.tail :+ self.currentValue(dt, token)
         last
       }
@@ -168,7 +169,7 @@ abstract class PeriodicSignal[T] { self =>
     */
   def withCheck(checkCallback: T => Unit): PeriodicSignal[T] = new PeriodicSignal[T] {
     val parent = Some(self)
-    val check = Some(checkCallback)
+    val check = Some((a: Any) => checkCallback(a.asInstanceOf[T]))
 
     def calculateValue(dt: Time, token: Int): T = self.currentValue(dt, token)
   }
@@ -200,6 +201,28 @@ abstract class PeriodicSignal[T] { self =>
         parent.foreach(_.detachTickSource(source))
       }
     }
+  }
+
+  /**
+    * Gives a signal returning the (optional) last calculated value
+    */
+  def peek: Signal[Option[T]] = Signal {
+    lastCalculated.map(_._1.asInstanceOf[T])
+  }
+
+  /**
+    * Converts the periodic signal to a signal by polling at a fixed rate
+    * @param period the interval to poll at
+    * @param clock the clock to use to register periodic updates
+    * @return a signal return the (optional) last polled value
+    */
+  def toPollingSignal(period: Time)(implicit clock: Clock): Signal[Option[T]] = {
+    attachTickSource(this)
+    clock(period) { dt =>
+      currentValue(dt)
+    }
+
+    peek
   }
 }
 
