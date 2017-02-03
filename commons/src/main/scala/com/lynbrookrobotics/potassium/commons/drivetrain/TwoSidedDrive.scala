@@ -43,14 +43,14 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
   type DriveSignal = TwoSidedSignal
   type DriveVelocity = TwoSidedVelocity
 
-  type DrivetrainHardware <: TwoSidedDriveHardware
-  type DrivetrainProperties <: TwoSidedDriveProperties
+  type Hardware <: TwoSidedDriveHardware
+  type Properties <: TwoSidedDriveProperties
 
   protected implicit val clock: Clock
   protected val updatePeriod: Time
 
   //TODO: add docs
-  protected def output(hardware: DrivetrainHardware, signal: TwoSidedSignal): Unit
+  protected def output(hardware: Hardware, signal: TwoSidedSignal): Unit
 
   protected def convertUnicycleToDrive(uni: UnicycleSignal): TwoSidedSignal = {
     TwoSidedSignal(
@@ -59,19 +59,19 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
     )
   }
 
-  protected def expectedVelocity(drive: TwoSidedSignal)(implicit props: DrivetrainProperties): TwoSidedVelocity = {
+  protected def expectedVelocity(drive: TwoSidedSignal)(implicit props: Properties): TwoSidedVelocity = {
     TwoSidedVelocity(props.maxLeftVelocity * drive.left, props.maxRightVelocity * drive.right)
   }
 
   protected def driveClosedLoop(signal: SignalLike[TwoSidedSignal])
-                               (implicit hardware: DrivetrainHardware,
-                                         props: Signal[DrivetrainProperties]): PeriodicSignal[TwoSidedSignal] =
+                               (implicit hardware: Hardware,
+                                props: Signal[Properties]): PeriodicSignal[TwoSidedSignal] =
     TwoSidedControllers.closedLoopControl(signal)
 
   object TwoSidedControllers {
     def velocityControl(target: SignalLike[TwoSidedVelocity])
-                       (implicit hardware: DrivetrainHardware,
-                                 props: Signal[DrivetrainProperties]): PeriodicSignal[TwoSidedSignal] = {
+                       (implicit hardware: Hardware,
+                        props: Signal[Properties]): PeriodicSignal[TwoSidedSignal] = {
       import hardware._
 
       val leftControl = PIDF.pidf(
@@ -90,13 +90,13 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
     }
 
     def closedLoopControl(signal: SignalLike[TwoSidedSignal])
-                         (implicit hardware: DrivetrainHardware,
-                                   props: Signal[DrivetrainProperties]): PeriodicSignal[TwoSidedSignal] = {
+                         (implicit hardware: Hardware,
+                          props: Signal[Properties]): PeriodicSignal[TwoSidedSignal] = {
       velocityControl(signal.map(s => expectedVelocity(s)(props.get)))
     }
   }
 
-  class Drivetrain(implicit hardware: DrivetrainHardware, props: Signal[DrivetrainProperties]) extends Component[TwoSidedSignal](updatePeriod) {
+  class Drivetrain(implicit hardware: Hardware, props: Signal[Properties]) extends Component[TwoSidedSignal](updatePeriod) {
     override def defaultController: PeriodicSignal[TwoSidedSignal] = self.defaultController
 
     override def applySignal(signal: TwoSidedSignal): Unit = {

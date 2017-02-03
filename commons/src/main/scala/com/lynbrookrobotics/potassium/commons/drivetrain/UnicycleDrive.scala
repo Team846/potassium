@@ -52,8 +52,8 @@ case class UnicycleVelocity(forward: Velocity, turn: AngularVelocity)
   * A drivetrain that has forward-backward and turning control in the unicycle model
   */
 trait UnicycleDrive extends Drive { self =>
-  type DrivetrainHardware <: UnicycleHardware
-  type DrivetrainProperties <: UnicycleProperties
+  type Hardware <: UnicycleHardware
+  type Properties <: UnicycleProperties
 
   /**
     * Converts a unicycle signal value to the parent's signal type
@@ -65,8 +65,8 @@ trait UnicycleDrive extends Drive { self =>
   object UnicycleControllers extends UnicycleCoreControllers
     with UnicycleMotionProfileControllers {
     type DriveSignal = self.DriveSignal
-    type DrivetrainHardware = self.DrivetrainHardware
-    type DrivetrainProperties = self.DrivetrainProperties
+    type DrivetrainHardware = self.Hardware
+    type DrivetrainProperties = self.Properties
 
     /**
       * Uses the parent's open loop control for the equivalent drive signal for the unicycle signal
@@ -95,11 +95,11 @@ trait UnicycleDrive extends Drive { self =>
     override val controllers = UnicycleControllers
   }
 
-  protected def controlMode(implicit hardware: DrivetrainHardware,
-                            props: DrivetrainProperties): UnicycleControlMode
+  protected def controlMode(implicit hardware: Hardware,
+                            props: Properties): UnicycleControlMode
 
-  override protected def defaultController(implicit hardware: DrivetrainHardware,
-                                           props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal] = {
+  override protected def defaultController(implicit hardware: Hardware,
+                                           props: Signal[Properties]): PeriodicSignal[DriveSignal] = {
     controlMode(hardware, props.get) match {
       case NoOperation =>
         parentOpenLoop(Signal.constant(UnicycleSignal(Percent(0), Percent(0))))
