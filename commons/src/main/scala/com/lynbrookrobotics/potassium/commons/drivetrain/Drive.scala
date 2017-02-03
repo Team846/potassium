@@ -9,19 +9,19 @@ trait Drive {
   type DriveSignal
   type DriveVelocity
 
-  type DrivetrainHardware
-  type DrivetrainProperties
+  type Hardware
+  type Properties
 
   /**
     * Drives with the signal with closed-loop control
     * @param signal the signal to drive with
     * @return
     */
-  protected def driveClosedLoop(signal: SignalLike[DriveSignal])(implicit hardware: DrivetrainHardware,
-                                                                 props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal]
+  protected def driveClosedLoop(signal: SignalLike[DriveSignal])(implicit hardware: Hardware,
+                                                                 props: Signal[Properties]): PeriodicSignal[DriveSignal]
 
-  protected def defaultController(implicit hardware: DrivetrainHardware,
-                                  props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal]
+  protected def defaultController(implicit hardware: Hardware,
+                                  props: Signal[Properties]): PeriodicSignal[DriveSignal]
 
   type Drivetrain <: Component[DriveSignal]
 }
