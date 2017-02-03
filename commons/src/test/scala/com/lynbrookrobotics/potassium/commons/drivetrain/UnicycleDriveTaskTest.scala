@@ -50,22 +50,22 @@ class UnicycleDriveTaskTest extends FunSuite {
 
       override val forwardControlGains = PIDFConfig(
         Percent(0) / MetersPerSecond(1),
-        Percent(0) / MetersPerSecondSquared(1),
         Percent(0) / Meters(1),
+        Percent(0) / MetersPerSecondSquared(1),
         Percent(100) / maxForwardVelocity
       )
 
       override val turnControlGains = PIDFConfig(
         Percent(0) / DegreesPerSecond(1),
-        Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)),
         Percent(0) / (DegreesPerSecond(1).toGeneric * Seconds(1)),
+        Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)),
         Percent(100) / maxTurnVelocity
       )
 
       override val forwardPositionControlGains = PIDFConfig(
         Percent(100) / Meters(10),
-        Percent(0) / MetersPerSecond(1),
         Percent(0) / (Meters(1).toGeneric * Seconds(1)),
+        Percent(0) / MetersPerSecond(1),
         Percent(0) / Meters(1)
       )
 
@@ -130,29 +130,29 @@ class UnicycleDriveTaskTest extends FunSuite {
 
       override val forwardControlGains = PIDFConfig(
         Percent(0) / MetersPerSecond(1),
-        Percent(0) / MetersPerSecondSquared(1),
         Percent(0) / Meters(1),
+        Percent(0) / MetersPerSecondSquared(1),
         Percent(100) / maxForwardVelocity
       )
 
       override val turnControlGains = PIDFConfig(
         Percent(0) / DegreesPerSecond(1),
-        Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)),
         Percent(0) / (DegreesPerSecond(1).toGeneric * Seconds(1)),
+        Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)),
         Percent(100) / maxTurnVelocity
       )
 
       override val forwardPositionControlGains = PIDFConfig(
         Percent(100) / Meters(10),
-        Percent(0) / MetersPerSecond(1),
         Percent(0) / (Meters(1).toGeneric * Seconds(1)),
+        Percent(0) / MetersPerSecond(1),
         Percent(0) / Meters(1)
       )
 
       override val turnPositionControlGains = PIDFConfig(
         Percent(100) / Degrees(10),
-        Percent(0) / DegreesPerSecond(1),
         Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
+        Percent(0) / DegreesPerSecond(1),
         Percent(0) / Degrees(1)
       )
     })
@@ -230,15 +230,15 @@ class UnicycleDriveTaskTest extends FunSuite {
 
       override val forwardControlGains = PIDFConfig(
         Percent(0) / MetersPerSecond(1),
-        Percent(0) / MetersPerSecondSquared(1),
         Percent(0) / Meters(1),
+        Percent(0) / MetersPerSecondSquared(1),
         Percent(100) / maxForwardVelocity
       )
 
       override val turnControlGains = PIDFConfig(
         Percent(0) / DegreesPerSecond(1),
-        Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)),
         Percent(0) / (DegreesPerSecond(1).toGeneric * Seconds(1)),
+        Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)),
         Percent(100) / maxTurnVelocity
       )
 
@@ -246,8 +246,8 @@ class UnicycleDriveTaskTest extends FunSuite {
 
       override def turnPositionControlGains = PIDFConfig(
         Percent(100) / Degrees(10),
-        Percent(0) / DegreesPerSecond(1),
         Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
+        Percent(0) / DegreesPerSecond(1),
         Percent(0) / Degrees(1)
       )
     })

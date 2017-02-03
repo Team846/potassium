@@ -27,8 +27,8 @@ trait TwoSidedDriveProperties extends UnicycleProperties {
 
   val forwardControlGains: VelocityGains = PIDFConfig(
     Each(0) / MetersPerSecond(1),
-    Each(0) / MetersPerSecondSquared(1),
     Each(0) / Meters(1),
+    Each(0) / MetersPerSecondSquared(1),
     Each(1) / maxForwardVelocity
   )
 }
