@@ -58,6 +58,27 @@ abstract class Signal[+T] { self =>
   }
 }
 
+class ConstantSignal[T](v: T) extends Signal[T] {
+  def get: T = v
+
+  override def map[U](f: (T) => U): Signal[U] = {
+    Signal.constant(f(v))
+  }
+
+  override def zip[O](other: Signal[O]): Signal[(T, O)] = {
+    if (other.isInstanceOf[ConstantSignal[O]]) {
+      Signal.constant((v, other.get))
+    } else {
+      super.zip(other)
+    }
+  }
+
+  override def filter(condition: (T) => Boolean)(implicit polling: ImpulseEvent): ContinuousEvent = {
+    val conditionResult = condition(v)
+    new ContinuousEvent(conditionResult)
+  }
+}
+
 object Signal {
   /**
     * Creates a new signal given the way to calculate values
@@ -75,7 +96,5 @@ object Signal {
     * @tparam T the type of the signal
     * @return a signal with a constant value
     */
-  def constant[T](v: T): Signal[T] = new Signal[T] {
-    def get: T = v
-  }
+  def constant[T](v: T): Signal[T] = new ConstantSignal[T](v)
 }

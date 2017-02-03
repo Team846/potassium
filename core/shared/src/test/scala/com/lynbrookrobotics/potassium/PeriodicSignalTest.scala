@@ -65,6 +65,18 @@ class PeriodicSignalTest extends FunSuite {
     assert(polled.get.contains(0))
   }
 
+  test("Zip with signal produces correct values") {
+    var value = 0
+    val sig = Signal(value)
+    val zipped = Signal.constant(0).toPeriodic.zip(sig)
+
+    assert(zipped.currentValue(Milliseconds(5)) == (0, 0))
+
+    value = 1
+
+    assert(zipped.currentValue(Milliseconds(5)) == (0, 1))
+  }
+
   test("Derivative of constant signal is always zero") {
     val sig = Signal(Feet(0)).toPeriodic.derivative
     (1 to 100).foreach { _ =>

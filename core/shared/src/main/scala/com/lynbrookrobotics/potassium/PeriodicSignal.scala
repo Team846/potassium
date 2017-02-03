@@ -91,6 +91,21 @@ abstract class PeriodicSignal[+T] { self =>
   }
 
   /**
+    * Combines the signal with another signal into a signal of tuples
+    * @param other the signal to combine with
+    * @tparam O the type of values of the other signal
+    * @return a new signal that returns tuples with one value from each signal
+    */
+  def zip[O](other: Signal[O]): PeriodicSignal[(T, O)] = new PeriodicSignal[(T, O)] {
+    val parent = Some(self)
+    val check = None
+
+    def calculateValue(dt: Time, token: Int): (T, O) = {
+      (self.currentValue(dt, token), other.get)
+    }
+  }
+
+  /**
     * Applies a fixed size sliding window over the signal
     * @param size the size of the window
     * @param filler the element to use to fill the window until elements are available

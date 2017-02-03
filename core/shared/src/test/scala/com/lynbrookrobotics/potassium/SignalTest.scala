@@ -87,6 +87,16 @@ class SignalTest extends FunSuite {
     assert(zipped.get == (2, 4))
   }
 
+  test("Zipping constant signals produces constant signal") {
+    assert(Signal.constant(0).zip(Signal.constant(1)).
+      isInstanceOf[ConstantSignal[(Int, Int)]])
+  }
+
+  test("Zipping constant signal with normal signal produces normal signal") {
+    assert(!Signal.constant(0).zip(Signal(1)).
+      isInstanceOf[ConstantSignal[(Int, Int)]])
+  }
+
   test("Signals are covariant") {
     assertCompiles(
       """
