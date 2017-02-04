@@ -19,6 +19,8 @@ abstract class Component[T](period: Time)(implicit val clock: Clock) {
   def defaultController: PeriodicSignal[T]
   private var currentController: PeriodicSignal[T] = defaultController
 
+  def peekedController: Signal[Option[T]] = currentController.peek
+
   /**
     * Sets the controller to be used by the component during updates.
     * @param controller the new controller to use
