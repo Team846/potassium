@@ -26,8 +26,9 @@ parallelExecution in ThisBuild := false
 lazy val potassium = project.in(file(".")).
   aggregate(
     coreJVM, coreJS,
-    controlJVM, controlJS,
     testingJVM, testingJS,
+    model,
+    controlJVM, controlJS,
     remote,
     vision,
     frc,
