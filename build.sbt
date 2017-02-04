@@ -33,7 +33,8 @@ lazy val potassium = project.in(file(".")).
     frc,
     config,
     sensors,
-    commonsJVM, commonsJS
+    commonsJVM, commonsJS,
+    lighting
   ).settings(
   publish := {},
   publishLocal := {}
@@ -55,6 +56,9 @@ lazy val testing = crossProject.crossType(CrossType.Pure).dependsOn(core).settin
   libraryDependencies ++= sharedDependencies.value
 )
 
+lazy val testingJVM = testing.jvm
+lazy val testingJS = testing.js
+
 lazy val model = project.dependsOn(coreJVM).settings(
   name := "potassium-model",
   libraryDependencies ++= sharedDependencies.value,
@@ -68,9 +72,6 @@ lazy val control = crossProject.crossType(CrossType.Pure).dependsOn(core).settin
 
 lazy val controlJVM = control.jvm
 lazy val controlJS = control.js
-
-lazy val testingJVM = testing.jvm
-lazy val testingJS = testing.js
 
 lazy val remote = project.dependsOn(coreJVM).settings(
   name := "potassium-remote",
@@ -92,6 +93,12 @@ lazy val frc = project.dependsOn(coreJVM, sensors).settings(
 
 lazy val config = project.dependsOn(coreJVM).settings(
   name := "potassium-config",
+  libraryDependencies ++= sharedDependencies.value,
+  libraryDependencies ++= jvmDependencies
+)
+
+lazy val lighting = project.dependsOn(coreJVM, testingJVM % Test).settings(
+  name := "potassium-lighting",
   libraryDependencies ++= sharedDependencies.value,
   libraryDependencies ++= jvmDependencies
 )
