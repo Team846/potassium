@@ -28,6 +28,8 @@ class RemoteSignalsTest extends FunSuite {
     Thread.sleep(1000)
 
     assert(clientSignal.get == number)
+
+    actorSystem.shutdown
   }
 
   test("RemoteSignal successfully polls from a RemoteSignalProvider over the network") {
@@ -51,5 +53,8 @@ class RemoteSignalsTest extends FunSuite {
     Thread.sleep(1000)
 
     assert(clientSignal.get == number)
+
+    hostActorSystem.shutdown
+    clientActorSystem.shutdown
   }
 }
