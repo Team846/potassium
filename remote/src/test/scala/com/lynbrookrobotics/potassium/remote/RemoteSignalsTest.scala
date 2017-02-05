@@ -18,7 +18,7 @@ class RemoteSignalsTest extends FunSuite {
       override def get(): Double = number
     }
 
-    implicit val actorSystem = ActorSystem("system")
+    implicit val actorSystem = ActorSystem("system", ConfigFactory.load("client-test.conf"))
 
     val signalOnHost = new SampleSignal()
     val provider = new RemoteSignalProvider[Double]("sample-signal-host", signalOnHost)
@@ -53,6 +53,9 @@ class RemoteSignalsTest extends FunSuite {
     Thread.sleep(1000)
 
     assert(clientSignal.get == number)
+
+    clientSignal.actor ! PoisonPill
+    hostActorRef ! PoisonPill
 
     hostActorSystem.shutdown
     clientActorSystem.shutdown
