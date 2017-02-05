@@ -13,9 +13,9 @@ trait UnicycleProperties {
   def forwardControlGains: PIDFProperUnitsConfig[Velocity, Acceleration, Length, Dimensionless]
   def turnControlGains: PIDFConfig[AngularVelocity,
                                    GenericValue[AngularVelocity],
-                                   GenericValue[AngularVelocity],
+                                   AngularVelocity,
                                    GenericDerivative[AngularVelocity],
-                                   GenericIntegral[AngularVelocity],
+                                   Angle,
                                    Dimensionless]
 
   def forwardPositionControlGains: PIDFConfig[Length,
