@@ -1,35 +1,58 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.clock.Clock
-import com.lynbrookrobotics.potassium.control.{PIDF, PIDFConfig}
+import com.lynbrookrobotics.potassium.control.{PIDConfig, PIDF}
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, SignalLike}
-
-import squants.motion.{MetersPerSecond, MetersPerSecondSquared}
-import squants.space.Meters
-import squants.{Dimensionless, Each, Time, Velocity}
+import squants.motion.{AngularVelocity, MetersPerSecond, MetersPerSecondSquared, RadiansPerSecond}
+import squants.space.{Meters, Radians}
+import squants.time.Seconds
+import squants.{Angle, Dimensionless, Each, Length, Percent, Time, Velocity}
 
 trait TwoSidedDriveHardware extends UnicycleHardware {
-  def leftVelocity: Signal[Velocity]
-  def rightVelocity: Signal[Velocity]
+  val leftVelocity: Signal[Velocity]
+  val rightVelocity: Signal[Velocity]
+
+  val leftPosition: Signal[Length]
+  val rightPosition: Signal[Length]
+
+  val track: Length
 
   lazy val forwardVelocity: Signal[Velocity] =
     leftVelocity.zip(rightVelocity).map(t => (t._1 + t._2) / 2)
+
+  lazy val turnVelocity: Signal[AngularVelocity] = {
+    rightVelocity.zip(leftVelocity).map { case (r, l) =>
+      RadiansPerSecond(((l - r) * Seconds(1)) / track)
+    }
+  }
+
+  lazy val forwardPosition: Signal[Length] =
+    leftPosition.zip(rightPosition).map(t => (t._1 + t._2) / 2)
+
+  lazy val turnPosition: Signal[Angle] = leftPosition.zip(rightPosition).map(t =>
+    Radians((t._1 - t._2) / track)
+  )
 }
 
 trait TwoSidedDriveProperties extends UnicycleProperties {
   val maxLeftVelocity: Velocity
   val maxRightVelocity: Velocity
-  val leftControlGains: VelocityGains
-  val rightControlGains: VelocityGains
+
+  val leftControlGains: ForwardVelocityGains
+  val rightControlGains: ForwardVelocityGains
+
+  lazy val leftControlGainsFull: ForwardVelocityGains#Full =
+    leftControlGains.withF(Percent(100) / maxLeftVelocity)
+  lazy val rightControlGainsFull: ForwardVelocityGains#Full =
+    rightControlGains.withF(Percent(100) / maxRightVelocity)
 
   val maxForwardVelocity: Velocity = maxLeftVelocity min maxRightVelocity
 
-  val forwardControlGains: VelocityGains = PIDFConfig(
+  val forwardControlGains = PIDConfig(
     Each(0) / MetersPerSecond(1),
     Each(0) / Meters(1),
-    Each(0) / MetersPerSecondSquared(1),
-    Each(1) / maxForwardVelocity
+    Each(0) / MetersPerSecondSquared(1)
   )
 }
 
@@ -79,13 +102,13 @@ abstract class TwoSidedDrive(updatePeriod: Time)(implicit clock: Clock)
       val leftControl = PIDF.pidf(
         leftVelocity.toPeriodic,
         target.map(_.left).toPeriodic,
-        props.map(_.leftControlGains)
+        props.map(_.leftControlGainsFull)
       )
 
       val rightControl = PIDF.pidf(
         rightVelocity.toPeriodic,
         target.map(_.right).toPeriodic,
-        props.map(_.rightControlGains)
+        props.map(_.rightControlGainsFull)
       )
 
       leftControl.zip(rightControl).map(s => TwoSidedSignal(s._1, s._2))

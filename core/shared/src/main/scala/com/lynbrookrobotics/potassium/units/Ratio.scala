@@ -9,7 +9,7 @@ import squants.Quantity
   * @tparam N the units of the numerator
   * @tparam D the units of the denominator
   */
-class Ratio[N <: Quantity[N], D <: Quantity[D]](num: N, den: D) {
+case class Ratio[N <: Quantity[N], D <: Quantity[D]](num: N, den: D) {
   def *(value: D): N = value / den * num
 
   override def toString: String = {
