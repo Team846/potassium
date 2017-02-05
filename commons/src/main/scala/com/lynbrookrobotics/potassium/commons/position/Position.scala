@@ -28,8 +28,6 @@ abstract class Position[S <: Quantity[S],
   type Properties <: PositionProperties[S, SWithD, SWithI, D, I, U]
   type Hardware <: PositionHardware[S]
 
-  def outputSignal(s: S)(implicit hardware: Hardware): Unit
-
   object positionControllers {
     def positionControl(target: S)(implicit properties: Signal[Properties], hardware: Hardware): (Signal[S], PeriodicSignal[U]) = {
       val error = hardware.position.map(target - _)
