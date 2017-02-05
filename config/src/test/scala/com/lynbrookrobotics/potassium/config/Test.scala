@@ -3,7 +3,6 @@ package com.lynbrookrobotics.potassium.config
 import java.io.File
 
 import squants.motion.{MetersPerSecond, Velocity}
-
 import SquantsPickling._
 
 object Test extends App{

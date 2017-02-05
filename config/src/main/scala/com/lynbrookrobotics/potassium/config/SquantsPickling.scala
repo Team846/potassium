@@ -1,7 +1,7 @@
 package com.lynbrookrobotics.potassium.config
 
+import com.lynbrookrobotics.potassium.units.{GenericDerivative, GenericIntegral}
 import squants.{Dimension, Quantity}
-
 import upickle.Js.Value
 import upickle.default.{Reader, Writer}
 
@@ -44,4 +44,66 @@ object SquantsPickling {
   }
 
   implicit def quantityReader[Q <: Quantity[Q]]: Reader[Q] = macro quantityReader_impl[Q]
+
+  implicit def genericDerivativeWriter[Q <: Quantity[Q]]: Writer[GenericDerivative[Q]] = new Writer[GenericDerivative[Q]] {
+    override def write0: (GenericDerivative[Q]) => Value = {
+      (q: GenericDerivative[Q]) => upickle.default.writeJs((q.value, q.uom.symbol + " / s"))
+    }
+  }
+
+  def genericDerivativeReader_impl[Q <: Quantity[Q] : c.WeakTypeTag]
+    (c: blackbox.Context): c.Expr[Reader[GenericDerivative[Q]]] = {
+    import c.universe._
+
+    val dimension = dimension_impl[Q](c)
+    val qExpr = weakTypeTag[Q].tpe.typeSymbol
+
+    c.Expr[Reader[GenericDerivative[Q]]](
+      q"""
+      new upickle.default.Reader[com.lynbrookrobotics.potassium.units.GenericDerivative[$qExpr]] {
+        override def read0: PartialFunction[upickle.Js.Value, com.lynbrookrobotics.potassium.units.GenericDerivative[$qExpr]] = {
+          case v: upickle.Js.Value =>
+            val dimension = $dimension
+            val (value, uom) = upickle.default.readJs[(Double, String)](v)
+            val unit = dimension.units.find(_.symbol == uom.dropRight(4)).get
+            new com.lynbrookrobotics.potassium.units.GenericDerivative(value, unit)
+        }
+      }
+      """
+    )
+  }
+
+  implicit def genericDerivativeReader[Q <: Quantity[Q]]: Reader[GenericDerivative[Q]] =
+    macro genericDerivativeReader_impl[Q]
+
+  implicit def genericIntegralWriter[Q <: Quantity[Q]]: Writer[GenericIntegral[Q]] = new Writer[GenericIntegral[Q]] {
+    override def write0: (GenericIntegral[Q]) => Value = {
+      (q: GenericIntegral[Q]) => upickle.default.writeJs((q.value, q.uom.symbol + " * s"))
+    }
+  }
+
+  def genericIntegralReader_impl[Q <: Quantity[Q] : c.WeakTypeTag]
+    (c: blackbox.Context): c.Expr[Reader[GenericIntegral[Q]]] = {
+    import c.universe._
+
+    val dimension = dimension_impl[Q](c)
+    val qExpr = weakTypeTag[Q].tpe.typeSymbol
+
+    c.Expr[Reader[GenericIntegral[Q]]](
+      q"""
+      new upickle.default.Reader[com.lynbrookrobotics.potassium.units.GenericIntegral[$qExpr]] {
+        override def read0: PartialFunction[upickle.Js.Value, com.lynbrookrobotics.potassium.units.GenericIntegral[$qExpr]] = {
+          case v: upickle.Js.Value =>
+            val dimension = $dimension
+            val (value, uom) = upickle.default.readJs[(Double, String)](v)
+            val unit = dimension.units.find(_.symbol == uom.dropRight(4)).get
+            new com.lynbrookrobotics.potassium.units.GenericIntegral(value, unit)
+        }
+      }
+      """
+    )
+  }
+
+  implicit def genericIntegralReader[Q <: Quantity[Q]]: Reader[GenericIntegral[Q]] =
+    macro genericIntegralReader_impl[Q]
 }
