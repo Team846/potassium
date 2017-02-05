@@ -85,17 +85,21 @@ lazy val remote = project.dependsOn(coreJVM).settings(
   libraryDependencies ++= jvmDependencies
 )
 
+<<<<<<< HEAD
 lazy val vision = project.dependsOn(coreJVM).settings(
   name := "potassium-vision",
   libraryDependencies ++= sharedDependencies.value,
   libraryDependencies ++= jvmDependencies
 )
 
+=======
+>>>>>>> a586bc425ba99301edc4b8d07b34aa2b157f4f04
 lazy val frc = project.dependsOn(coreJVM, sensors).settings(
   name := "potassium-frc",
   libraryDependencies ++= sharedDependencies.value,
   libraryDependencies ++= jvmDependencies
 )
+
 
 lazy val config = project.dependsOn(coreJVM).settings(
   name := "potassium-config",
