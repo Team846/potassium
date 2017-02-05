@@ -36,7 +36,8 @@ trait TwoSidedDriveProperties extends UnicycleProperties {
 /**
   * A drivetrain with two side control (such as a tank drive)
   */
-trait TwoSidedDrive extends UnicycleDrive { self =>
+abstract class TwoSidedDrive(updatePeriod: Time)(implicit clock: Clock)
+  extends UnicycleDrive { self =>
   case class TwoSidedSignal(left: Dimensionless, right: Dimensionless)
   case class TwoSidedVelocity(left: Velocity, right: Velocity)
 
@@ -46,10 +47,11 @@ trait TwoSidedDrive extends UnicycleDrive { self =>
   type Hardware <: TwoSidedDriveHardware
   type Properties <: TwoSidedDriveProperties
 
-  protected implicit val clock: Clock
-  protected val updatePeriod: Time
-
-  //TODO: add docs
+  /**
+    * Output the current signal to actuators with the hardware
+    * @param hardware the hardware to output with
+    * @param signal the signal to output
+    */
   protected def output(hardware: Hardware, signal: TwoSidedSignal): Unit
 
   protected def convertUnicycleToDrive(uni: UnicycleSignal): TwoSidedSignal = {

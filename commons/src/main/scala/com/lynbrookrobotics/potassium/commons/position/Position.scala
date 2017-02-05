@@ -19,17 +19,14 @@ trait PositionHardware[S <: Quantity[S]] {
   def position: Signal[S]
 }
 
-trait Position[S <: Quantity[S],
+abstract class Position[S <: Quantity[S],
                SWithD <: Quantity[SWithD] with TimeIntegral[D],
                SWithI <: Quantity[SWithI] with TimeDerivative[I],
                D <: Quantity[D] with TimeDerivative[SWithD],
                I <: Quantity[I] with TimeIntegral[SWithI],
-               U <: Quantity[U]] {
+               U <: Quantity[U]](implicit exD: S => SWithD, exI: S => SWithI) {
   type Properties <: PositionProperties[S, SWithD, SWithI, D, I, U]
   type Hardware <: PositionHardware[S]
-
-  implicit val exD: S => SWithD
-  implicit val exI: S => SWithI
 
   def outputSignal(s: S)(implicit hardware: Hardware): Unit
 
