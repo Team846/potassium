@@ -1,12 +1,17 @@
+enablePlugins(GitVersioning)
+
 name := "potassium"
 
 organization in ThisBuild := "com.lynbrookrobotics"
 
-version in ThisBuild := "0.1.0-SNAPSHOT"
+val potassiumVersion = "0.1.0"
+val isRelease = sys.props.get("TRAVIS_TAG").isDefined
+
+git.formattedShaVersion := git.gitHeadCommit.value map { sha =>
+  if (isRelease) potassiumVersion else s"$potassiumVersion-${sha.take(8)}"
+}
 
 scalaVersion in ThisBuild := "2.12.1"
-
-crossScalaVersions in ThisBuild := Seq("2.12.1")
 
 resolvers in ThisBuild += "Funky-Repo" at "http://team846.github.io/repo"
 
