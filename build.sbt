@@ -16,7 +16,7 @@ scalaVersion in ThisBuild := "2.12.1"
 resolvers in ThisBuild += "Funky-Repo" at "http://team846.github.io/repo"
 
 lazy val sharedDependencies = Def.setting(Seq(
-  "org.typelevel"  %%% "squants"  % "1.2.0-SNAPSHOT",
+  "org.typelevel"  %%% "squants"  % "1.2.0-1",
   "org.scalatest" %%% "scalatest" % "3.0.1" % Test,
   "org.scalacheck" %%% "scalacheck" % "1.13.4" % Test
 ))
