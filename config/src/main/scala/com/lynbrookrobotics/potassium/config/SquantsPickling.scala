@@ -11,7 +11,7 @@ import scala.reflect.macros.blackbox
 object SquantsPickling {
   implicit def quantityWriter[Q <: Quantity[Q]]: Writer[Q] = new Writer[Q] {
     override def write0: (Q) => Value = {
-      (q: Q) => upickle.default.writeJs((q.value, q.unit.symbol))
+      (q: Q) => upickle.default.writeJs((q.value, q.unit.getClass.getSimpleName))
     }
   }
 
@@ -35,7 +35,7 @@ object SquantsPickling {
           case v: upickle.Js.Value =>
             val dimension = $dimension
             val (value, uom) = upickle.default.readJs[(Double, String)](v)
-            val unit = dimension.units.find(_.symbol == uom).get
+            val unit = dimension.units.find(_.getClass.getSimpleName == uom).getOrElse(throw new Exception(uom))
             unit(value)
         }
       }
@@ -47,7 +47,7 @@ object SquantsPickling {
 
   implicit def genericDerivativeWriter[Q <: Quantity[Q]]: Writer[GenericDerivative[Q]] = new Writer[GenericDerivative[Q]] {
     override def write0: (GenericDerivative[Q]) => Value = {
-      (q: GenericDerivative[Q]) => upickle.default.writeJs((q.value, q.uom.symbol + " / s"))
+      (q: GenericDerivative[Q]) => upickle.default.writeJs((q.value, q.uom.getClass.getSimpleName + " / s"))
     }
   }
 
@@ -65,7 +65,7 @@ object SquantsPickling {
           case v: upickle.Js.Value =>
             val dimension = $dimension
             val (value, uom) = upickle.default.readJs[(Double, String)](v)
-            val unit = dimension.units.find(_.symbol == uom.dropRight(4)).get
+            val unit = dimension.units.find(_.getClass.getSimpleName == uom.dropRight(4)).getOrElse(throw new Exception(uom))
             new com.lynbrookrobotics.potassium.units.GenericDerivative(value, unit)
         }
       }
@@ -78,7 +78,7 @@ object SquantsPickling {
 
   implicit def genericIntegralWriter[Q <: Quantity[Q]]: Writer[GenericIntegral[Q]] = new Writer[GenericIntegral[Q]] {
     override def write0: (GenericIntegral[Q]) => Value = {
-      (q: GenericIntegral[Q]) => upickle.default.writeJs((q.value, q.uom.symbol + " * s"))
+      (q: GenericIntegral[Q]) => upickle.default.writeJs((q.value, q.uom.getClass.getSimpleName + " * s"))
     }
   }
 
@@ -96,7 +96,7 @@ object SquantsPickling {
           case v: upickle.Js.Value =>
             val dimension = $dimension
             val (value, uom) = upickle.default.readJs[(Double, String)](v)
-            val unit = dimension.units.find(_.symbol == uom.dropRight(4)).get
+            val unit = dimension.units.find(_.getClass.getSimpleName == uom.dropRight(4)).getOrElse(throw new Exception(uom))
             new com.lynbrookrobotics.potassium.units.GenericIntegral(value, unit)
         }
       }
