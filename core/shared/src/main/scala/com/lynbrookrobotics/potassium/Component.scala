@@ -62,6 +62,6 @@ abstract class Component[T](period: Time)(implicit val clock: Clock) {
 
     lastOutput = Some(value)
 
-    applySignal(currentController.currentValue(dt))
+    applySignal(value)
   }
 }
