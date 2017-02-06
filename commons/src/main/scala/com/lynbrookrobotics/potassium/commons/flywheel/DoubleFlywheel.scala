@@ -28,8 +28,6 @@ abstract class DoubleFlywheel {
 
   case class DoubleFlywheelSignal(left: Dimensionless, right: Dimensionless)
 
-  def outputSignal(s: DoubleFlywheelSignal)(implicit hardware: Hardware): Unit
-
   object velocityControllers {
     def velocityControl(target: AngularVelocity)
                        (implicit properties: Signal[Properties],

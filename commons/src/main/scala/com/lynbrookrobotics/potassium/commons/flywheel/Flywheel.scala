@@ -25,8 +25,6 @@ abstract class Flywheel {
   type Properties <: FlywheelProperties
   type Hardware <: FlywheelHardware
 
-  def outputSignal(s: Dimensionless)(implicit hardware: Hardware): Unit
-
   object velocityControllers {
     def velocityControl(target: AngularVelocity)
                        (implicit properties: Signal[Properties],
