@@ -1,16 +1,14 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
-import com.lynbrookrobotics.potassium.control.PIDFConfig
+import com.lynbrookrobotics.potassium.control.{PIDConfig, PIDFConfig}
 import com.lynbrookrobotics.potassium.testing.ClockMocking
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, SignalLike}
-
 import squants.motion.{AngularVelocity, DegreesPerSecond, MetersPerSecond, MetersPerSecondSquared}
 import squants.space.{Degrees, Meters}
 import squants.time.{Milliseconds, Seconds}
 import squants.{Angle, Length, Percent, Velocity}
-
 import org.scalatest.FunSuite
 
 class UnicycleDriveTaskTest extends FunSuite {
@@ -18,8 +16,8 @@ class UnicycleDriveTaskTest extends FunSuite {
     override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
     override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
 
-    override def forwardPosition: Signal[Length] = ???
-    override def turnPosition: Signal[Angle] = ???
+    override val forwardPosition: Signal[Length] = null
+    override val turnPosition: Signal[Angle] = null
   }
 
   private class TestDrivetrain extends UnicycleDrive {
@@ -46,30 +44,27 @@ class UnicycleDriveTaskTest extends FunSuite {
 
     val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = MetersPerSecond(10)
-      override def maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
+      override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
 
-      override val forwardControlGains = PIDFConfig(
+      override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
         Percent(0) / Meters(1),
-        Percent(0) / MetersPerSecondSquared(1),
-        Percent(100) / maxForwardVelocity
+        Percent(0) / MetersPerSecondSquared(1)
       )
 
-      override val turnControlGains = PIDFConfig(
+      override val turnControlGains = PIDConfig(
         Percent(0) / DegreesPerSecond(1),
         Percent(0) / Degrees(1),
-        Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)),
-        Percent(100) / maxTurnVelocity
+        Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1))
       )
 
-      override val forwardPositionControlGains = PIDFConfig(
+      override val forwardPositionControlGains = PIDConfig(
         Percent(100) / Meters(10),
         Percent(0) / (Meters(1).toGeneric * Seconds(1)),
-        Percent(0) / MetersPerSecond(1),
-        Percent(0) / Meters(1)
+        Percent(0) / MetersPerSecond(1)
       )
 
-      override def turnPositionControlGains = ???
+      override val turnPositionControlGains = null
     })
 
     var lastAppliedSignal: UnicycleSignal = null
@@ -91,8 +86,8 @@ class UnicycleDriveTaskTest extends FunSuite {
       override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
       override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
 
-      override def forwardPosition: Signal[Length] = Signal(currentPosition)
-      override def turnPosition: Signal[Angle] = ???
+      override val forwardPosition: Signal[Length] = Signal(currentPosition)
+      override val turnPosition: Signal[Angle] = null
     }
 
     val task = new drive.unicycleTasks.DriveDistance(
@@ -126,34 +121,30 @@ class UnicycleDriveTaskTest extends FunSuite {
 
     val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = MetersPerSecond(10)
-      override def maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
+      override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
 
-      override val forwardControlGains = PIDFConfig(
+      override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
         Percent(0) / Meters(1),
-        Percent(0) / MetersPerSecondSquared(1),
-        Percent(100) / maxForwardVelocity
+        Percent(0) / MetersPerSecondSquared(1)
       )
 
-      override val turnControlGains = PIDFConfig(
+      override val turnControlGains = PIDConfig(
         Percent(0) / DegreesPerSecond(1),
         Percent(0) / Degrees(1),
-        Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)),
-        Percent(100) / maxTurnVelocity
+        Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1))
       )
 
-      override val forwardPositionControlGains = PIDFConfig(
+      override val forwardPositionControlGains = PIDConfig(
         Percent(100) / Meters(10),
         Percent(0) / (Meters(1).toGeneric * Seconds(1)),
-        Percent(0) / MetersPerSecond(1),
-        Percent(0) / Meters(1)
+        Percent(0) / MetersPerSecond(1)
       )
 
-      override val turnPositionControlGains = PIDFConfig(
+      override val turnPositionControlGains = PIDConfig(
         Percent(100) / Degrees(10),
         Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
-        Percent(0) / DegreesPerSecond(1),
-        Percent(0) / Degrees(1)
+        Percent(0) / DegreesPerSecond(1)
       )
     })
 
@@ -177,8 +168,8 @@ class UnicycleDriveTaskTest extends FunSuite {
       override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
       override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
 
-      override def forwardPosition: Signal[Length] = Signal(currentPositionForward)
-      override def turnPosition: Signal[Angle] = Signal(currentPositionTurn)
+      override val forwardPosition: Signal[Length] = Signal(currentPositionForward)
+      override val turnPosition: Signal[Angle] = Signal(currentPositionTurn)
     }
 
     val task = new drive.unicycleTasks.DriveDistanceStraight(
@@ -226,29 +217,26 @@ class UnicycleDriveTaskTest extends FunSuite {
 
     val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = MetersPerSecond(10)
-      override def maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
+      override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
 
-      override val forwardControlGains = PIDFConfig(
+      override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
         Percent(0) / Meters(1),
-        Percent(0) / MetersPerSecondSquared(1),
-        Percent(100) / maxForwardVelocity
+        Percent(0) / MetersPerSecondSquared(1)
       )
 
-      override val turnControlGains = PIDFConfig(
+      override val turnControlGains = PIDConfig(
         Percent(0) / DegreesPerSecond(1),
         Percent(0) / Degrees(1),
-        Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)),
-        Percent(100) / maxTurnVelocity
+        Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1))
       )
 
-      override def forwardPositionControlGains = ???
+      override val forwardPositionControlGains = null
 
-      override def turnPositionControlGains = PIDFConfig(
+      override val turnPositionControlGains = PIDConfig(
         Percent(100) / Degrees(10),
         Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
-        Percent(0) / DegreesPerSecond(1),
-        Percent(0) / Degrees(1)
+        Percent(0) / DegreesPerSecond(1)
       )
     })
 
@@ -271,8 +259,8 @@ class UnicycleDriveTaskTest extends FunSuite {
       override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
       override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
 
-      override def forwardPosition: Signal[Length] = ???
-      override def turnPosition: Signal[Angle] = Signal(currentPosition)
+      override val forwardPosition: Signal[Length] = null
+      override val turnPosition: Signal[Angle] = Signal(currentPosition)
     }
 
     val task = new drive.unicycleTasks.RotateByAngle(
