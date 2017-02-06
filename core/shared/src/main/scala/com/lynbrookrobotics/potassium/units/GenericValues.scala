@@ -4,7 +4,8 @@ import com.lynbrookrobotics.potassium.{PeriodicSignal, SignalLike}
 import squants.{Dimension, Quantity, UnitOfMeasure}
 import squants.time.{Seconds, Time, TimeDerivative, TimeIntegral}
 
-class GenericIntegral[T <: Quantity[T]](val value: Double, val uom: UnitOfMeasure[T]) extends Quantity[GenericIntegral[T]] with TimeIntegral[GenericValue[T]] {
+class GenericIntegral[T <: Quantity[T]](val value: Double, val uom: UnitOfMeasure[T])
+  extends Quantity[GenericIntegral[T]] with TimeIntegral[GenericValue[T]] {
   override def unit: UnitOfMeasure[GenericIntegral[T]] = new UnitOfMeasure[GenericIntegral[T]] {
     override protected def converterFrom = identity
 
@@ -22,7 +23,27 @@ class GenericIntegral[T <: Quantity[T]](val value: Double, val uom: UnitOfMeasur
   override protected def time: Time = Seconds(1)
 }
 
-class GenericValue[T <: Quantity[T]](val value: Double, val uom: UnitOfMeasure[T]) extends Quantity[GenericValue[T]] with TimeIntegral[GenericDerivative[T]] with TimeDerivative[GenericIntegral[T]] {
+class GenericDerivative[T <: Quantity[T]](val value: Double, val uom: UnitOfMeasure[T])
+  extends Quantity[GenericDerivative[T]] with TimeDerivative[GenericValue[T]] {
+  override def unit: UnitOfMeasure[GenericDerivative[T]] = new UnitOfMeasure[GenericDerivative[T]] {
+    override protected def converterFrom = identity
+
+    override def symbol = uom.symbol + " / s"
+
+    override protected def converterTo = identity
+
+    override def apply[N](n: N)(implicit num: Numeric[N]) = new GenericDerivative[T](num.toDouble(n), uom)
+  }
+
+  override def dimension: Dimension[GenericDerivative[T]] = ???
+
+  override def timeIntegrated: GenericValue[T] = new GenericValue[T](value, uom)
+
+  override def time: Time = Seconds(1)
+}
+
+class GenericValue[T <: Quantity[T]](val value: Double, val uom: UnitOfMeasure[T])
+  extends Quantity[GenericValue[T]] with TimeIntegral[GenericDerivative[T]] with TimeDerivative[GenericIntegral[T]] {
   override def unit: UnitOfMeasure[GenericValue[T]] = new UnitOfMeasure[GenericValue[T]] {
     override protected def converterFrom = identity
 
@@ -54,22 +75,3 @@ object GenericValue {
     target.map(x => toGenericValue(x))
   }
 }
-
-class GenericDerivative[T <: Quantity[T]](val value: Double, val uom: UnitOfMeasure[T]) extends Quantity[GenericDerivative[T]] with TimeDerivative[GenericValue[T]] {
-  override def unit: UnitOfMeasure[GenericDerivative[T]] = new UnitOfMeasure[GenericDerivative[T]] {
-    override protected def converterFrom = identity
-
-    override def symbol = uom.symbol + " / s"
-
-    override protected def converterTo = identity
-
-    override def apply[N](n: N)(implicit num: Numeric[N]) = new GenericDerivative[T](num.toDouble(n), uom)
-  }
-
-  override def dimension: Dimension[GenericDerivative[T]] = ???
-
-  override def timeIntegrated: GenericValue[T] = new GenericValue[T](value, uom)
-
-  override def time: Time = Seconds(1)
-}
-

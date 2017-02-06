@@ -1,44 +1,37 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
-import com.lynbrookrobotics.potassium.control.{PIDFConfig, PIDFProperUnitsConfig}
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal, SignalLike}
 import squants.motion.AngularVelocity
-import squants.{Acceleration, Angle, Dimensionless, Length, Percent, Velocity}
+import squants.{Angle, Dimensionless, Length, Percent, Velocity}
 
 trait UnicycleProperties {
-  def maxForwardVelocity: Velocity
-  def maxTurnVelocity: AngularVelocity
+  val maxForwardVelocity: Velocity
+  val maxTurnVelocity: AngularVelocity
 
-  def forwardControlGains: PIDFProperUnitsConfig[Velocity, Acceleration, Length, Dimensionless]
-  def turnControlGains: PIDFConfig[AngularVelocity,
-                                   GenericValue[AngularVelocity],
-                                   AngularVelocity,
-                                   GenericDerivative[AngularVelocity],
-                                   Angle,
-                                   Dimensionless]
+  val forwardControlGains: ForwardVelocityGains
 
-  def forwardPositionControlGains: PIDFConfig[Length,
-                                              Length,
-                                              GenericValue[Length],
-                                              Velocity,
-                                              GenericIntegral[Length],
-                                              Dimensionless]
+  lazy val forwardControlGainsFull: ForwardVelocityGains#Full = {
+    forwardControlGains.withF(Percent(100) / maxForwardVelocity)
+  }
 
-  def turnPositionControlGains: PIDFConfig[Angle,
-                                           Angle,
-                                           GenericValue[Angle],
-                                           AngularVelocity,
-                                           GenericIntegral[Angle],
-                                           Dimensionless]
+  val turnControlGains: TurnVelocityGains
+
+  lazy val turnControlGainsFull: TurnVelocityGains#Full = {
+    turnControlGains.withF(Percent(100) / maxTurnVelocity)
+  }
+
+  val forwardPositionControlGains: ForwardPositionGains
+
+  val turnPositionControlGains: TurnPositionGains
 }
 
 trait UnicycleHardware {
-  def forwardVelocity: Signal[Velocity]
-  def turnVelocity: Signal[AngularVelocity]
+  val forwardVelocity: Signal[Velocity]
+  val turnVelocity: Signal[AngularVelocity]
 
-  def forwardPosition: Signal[Length]
-  def turnPosition: Signal[Angle]
+  val forwardPosition: Signal[Length]
+  val turnPosition: Signal[Angle]
 }
 
 case class UnicycleSignal(forward: Dimensionless, turn: Dimensionless) {
