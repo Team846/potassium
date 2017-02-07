@@ -6,9 +6,8 @@ import edu.wpi.first.wpilibj.SPI
 
 class SPIWrapper(spi: SPI) extends SPITrait {
   override def read(initiate: Boolean, dataReceived: ByteBuffer, size: Int): Int = {
-    spi.read(initiate, dataReceived.array, size)
     try {
-      spi.read(initiate, dataReceived, size)
+      spi.read(initiate, dataReceived.array, size)
     }
     catch {
       case e: java.lang.UnsupportedOperationException =>
@@ -23,7 +22,6 @@ class SPIWrapper(spi: SPI) extends SPITrait {
 
   override def write(byte: ByteBuffer, size: Int): Int = {
     spi.write(byte.array, size)
-    spi.write(byte, size)
   }
 
   override def setMSBFirst(): Unit = {
