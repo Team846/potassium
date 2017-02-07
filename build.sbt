@@ -1,4 +1,4 @@
-enablePlugins(GitVersioning)
+enablePlugins(GitVersioning, TravisScalaStylePlugin)
 
 name := "potassium"
 

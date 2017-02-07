@@ -84,5 +84,5 @@
  </check>
  <check level="warning" class="org.scalastyle.scalariform.PublicMethodsHaveTypeChecker" enabled="true"></check>
  <check level="warning" class="org.scalastyle.file.NewLineAtEofChecker" enabled="true"></check>
- <check level="warning" class="org.scalastyle.file.NoNewLineAtEofChecker" enabled="false"></check>
+ <check level="warning" class="org.scalastyle.file.NoNewLineAtEofChecker" enabled="true"></check>
 </scalastyle>
