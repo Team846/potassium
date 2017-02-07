@@ -4,6 +4,8 @@ import com.lynbrookrobotics.potassium.{PeriodicSignal, SignalLike}
 import squants.{Dimension, Quantity, UnitOfMeasure}
 import squants.time.{Seconds, Time, TimeDerivative, TimeIntegral}
 
+import scala.language.implicitConversions
+
 class GenericIntegral[T <: Quantity[T]](val value: Double, val uom: UnitOfMeasure[T])
   extends Quantity[GenericIntegral[T]] with TimeIntegral[GenericValue[T]] {
   override def unit: UnitOfMeasure[GenericIntegral[T]] = new UnitOfMeasure[GenericIntegral[T]] {
@@ -65,13 +67,8 @@ class GenericValue[T <: Quantity[T]](val value: Double, val uom: UnitOfMeasure[T
 
 object GenericValue {
   implicit def toGenericValue[T <: Quantity[T]](l: T): GenericValue[T] = new GenericValue[T](l.value, l.unit)
-  implicit def fromGenericValue[T <: Quantity[T]](v: GenericValue[T]): T = v.uom.apply(v.value)
 
   implicit class ToGeneric[T <: Quantity[T]](l: T) {
     def toGeneric: GenericValue[T] = toGenericValue(l)
-  }
-
-  implicit def fromSignalLike[T <: Quantity[T]](target: PeriodicSignal[T]): PeriodicSignal[GenericValue[T]] = {
-    target.map(x => toGenericValue(x))
   }
 }

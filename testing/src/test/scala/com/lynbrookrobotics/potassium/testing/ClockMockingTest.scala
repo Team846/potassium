@@ -20,6 +20,22 @@ class ClockMockingTest extends FunSuite {
     assert(periodicRun)
   }
 
+  test("Cancelled periodic statement does not run") {
+    var periodicRun: Boolean = false
+
+    val (mockedClock, trigger) = ClockMocking.mockedClockTicker
+
+    val cancel = mockedClock(Milliseconds(5)) { _ =>
+      periodicRun = true
+    }
+
+    cancel()
+
+    trigger(Milliseconds(5))
+
+    assert(!periodicRun)
+  }
+
   test("Single tick produces correct dt") {
     val (mockedClock, trigger) = ClockMocking.mockedClockTicker
 
