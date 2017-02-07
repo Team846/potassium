@@ -15,6 +15,6 @@ class DisplayLighting(signal: Signal[List[Color]], lightingComponent: LightingCo
   }
 
   override def onEnd(): Unit = {
-    lightingComponent.setController(lightingComponent.defaultController)
+    lightingComponent.resetToDefault()
   }
 }

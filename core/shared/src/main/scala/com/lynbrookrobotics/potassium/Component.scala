@@ -19,7 +19,11 @@ abstract class Component[T](period: Time)(implicit val clock: Clock) {
   def defaultController: PeriodicSignal[T]
   private var currentController: PeriodicSignal[T] = defaultController
 
-  def peekedController: Signal[Option[T]] = currentController.peek
+  private var lastOutput: Option[T] = None
+
+  val peekedController: Signal[Option[T]] = Signal {
+    lastOutput
+  }
 
   /**
     * Sets the controller to be used by the component during updates.
@@ -54,6 +58,10 @@ abstract class Component[T](period: Time)(implicit val clock: Clock) {
     }
     // scalastyle:on
 
-    applySignal(currentController.currentValue(dt))
+    val value = currentController.currentValue(dt)
+
+    lastOutput = Some(value)
+
+    applySignal(value)
   }
 }
