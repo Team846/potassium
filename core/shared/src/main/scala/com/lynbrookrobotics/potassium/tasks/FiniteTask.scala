@@ -78,6 +78,15 @@ abstract class FiniteTask extends Task { self =>
   }
 
   /**
+    * Creates a continuous task with the given task to be run after this task has finished
+    * @param that the task to run second
+    * @return a sequential task combining both tasks
+    */
+  def then(that: ContinuousTask): ContinuousTask = {
+    new SequentialContinuousTask(this, that)
+  }
+
+  /**
     * Creates a task that runs this task and the given task in parallel
     * @param that the other task to run
     * @return a parallel task combining both tasks
