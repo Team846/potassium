@@ -21,3 +21,5 @@ projectFilesBackup/
 version.properties
 RUNNING_PID
 node_modules/
+.ensime
+.ensime_cache/
