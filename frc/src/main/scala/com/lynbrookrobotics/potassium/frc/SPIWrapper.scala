@@ -12,8 +12,6 @@ class SPIWrapper(spi: SPI) extends SPITrait {
     }
     catch {
       case e: java.lang.UnsupportedOperationException =>
-        e.printStackTrace()
-
         print("initiate Boolean: ", initiate, "dataReceived ByteBuffer: ", dataReceived, "size Int: ", size)
         0
     }
