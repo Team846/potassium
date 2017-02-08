@@ -30,5 +30,9 @@ class TimeoutFiniteTask private[tasks](task: FiniteTask, timeout: Time, clock: C
     }
   }
 
-  override def onEnd(): Unit = {}
+  override def onEnd(): Unit = {
+    if (task.isRunning) {
+      task.abort()
+    }
+  }
 }
