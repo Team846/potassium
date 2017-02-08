@@ -11,6 +11,7 @@ install:
 script:
   - 'sbt "clean" "coverage" "+ testOnly * -- -l com.lynbrookrobotics.potassium.PerfTest" "coverageReport"'
   - 'sbt coverageAggregate'
+  - 'if [[ $TRAVIS_PULL_REQUEST != "false" ]]; then bash ./style-checks.sh; fi'
 jdk: oraclejdk8
 after_success:
   - 'bash <(curl -s https://codecov.io/bash)'
