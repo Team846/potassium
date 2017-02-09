@@ -2,9 +2,8 @@ package com.lynbrookrobotics.potassium.commons.flywheel
 
 import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, SignalLike}
 import com.lynbrookrobotics.potassium.control.{PIDF, PIDFConfig}
-import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask}
+import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask, WrapperTask}
 import com.lynbrookrobotics.potassium.units.{GenericDerivative, GenericValue}
-
 import squants.{Angle, Dimensionless}
 import squants.motion.AngularVelocity
 
@@ -62,6 +61,23 @@ abstract class DoubleFlywheel {
         component.setController(control.withCheck { _ =>
           if (errorLeft.get.abs < tolerance && errorRight.get.abs < tolerance) {
             finished()
+          }
+        })
+      }
+
+      override def onEnd(): Unit = {
+        component.resetToDefault()
+      }
+    }
+
+    class WhileAtVelocity(vel: AngularVelocity, tolerance: AngularVelocity)
+                         (implicit properties: Signal[Properties],
+                          hardware: Hardware, component: Comp) extends WrapperTask {
+      override def onStart(): Unit = {
+        val (errorLeft, errorRight, control) = velocityControllers.velocityControl(vel)
+        component.setController(control.withCheck { _ =>
+          if (errorLeft.get.abs < tolerance && errorRight.get.abs < tolerance) {
+            readyToRunInner()
           }
         })
       }
