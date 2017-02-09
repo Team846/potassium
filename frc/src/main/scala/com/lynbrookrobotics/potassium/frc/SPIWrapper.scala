@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.SPI
 class SPIWrapper(spi: SPI) extends SPITrait {
   override def read(initiate: Boolean, dataReceived: ByteBuffer, size: Int): Int = {
     try {
+      println("It works")
       spi.read(initiate, dataReceived.array, size)
     }
     catch {
