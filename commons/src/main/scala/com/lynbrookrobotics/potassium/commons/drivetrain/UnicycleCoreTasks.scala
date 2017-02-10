@@ -80,6 +80,7 @@ trait UnicycleCoreTasks {
     }
 
     override final def onStart(): Unit = {
+      println("starting task!")
       val (velocity, error) = trapezoidalDriveControl(
         hardware.forwardVelocity.get, // not map because we need position at this time
         cruisingVelocity,
@@ -91,10 +92,12 @@ trait UnicycleCoreTasks {
 
       val unicycleOutput = velocity.map(UnicycleVelocity(_, DegreesPerSecond(0)))
 
+
       drive.setController(
-        lowerLevelVelocityControl(velocityControl(unicycleOutput).withCheck { _ =>
-          val velocityVal = velocity.toPollingSignal(Milliseconds(20)).get.getOrElse(FeetPerSecond(-20.0))
-          println("curr pos: ", hardware.forwardPosition.get.toFeet, " ft", " error: ", error.get.toFeet, " ft", "velocity output: " + velocityVal.toFeetPerSecond , "ft/s")
+        lowerLevelVelocityControl(velocityControl(unicycleOutput).withCheck { v =>
+          val velocityVal = velocity.toPollingSignal(Milliseconds(5)).get.getOrElse(FeetPerSecond(-20.0))
+
+          println("curr pos: ", hardware.forwardPosition.get.toFeet, " ft ", " error: ", error.get.toFeet, " ft", "velocity output: " + velocityVal.toFeetPerSecond , " ft/s", "unicycle output: ", v )
 
           if (error.get.abs < Feet(0.1)) {
             println("finished!")

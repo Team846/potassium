@@ -93,6 +93,7 @@ trait UnicycleMotionProfileControllers
       case ((velDec, velAcc), sign) => sign * velDec min cruisingVelocity min velAcc
     }.toPeriodic
 
-    (velocityOutput, error)
+    (/*velocityOutput*/Signal.constant(cruisingVelocity).toPeriodic, error)
   }
+
 }
