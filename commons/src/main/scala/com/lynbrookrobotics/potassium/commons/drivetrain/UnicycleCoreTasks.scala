@@ -68,7 +68,8 @@ trait UnicycleCoreTasks {
                                             finalVelocity: Velocity,
                                             acceleration: Acceleration,
                                             targetDistance: Length,
-                                            position: Signal[Length])
+                                            position: Signal[Length],
+                                            tolerance: Length)
                                            (implicit drive: Drivetrain,
                                             hardware: DrivetrainHardware,
                                             properties: Signal[DrivetrainProperties],
@@ -80,7 +81,6 @@ trait UnicycleCoreTasks {
     }
 
     override final def onStart(): Unit = {
-      println("starting task!")
       val (velocity, error) = trapezoidalDriveControl(
         hardware.forwardVelocity.get, // not map because we need position at this time
         cruisingVelocity,
@@ -88,23 +88,17 @@ trait UnicycleCoreTasks {
         acceleration,
         hardware.forwardPosition.get, // not map because we need position at this time
         targetDistance,
-        position)
+        position,
+        tolerance
+      )
 
-      val unicycleOutput = velocity.map(UnicycleVelocity(_, DegreesPerSecond(0)))
+      val unicycleOutput = velocity.map(UnicycleVelocity(_, DegreesPerSecond(0)).toUnicycleSignal)
 
-
-      drive.setController(
-        lowerLevelVelocityControl(velocityControl(unicycleOutput).withCheck { v =>
-          val velocityVal = velocity.toPollingSignal(Milliseconds(5)).get.getOrElse(FeetPerSecond(-20.0))
-
-          println("curr pos: ", hardware.forwardPosition.get.toFeet, " ft ", " error: ", error.get.toFeet, " ft", "velocity output: " + velocityVal.toFeetPerSecond , " ft/s", "unicycle output: ", v )
-
-          if (error.get.abs < Feet(0.1)) {
-            println("finished!")
+      drive.setController(lowerLevelVelocityControl(unicycleOutput).withCheck { _ =>
+          if (error.get.abs < tolerance) {
             finished()
           }
         })
-      )
     }
 
     override def onEnd(): Unit = {
@@ -130,7 +124,8 @@ trait UnicycleCoreTasks {
                                 finalVelocity,
                                 properties.get.maxAcceleration,
                                 targetForwardDistance,
-                                hardware.forwardPosition)
+                                hardware.forwardPosition,
+                                Feet(.1))
 
   class DriveDistanceStraight(distance: Length, toleranceForward: Length, toleranceAngle: Angle)
                              (implicit drive: Drivetrain,

@@ -3,7 +3,7 @@ package com.lynbrookrobotics.potassium.commons.drivetrain
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal, SignalLike}
 import squants.motion.AngularVelocity
-import squants.{Acceleration, Angle, Dimensionless, Length, Percent, Velocity}
+import squants.{Acceleration, Angle, Dimensionless, Each, Length, Percent, Velocity}
 
 trait UnicycleProperties {
   val maxForwardVelocity: Velocity
@@ -40,7 +40,13 @@ case class UnicycleSignal(forward: Dimensionless, turn: Dimensionless) {
     UnicycleSignal(this.forward + that.forward, this.turn + that.turn)
 }
 
-case class UnicycleVelocity(forward: Velocity, turn: AngularVelocity)
+case class UnicycleVelocity(forward: Velocity, turn: AngularVelocity) {
+  def toUnicycleSignal(implicit unicycleProperties: Signal[UnicycleProperties]) = {
+    UnicycleSignal(
+      Each(forward / unicycleProperties.get.maxForwardVelocity),
+      Each(turn / unicycleProperties.get.maxTurnVelocity))
+  }
+}
 
 /**
   * A drivetrain that has forward-backward and turning control in the unicycle model
