@@ -1,21 +1,12 @@
 package com.lynbrookrobotics.potassium.frc
 
 import java.nio.ByteBuffer
-
 import com.lynbrookrobotics.potassium.sensors.SPITrait
 import edu.wpi.first.wpilibj.SPI
 
 class SPIWrapper(spi: SPI) extends SPITrait {
   override def read(initiate: Boolean, dataReceived: ByteBuffer, size: Int): Int = {
-    try {
-      println("Dank Memes")
       spi.read(initiate, dataReceived, size)
-    }
-    catch {
-      case e: java.lang.UnsupportedOperationException =>
-        print("initiate Boolean: ", initiate, "dataReceived ByteBuffer: ", dataReceived, "size Int: ", size)
-        100
-    }
   }
 
   override def setClockRate(hz: Int): Unit = {
