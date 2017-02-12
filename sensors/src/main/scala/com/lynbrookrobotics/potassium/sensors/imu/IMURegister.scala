@@ -8,9 +8,12 @@ import com.lynbrookrobotics.potassium.sensors.SPITrait
   *
   * @param register is ID of register on IMU
   */
-class IMURegister(register: Int) {
+class IMURegister(register: Byte) {
   private val readBuffer: ByteBuffer = ByteBuffer.allocateDirect(2)
-  private val readMessage: Array[Byte] = Array((register & 0x7f).toByte, 0.toByte)
+  private val readMessage: ByteBuffer = ByteBuffer.allocateDirect(2)
+  readMessage.put(0, register)
+  readMessage.put(1, 0.toByte)
+
   private val writeMessage1: Byte = (register | 0x80).toByte
   private val writeMessage2: Byte = (register | 0x81).toByte
 
@@ -21,10 +24,14 @@ class IMURegister(register: Int) {
     */
   def read(spi: SPITrait): Int = {
     readBuffer.clear()
-    spi.write(ByteBuffer.wrap(readMessage), 2)
+    readBuffer.put(0.toByte)
+    readBuffer.put(0.toByte)
+    spi.write(readMessage, 2)
+    println(s"read buffer contains $readBuffer")
+
     spi.read(false, readBuffer, 2)
 
-    readBuffer.getShort(0).asInstanceOf[Int] & 0xffff
+    readBuffer.getShort(0).toInt
   }
 
   /**
@@ -34,9 +41,18 @@ class IMURegister(register: Int) {
     * @param spi   the interface to use for communication
     */
   def write(value: Int, spi: SPITrait): Unit = {
-    val valueWriter1: Array[Byte] = Array(writeMessage1, value.asInstanceOf[Byte])
-    val valueWriter2: Array[Byte] = Array(writeMessage2, (value >> 8).asInstanceOf[Byte])
-    spi.write(ByteBuffer.wrap(valueWriter1), 2)
-    spi.write(ByteBuffer.wrap(valueWriter2), 2)
+//    val valueWriter1: Array[Byte] = Array(writeMessage1, value.asInstanceOf[Byte])
+//    val valueWriter2: Array[Byte] = Array(writeMessage2, (value >> 8).asInstanceOf[Byte])
+    val valueWriter1 = ByteBuffer.allocateDirect(2)
+    val valueWriter2 = ByteBuffer.allocateDirect(2)
+    valueWriter1.put(0, writeMessage1)
+    valueWriter1.put(1, value.toByte)
+
+    valueWriter2.put(0, writeMessage2)
+    valueWriter2.put(1, (value >> 8).toByte)
+
+
+    spi.write(valueWriter1, 2)
+    spi.write(valueWriter2, 2)
   }
 }
