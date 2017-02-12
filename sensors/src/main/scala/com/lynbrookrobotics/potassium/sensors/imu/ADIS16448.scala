@@ -9,8 +9,8 @@ import squants.motion.{AngularVelocity, DegreesPerSecond}
   * An interface for communicating with the ADIS16448 IMU.
   */
 class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePeriod) {
+  // List of register addresses on the IMU
   private object Registers {
-    // List of register addresses on the IMU
     // Sample period
     val SMPL_PRD: IMURegister = new IMURegister(0x36)
     // Sensor data
@@ -45,12 +45,9 @@ class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePer
   spi.setClockActiveLow()
   spi.setChipSelectActiveLow()
 
-//  Registers.PROD_ID.read(spi)
-  val idNum = Registers.PROD_ID.read(spi)
-
   // Checks whether or not the IMU connected is the ADIS16448
-  if (idNum != 16448) {
-    throw new IllegalStateException("The device in the MXP port is not an ADIS16448 IMU    " + idNum)
+  if (Registers.PROD_ID.read(spi) != 16448) {
+    throw new IllegalStateException("The device in the MXP port is not an ADIS16448 IMU")
   }
   // Saves the com.lynbrookrobotics.potassium.sensors.SPI being used (16448) to the various registers
   Registers.SMPL_PRD.write(1, spi) // 1 Means use default period
@@ -62,6 +59,13 @@ class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePer
   private val inBuffer: ByteBuffer = ByteBuffer.allocateDirect(2)
 
   // Returns data from register as short (16 bit Integer)
+  private var firstRun = true
+
+  /**
+    * Returns data from register as short (16 bit integer)
+    * @param register register- hex
+    * @return short
+    */
   private def readGyroRegister(register: Byte): Short = {
     outBuffer.put(0, register) // Request data from register
     outBuffer.put(1, 0.asInstanceOf[Byte]) // Second byte must be 0
@@ -75,8 +79,11 @@ class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePer
     inBuffer.getShort
   }
 
-  // Gets the current gyro, accel, and magneto data from the IMU.
-  // 2nd and 3rd parameters are null because only gyro is used.
+  /**
+    * Gets the current gyro data from the IMU.
+    * 2nd and 3rd parameters are null because accelerometer and magneto data not used.
+    * @return IMUValue
+    */
   def currentData: IMUValue = {
     val gyro: Value3D[AngularVelocity] = Value3D[AngularVelocity](
       DegreesPerSecond(readGyroRegister(ADIS16448Protocol.X_GYRO_REG)),

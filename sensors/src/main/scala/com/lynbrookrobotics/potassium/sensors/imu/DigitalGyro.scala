@@ -1,6 +1,5 @@
 package com.lynbrookrobotics.potassium.sensors.imu
 
-import java.util
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
 import squants.motion.{AngularVelocity, DegreesPerSecond}
 import squants.{Angle, Time}
@@ -12,20 +11,22 @@ import squants.{Angle, Time}
 abstract class DigitalGyro(tickPeriod: Time) {
   // Tick Period of the robot
   var currentDrift: Value3D[AngularVelocity] = null
-
   // List of velocities used for calibration of IMU
   var calibrationVelocities: Array[Value3D[AngularVelocity]] = new Array(200)
-
   // Current index in calibrationVelocities
   var index: Int = 0
-
   // Whether IMU is calibrating
   var calibrating: Boolean = true
 
-  // Gets the current velocity.
+  /**
+    * Gets the current velocity
+    * @return Value3D
+    */
   def retrieveVelocity: Value3D[AngularVelocity]
 
-  // Update velocity stored calibrationVelocities at index
+  /**
+    * Update velocity stored calibrationVelocities at index
+    */
   def calibrateUpdate(): Unit = {
     if (calibrating) {
       calibrationVelocities(index) = retrieveVelocity
@@ -35,7 +36,9 @@ abstract class DigitalGyro(tickPeriod: Time) {
     }
   }
 
-  // Updates values for the angle on the gyro.
+  /**
+    * Update values for the angle on the gyro.
+    */
   def angleUpdate(): Unit = {
     if (calibrating) {
       val sum = calibrationVelocities.reduceLeft { (cur, acc) =>
@@ -47,11 +50,6 @@ abstract class DigitalGyro(tickPeriod: Time) {
       calibrationVelocities = null
       calibrating = false
     }
-
-
-//    // Stores the value as a form of memory
-//    // Modifies velocity according to drift and change in position
-//    currentVelocity = retrieveVelocity + currentDrift
   }
 
   val velocity: PeriodicSignal[Value3D[AngularVelocity]] = Signal {

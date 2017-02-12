@@ -13,7 +13,6 @@ class IMURegister(register: Byte) {
   private val readMessage: ByteBuffer = ByteBuffer.allocateDirect(2)
   readMessage.put(0, register)
   readMessage.put(1, 0.toByte)
-
   private val writeMessage1: Byte = (register | 0x80).toByte
   private val writeMessage2: Byte = (register | 0x81).toByte
 
@@ -27,7 +26,6 @@ class IMURegister(register: Byte) {
     readBuffer.put(0.toByte)
     readBuffer.put(0.toByte)
     spi.write(readMessage, 2)
-    println(s"read buffer contains $readBuffer")
 
     spi.read(false, readBuffer, 2)
 
@@ -41,8 +39,6 @@ class IMURegister(register: Byte) {
     * @param spi   the interface to use for communication
     */
   def write(value: Int, spi: SPITrait): Unit = {
-//    val valueWriter1: Array[Byte] = Array(writeMessage1, value.asInstanceOf[Byte])
-//    val valueWriter2: Array[Byte] = Array(writeMessage2, (value >> 8).asInstanceOf[Byte])
     val valueWriter1 = ByteBuffer.allocateDirect(2)
     val valueWriter2 = ByteBuffer.allocateDirect(2)
     valueWriter1.put(0, writeMessage1)
