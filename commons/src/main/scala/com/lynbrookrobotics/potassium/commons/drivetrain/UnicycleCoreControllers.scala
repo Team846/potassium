@@ -12,8 +12,8 @@ trait UnicycleCoreControllers {
 
   def parentOpenLoop(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal]
 
-  def parentClosedLoop(unicycle: SignalLike[UnicycleSignal])(implicit hardware: DrivetrainHardware,
-                                                             props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal]
+  def lowerLevelVelocityControl(unicycle: SignalLike[UnicycleSignal])(implicit hardware: DrivetrainHardware,
+                                                                      props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal]
 
   def openForwardOpenDrive(forwardSpeed: Signal[Dimensionless]): PeriodicSignal[DriveSignal] = {
     parentOpenLoop(forwardSpeed.map(f => UnicycleSignal(f, Percent(0))))
@@ -21,7 +21,7 @@ trait UnicycleCoreControllers {
 
   def openForwardClosedDrive(forwardSpeed: Signal[Dimensionless])(implicit hardware: DrivetrainHardware,
                                                                   props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal] = {
-    parentClosedLoop(forwardSpeed.map(f => UnicycleSignal(f, Percent(0))))
+    lowerLevelVelocityControl(forwardSpeed.map(f => UnicycleSignal(f, Percent(0))))
   }
 
   def openTurnOpenDrive(turnSpeed: Signal[Dimensionless]): PeriodicSignal[DriveSignal] = {
@@ -30,7 +30,7 @@ trait UnicycleCoreControllers {
 
   def openTurnClosedDrive(turnSpeed: Signal[Dimensionless])(implicit hardware: DrivetrainHardware,
                                                             props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal] = {
-    parentClosedLoop(turnSpeed.map(t => UnicycleSignal(Percent(0), t)))
+    lowerLevelVelocityControl(turnSpeed.map(t => UnicycleSignal(Percent(0), t)))
   }
 
   def velocityControl(target: SignalLike[UnicycleVelocity])

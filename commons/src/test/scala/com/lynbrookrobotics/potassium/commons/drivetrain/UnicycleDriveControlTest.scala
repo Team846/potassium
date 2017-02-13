@@ -5,10 +5,10 @@ import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal, SignalLike}
 import org.scalacheck.{Arbitrary, Gen}
-import squants.motion.{AngularVelocity, DegreesPerSecond, MetersPerSecond, MetersPerSecondSquared}
+import squants.motion._
 import squants.space.{Degrees, Meters}
 import squants.time.{Milliseconds, Seconds}
-import squants.{Angle, Each, Length, Percent, Velocity}
+import squants.{Acceleration, Angle, Each, Length, Percent, Velocity}
 import org.scalacheck.Prop.forAll
 import org.scalatest.FunSuite
 import org.scalatest.prop.Checkers._
@@ -76,6 +76,7 @@ class UnicycleDriveControlTest extends FunSuite {
     implicit val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = MetersPerSecond(10)
       override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
+      override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
 
       override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
@@ -112,6 +113,7 @@ class UnicycleDriveControlTest extends FunSuite {
     val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = null
       override val maxTurnVelocity: AngularVelocity = null
+      override val maxAcceleration: Acceleration = null
 
       override val forwardControlGains = null
       override val turnControlGains = null
@@ -145,6 +147,7 @@ class UnicycleDriveControlTest extends FunSuite {
     val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = null
       override val maxTurnVelocity: AngularVelocity = null
+      override val maxAcceleration: Acceleration = null
 
       override val forwardControlGains = null
       override val turnControlGains = null
@@ -178,6 +181,7 @@ class UnicycleDriveControlTest extends FunSuite {
     val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = null
       override val maxTurnVelocity: AngularVelocity = null
+      override val maxAcceleration: Acceleration = null
 
       override val forwardControlGains = null
       override val turnControlGains = null
@@ -211,6 +215,7 @@ class UnicycleDriveControlTest extends FunSuite {
     val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = null
       override val maxTurnVelocity: AngularVelocity = null
+      override val maxAcceleration: Acceleration = null
 
       override val forwardControlGains = null
       override val turnControlGains = null
@@ -244,6 +249,7 @@ class UnicycleDriveControlTest extends FunSuite {
     val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = null
       override val maxTurnVelocity: AngularVelocity = null
+      override val maxAcceleration: Acceleration = null
 
       override val forwardControlGains = null
       override val turnControlGains = null
@@ -277,6 +283,7 @@ class UnicycleDriveControlTest extends FunSuite {
     val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = null
       override val maxTurnVelocity: AngularVelocity = null
+      override val maxAcceleration: Acceleration = null
 
       override val forwardControlGains = null
       override val turnControlGains = null

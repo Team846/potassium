@@ -6,8 +6,7 @@ import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
 import squants.motion._
 import squants.space.Feet
 
-trait UnicycleMotionProfileControllers
-  extends UnicycleCoreControllers {
+trait UnicycleMotionProfileControllers extends UnicycleCoreControllers {
   /**
     * Uses a control loop that results in constant acceleration,
     * then constant cruising velocity, and then constant deceleration to the
@@ -21,7 +20,7 @@ trait UnicycleMotionProfileControllers
     * @param finalVelocity desired final velocity when target is reached
     * @param acceleration desired magnitude of acceleration of the system
     * @param initPosition initial position of the system
-    * @param target target position
+    * @param targetForwardTravel target position
     * @param position current position
     * @return velocity to travel at to achieve a trapezoidal motion profile.
     *         This value must be used a well tuned velocity controller to result
@@ -32,15 +31,18 @@ trait UnicycleMotionProfileControllers
                               finalVelocity: Velocity,
                               acceleration: Acceleration,
                               initPosition: Distance,
-                              target: Distance,
-                              position: Signal[Distance]): PeriodicSignal[Velocity] = {
-    val error            = position.map(target - _)
+                              targetForwardTravel: Distance,
+                              position: Signal[Distance],
+                              tolerance: Distance): (PeriodicSignal[Velocity], Signal[Distance]) = {
+    val targetPosition   = initPosition + targetForwardTravel
+    val error            = position.map(targetPosition - _)
     val signError        = error.map(error => Math.signum(error.toFeet))
     val distanceTraveled = position.map(_ - initPosition)
 
-    // Travel at max velocity for the first 0.5 feet
-    val KickstartDistance = Feet(0.5)
+    // Travel at 0.1 ft/s for the first 0.25 feet
+    val KickstartDistance = Feet(0.25)
     val Tolerance         = Feet(0.1)
+    val KickStartVelocity = FeetPerSecond(1)
 
     /**
       * Calculate the magnitude of ideal velocity assuming constant acceleration
@@ -50,7 +52,7 @@ trait UnicycleMotionProfileControllers
     val velocityAccel = distanceTraveled.map { traveled =>
       // otherwise additional output is zero and nothing happens
       if (traveled.abs <= KickstartDistance) {
-        cruisingVelocity
+        KickStartVelocity
       } else {
         val V0Squared             = Math.pow(initVelocity.toFeetPerSecond, 2)
         val accelerationValue     = acceleration.toFeetPerSecondSquared
@@ -73,23 +75,26 @@ trait UnicycleMotionProfileControllers
       * Direction of ideal velocity is decided later.
       */
     val velocityDeccel = error.map { toTarget =>
-      if (toTarget.abs <= Tolerance) {
+      if (toTarget.abs <= tolerance) {
         FeetPerSecond(0.0)
+      } else {
+        val finalVelocitySquared = Math.pow(finalVelocity.toFeetPerSecond, 2)
+        val errorValue = toTarget.abs.toFeet
+        val accelerationValue = acceleration.toFeetPerSecondSquared
+
+        FeetPerSecond(
+          sqrt(
+            abs(
+              finalVelocitySquared + 2 * accelerationValue * errorValue)))
       }
-
-      val finalVelocitySquared = Math.pow(finalVelocity.toFeetPerSecond, 2)
-      val errorValue           = toTarget.abs.toFeet
-      val accelerationValue    = acceleration.toFeetPerSecondSquared
-
-      FeetPerSecond(
-        sqrt(
-          abs(
-            finalVelocitySquared + 2 * accelerationValue * errorValue)))
     }
 
     // Ensure that motion is in the direction of the error
-    velocityDeccel.zip(velocityAccel).zip(signError).map {
+    val velocityOutput = velocityDeccel.zip(velocityAccel).zip(signError).map {
       case ((velDec, velAcc), sign) => sign * velDec min cruisingVelocity min velAcc
     }.toPeriodic
+
+    (velocityOutput, error)
   }
+
 }
