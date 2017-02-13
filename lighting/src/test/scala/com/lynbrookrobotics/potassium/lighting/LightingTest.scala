@@ -10,8 +10,8 @@ import squants.time.Milliseconds
 
 class LightingTest extends FunSuite {
   test("Test static color"){
-    val comm = new TwoWayComm {
-      isConnected = true
+    val comm = new RXTXTwoWayComms {
+      connected = true
       def dataToLog(): Unit ={
         logQueue.enqueue(data.toString)
       }
@@ -36,7 +36,7 @@ class LightingTest extends FunSuite {
   }
 
   test("Test Failures"){
-    val comm = new TwoWayComm {
+    val comm = new RXTXTwoWayComms {
       def dataToLog(): Unit ={
         logQueue.enqueue(data.toString)
       }

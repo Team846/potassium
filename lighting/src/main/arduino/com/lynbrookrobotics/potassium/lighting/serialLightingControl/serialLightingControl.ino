@@ -5,7 +5,7 @@ int nLEDs = 20;
 int incomingByte = 0;
 int iter = 0;
 int acc = 0;
-int data = 0;
+int data = 7;
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(nLEDs, pin, NEO_GRB + NEO_KHZ800);
 
@@ -55,7 +55,7 @@ void doEffect(int integer){
       colorWipe(strip.Color(0, 0, 255), 50);
     }
     break;
-    case 0:
+    case 1:
     staticColor(strip.Color(0, 0, 0));
     break;
   }
