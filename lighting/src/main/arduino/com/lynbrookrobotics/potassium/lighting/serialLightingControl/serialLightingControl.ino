@@ -1,48 +1,109 @@
-int pins[3] = {9, 10, 11};
+#include <Adafruit_NeoPixel.h>
+
+int pin  = 6;
+int nLEDs = 20;
 int incomingByte = 0;
 int iter = 0;
 int acc = 0;
-int rgb[3] = {0, 0, 0};
+int data = 0;
+
+Adafruit_NeoPixel strip = Adafruit_NeoPixel(nLEDs, pin, NEO_GRB + NEO_KHZ800);
+
 void setup() {
   Serial.begin(115200);
-  pinMode(pins[0], OUTPUT);
-  pinMode(pins[1], OUTPUT);
-  pinMode(pins[2], OUTPUT);
+  strip.begin();
+  strip.show();
 }
 
 void loop() {
-  //Serial.println("hi");
-  //delay(1);
-  // send data only when you receive data:
   if (Serial.available() > 0) {
-  // read the incoming byte:
     incomingByte = Serial.read();
-  // say what you got:
-  if(incomingByte - 48 < 10 && incomingByte - 48 >= 0){
-    Serial.print("I received: ");
-    Serial.println(incomingByte - 48, DEC);
-    iter++;
-    switch(iter % 3){
-      case 0:
-      acc += (incomingByte -48);
-      rgb[(iter / 3) - 1] = acc;
-      acc = 0;
-      if(iter == 9){
-        iter = 0;
-      }
-      break;
-      case 1:
-      acc += (incomingByte - 48) * 100;
-      break;
-      case 2:
-      acc += (incomingByte - 48) * 10;
-      break;
+    Serial.println(incomingByte, DEC);
+    data = incomingByte;
+  }
+  doEffect(data);
+}
+
+boolean undo = false;
+void doEffect(int integer){
+  switch(integer){
+    default:
+    staticColor(strip.Color(255, 255, 0));
+    break;
+    case 2:
+    staticColor(strip.Color(255, 0, 255));
+    break;
+    case 3:
+    staticColor(strip.Color(0, 255, 255));
+    break;
+    case 4:
+    staticColor(strip.Color(255, 0, 0));
+    break;
+    case 5:
+    staticColor(strip.Color(0, 255, 0));
+    break;
+    case 6:
+    staticColor(strip.Color(0, 0, 255));
+    break;
+    case 7:
+    rainbowCycle(20);
+    break;
+    case 8:
+    if(undo){
+      colorWipe(strip.Color(0, 0, 0), 50);
+    }else{
+      colorWipe(strip.Color(0, 0, 255), 50);
     }
+    break;
+    case 0:
+    staticColor(strip.Color(0, 0, 0));
+    break;
   }
+}
+
+void staticColor(uint32_t c){
+  for(int i = 0; i < strip.numPixels(); i++){
+    strip.setPixelColor(i, c);
   }
-  analogWrite(pins[0], 255 - rgb[0]);
-  analogWrite(pins[1], 255 - rgb[1]);
-  analogWrite(pins[2], 255 - rgb[2]);
+  strip.show();
+}
+
+uint16_t colorWipeIter = 0;
+void colorWipe(uint32_t c, uint8_t wait){
+  if(colorWipeIter > strip.numPixels()){
+    colorWipeIter = 0;
+    undo = !undo;
+  }else{
+  strip.setPixelColor(colorWipeIter, c);
+  strip.show();
+  delay(wait);
+  colorWipeIter++;
+  }
+}
+
+uint16_t rainbowIter = 0;
+void rainbowCycle(uint32_t wait) {
+  uint16_t i;
+  
+  for(i=0; i< strip.numPixels(); i++) {
+      strip.setPixelColor(i, Wheel(((i * 256 / strip.numPixels()) + rainbowIter) & 255));
+  }
+  rainbowIter++;
+  delay(wait);
+  strip.show();
+}
+
+uint32_t Wheel(byte WheelPos) {
+  WheelPos = 255 - WheelPos;
+  if(WheelPos < 85) {
+    return strip.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+  }
+  if(WheelPos < 170) {
+    WheelPos -= 85;
+    return strip.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+  }
+  WheelPos -= 170;
+  return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
 }
 
 
