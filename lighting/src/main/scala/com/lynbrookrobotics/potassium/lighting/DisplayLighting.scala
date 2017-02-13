@@ -9,7 +9,7 @@ import com.lynbrookrobotics.potassium.tasks.ContinuousTask
   * Continuous Task that you feed a communicator and an rgb value.
   * Defaults to black onEnd
   */
-class DisplayLighting(signal: Signal[List[Color]], lightingComponent: LightingComponent) extends ContinuousTask {
+class DisplayLighting(signal: Signal[Int], lightingComponent: LightingComponent) extends ContinuousTask {
   override def onStart(): Unit = {
     lightingComponent.setController(signal.toPeriodic)
   }
