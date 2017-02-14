@@ -33,6 +33,7 @@ trait UnicycleHardware {
 
   val forwardPosition: Signal[Length]
   val turnPosition: Signal[Angle]
+  val position: Signal[Point]
 }
 
 case class UnicycleSignal(forward: Dimensionless, turn: Dimensionless) {

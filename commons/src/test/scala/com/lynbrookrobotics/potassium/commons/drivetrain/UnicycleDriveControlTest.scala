@@ -18,6 +18,7 @@ class UnicycleDriveControlTest extends FunSuite {
     override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
     override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
 
+    override val position: Signal[Point] = null
     override val forwardPosition: Signal[Length] = null
     override val turnPosition: Signal[Angle] = null
   }
@@ -130,6 +131,7 @@ class UnicycleDriveControlTest extends FunSuite {
     val hardware: UnicycleHardware = new UnicycleHardware {
       override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
       override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+      override val position: Signal[Point] = null
 
       override val forwardPosition: Signal[Length] = Signal(Meters(5))
       override val turnPosition: Signal[Angle] = null
@@ -164,6 +166,7 @@ class UnicycleDriveControlTest extends FunSuite {
     val hardware: UnicycleHardware = new UnicycleHardware {
       override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
       override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+      override val position: Signal[Point] = null
 
       override val forwardPosition: Signal[Length] = Signal(Meters(0))
       override val turnPosition: Signal[Angle] = null
@@ -198,6 +201,7 @@ class UnicycleDriveControlTest extends FunSuite {
     val hardware: UnicycleHardware = new UnicycleHardware {
       override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
       override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+      override val position: Signal[Point] = null
 
       override val forwardPosition: Signal[Length] = Signal(Meters(0))
       override val turnPosition: Signal[Angle] = null
@@ -232,6 +236,7 @@ class UnicycleDriveControlTest extends FunSuite {
     val hardware: UnicycleHardware = new UnicycleHardware {
       override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
       override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+      override val position: Signal[Point] = null
 
       override val forwardPosition: Signal[Length] = null
       override val turnPosition: Signal[Angle] = Signal(Degrees(5))
@@ -266,6 +271,7 @@ class UnicycleDriveControlTest extends FunSuite {
     val hardware: UnicycleHardware = new UnicycleHardware {
       override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
       override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+      override val position: Signal[Point] = null
 
       override val forwardPosition: Signal[Length] = null
       override val turnPosition: Signal[Angle] = Signal(Degrees(0))
@@ -300,6 +306,7 @@ class UnicycleDriveControlTest extends FunSuite {
     val hardware: UnicycleHardware = new UnicycleHardware {
       override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
       override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+      override val position: Signal[Point] = null
 
       override val forwardPosition: Signal[Length] = null
       override val turnPosition: Signal[Angle] = Signal(Degrees(0))
