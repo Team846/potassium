@@ -44,15 +44,19 @@ case class Segment(start: Point, end: Point) {
     *         plane
     */
   def containsInXY(toTest: Point, tolerance: Length): Boolean = {
+    val minX = start.x min end.x
+    val maxX = start.x max end.x
+
+    val minY = start.y min end.y
+    val maxY = start.y max end.y
+
     val withinBoundaries =
-      toTest.x <= end.x &&
-        toTest.y <= end.y &&
-        toTest.x >= start.x &&
-        toTest.y >= start.y
+      toTest.x >= minX && toTest.x <= maxX &&
+        toTest.y >= minY && toTest.y <= maxY
 
     // Uses point slope form of line to determine if the line constructed from
     // start and end contains the given point
-    val onLine = ((end.y - toTest.y) - xySlope * (end.x - toTest.x)).abs <= tolerance
+    val onLine = ((toTest.y - start.y) - xySlope * (toTest.x - start.x)).abs <= tolerance
     withinBoundaries && onLine
   }
 }

@@ -149,9 +149,12 @@ trait AdvancedPositionTasks extends UnicycleCoreTasks {
       var currPath: (Segment, Option[Segment]) = (origin segmentTo wayPoints(0), Some(wayPoints(0) segmentTo wayPoints(1)))
       val selectedPath = Signal {
         implicit val tolerance = Feet(0.01)
-        if (currPath._2.get.end ~= previousLookAheadPoint) {
+        if (currPath._2.get.containsInXY(previousLookAheadPoint, Feet(0.1))) {
           if (biSegmentPaths.hasNext) {
+            println("advancing path")
             currPath = biSegmentPaths.next()
+            println(s"path: $currPath")
+            println(s"look ahead is $previousLookAheadPoint")
           }
 
           currPath

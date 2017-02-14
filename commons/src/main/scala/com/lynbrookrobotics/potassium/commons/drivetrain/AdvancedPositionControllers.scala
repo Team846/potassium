@@ -54,9 +54,10 @@ trait AdvancedPositionControllers {
       intersectionClosestToEnd(_, currPosition, lookAheadDistance))
 
     secondLookAheadPoint.getOrElse(
-      firstLookAheadPoint.getOrElse(
+      firstLookAheadPoint.getOrElse {
+        println(s"expanding look ahead distance to ${1.1 * lookAheadDistance}")
         getLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
-      )
+      }
     )
   }
 
@@ -69,26 +70,6 @@ trait AdvancedPositionControllers {
         diff.y.toFeet,
         diff.x.toFeet
       ))
-    }
-  }
-
-  def headingToTarget(currentPosition: PeriodicSignal[Point],
-                      biSegmentPath: Signal[(Segment, Option[Segment])])
-                     (implicit properties: Signal[UnicycleProperties]): PeriodicSignal[Angle] = {
-    val lookAheadPoint = currentPosition.zip(properties).zip(biSegmentPath).map { p =>
-      val ((currentPosition, properties), path) = p
-      getLookAheadPoint(
-        path,
-        currentPosition,
-        properties.defaultLookAheadDistance)
-    }
-
-    currentPosition.zip(lookAheadPoint).map {p =>
-      val (pos, lookAhead) = p
-      Radians(
-        Math.atan2(
-          (lookAhead - pos).y.toFeet,
-          (lookAhead - pos).x.toFeet))
     }
   }
 
