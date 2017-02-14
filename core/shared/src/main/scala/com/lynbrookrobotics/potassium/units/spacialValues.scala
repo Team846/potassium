@@ -20,14 +20,11 @@ class Point(override val x: Length,
   def - (other: Point) = new Point(super.-(other))
   def + (other: Point) = new Point(super.+(other))
   override def * (scalar: Double) = new Point(super.*(scalar))
-  def == (other: Point): Boolean = {
-    ==(other, Feet(0.5))
-  }
 
-  def == (other: Point, tolerance: Length): Boolean = {
-    (other.x - this.x).abs <= tolerance &&
-      (other.y - this.y).abs <= tolerance &&
-      (other.z - this.z).abs <= tolerance
+  def ~=(other: Point)(implicit tolerance: Length): Boolean = {
+    (other.x ~= this.x) &&
+      (other.y ~= this.y) &&
+      (other.z ~= this.z)
   }
 }
 
@@ -35,6 +32,7 @@ case class Segment(start: Point, end: Point) {
   val diff = end - start
   val length = diff.magnitude
   val xySlope = (end.y - start.y) / (end.x - start.x)
+
   val dz = end.z - start.z
   val dy = end.y - start.y
   val dx = end.x - start.x

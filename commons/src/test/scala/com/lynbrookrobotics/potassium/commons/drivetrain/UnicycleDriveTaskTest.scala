@@ -9,7 +9,6 @@ import squants.motion.{AngularVelocity, DegreesPerSecond, MetersPerSecond, Meter
 import squants.motion._
 import squants.space.{Degrees, Meters}
 import squants.time.{Milliseconds, Seconds}
-
 import squants.{Acceleration, Angle, Length, Percent, Velocity}
 import org.scalatest.FunSuite
 
@@ -42,12 +41,16 @@ class UnicycleDriveTaskTest extends FunSuite {
   }
 
   test("Drive distance task sets up correct relative position and ends at target") {
+
+    implicit val (clock, ticker) = ClockMocking.mockedClockTicker
+
     val drive = new TestDrivetrain
 
     val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = MetersPerSecond(10)
       override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(15)
+      override val defaultLookAheadDistance: Length = null
 
       override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
@@ -71,8 +74,6 @@ class UnicycleDriveTaskTest extends FunSuite {
     })
 
     var lastAppliedSignal: UnicycleSignal = null
-
-    implicit val (clock, ticker) = ClockMocking.mockedClockTicker
 
     val drivetrain = new Component[UnicycleSignal](Milliseconds(5)) {
       override def defaultController: PeriodicSignal[UnicycleSignal] =
@@ -126,6 +127,7 @@ class UnicycleDriveTaskTest extends FunSuite {
       override val maxForwardVelocity: Velocity = MetersPerSecond(10)
       override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
+      override val defaultLookAheadDistance: Length = null
 
       override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
@@ -223,6 +225,7 @@ class UnicycleDriveTaskTest extends FunSuite {
       override val maxForwardVelocity: Velocity = MetersPerSecond(10)
       override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
+      override val defaultLookAheadDistance: Length = null
 
       override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),

@@ -12,6 +12,10 @@ trait UnicycleCoreControllers {
   type DrivetrainHardware <: UnicycleHardware
   type DrivetrainProperties <: UnicycleProperties
 
+  // TODO: clarify
+  //def parentOpenLoop(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal]?
+  def toDriveSignal(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal] = parentOpenLoop(unicycle)
+
   def parentOpenLoop(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal]
 
   def lowerLevelVelocityControl(unicycle: SignalLike[UnicycleSignal])(implicit hardware: DrivetrainHardware,

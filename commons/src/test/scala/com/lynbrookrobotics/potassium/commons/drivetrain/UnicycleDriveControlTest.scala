@@ -15,6 +15,7 @@ import org.scalatest.prop.Checkers._
 
 class UnicycleDriveControlTest extends FunSuite {
   implicit val hardware: UnicycleHardware = new UnicycleHardware {
+
     override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
     override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
 
@@ -77,6 +78,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxForwardVelocity: Velocity = MetersPerSecond(10)
       override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
+      override val defaultLookAheadDistance: Length = null
 
       override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
@@ -114,6 +116,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxForwardVelocity: Velocity = null
       override val maxTurnVelocity: AngularVelocity = null
       override val maxAcceleration: Acceleration = null
+      override val defaultLookAheadDistance: Length = null
 
       override val forwardControlGains = null
       override val turnControlGains = null
@@ -148,6 +151,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxForwardVelocity: Velocity = null
       override val maxTurnVelocity: AngularVelocity = null
       override val maxAcceleration: Acceleration = null
+      override val defaultLookAheadDistance: Length = null
 
       override val forwardControlGains = null
       override val turnControlGains = null
@@ -182,6 +186,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxForwardVelocity: Velocity = null
       override val maxTurnVelocity: AngularVelocity = null
       override val maxAcceleration: Acceleration = null
+      override val defaultLookAheadDistance: Length = null
 
       override val forwardControlGains = null
       override val turnControlGains = null
@@ -216,6 +221,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxForwardVelocity: Velocity = null
       override val maxTurnVelocity: AngularVelocity = null
       override val maxAcceleration: Acceleration = null
+      override val defaultLookAheadDistance: Length = null
 
       override val forwardControlGains = null
       override val turnControlGains = null
@@ -250,6 +256,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxForwardVelocity: Velocity = null
       override val maxTurnVelocity: AngularVelocity = null
       override val maxAcceleration: Acceleration = null
+      override val defaultLookAheadDistance: Length = null
 
       override val forwardControlGains = null
       override val turnControlGains = null
@@ -284,6 +291,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxForwardVelocity: Velocity = null
       override val maxTurnVelocity: AngularVelocity = null
       override val maxAcceleration: Acceleration = null
+      override val defaultLookAheadDistance: Length = null
 
       override val forwardControlGains = null
       override val turnControlGains = null
