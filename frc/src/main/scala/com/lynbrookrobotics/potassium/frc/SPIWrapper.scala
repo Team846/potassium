@@ -6,15 +6,15 @@ import edu.wpi.first.wpilibj.SPI
 
 class SPIWrapper(spi: SPI) extends SPITrait {
   override def read(initiate: Boolean, dataReceived: ByteBuffer, size: Int): Int = {
-    spi.read(initiate, dataReceived.array, size)
+      spi.read(initiate, dataReceived.array, size)
   }
-
+  
   override def setClockRate(hz: Int): Unit = {
     spi.setClockRate(hz)
   }
 
   override def write(byte: ByteBuffer, size: Int): Int = {
-    spi.write(byte.array, size)
+    spi.write(byte, size)
   }
 
   override def setMSBFirst(): Unit = {
