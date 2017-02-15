@@ -5,8 +5,10 @@ import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal}
 import squants.time.Milliseconds
 
 class LightingComponent(numLEDs: Int, comm: TwoWayComm)(implicit clock: Clock) extends Component[Int](Milliseconds(20)) {
-  override def defaultController: PeriodicSignal[Int] = Signal[Int](0).toPeriodic
 
+  val debug = false
+
+  override def defaultController: PeriodicSignal[Int] = Signal[Int](0).toPeriodic
   /**
     * Applies the latest control signal value.
     *
@@ -14,9 +16,14 @@ class LightingComponent(numLEDs: Int, comm: TwoWayComm)(implicit clock: Clock) e
     */
   override def applySignal(signal: Int): Unit = {
     if (comm.isConnected) {
-        comm.newData(signal)
+      comm.newData(signal)
+      if(debug){
+        println(comm.pullLog)
+      }
     } else {
-      println("Error: Serial device not connected")
+      if(debug) {
+        println("Error: Serial device not connected")
+      }
     }
   }
 }

@@ -27,7 +27,7 @@ class RXTXTwoWayComms extends TwoWayComm{
     }
   }
 
-  def pullLog(): String = {
+  def pullLog: String = {
     if(logQueue.nonEmpty && data != -1) {
       logQueue.dequeue()
     } else {
@@ -83,7 +83,7 @@ class RXTXTwoWayComms extends TwoWayComm{
       val commPort = portIdentifier.open(this.getClass.getName, 2000)
       commPort match {
         case serialPort: SerialPort =>
-          serialPort.setSerialPortParams(115200, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE)
+          serialPort.setSerialPortParams(9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE)
           val in = serialPort.getInputStream
           val out = serialPort.getOutputStream
           data = 0
