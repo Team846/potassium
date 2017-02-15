@@ -57,8 +57,6 @@ class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePer
   // Creates ByteBuffer of sie 2 for inputs and outputs
   private val outBuffer: ByteBuffer = ByteBuffer.allocateDirect(2)
   private val inBuffer: ByteBuffer = ByteBuffer.allocateDirect(2)
-
-  // Returns data from register as short (16 bit Integer)
   private var firstRun = true
 
   /**
@@ -71,10 +69,12 @@ class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePer
     outBuffer.put(1, 0.asInstanceOf[Byte]) // Second byte must be 0
     spi.write(outBuffer, 2) // Outputs 2 elements to spi
 
-    inBuffer.clear
+    inBuffer.clear()
     // inBuffer already defined so it does not need to be created
     // Reads 2 bytes and puts them in inBuffer
-    spi.read(false, inBuffer, 2)
+    spi.read(firstRun, inBuffer, 2)
+
+    if(firstRun) firstRun = false
 
     inBuffer.getShort
   }

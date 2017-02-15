@@ -6,25 +6,9 @@ import edu.wpi.first.wpilibj.SPI
 
 class SPIWrapper(spi: SPI) extends SPITrait {
   override def read(initiate: Boolean, dataReceived: ByteBuffer, size: Int): Int = {
-<<<<<<< HEAD
-<<<<<<< HEAD
-    spi.read(initiate, dataReceived.array, size)
-=======
-    try {
-      println("Dank Memes")
-      spi.read(initiate, dataReceived, size)
-    }
-    catch {
-      case e: java.lang.UnsupportedOperationException =>
-        print("initiate Boolean: ", initiate, "dataReceived ByteBuffer: ", dataReceived, "size Int: ", size)
-        100
-    }
->>>>>>> 7d5a6b9... Finally done
-=======
-      spi.read(initiate, dataReceived, size)
->>>>>>> 3f3320c... Style issues
+      spi.read(initiate, dataReceived.array, size)
   }
-
+  
   override def setClockRate(hz: Int): Unit = {
     spi.setClockRate(hz)
   }
