@@ -9,7 +9,7 @@ object LightingRunnable extends App{
   while(true){
     comms.newData(scanner.nextInt())
     while(comms.hasLog){
-      print(comms.pullLog())
+      print(comms.pullLog)
     }
   }
 }
