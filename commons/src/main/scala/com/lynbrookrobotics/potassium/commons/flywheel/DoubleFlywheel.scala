@@ -54,8 +54,7 @@ abstract class DoubleFlywheel {
 
   object velocityTasks {
     class WaitForVelocity(vel: AngularVelocity, tolerance: AngularVelocity)
-                         (implicit properties: Signal[Properties],
-                          hardware: Hardware, component: Comp) extends FiniteTask {
+                         (implicit properties: Signal[Properties], hardware: Hardware, component: Comp) extends FiniteTask {
       override def onStart(): Unit = {
         val (errorLeft, errorRight, control) = velocityControllers.velocityControl(vel)
         component.setController(control.withCheck { _ =>
@@ -71,8 +70,7 @@ abstract class DoubleFlywheel {
     }
 
     class WhileAtVelocity(vel: AngularVelocity, tolerance: AngularVelocity)
-                         (implicit properties: Signal[Properties],
-                          hardware: Hardware, component: Comp) extends WrapperTask {
+                         (implicit properties: Signal[Properties], hardware: Hardware, component: Comp) extends WrapperTask {
       override def onStart(): Unit = {
         val (errorLeft, errorRight, control) = velocityControllers.velocityControl(vel)
         component.setController(control.withCheck { _ =>
@@ -88,8 +86,7 @@ abstract class DoubleFlywheel {
     }
 
     class SpinAtVelocity(vel: AngularVelocity)
-                        (implicit properties: Signal[Properties],
-                         hardware: Hardware, component: Comp) extends ContinuousTask {
+                        (implicit properties: Signal[Properties], hardware: Hardware, component: Comp) extends ContinuousTask {
       override def onStart(): Unit = {
         val (_, _, control) = velocityControllers.velocityControl(vel)
         component.setController(control)

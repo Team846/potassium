@@ -8,7 +8,6 @@ import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, Signal
 trait Drive {
   type DriveSignal
   type DriveVelocity
-
   type Hardware
   type Properties
 
