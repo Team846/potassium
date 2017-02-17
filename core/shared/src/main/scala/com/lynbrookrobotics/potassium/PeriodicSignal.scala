@@ -2,7 +2,7 @@ package com.lynbrookrobotics.potassium
 
 import com.lynbrookrobotics.potassium.clock.Clock
 import squants.{Quantity, Time}
-import squants.time.{TimeDerivative, TimeIntegral}
+import squants.time.{TimeDerivative, TimeIntegral, Milliseconds}
 
 import scala.collection.immutable.Queue
 
@@ -120,6 +120,29 @@ abstract class PeriodicSignal[+T] { self =>
 
       def calculateValue(dt: Time, token: Int): Queue[U] = {
         last = last.tail :+ self.currentValue(dt, token)
+        last
+      }
+    }
+  }
+
+  /**
+    * Applies a timestamped fixed size sliding window over the signal
+    * @param size the size of the window
+    * @param filler the element to use to fill the window until elements are available
+    * @return
+    */
+  def slidingWithTime[U >: T](size: Int, filler: U): PeriodicSignal[Queue[(Time, U)]] = {
+    // TODO: poor resolution with currentTimeMillis
+    // we want to use Timer.getFPGATime on the RoboRIO but not on other platforms
+
+    var last = Queue.fill(size)((Milliseconds(System.currentTimeMillis()), filler ))
+
+    new PeriodicSignal[Queue[(Time, U)]] {
+      val parent = Some(self)
+      val check = None
+
+      def calculateValue(dt: Time, token: Int): Queue[(Time, U)] = {
+        last = last.tail :+ (Milliseconds(System.currentTimeMillis()), self.currentValue(dt, token))
         last
       }
     }
