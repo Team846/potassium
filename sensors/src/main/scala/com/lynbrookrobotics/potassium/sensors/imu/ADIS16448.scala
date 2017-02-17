@@ -1,14 +1,16 @@
 package com.lynbrookrobotics.potassium.sensors.imu
 
 import java.nio.ByteBuffer
-import com.lynbrookrobotics.potassium.sensors.SPITrait
+import com.lynbrookrobotics.potassium.sensors.SPI
 import squants.Time
 import squants.motion.{AngularVelocity, DegreesPerSecond}
 
 /**
   * An interface for communicating with the ADIS16448 IMU.
   */
-class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePeriod) {
+class ADIS16448(spi: SPI, updatePeriod: Time) extends DigitalGyro(updatePeriod) {
+  implicit private val spiInterface = spi
+
   // List of register addresses on the IMU
   private object Registers {
     // Sample period
@@ -19,13 +21,10 @@ class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePer
     val MSC_CTRL: IMURegister = new IMURegister(0x34)
     // Product ID
     val PROD_ID: IMURegister = new IMURegister(0x56)
-  }
 
-  // Private object used to store private variables
-  private object ADIS16448Protocol {
-    val X_GYRO_REG: Byte = 0x04
-    val Y_GYRO_REG: Byte = 0x06
-    val Z_GYRO_REG: Byte = 0x08
+    val X_GYRO_REG = new IMURegister(0x04)
+    val Y_GYRO_REG = new IMURegister(0x06)
+    val Z_GYRO_REG = new IMURegister(0x08)
   }
 
   // Private object used to substitute for private values in Java
@@ -49,10 +48,10 @@ class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePer
   if (Registers.PROD_ID.read(spi) != 16448) {
     throw new IllegalStateException("The device in the MXP port is not an ADIS16448 IMU")
   }
-  // Saves the com.lynbrookrobotics.potassium.sensors.SPI being used (16448) to the various registers
-  Registers.SMPL_PRD.write(1, spi) // 1 Means use default period
-  Registers.MSC_CTRL.write(4, spi) // 4 is reset command
-  Registers.SENS_AVG.write(Integer.parseInt("10000000000", 2), spi) // Creates an empty queue of size 1024 bits
+
+  Registers.SMPL_PRD.write(1) // use internal sampling clock (819.2 sps)
+  Registers.MSC_CTRL.write(4) // 4 is reset command
+  Registers.SENS_AVG.write(1024) // Creates an empty queue of size 1024 bits
 
   // Creates ByteBuffer of sie 2 for inputs and outputs
   private val outBuffer: ByteBuffer = ByteBuffer.allocateDirect(2)
@@ -60,36 +59,17 @@ class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePer
   private var firstRun = true
 
   /**
-    * Returns data from register as short (16 bit integer)
-    * @param register register- hex
-    * @return short
-    */
-  private def readGyroRegister(register: Byte): Short = {
-    outBuffer.put(0, register) // Request data from register
-    outBuffer.put(1, 0.asInstanceOf[Byte]) // Second byte must be 0
-    spi.write(outBuffer, 2) // Outputs 2 elements to spi
-
-    inBuffer.clear()
-    // inBuffer already defined so it does not need to be created
-    // Reads 2 bytes and puts them in inBuffer
-    spi.read(firstRun, inBuffer, 2)
-
-    if(firstRun) firstRun = false
-
-    inBuffer.getShort
-  }
-
-  /**
     * Gets the current gyro data from the IMU.
     * 2nd and 3rd parameters are null because accelerometer and magneto data not used.
     * @return IMUValue
     */
   def currentData: IMUValue = {
-    val gyro: Value3D[AngularVelocity] = Value3D[AngularVelocity](
-      DegreesPerSecond(readGyroRegister(ADIS16448Protocol.X_GYRO_REG)),
-      DegreesPerSecond(readGyroRegister(ADIS16448Protocol.Y_GYRO_REG)),
-      DegreesPerSecond(readGyroRegister(ADIS16448Protocol.Z_GYRO_REG))
-    ).times(Constants.DegreePerSecondPerLSB)
+    val gyro = Value3D(
+      DegreesPerSecond(Registers.X_GYRO_REG.read),
+      DegreesPerSecond(Registers.Y_GYRO_REG.read),
+      DegreesPerSecond(Registers.Z_GYRO_REG.read)
+    ) * Constants.DegreePerSecondPerLSB
+
     IMUValue(gyro, null, null)
   }
 

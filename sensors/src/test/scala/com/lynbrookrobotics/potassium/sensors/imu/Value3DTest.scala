@@ -11,6 +11,6 @@ class Value3DTest extends FunSuite {
     assertResult(Value3D[AngularVelocity](DegreesPerSecond(4),
       DegreesPerSecond(4),
       DegreesPerSecond(4))) (value1 + value2)
-    assertResult(Value3D[AngularVelocity](DegreesPerSecond(1), DegreesPerSecond(2), DegreesPerSecond(3))) (value1.times(1D))
+    assertResult(Value3D[AngularVelocity](DegreesPerSecond(1), DegreesPerSecond(2), DegreesPerSecond(3))) (value1.*(1D))
   }
 }

@@ -2,7 +2,8 @@ package com.lynbrookrobotics.potassium.frc
 
 import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.events.{ContinuousEvent, ImpulseEvent, ImpulseEventSource}
-import edu.wpi.first.wpilibj._
+import com.lynbrookrobotics.potassium.sensors.SPI
+import edu.wpi.first.wpilibj.{SPI => wpiSPI, _}
 import squants.{Dimensionless, Each, Time}
 import squants.electro.{ElectricPotential, Volts}
 import squants.time.{Frequency, Seconds}
@@ -52,7 +53,7 @@ object Implicits {
     }
   }
 
-  implicit def spiToWrapper(spi: SPI): SPIWrapper = new SPIWrapper(spi)
+  implicit def spiToWrapper(spi: wpiSPI): SPI = new RioSPI(spi)
 
   implicit val clock = WPIClock
 }

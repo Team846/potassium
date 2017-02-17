@@ -45,7 +45,7 @@ abstract class DigitalGyro(tickPeriod: Time) {
         acc + cur
       }
 
-      currentDrift = sum.times(1D / calibrationVelocities.length)
+      currentDrift = sum.*(1D / calibrationVelocities.length)
 
       calibrationVelocities = null
       calibrating = false

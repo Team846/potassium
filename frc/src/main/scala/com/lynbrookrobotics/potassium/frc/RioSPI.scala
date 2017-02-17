@@ -1,12 +1,12 @@
 package com.lynbrookrobotics.potassium.frc
 
 import java.nio.ByteBuffer
-import com.lynbrookrobotics.potassium.sensors.SPITrait
-import edu.wpi.first.wpilibj.SPI
+import com.lynbrookrobotics.potassium.sensors.SPI
+import edu.wpi.first.wpilibj.{SPI => wpiSPI}
 
-class SPIWrapper(spi: SPI) extends SPITrait {
+class RioSPI(spi: wpiSPI) extends SPI {
   override def read(initiate: Boolean, dataReceived: ByteBuffer, size: Int): Int = {
-      spi.read(initiate, dataReceived.array, size)
+    spi.read(initiate, dataReceived, size)
   }
   
   override def setClockRate(hz: Int): Unit = {

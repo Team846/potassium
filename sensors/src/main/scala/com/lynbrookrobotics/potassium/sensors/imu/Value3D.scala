@@ -37,7 +37,7 @@ case class Value3D[Q <: Quantity[Q]](x: Q, y: Q, z: Q) {
     * @param scalar the value to multiply the axes by
     * @return the scaled 3D value
     */
-  def times(scalar: Double): Value3D[Q] = {
+  def *(scalar: Double): Value3D[Q] = {
     Value3D(
       scalar * x,
       scalar * y,

@@ -2,7 +2,7 @@ package com.lynbrookrobotics.potassium.sensors
 
 import java.nio.ByteBuffer
 
-trait SPITrait {
+trait SPI {
   def setClockRate(hz: Int): Unit
   def setMSBFirst(): Unit
   def setSampleDataOnFalling(): Unit
