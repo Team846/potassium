@@ -21,6 +21,8 @@ class LightingTest extends FunSuite {
     val dummyComponent = new LightingComponent(1, comm)(mockedClock)
     val task = new DisplayLighting(Signal[Int](2), dummyComponent)
 
+    dummyComponent.debug = true
+
     Task.executeTask(task)
     trigger(Milliseconds(20))
     comm.dataToLog()
@@ -44,6 +46,8 @@ class LightingTest extends FunSuite {
     val (mockedClock, trigger) = ClockMocking.mockedClockTicker
     val dummyComponent = new LightingComponent(1, comm)(mockedClock)
     val task = new DisplayLighting(Signal[Int](2), dummyComponent)
+
+    dummyComponent.debug = true
 
     Task.executeTask(task)
     trigger(Milliseconds(20))
