@@ -15,17 +15,19 @@ class Point(override val x: Length,
 
   def magnitude: Length = (x * x + y * y + z * z).squareRoot
 
-  def zip(other: Point) = Segment(this, other)
+  def segmentTo(other: Point) = Segment(this, other)
 
-  // Better solution, perhaps using type aliases?
   def - (other: Point) = new Point(super.-(other))
   def + (other: Point) = new Point(super.+(other))
   override def * (scalar: Double) = new Point(super.*(scalar))
   def == (other: Point): Boolean = {
-    val Tolerance = Feet(0.05)
-    (other.x - this.x).abs <= Tolerance &&
-      (other.y - this.y).abs <= Tolerance &&
-      (other.z - this.z).abs <= Tolerance
+    ==(other, Feet(0.5))
+  }
+
+  def == (other: Point, tolerance: Length): Boolean = {
+    (other.x - this.x).abs <= tolerance &&
+      (other.y - this.y).abs <= tolerance &&
+      (other.z - this.z).abs <= tolerance
   }
 }
 
@@ -43,7 +45,7 @@ case class Segment(start: Point, end: Point) {
     * @return whether the given point is contained by this segment IN THE XY
     *         plane
     */
-  def containsInXY(toTest: Point): Boolean = {
+  def containsInXY(toTest: Point, tolerance: Length): Boolean = {
     val withinBoundaries =
       toTest.x <= end.x &&
         toTest.y <= end.y &&
@@ -52,7 +54,7 @@ case class Segment(start: Point, end: Point) {
 
     // Uses point slope form of line to determine if the line constructed from
     // start and end contains the given point
-    val onLine = (end.y - toTest.y) == xySlope * (end.x - toTest.x)
+    val onLine = ((end.y - toTest.y) - xySlope * (end.x - toTest.x)).abs <= tolerance
     withinBoundaries && onLine
   }
 }

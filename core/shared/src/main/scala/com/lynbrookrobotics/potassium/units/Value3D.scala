@@ -6,10 +6,6 @@ import squants.Quantity
   * Constructs a new 3D value given X, Y, and Z axes.
   */
 case class Value3D[Q <: Quantity[Q]](x: Q, y: Q, z: Q) {
-
-  def this(value3D: Value3D[Q]) = {
-    this(value3D.x, value3D.y, value3D.z)
-  }
   /**
     * Adds this 3D value to another one.
     * @param toAdd the 3D value to add
