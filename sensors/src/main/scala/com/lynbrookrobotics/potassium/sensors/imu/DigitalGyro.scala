@@ -5,6 +5,8 @@ import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
 import squants.motion.{AngularVelocity, DegreesPerSecond}
 import squants.{Angle, Time}
 
+import scala.collection.mutable
+
 /**
   * Calibration, calculation for velocity
   * @param tickPeriod tick period of robot
@@ -12,8 +14,10 @@ import squants.{Angle, Time}
 abstract class DigitalGyro(tickPeriod: Time) {
   // Tick Period of the robot
   var currentDrift: Value3D[AngularVelocity] = null
+
   // List of velocities used for calibration of IMU
-  var calibrationVelocities: Array[Value3D[AngularVelocity]] = new Array(200)
+  val calibrationVelocities: mutable.Queue[Value3D[AngularVelocity]] = mutable.Queue.empty
+
   // Current index in calibrationVelocities
   var index: Int = 0
   // Whether IMU is calibrating
@@ -30,10 +34,9 @@ abstract class DigitalGyro(tickPeriod: Time) {
     */
   def calibrateUpdate(): Unit = {
     if (calibrating) {
-      calibrationVelocities(index) = retrieveVelocity
-      index += 1
+      calibrationVelocities.enqueue(retrieveVelocity)
 
-      if (index >= 200) index = 0
+      if (calibrationVelocities.size > 200) calibrationVelocities.dequeue()
     }
   }
 
@@ -42,13 +45,12 @@ abstract class DigitalGyro(tickPeriod: Time) {
     */
   def angleUpdate(): Unit = {
     if (calibrating) {
-      val sum = calibrationVelocities.reduceLeft { (cur, acc) =>
+      val sum = calibrationVelocities.reduceLeft { (acc, cur) =>
         acc + cur
       }
 
-      currentDrift = sum.times(1D / calibrationVelocities.length)
+      currentDrift = sum.times(1D / calibrationVelocities.size)
 
-      calibrationVelocities = null
       calibrating = false
     }
   }
