@@ -1,7 +1,9 @@
 package com.lynbrookrobotics.potassium.sensors.imu
 
 import java.nio.ByteBuffer
+
 import com.lynbrookrobotics.potassium.sensors.SPITrait
+import com.lynbrookrobotics.potassium.units.Value3D
 import squants.Time
 import squants.motion.{AngularVelocity, DegreesPerSecond}
 

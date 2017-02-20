@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.sensors.imu
 
+import com.lynbrookrobotics.potassium.units.Value3D
 import org.scalatest.FunSuite
 import squants.motion.{AngularVelocity, DegreesPerSecond}
 

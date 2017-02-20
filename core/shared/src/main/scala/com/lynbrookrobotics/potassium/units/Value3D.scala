@@ -1,4 +1,4 @@
-package com.lynbrookrobotics.potassium.sensors.imu
+package com.lynbrookrobotics.potassium.units
 
 import squants.Quantity
 
@@ -21,16 +21,17 @@ case class Value3D[Q <: Quantity[Q]](x: Q, y: Q, z: Q) {
 
   /**
     * Subtracts this 3D value from another one.
-    * @param toAdd the 3D value to subtract
+    * @param toSub the 3D value to subtract
     * @return the combined 3D value
     */
-  def -(toAdd: Value3D[Q]): Value3D[Q] = {
+  def - (toSub: Value3D[Q]): Value3D[Q] = {
     Value3D(
-      x - toAdd.x,
-      y - toAdd.y,
-      z - toAdd.z
+      x - toSub.x,
+      y - toSub.y,
+      z - toSub.z
     )
   }
+
 
   /**
     * Multiplies this 3D value by a scalar.
@@ -44,4 +45,7 @@ case class Value3D[Q <: Quantity[Q]](x: Q, y: Q, z: Q) {
       scalar * z
     )
   }
+
+  def * (scaler: Double): Value3D[Q] = this.times(scaler)
+
 }
