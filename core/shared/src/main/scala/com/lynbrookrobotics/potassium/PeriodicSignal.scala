@@ -2,7 +2,7 @@ package com.lynbrookrobotics.potassium
 
 import com.lynbrookrobotics.potassium.clock.Clock
 import squants.{Quantity, Time}
-import squants.time.{TimeDerivative, TimeIntegral}
+import squants.time.{TimeDerivative, TimeIntegral, Milliseconds}
 
 import scala.collection.immutable.Queue
 
@@ -24,6 +24,10 @@ abstract class PeriodicSignal[+T] { self =>
   private var lastCalculated: Option[(Any, Int)] = None
 
   protected def calculateValue(dt: Time, token: Int): T
+
+  private val timeSignal = new Signal[Time] {
+    override def get() = Milliseconds(System.currentTimeMillis())
+  }
 
   /**
     * Gets the latest value from the signal
@@ -89,6 +93,8 @@ abstract class PeriodicSignal[+T] { self =>
       (self.currentValue(dt, token), other.currentValue(dt, token))
     }
   }
+
+  def zipWithTime: PeriodicSignal[(T, Time)] = self.zip(timeSignal)
 
   /**
     * Combines the signal with another signal into a signal of tuples

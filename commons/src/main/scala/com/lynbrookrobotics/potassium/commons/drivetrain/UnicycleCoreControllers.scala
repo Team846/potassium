@@ -2,8 +2,10 @@ package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal, SignalLike}
-import squants.{Angle, Dimensionless, Length, Percent}
+import squants.{Quantity, Time, Angle, Dimensionless, Length, Percent}
 import com.lynbrookrobotics.potassium.units._
+
+import scala.collection.immutable.Queue
 
 trait UnicycleCoreControllers {
   type DriveSignal
@@ -61,6 +63,19 @@ trait UnicycleCoreControllers {
     )))
   }
 
+  def calculateTargetFromOffsetWithLatency[T <: Quantity[T]]
+    (timestampedOffset: Signal[(T, Time)],
+     positionSlide: PeriodicSignal[Queue[(T, Time)]]) = {
+    positionSlide.zip(timestampedOffset).map { t =>
+      val (positionHistory, (offset, offsetTime)) = t
+        val closestTimeSoFar = positionHistory.minBy{ case (position, positionTime) =>
+          Math.abs(positionTime.value - offsetTime.value)
+        }
+
+        closestTimeSoFar._1 + offset
+    }
+  }
+
   def forwardPositionControl(targetAbsolute: Length)
                             (implicit hardware: DrivetrainHardware,
                              props: Signal[DrivetrainProperties]): (PeriodicSignal[UnicycleSignal], Signal[Length]) = {
@@ -75,9 +90,26 @@ trait UnicycleCoreControllers {
     (control, error)
   }
 
+  def continuousTurnPositionControl(targetAbsolute: PeriodicSignal[Angle])
+    (implicit hardware: DrivetrainHardware,
+      props: Signal[DrivetrainProperties]): (PeriodicSignal[UnicycleSignal], PeriodicSignal[Angle]) = {
+    val error = targetAbsolute.zip(hardware.turnPosition).map{ t =>
+      val (target: Angle, pos: Angle) = t
+      target - pos
+    }
+
+    val control = PIDF.pid(
+      hardware.turnPosition.toPeriodic,
+      targetAbsolute,
+      props.map(_.turnPositionControlGains)
+    ).map(s => UnicycleSignal(Percent(0), s))
+
+    (control, error)
+  }
+
   def turnPositionControl(targetAbsolute: Angle)
-                         (implicit hardware: DrivetrainHardware,
-                          props: Signal[DrivetrainProperties]): (PeriodicSignal[UnicycleSignal], Signal[Angle]) = {
+    (implicit hardware: DrivetrainHardware,
+      props: Signal[DrivetrainProperties]): (PeriodicSignal[UnicycleSignal], Signal[Angle]) = {
     val error = hardware.turnPosition.map(targetAbsolute - _)
 
     val control = PIDF.pid(

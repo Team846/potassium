@@ -1,12 +1,15 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.clock.Clock
-import com.lynbrookrobotics.potassium.{Component, Signal}
+import com.lynbrookrobotics.potassium.{Component, Signal, PeriodicSignal}
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask}
 import squants.{Acceleration, Angle, Dimensionless, Length, Velocity}
 import squants.motion.{AngularVelocity, DegreesPerSecond, Distance, FeetPerSecond}
 import squants.space.Feet
+import squants.Time
 import squants.time.Milliseconds
+
+import scala.collection.immutable.Queue
 
 trait UnicycleCoreTasks {
   val controllers: UnicycleCoreControllers with UnicycleMotionProfileControllers
@@ -175,4 +178,33 @@ trait UnicycleCoreTasks {
       drive.resetToDefault()
     }
   }
+
+  class CorrectOffsetWithLatency(timestampedOffset: Signal[(Angle, Time)], tolerance: Angle)
+    (implicit drive: Drivetrain,
+      hardware: DrivetrainHardware,
+      props: Signal[DrivetrainProperties]) extends FiniteTask {
+
+    val positionSlide: PeriodicSignal[Queue[(Angle, Time)]] = hardware.turnPosition.toPeriodic.zipWithTime.sliding(
+      20, (hardware.turnPosition.get, Milliseconds(System.currentTimeMillis()))
+    )
+
+    override def onStart(): Unit = {
+      val targetAbsolute = calculateTargetFromOffsetWithLatency(timestampedOffset, positionSlide)
+
+      val (controller, error) = continuousTurnPositionControl(targetAbsolute)
+      val checkedController = controller.zip(error).withCheck { t =>
+        val (_, e) = t
+        if (e.abs < tolerance) {
+          finished()
+        }
+      }.map(_._1)
+
+      drive.setController(lowerLevelVelocityControl(speedControl(checkedController)))
+    }
+
+    override def onEnd(): Unit = {
+      drive.resetToDefault()
+    }
+  }
+
 }
