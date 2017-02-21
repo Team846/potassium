@@ -25,6 +25,10 @@ abstract class PeriodicSignal[+T] { self =>
 
   protected def calculateValue(dt: Time, token: Int): T
 
+  private val timeSignal = new Signal[Time] {
+    override def get() = Milliseconds(System.currentTimeMillis())
+  }
+
   /**
     * Gets the latest value from the signal
     * @param dt the time since the last value request
@@ -90,6 +94,8 @@ abstract class PeriodicSignal[+T] { self =>
     }
   }
 
+  def zipWithTime: PeriodicSignal[(T, Time)] = self.zip(timeSignal)
+
   /**
     * Combines the signal with another signal into a signal of tuples
     * @param other the signal to combine with
@@ -120,29 +126,6 @@ abstract class PeriodicSignal[+T] { self =>
 
       def calculateValue(dt: Time, token: Int): Queue[U] = {
         last = last.tail :+ self.currentValue(dt, token)
-        last
-      }
-    }
-  }
-
-  /**
-    * Applies a timestamped fixed size sliding window over the signal
-    * @param size the size of the window
-    * @param filler the element to use to fill the window until elements are available
-    * @return
-    */
-  def slidingWithTime[U >: T](size: Int, filler: U): PeriodicSignal[Queue[(Time, U)]] = {
-    // TODO: poor resolution with currentTimeMillis
-    // we want to use Timer.getFPGATime on the RoboRIO but not on other platforms
-
-    var last = Queue.fill(size)((Milliseconds(System.currentTimeMillis()), filler ))
-
-    new PeriodicSignal[Queue[(Time, U)]] {
-      val parent = Some(self)
-      val check = None
-
-      def calculateValue(dt: Time, token: Int): Queue[(Time, U)] = {
-        last = last.tail :+ (Milliseconds(System.currentTimeMillis()), self.currentValue(dt, token))
         last
       }
     }
