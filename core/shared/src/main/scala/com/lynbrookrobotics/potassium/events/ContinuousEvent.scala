@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.events
 
+import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, Task}
 
 /**
@@ -22,7 +23,7 @@ class ContinuousEvent(condition: => Boolean)(implicit polling: ImpulseEvent) {
   val onEnd: ImpulseEvent = onEndSource.event
 
   private var tickingCallbacks: List[() => Unit] = List.empty
-  private var isRunning = false
+  private[events] var isRunning = false
 
   polling.foreach { () =>
     if (condition) {
@@ -54,5 +55,13 @@ class ContinuousEvent(condition: => Boolean)(implicit polling: ImpulseEvent) {
   def foreach(task: ContinuousTask): Unit = {
     onStart.foreach(() => Task.executeTask(task))
     onEnd.foreach(() => Task.abortTask(task))
+  }
+
+  /**
+    * Returns a continuous event that is an intersection of both events
+    * @param event the event to intersect with the original
+    */
+  def and(event: ContinuousEvent): ContinuousEvent = {
+    Signal(event.isRunning && this.isRunning).filter(down => down)
   }
 }
