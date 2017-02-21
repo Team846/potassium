@@ -34,11 +34,9 @@ abstract class DigitalGyro(tickPeriod: Time) {
     * Update values for the angle on the gyro.
     */
   def endCalibration(): Unit = {
-    println("lol you dead yet?")
     if (calibrating) {
       val sum = calibrationVelocities.reduceLeft { (acc, cur) =>
         acc + cur
-        // lol hi?
       }
 
       currentDrift = sum.times(1D / calibrationVelocities.size)

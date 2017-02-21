@@ -67,6 +67,7 @@ class GenericValue[T <: Quantity[T]](val value: Double, val uom: UnitOfMeasure[T
 
 object GenericValue {
   implicit def toGenericValue[T <: Quantity[T]](l: T): GenericValue[T] = new GenericValue[T](l.value, l.unit)
+  implicit def fromGenericValue[T <: Quantity[T]](v: GenericValue[T]): T = v.uom.apply(v.value)
 
   implicit class ToGeneric[T <: Quantity[T]](l: T) {
     def toGeneric: GenericValue[T] = toGenericValue(l)
