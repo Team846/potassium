@@ -6,7 +6,7 @@ import squants.time.Milliseconds
 
 class LightingComponent(numLEDs: Int, comm: TwoWayComm)(implicit clock: Clock) extends Component[Int](Milliseconds(20)) {
 
-  val debug = false
+  var debug = false
 
   override def defaultController: PeriodicSignal[Int] = Signal[Int](0).toPeriodic
   /**
