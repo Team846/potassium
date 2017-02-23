@@ -40,7 +40,8 @@ lazy val potassium = project.in(file(".")).
     config,
     sensors,
     commonsJVM, commonsJS,
-    lighting
+    lighting,
+    dashboardJVM, dashboardJS
   ).settings(
   publish := {},
   publishLocal := {}
@@ -117,10 +118,19 @@ lazy val sensors = project.dependsOn(coreJVM).settings(
 )
 
 lazy val commons = crossProject.crossType(CrossType.Pure).
-  dependsOn(control, testing % Test).settings(
+  dependsOn(control, testing % Test, funkyDashboardContexts).settings(
   name := "potassium-commons",
   libraryDependencies ++= sharedDependencies.value
 )
+
+lazy val funkyDashboardContexts = crossProject.crossType(CrossType.Full)
+  .dependsOn(core).settings(
+  name := "potassium-dashboard",
+  libraryDependencies ++= sharedDependencies.value
+)
+
+lazy val dashboardJVM = funkyDashboardContexts.jvm
+lazy val dashboardJS = funkyDashboardContexts.js
 
 lazy val commonsJVM = commons.jvm
 lazy val commonsJS = commons.js

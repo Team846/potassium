@@ -89,14 +89,12 @@ abstract class TwoSidedDrive(updatePeriod: Time)(implicit clock: Clock)
   }
 
   protected def driveClosedLoop(signal: SignalLike[TwoSidedSignal])
-                               (implicit hardware: Hardware,
-                                props: Signal[Properties]): PeriodicSignal[TwoSidedSignal] =
+                               (implicit hardware: Hardware, props: Signal[Properties]): PeriodicSignal[TwoSidedSignal] =
     TwoSidedControllers.closedLoopControl(signal)
 
   object TwoSidedControllers {
     def velocityControl(target: SignalLike[TwoSidedVelocity])
-                       (implicit hardware: Hardware,
-                        props: Signal[Properties]): PeriodicSignal[TwoSidedSignal] = {
+                       (implicit hardware: Hardware, props: Signal[Properties]): PeriodicSignal[TwoSidedSignal] = {
       import hardware._
 
       val leftControl = PIDF.pidf(
@@ -115,8 +113,7 @@ abstract class TwoSidedDrive(updatePeriod: Time)(implicit clock: Clock)
     }
 
     def closedLoopControl(signal: SignalLike[TwoSidedSignal])
-                         (implicit hardware: Hardware,
-                          props: Signal[Properties]): PeriodicSignal[TwoSidedSignal] = {
+                         (implicit hardware: Hardware, props: Signal[Properties]): PeriodicSignal[TwoSidedSignal] = {
       velocityControl(signal.map(s => expectedVelocity(s)(props.get)))
     }
   }

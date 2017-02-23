@@ -29,7 +29,8 @@ abstract class Position[S <: Quantity[S],
   type Hardware <: PositionHardware[S]
 
   object positionControllers {
-    def positionControl(target: S)(implicit properties: Signal[Properties], hardware: Hardware): (Signal[S], PeriodicSignal[U]) = {
+    def positionControl(target: S)(implicit properties: Signal[Properties],
+                                   hardware: Hardware): (Signal[S], PeriodicSignal[U]) = {
       val error = hardware.position.map(target - _)
       (error, PIDF.pidf(hardware.position.toPeriodic, Signal.constant(target).toPeriodic, properties.map(_.positionGains)))
     }
