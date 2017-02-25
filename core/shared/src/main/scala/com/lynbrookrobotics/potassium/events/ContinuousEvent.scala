@@ -62,6 +62,10 @@ class ContinuousEvent(condition: => Boolean)(implicit polling: ImpulseEvent) {
     * @param event the event to intersect with the original
     */
   def and(event: ContinuousEvent): ContinuousEvent = {
-    Signal(event.isRunning && this.isRunning).filter(down => down)
+    Signal(event.isRunning && this.isRunning).filter(identity)
+  }
+
+  def unary_!(): ContinuousEvent = {
+    Signal(!this.isRunning).filter(identity)
   }
 }
