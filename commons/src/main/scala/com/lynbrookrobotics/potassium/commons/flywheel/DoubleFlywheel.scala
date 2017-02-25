@@ -1,24 +1,40 @@
 package com.lynbrookrobotics.potassium.commons.flywheel
 
-import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, SignalLike}
-import com.lynbrookrobotics.potassium.control.{PIDF, PIDFConfig}
+import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal}
+import com.lynbrookrobotics.potassium.control.{PIDConfig, PIDF, PIDFConfig}
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask, WrapperTask}
-import com.lynbrookrobotics.potassium.units.{GenericDerivative, GenericValue}
-import squants.{Angle, Dimensionless}
-import squants.motion.AngularVelocity
+import com.lynbrookrobotics.potassium.units.{GenericDerivative, GenericValue, Ratio}
+import squants.{Dimensionless, Percent}
+import squants.time.Frequency
 
 trait DoubleFlywheelProperties {
-  def velocityGains: PIDFConfig[AngularVelocity,
-                                GenericValue[AngularVelocity],
-                                AngularVelocity,
-                                GenericDerivative[AngularVelocity],
-                                Angle,
-                                Dimensionless]
+  def maxVelocityLeft: Frequency
+  def maxVelocityRight: Frequency
+
+  def velocityGainsLeft: PIDConfig[Frequency,
+                                   GenericValue[Frequency],
+                                   Frequency,
+                                   GenericDerivative[Frequency],
+                                   Dimensionless,
+                                   Dimensionless]
+
+  def velocityGainsRight: PIDConfig[Frequency,
+                                    GenericValue[Frequency],
+                                    Frequency,
+                                    GenericDerivative[Frequency],
+                                    Dimensionless,
+                                    Dimensionless]
+
+  lazy val velocityGainsLeftFull =
+    velocityGainsLeft.withF(Ratio(Percent(100), maxVelocityLeft))
+
+  lazy val velocityGainsRightFull =
+    velocityGainsRight.withF(Ratio(Percent(100), maxVelocityRight))
 }
 
 trait DoubleFlywheelHardware {
-  def leftVelocity: Signal[AngularVelocity]
-  def rightVelocity: Signal[AngularVelocity]
+  def leftVelocity: Signal[Frequency]
+  def rightVelocity: Signal[Frequency]
 }
 
 abstract class DoubleFlywheel {
@@ -28,23 +44,24 @@ abstract class DoubleFlywheel {
   case class DoubleFlywheelSignal(left: Dimensionless, right: Dimensionless)
 
   object velocityControllers {
-    def velocityControl(target: AngularVelocity)
+    def velocityControl(target: Signal[Frequency])
                        (implicit properties: Signal[Properties],
-                        hardware: Hardware): (Signal[AngularVelocity], Signal[AngularVelocity], PeriodicSignal[DoubleFlywheelSignal]) = {
-      val errorLeft = hardware.leftVelocity.map(target - _)
-      val errorRight = hardware.rightVelocity.map(target - _)
+                        hardware: Hardware): (Signal[Frequency], Signal[Frequency],
+                                              PeriodicSignal[DoubleFlywheelSignal]) = {
+      val errorLeft = hardware.leftVelocity.zip(target).map(t => t._2 - t._1)
+      val errorRight = hardware.rightVelocity.zip(target).map(t => t._2 - t._1)
 
       val controlLeft = PIDF.pidf(
         hardware.leftVelocity.toPeriodic,
-        Signal.constant(target).toPeriodic,
-        properties.map(_.velocityGains)
-      )
+        target.toPeriodic,
+        properties.map(_.velocityGainsLeftFull)
+      ).map(_.abs)
 
       val controlRight = PIDF.pidf(
         hardware.rightVelocity.toPeriodic,
-        Signal.constant(target).toPeriodic,
-        properties.map(_.velocityGains)
-      )
+        target.toPeriodic,
+        properties.map(_.velocityGainsRightFull)
+      ).map(_.abs)
 
       (errorLeft, errorRight, controlLeft.zip(controlRight).map { t =>
         DoubleFlywheelSignal(t._1, t._2)
@@ -53,7 +70,7 @@ abstract class DoubleFlywheel {
   }
 
   object velocityTasks {
-    class WaitForVelocity(vel: AngularVelocity, tolerance: AngularVelocity)
+    class WaitForVelocity(vel: Signal[Frequency], tolerance: Frequency)
                          (implicit properties: Signal[Properties],
                           hardware: Hardware, component: Comp) extends FiniteTask {
       override def onStart(): Unit = {
@@ -70,7 +87,7 @@ abstract class DoubleFlywheel {
       }
     }
 
-    class WhileAtVelocity(vel: AngularVelocity, tolerance: AngularVelocity)
+    class WhileAtVelocity(vel: Signal[Frequency], tolerance: Frequency)
                          (implicit properties: Signal[Properties],
                           hardware: Hardware, component: Comp) extends WrapperTask {
       override def onStart(): Unit = {
@@ -87,7 +104,7 @@ abstract class DoubleFlywheel {
       }
     }
 
-    class SpinAtVelocity(vel: AngularVelocity)
+    class SpinAtVelocity(vel: Signal[Frequency])
                         (implicit properties: Signal[Properties],
                          hardware: Hardware, component: Comp) extends ContinuousTask {
       override def onStart(): Unit = {

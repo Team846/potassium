@@ -6,18 +6,19 @@ import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask, Wrapper
 import com.lynbrookrobotics.potassium.units.{GenericDerivative, GenericValue}
 import squants.{Angle, Dimensionless}
 import squants.motion.AngularVelocity
+import squants.time.Frequency
 
 trait FlywheelProperties {
-  def velocityGains: PIDFConfig[AngularVelocity,
-                                GenericValue[AngularVelocity],
-                                AngularVelocity,
-                                GenericDerivative[AngularVelocity],
-                                Angle,
+  def velocityGains: PIDFConfig[Frequency,
+                                GenericValue[Frequency],
+                                Frequency,
+                                GenericDerivative[Frequency],
+                                Dimensionless,
                                 Dimensionless]
 }
 
 trait FlywheelHardware {
-  def velocity: Signal[AngularVelocity]
+  def velocity: Signal[Frequency]
 }
 
 abstract class Flywheel {
@@ -25,20 +26,20 @@ abstract class Flywheel {
   type Hardware <: FlywheelHardware
 
   object velocityControllers {
-    def velocityControl(target: AngularVelocity)
+    def velocityControl(target: Signal[Frequency])
                        (implicit properties: Signal[Properties],
-                        hardware: Hardware): (Signal[AngularVelocity], PeriodicSignal[Dimensionless]) = {
-      val error = hardware.velocity.map(target - _)
+                        hardware: Hardware): (Signal[Frequency], PeriodicSignal[Dimensionless]) = {
+      val error = hardware.velocity.zip(target).map(t => t._2 - t._1)
       (error, PIDF.pidf(
         hardware.velocity.toPeriodic,
-        Signal.constant(target).toPeriodic,
+        target.toPeriodic,
         properties.map(_.velocityGains)
       ))
     }
   }
 
   object velocityTasks {
-    class WaitForVelocity(vel: AngularVelocity, tolerance: AngularVelocity)
+    class WaitForVelocity(vel: Signal[Frequency], tolerance: Frequency)
                          (implicit properties: Signal[Properties],
                           hardware: Hardware, component: Comp) extends FiniteTask {
       override def onStart(): Unit = {
@@ -55,7 +56,7 @@ abstract class Flywheel {
       }
     }
 
-    class WhileAtVelocity(vel: AngularVelocity, tolerance: AngularVelocity)
+    class WhileAtVelocity(vel: Signal[Frequency], tolerance: Frequency)
                          (implicit properties: Signal[Properties],
                           hardware: Hardware, component: Comp) extends WrapperTask {
       override def onStart(): Unit = {
@@ -72,7 +73,7 @@ abstract class Flywheel {
       }
     }
 
-    class SpinAtVelocity(vel: AngularVelocity)
+    class SpinAtVelocity(vel: Signal[Frequency])
                         (implicit properties: Signal[Properties],
                          hardware: Hardware, component: Comp) extends ContinuousTask {
       override def onStart(): Unit = {
