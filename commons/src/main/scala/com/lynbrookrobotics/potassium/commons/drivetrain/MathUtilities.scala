@@ -5,7 +5,14 @@ import squants.space.{Feet, Length}
 
 
 object MathUtilities {
-  // TODO: Add source for equations
+  /**
+    * see http://mathworld.wolfram.com/Circle-LineIntersection.html
+    * @param segment segment defining the infinite line to test for intersection
+    * @param center center of circle to test for intersection
+    * @param radius radius of circle to test for intersection
+    * @return on Option of a tuple of points where the
+    *         infinitely long line and circle intersect
+    */
   def interSectionCircleLine(segment: Segment,
                              center: Point,
                              radius: Length): Option[(Point, Point)] = {
@@ -47,7 +54,7 @@ object MathUtilities {
   }
   /**
     * Finds intersection between segment and circle with given center and radius
-    * lookAheadDistance that is closest to segment.end.
+    * lookAheadDistance that is closest to segment.end
     * @param segment
     * @param center
     * @param radius
@@ -57,16 +64,12 @@ object MathUtilities {
                                center: Point,
                                radius: Length): Option[Point] = {
     interSectionCircleLine(segment, center, radius).flatMap { case (negativeSolution, positiveSolution) =>
-//      println(s"segment $segment, center $center radius $radius")
-//      println(s"negative solution $negativeSolution positive solution $positiveSolution")
       val negSolutionLengthToEnd = negativeSolution distanceTo segment.end
       val posSolutionLengthToEnd = positiveSolution distanceTo segment.end
 
       val solutionClosestToEnd = if (posSolutionLengthToEnd >= negSolutionLengthToEnd) {
-//        println(s"returning negative solution $negativeSolution")
         negativeSolution
       } else {
-//        println(s"returning positive solution $positiveSolution")
         positiveSolution
       }
 
@@ -76,19 +79,12 @@ object MathUtilities {
       if (segment.containsInXY(solutionClosestToEnd, Feet(0.2))) {
         Some(solutionClosestToEnd)
       } else {
-//        println(s"returning end: ${segment.end}  segment $segment currpose $center solution $solutionClosestToEnd")
         Some(segment.end)
       }
     }
   }
 
-  /**
-    *
-    * @param segment
-    * @param center
-    * @param radius
-    * @return
-    */
+  @deprecated
   def intersectionLineCircleFurthestFromStart(segment: Segment,
                                               center: Point,
                                               radius: Length): Option[Point] = {

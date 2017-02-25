@@ -17,7 +17,7 @@ class PurePursuitControllerTests extends FunSuite {
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(15)
     override val defaultLookAheadDistance: Length = Feet(1)
 
-    override val forwardControlGains = PIDConfig( // Why is this being used?
+    override val forwardControlGains = PIDConfig(
       Percent(0) / MetersPerSecond(1),
       Percent(0) / Meters(1),
       Percent(0) / MetersPerSecondSquared(1)
@@ -70,24 +70,14 @@ class PurePursuitControllerTests extends FunSuite {
     val controllers = testDrivetrain.UnicycleControllers
 
     val target = new Point(Feet(1), Feet(0))
-    val path = (Segment(origin, target), None)
+    val path = Signal.constant((Segment(origin, target), None))
 
     val position = Signal.constant(origin).toPeriodic
-
-    val lookAheadPoint = position.zip(props).map { p =>
-      val (pose, props) = p
-      controllers.getLookAheadPoint(
-        path,
-        pose,
-        props.defaultLookAheadDistance)
-    }
 
     val output = controllers.purePursuitControllerTurn(
       Signal.constant(Degrees(90)),
       position,
-      lookAheadPoint,
-      false
-    )._1
+      path)._1
 
     val currOutput = output.currentValue(Milliseconds(5))
     assert(currOutput == Percent(0), "Output is: " + currOutput)
@@ -98,24 +88,14 @@ class PurePursuitControllerTests extends FunSuite {
     val controllers = testDrivetrain.UnicycleControllers
 
     val target = new Point(Feet(0), Feet(1))
-    val path = (Segment(origin, target), None)
+    val path = Signal.constant((Segment(origin, target), None))
 
     val position = Signal.constant(new Point(Feet(1), Feet(1))).toPeriodic
-
-    val lookAheadPoint = position.zip(props).map { p =>
-      val (pose, props) = p
-      controllers.getLookAheadPoint(
-        path,
-        pose,
-        props.defaultLookAheadDistance)
-    }
 
     val output = controllers.purePursuitControllerTurn(
       Signal.constant(Degrees(0)),
       position,
-      lookAheadPoint,
-      false
-    )._1
+      path)._1
 
     assert(output.currentValue(Milliseconds(5)).abs >= Percent(100))
   }
@@ -130,7 +110,7 @@ class PurePursuitControllerTests extends FunSuite {
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(15)
       override val defaultLookAheadDistance: Length = Feet(1)
 
-      override val forwardControlGains = PIDConfig( // Why is this being used?
+      override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
         Percent(0) / Meters(1),
         Percent(0) / MetersPerSecondSquared(1)
@@ -157,11 +137,11 @@ class PurePursuitControllerTests extends FunSuite {
 
     val target = new Point(Feet(0), Feet(1))
     val position = Signal.constant(new Point(Feet(1), Feet(1))).toPeriodic
-    val path = (Segment(origin, target), None)
+    val path = Signal.constant((Segment(origin, target), None))
 
 
-    val lookAheadPoint = position.zip(props).map { p =>
-      val (pose, props) = p
+    val lookAheadPoint = position.zip(path).zip(props).map { p =>
+      val ((pose, path), props) = p
       controllers.getLookAheadPoint(
         path,
         pose,
@@ -170,10 +150,7 @@ class PurePursuitControllerTests extends FunSuite {
 
     val output = controllers.purePursuitControllerTurn(
       Signal.constant(Degrees(-85)),
-      position,
-      lookAheadPoint,
-      false
-    )._1
+      position, path)._1
 
     implicit val Tolerance = Percent(0.001)
     val result = output.currentValue(Milliseconds(5))
@@ -186,11 +163,11 @@ class PurePursuitControllerTests extends FunSuite {
 
     val target = new Point(Feet(1), Feet(1))
     val position = Signal.constant(new Point(Feet(2), Feet(2))).toPeriodic
-    val path = (Segment(origin, target), None)
+    val path = Signal.constant((Segment(origin, target), None))
 
 
-    val lookAheadPoint = position.zip(props).map { p =>
-      val (pose, props) = p
+    val lookAheadPoint = position.zip(path).zip(props).map { p =>
+      val ((pose, path), props) = p
       controllers.getLookAheadPoint(
         path,
         pose,
@@ -198,11 +175,8 @@ class PurePursuitControllerTests extends FunSuite {
     }
 
     val output = controllers.purePursuitControllerTurn(
-      Signal.constant(Degrees(45)),
-      position,
-      lookAheadPoint,
-      false
-    )._1
+      Signal.constant(Degrees(45)), position,
+      path)._1
 
     implicit val Tolerance = Percent(0.001)
     val result = output.currentValue(Milliseconds(5))

@@ -12,7 +12,7 @@ import squants.time.Milliseconds
 import scala.collection.immutable.Queue
 
 trait UnicycleCoreTasks {
-  val controllers: UnicycleCoreControllers with UnicycleMotionProfileControllers with AdvancedPositionControllers
+  val controllers: UnicycleCoreControllers with UnicycleMotionProfileControllers with PurePursuitControllers
 
   type Drivetrain <: Component[controllers.DriveSignal]
 

@@ -54,29 +54,15 @@ case class Segment(start: Point, end: Point) {
       toTest.x >= minX && toTest.x <= maxX &&
         toTest.y >= minY && toTest.y <= maxY
 
-//    println(s"withing boundries $withinBoundaries")
-//    if (!withinBoundaries) {
-//      println(s"to test $toTest")
-//      println(s"segment ${this}")
-//      println(s"minx $minX miny $minY maxX  $maxX maxY $maxY")
-//    }
-    // If the segment is directly upwards, slope is Nan
+
+    // If the segment is directly upwards, slope is Nan or Infinity
     if (xySlope != Double.NaN && Math.abs(xySlope) != Double.PositiveInfinity) {
       // Uses point slope form of line to determine if the line constructed from
       // start and end contains the given point
       val onLine = ((toTest.y - start.y) - xySlope * (toTest.x - start.x)).abs <= tolerance
-      if (!onLine) {
-        println(s"online is false toTest $toTest segment $this slope $xySlope")
-      }
-
-      implicit val implicitTolerance = tolerance
-//      if (!withinBoundaries && (this.start.y ~= Feet(0))) {
-//        println(s" withinBoundries is false toTest $toTest segment $this")
-//      }
 
       withinBoundaries && onLine
     } else {
-      println("slope is NaN edge case")
       implicit val implicitTolerance = tolerance
       withinBoundaries && (toTest.x ~= start.x)
     }

@@ -49,7 +49,7 @@ class TestXYPosition extends FunSuite{
   }
 
   test("Test rotating 90 degrees/s with radius 1 starting angle 90 " +
-       "degrees for 4 sec results in (0,0) ") {
+       "degrees for 1 sec results in (-1,1) ") {
     implicit val tolerance = Feet(0.05)
     val periodicAngularSpeed = Signal.constant(DegreesPerSecond(90)).toPeriodic
     val angle = periodicAngularSpeed.integral.map(_ + Degrees(90))
@@ -58,14 +58,14 @@ class TestXYPosition extends FunSuite{
     }
 
     val targetPosition = new Point(
-      Feet(0),
-      Feet(0))
+      Feet(-1),
+      Feet(1))
 
     val position = XYPosition(
       Signal(angle.peek.get.getOrElse(Degrees(90))),
       distance.peek.map(_.getOrElse(Feet(0))))
 
-    for(_ <- 1 to 800){
+    for(_ <- 1 to 200){
       distance.currentValue(Milliseconds(5))
       position.currentValue(Milliseconds(5))
     }

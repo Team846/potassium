@@ -12,9 +12,7 @@ trait UnicycleCoreControllers {
   type DrivetrainHardware <: UnicycleHardware
   type DrivetrainProperties <: UnicycleProperties
 
-  // TODO: clarify
-  //def parentOpenLoop(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal]?
-  def toDriveSignal(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal] = parentOpenLoop(unicycle)
+  def lowerLevelOpenLoop(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal] = parentOpenLoop(unicycle)
 
   def parentOpenLoop(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal]
 

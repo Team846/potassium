@@ -34,7 +34,7 @@ class MathUtilitiesTest extends FunSuite {
     assert(solutionClosestToEnd.get == posSolution, "Solution is: " + solutionClosestToEnd)
   }
 
-  test("Test circle intersection with diagnol line") {
+  test("Test circle intersection with diagonal line") {
     val firstPoint = new Point(Feet(-2), Feet(-2))
     val secondPoint = new Point(Feet(2), Feet(2))
 
@@ -75,18 +75,6 @@ class MathUtilitiesTest extends FunSuite {
       currPose,
       Feet(2)
     )
-
-//    val segment = Segment(
-//      origin,
-//      new Point(Feet(2), Feet(0))
-//    )
-//    val currPose = new Point(Feet(0.01), Feet(1))
-//
-//    val solutionClosestToEnd = MathUtilities.intersectionClosestToEnd(
-//      segment,
-//      currPose,
-//      Feet(11000)
-//    )
 
     implicit val tolerance = Feet(0.01)
     assert(solutionClosestToEnd.isDefined, "No solutions found!")
