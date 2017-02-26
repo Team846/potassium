@@ -55,13 +55,13 @@ abstract class DoubleFlywheel {
         hardware.leftVelocity.toPeriodic,
         target.toPeriodic,
         properties.map(_.velocityGainsLeftFull)
-      ).map(_.abs)
+      ).map(_ max Percent(0))
 
       val controlRight = PIDF.pidf(
         hardware.rightVelocity.toPeriodic,
         target.toPeriodic,
         properties.map(_.velocityGainsRightFull)
-      ).map(_.abs)
+      ).map(_ max Percent(0))
 
       (errorLeft, errorRight, controlLeft.zip(controlRight).map { t =>
         DoubleFlywheelSignal(t._1, t._2)

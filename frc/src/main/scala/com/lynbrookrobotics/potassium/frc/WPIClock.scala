@@ -8,14 +8,19 @@ import squants.time.{Microseconds, Seconds}
 object WPIClock extends Clock {
   override def apply(period: Time)(thunk: (Time) => Unit): Cancel = {
     var lastTime: Option[Time] = None
+    var running = false
 
     val notifier = new Notifier(() => {
-      val currentTime = Microseconds(Utility.getFPGATime)
-      lastTime.foreach { l =>
-        thunk(currentTime - l)
-      }
+      if (!running) {
+        running = true
+        val currentTime = Microseconds(Utility.getFPGATime)
+        lastTime.foreach { l =>
+          thunk(currentTime - l)
+        }
 
-      lastTime = Some(currentTime)
+        lastTime = Some(currentTime)
+        running = false
+      }
     })
 
     notifier.startPeriodic(period.to(Seconds))
