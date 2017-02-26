@@ -4,7 +4,7 @@ import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, Signal
 import com.lynbrookrobotics.potassium.control.{PIDF, PIDFConfig}
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask, WrapperTask}
 import com.lynbrookrobotics.potassium.units.{GenericDerivative, GenericValue}
-import squants.{Angle, Dimensionless}
+import squants.{Angle, Dimensionless, Percent}
 import squants.motion.AngularVelocity
 import squants.time.Frequency
 
@@ -34,7 +34,7 @@ abstract class Flywheel {
         hardware.velocity.toPeriodic,
         target.toPeriodic,
         properties.map(_.velocityGains)
-      ))
+      ).map(_ max Percent(0)))
     }
   }
 
