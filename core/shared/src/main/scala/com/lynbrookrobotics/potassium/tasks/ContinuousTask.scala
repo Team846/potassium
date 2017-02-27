@@ -26,3 +26,11 @@ abstract class ContinuousTask extends Task {
     */
   override def abort(): Unit = onEnd()
 }
+
+object ContinuousTask {
+  def empty: ContinuousTask = new ContinuousTask {
+    override protected def onStart(): Unit = {}
+
+    override protected def onEnd(): Unit = {}
+  }
+}
