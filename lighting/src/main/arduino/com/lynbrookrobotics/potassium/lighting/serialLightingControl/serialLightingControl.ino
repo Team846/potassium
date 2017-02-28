@@ -1,6 +1,6 @@
 #include <Adafruit_NeoPixel.h>
 
-int pin  = 6;
+int pin  = 13;
 int nLEDs = 20;
 int incomingByte = 0;
 int iter = 0;
