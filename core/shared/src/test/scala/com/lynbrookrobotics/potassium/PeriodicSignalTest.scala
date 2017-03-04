@@ -128,6 +128,21 @@ class PeriodicSignalTest extends FunSuite {
     }
   }
 
+  test("Simpson's Integral of zero always produces zero") {
+    val sig = Signal(MetersPerSecond(0)).toPeriodic.simpsonsIntegral
+    (1 to 100).foreach { _ =>
+      assert(sig.currentValue(Milliseconds(5)).toMeters == 0)
+    }
+  }
+
+  test("Simpson's Integral of a certain value produces an appropriate value") {
+    val sig = Signal(MetersPerSecond(-5)).toPeriodic.simpsonsIntegral
+    (1 to 500).foreach { _ =>
+      sig.currentValue(Milliseconds(5))
+    }
+    assert((sig.currentValue(Milliseconds(5))- Meters(-25)).abs < Meters(0.05))
+  }
+
   test("Integral of one always produces ascending values") {
     implicit val tolerance = Meters(0.00000001)
 
