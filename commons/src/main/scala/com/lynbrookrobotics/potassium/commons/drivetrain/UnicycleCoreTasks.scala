@@ -12,7 +12,7 @@ import squants.time.Milliseconds
 import scala.collection.immutable.Queue
 
 trait UnicycleCoreTasks {
-  val controllers: UnicycleCoreControllers with UnicycleMotionProfileControllers
+  val controllers: UnicycleCoreControllers with UnicycleMotionProfileControllers with PurePursuitControllers
 
   type Drivetrain <: Component[controllers.DriveSignal]
 
@@ -144,7 +144,6 @@ trait UnicycleCoreTasks {
       val combinedController = forwardController.zip(turnController).map(t => t._1 + t._2)
 
       val checkedController = combinedController.withCheck { _ =>
-        println("in driveDistance straight Controller")
         if (forwardError.get.abs < toleranceForward && turnError.get.abs < toleranceAngle) {
           finished()
         }

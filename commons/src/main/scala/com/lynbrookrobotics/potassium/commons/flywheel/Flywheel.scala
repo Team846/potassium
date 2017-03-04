@@ -7,7 +7,6 @@ import com.lynbrookrobotics.potassium.units.{GenericDerivative, GenericValue}
 import squants.{Angle, Dimensionless, Percent}
 import squants.motion.AngularVelocity
 import squants.time.Frequency
-
 trait FlywheelProperties {
   def velocityGains: PIDFConfig[Frequency,
                                 GenericValue[Frequency],

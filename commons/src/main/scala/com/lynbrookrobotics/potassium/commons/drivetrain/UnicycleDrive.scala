@@ -4,11 +4,16 @@ import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal, SignalLike}
 import squants.motion.AngularVelocity
 import squants.{Acceleration, Angle, Dimensionless, Each, Length, Percent, Velocity}
+import com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleMotionProfileControllers
+import com.lynbrookrobotics.potassium.commons.position.PurePursuitTasks
+import squants.space.Feet
+import squants.time.Milliseconds
 
 trait UnicycleProperties {
   val maxForwardVelocity: Velocity
   val maxTurnVelocity: AngularVelocity
   val maxAcceleration: Acceleration
+  val defaultLookAheadDistance: Length
 
   val forwardControlGains: ForwardVelocityGains
 
@@ -62,8 +67,7 @@ trait UnicycleDrive extends Drive { self =>
     */
   protected def convertUnicycleToDrive(uni: UnicycleSignal): DriveSignal
   
-  object UnicycleControllers extends UnicycleCoreControllers
-    with UnicycleMotionProfileControllers {
+  object UnicycleControllers extends PurePursuitControllers with UnicycleMotionProfileControllers with UnicycleCoreControllers{
     type DriveSignal = self.DriveSignal
     type DrivetrainHardware = self.Hardware
     type DrivetrainProperties = self.Properties
@@ -90,7 +94,7 @@ trait UnicycleDrive extends Drive { self =>
 
   import UnicycleControllers._
 
-  object unicycleTasks extends UnicycleCoreTasks {
+  object unicycleTasks extends UnicycleCoreTasks with PurePursuitTasks {
     type Drivetrain = self.Drivetrain
     override val controllers = UnicycleControllers
   }

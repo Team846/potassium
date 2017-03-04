@@ -30,6 +30,7 @@ abstract class Component[T](period: Time)(implicit val clock: Clock) {
     * @param controller the new controller to use
     */
   def setController(controller: PeriodicSignal[T]): Unit = {
+//    println("setting controller")
     currentController.detachTickSource(this)
     controller.attachTickSource(this)
     currentController = controller
@@ -39,6 +40,8 @@ abstract class Component[T](period: Time)(implicit val clock: Clock) {
     * Resets the component to use its default controller.
     */
   def resetToDefault(): Unit = {
+//    println(s"reseting to default $lastOutput")
+//    println(Thread.currentThread().getStackTrace)
     setController(defaultController)
   }
 

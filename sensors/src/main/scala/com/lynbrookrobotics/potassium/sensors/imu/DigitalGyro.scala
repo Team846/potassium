@@ -1,6 +1,7 @@
 package com.lynbrookrobotics.potassium.sensors.imu
 
 import com.lynbrookrobotics.potassium.units.Value3D
+
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
 import squants.motion.{AngularVelocity, DegreesPerSecond}
 import squants.{Angle, Time}
@@ -30,20 +31,9 @@ abstract class DigitalGyro(tickPeriod: Time) {
   def retrieveVelocity: Value3D[AngularVelocity]
 
   /**
-    * Update velocity stored calibrationVelocities at index
-    */
-  def calibrateUpdate(): Unit = {
-    if (calibrating) {
-      calibrationVelocities.enqueue(retrieveVelocity)
-
-      if (calibrationVelocities.size > 200) calibrationVelocities.dequeue()
-    }
-  }
-
-  /**
     * Update values for the angle on the gyro.
     */
-  def angleUpdate(): Unit = {
+  def endCalibration(): Unit = {
     if (calibrating) {
       val sum = calibrationVelocities.reduceLeft { (acc, cur) =>
         acc + cur
@@ -57,7 +47,11 @@ abstract class DigitalGyro(tickPeriod: Time) {
 
   val velocity: PeriodicSignal[Value3D[AngularVelocity]] = Signal {
     if (calibrating) {
-      Value3D[AngularVelocity](DegreesPerSecond(0), DegreesPerSecond(0), DegreesPerSecond(0))
+      calibrationVelocities.enqueue(retrieveVelocity)
+
+      if (calibrationVelocities.size > 200) calibrationVelocities.dequeue()
+
+      Value3D(DegreesPerSecond(0), DegreesPerSecond(0), DegreesPerSecond(0))
     } else {
       retrieveVelocity - currentDrift
     }

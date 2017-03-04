@@ -53,7 +53,11 @@ class ContinuousEvent(condition: => Boolean)(implicit polling: ImpulseEvent) {
     * @param task the task to run during the event
     */
   def foreach(task: ContinuousTask): Unit = {
-    onStart.foreach(() => Task.executeTask(task))
+    onStart.foreach { () =>
+      Task.abortCurrentTask()
+      Task.executeTask(task)
+    }
+
     onEnd.foreach(() => Task.abortTask(task))
   }
 

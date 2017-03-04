@@ -6,7 +6,6 @@ import com.lynbrookrobotics.potassium.sensors.SPITrait
 import com.lynbrookrobotics.potassium.units.Value3D
 import squants.Time
 import squants.motion.{AngularVelocity, DegreesPerSecond}
-
 /**
   * An interface for communicating with the ADIS16448 IMU.
   */
