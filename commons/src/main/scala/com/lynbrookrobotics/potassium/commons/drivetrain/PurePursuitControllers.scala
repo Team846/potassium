@@ -7,8 +7,6 @@ import squants.{Angle, Dimensionless}
 import squants.space.{Angle, _}
 
 trait PurePursuitControllers {
-
-
   /**
     * use pid control on the distance from the target point
     * @param target the target point to reach
@@ -19,7 +17,7 @@ trait PurePursuitControllers {
   def pointDistanceControl(position: PeriodicSignal[Point],
                            target: PeriodicSignal[Point])
                           (implicit properties: Signal[UnicycleProperties],
-                          hardware: UnicycleHardware): (PeriodicSignal[Dimensionless],
+                           hardware: UnicycleHardware): (PeriodicSignal[Dimensionless],
                                                    PeriodicSignal[Length]) = {
     val distanceToTarget = position.zip(target).map { p =>
       p._1 distanceTo p._2
@@ -164,6 +162,71 @@ trait PurePursuitControllers {
         getLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
       }
     )
+  }
+
+  def followWayPointsController(wayPoints: Seq[Point], position: PeriodicSignal[Point])
+                               (implicit hardware: UnicycleHardware,
+                                signal: Signal[UnicycleProperties]): (PeriodicSignal[UnicycleSignal], Signal[Option[Length]]) = {
+    var previousLookAheadPoint: Option[Point] = None
+
+    val biSegmentPaths = wayPoints.sliding(3).map { points =>
+      (
+        Segment(points(0), points(1)),
+        if (points.size == 3) {
+          Some(Segment(points(1), points(2)))
+        } else {
+          None
+        }
+      )
+    }
+
+    var currPath: (Segment, Option[Segment]) = (
+      Segment(wayPoints(0), wayPoints(1)),
+      if (wayPoints.size >= 3) {
+        Some(Segment(wayPoints(1), wayPoints(2)))
+      } else {
+        None
+      }
+    )
+
+    val selectedPath = Signal {
+      if (previousLookAheadPoint.forall(p => currPath._2.get.containsInXY(p, Feet(0.1)))) {
+        if (biSegmentPaths.hasNext) {
+          println("**********advancing path ***********")
+          currPath = biSegmentPaths.next()
+        }
+      }
+
+      currPath
+    }
+
+    val initialTurnPosition = hardware.turnPosition.get
+
+    val (turnOutput, heading, lookAheadPoint) = purePursuitControllerTurn(
+      hardware.turnPosition.map(_ - initialTurnPosition),
+      position,
+      selectedPath)
+    val historyUpdatingLookAheadPoint = lookAheadPoint.withCheck{p =>
+      previousLookAheadPoint = Some(p)
+    }
+
+    val forwardOutput = pointDistanceControl(
+      position,
+      historyUpdatingLookAheadPoint)._1
+    val distanceToLast = position.map(_ distanceTo wayPoints.last)
+
+    val errorToLast = distanceToLast.peek.map { d =>
+      (if (!biSegmentPaths.hasNext) {
+        Some(d)
+      } else {
+        None
+      }).flatten
+    }
+
+    (forwardOutput.zip(turnOutput).zip(heading).map { o =>
+      val ((forward, turn), fdMultiplier) = o
+      UnicycleSignal(forward * fdMultiplier, turn)
+    }, errorToLast)
   }
 }
 

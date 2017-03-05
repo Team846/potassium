@@ -62,6 +62,24 @@ class ContinuousEvent(condition: => Boolean)(implicit polling: ImpulseEvent) {
   }
 
   /**
+    * Adds a mapping to run a task while the continuous event is running
+    * @param task the task to run during the event
+    */
+  def foreach(task: Signal[ContinuousTask]): Unit = {
+    var currentRunningTask: ContinuousTask = null
+
+    onStart.foreach { () =>
+      Task.abortCurrentTask()
+
+      currentRunningTask = task.get
+
+      Task.executeTask(currentRunningTask)
+    }
+
+    onEnd.foreach(() => Task.abortTask(currentRunningTask))
+  }
+
+  /**
     * Returns a continuous event that is an intersection of both events
     * @param event the event to intersect with the original
     */
