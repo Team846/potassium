@@ -5,7 +5,6 @@ import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal, SignalLike}
 import squants.motion.AngularVelocity
 import squants.{Acceleration, Angle, Dimensionless, Each, Length, Percent, Velocity}
 import com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleMotionProfileControllers
-import com.lynbrookrobotics.potassium.commons.position.PurePursuitTasks
 import squants.space.Feet
 import squants.time.Milliseconds
 

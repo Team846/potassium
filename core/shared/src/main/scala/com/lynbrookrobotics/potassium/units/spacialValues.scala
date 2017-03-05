@@ -7,6 +7,7 @@ class Point(override val x: Length,
             override val z: Length) extends Value3D(x, y, z) {
   def this(value3D: Value3D[Length]) = this(value3D.x, value3D.y, value3D.z)
   def this(x: Length, y: Length) = this(x, y, Feet(0))
+
   def distanceTo(other: Point): Length = Segment(this, other).length
 
   def dot(other: Point): Area = {
@@ -14,8 +15,6 @@ class Point(override val x: Length,
   }
 
   def magnitude: Length = (x * x + y * y + z * z).squareRoot
-
-  def segmentTo(other: Point) = Segment(this, other)
 
   def - (other: Point) = new Point(super.-(other))
   def + (other: Point) = new Point(super.+(other))
@@ -26,6 +25,10 @@ class Point(override val x: Length,
       (other.y ~= this.y) &&
       (other.z ~= this.z)
   }
+}
+
+object Point {
+  def origin: Point = new Point(Feet(0), Feet(0))
 }
 
 case class Segment(start: Point, end: Point) {

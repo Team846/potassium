@@ -1,5 +1,6 @@
+package com.lynbrookrobotics.potassium.commons.drivetrain
+
 import org.scalatest.FunSuite
-import com.lynbrookrobotics.potassium.commons.drivetrain.MathUtilities
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import squants.space.Feet
 
@@ -20,9 +21,9 @@ class MathUtilitiesTest extends FunSuite {
     val posSolution = new Point(Feet(0), Feet(1))
     val negSolution = new Point(Feet(0), Feet(-1))
 
-    assert(solutions.isDefined, "Solutions don't exist!")
-    assert(solutions.get._1 == negSolution, "First solution is: " + solutions.get._1)
-    assert(solutions.get._2 == posSolution, "Second solution is: " + solutions.get._2)
+    assert(solutions.isDefined)
+    assert(solutions.get._1 == negSolution)
+    assert(solutions.get._2 == posSolution)
 
     val solutionClosestToEnd = MathUtilities.intersectionClosestToEnd(
       segment,
@@ -30,8 +31,8 @@ class MathUtilitiesTest extends FunSuite {
       Feet(1)
     )
 
-    assert(solutionClosestToEnd.isDefined, "Solution doesn't exist!")
-    assert(solutionClosestToEnd.get == posSolution, "Solution is: " + solutionClosestToEnd)
+    assert(solutionClosestToEnd.isDefined)
+    assert(solutionClosestToEnd.get == posSolution)
   }
 
   test("Test circle intersection with diagonal line") {
@@ -48,9 +49,9 @@ class MathUtilitiesTest extends FunSuite {
     val posSolution = new Point(Feet(Math.sqrt(2) / 2), Feet(Math.sqrt(2) / 2))
     val negSolution = new Point(Feet(-Math.sqrt(2) / 2), Feet(-Math.sqrt(2) / 2))
 
-    assert(solutions.isDefined, "Solutions don't exist!")
-    assert(solutions.get._1 == negSolution, "First solution is: " + solutions.get._1)
-    assert(solutions.get._2 == posSolution, "Second solution is: " + solutions.get._2 )
+    assert(solutions.isDefined)
+    assert(solutions.get._1 == negSolution)
+    assert(solutions.get._2 == posSolution)
   }
 
   test("Circle and non intersecting segment do not intersect") {
@@ -77,9 +78,9 @@ class MathUtilitiesTest extends FunSuite {
     )
 
     implicit val tolerance = Feet(0.01)
-    assert(solutionClosestToEnd.isDefined, "No solutions found!")
-    println(s" solution $solutionClosestToEnd")
-    assert(solutionClosestToEnd.get.y ~= Feet(0), "Solutions are not equal!")
+
+    assert(solutionClosestToEnd.isDefined)
+    assert(solutionClosestToEnd.get.y ~= Feet(0))
     assert(solutionClosestToEnd.get.x ~= Feet(1.732))
   }
 }
