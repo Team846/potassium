@@ -1,7 +1,7 @@
 #include <Adafruit_NeoPixel.h>
 
 int pin  = 13;
-int nLEDs = 20;
+int nLEDs = 61;
 int incomingByte = 0;
 int iter = 0;
 int acc = 0;
