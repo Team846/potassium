@@ -3,7 +3,7 @@ package com.lynbrookrobotics.potassium.commons.drivetrain
 import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
-import squants.{Angle, Dimensionless}
+import squants.{Angle, Dimensionless, Percent}
 import squants.space.{Angle, _}
 
 trait PurePursuitControllers {
@@ -172,7 +172,7 @@ trait PurePursuitControllers {
                                 position: PeriodicSignal[Point],
                                 turnPosition: Signal[Angle])
                                (implicit hardware: UnicycleHardware,
-                                signal: Signal[UnicycleProperties]): (PeriodicSignal[UnicycleSignal], Signal[Option[Length]]) = {
+                                props: Signal[UnicycleProperties]): (PeriodicSignal[UnicycleSignal], Signal[Option[Length]]) = {
     var previousLookAheadPoint: Option[Point] = None
 
     val biSegmentPaths = wayPoints.sliding(3).map { points =>
@@ -208,9 +208,9 @@ trait PurePursuitControllers {
       previousLookAheadPoint = Some(p)
     }
 
-    val forwardOutput = pointDistanceControl(
+    val (forwardOutput, forwardError) = pointDistanceControl(
       position,
-      historyUpdatingLookAheadPoint)._1
+      historyUpdatingLookAheadPoint)
     val distanceToLast = position.map(_ distanceTo wayPoints.last)
 
     val errorToLast = distanceToLast.peek.map { d =>
@@ -221,9 +221,13 @@ trait PurePursuitControllers {
       }).flatten
     }
 
-    (forwardOutput.zip(turnOutput).zip(multiplier).zip(distanceToLast).map { o =>
-      val (((forward, turn), fdMultiplier), _) = o
-      UnicycleSignal(forward * fdMultiplier, turn)
+    (forwardOutput.zip(turnOutput).zip(multiplier).zip(distanceToLast).zip(props).zip(forwardError).map { o =>
+      val (((((forward, turn), fdMultiplier), _), props), frdError) = o
+      if (frdError > props.defaultLookAheadDistance / 2) {
+        UnicycleSignal(forward * fdMultiplier, turn)
+      } else {
+        UnicycleSignal(forward * fdMultiplier, Percent(0))
+      }
     }, errorToLast)
   }
 }
