@@ -30,15 +30,17 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
     override def onStart(): Unit = {
       val initialTurnPosition = hardware.turnPosition.get
 
+      val turnPosition = hardware.turnPosition.map(_ - initialTurnPosition)
+
       val position = XYPosition(
-        hardware.turnPosition.map(_ - initialTurnPosition).map(compassToTrigonometric),
+        turnPosition.map(compassToTrigonometric),
         hardware.forwardPosition
       )
 
-      val (unicycle, error) = followWayPointsController(wayPoints, position)
+      val (unicycle, error) = followWayPointsController(wayPoints, position, turnPosition)
 
       drive.setController(lowerLevelOpenLoop(unicycle.withCheck { _ =>
-        if (error.get.forall(_ < tolerance)) {
+        if (error.get.exists(_ < tolerance)) {
           finished()
         }
       }))
@@ -49,16 +51,19 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
     }
   }
 
-  class FollowWayPointsWithPosition(wayPoints: Seq[Point], tolerance: Length,
-                                    position: PeriodicSignal[Point])
+  class FollowWayPointsWithPosition(wayPoints: Seq[Point],
+                                    tolerance: Length,
+                                    position: PeriodicSignal[Point],
+                                    turnPosition: Signal[Angle])
                                    (implicit drive: Drivetrain,
                                     properties: Signal[UnicycleProperties],
                                     hardware: UnicycleHardware) extends FiniteTask {
     override def onStart(): Unit = {
-      val (unicycle, error) = followWayPointsController(wayPoints, position)
+      val (unicycle, error) = followWayPointsController(wayPoints, position, turnPosition)
 
       drive.setController(lowerLevelOpenLoop(unicycle.withCheck { _ =>
-        if (error.get.forall(_ < tolerance)) {
+        if (error.get.exists(_ < tolerance)) {
+          println("finished")
           finished()
         }
       }))

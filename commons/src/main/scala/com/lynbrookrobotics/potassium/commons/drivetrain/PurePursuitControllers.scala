@@ -80,13 +80,13 @@ trait PurePursuitControllers {
   /**
     * returns an angle limited from -180 to 180 equivalent to the input
     * @param degrees
-    * @return angle betwee -180 and 180
+    * @return angle betwee -270 and 90
     */
   def limitTo180Range(degrees: Angle): Angle = {
-    if (degrees < Degrees(-180)) {
-      degrees + Degrees(360)
-    } else if (degrees > Degrees(180)) {
-      degrees - Degrees(180)
+    if (degrees < Degrees(-270)) {
+      limitTo180Range(degrees + Degrees(360))
+    } else if (degrees > Degrees(90)) {
+      limitTo180Range(degrees - Degrees(360))
     } else {
       degrees
     }
@@ -117,25 +117,29 @@ trait PurePursuitControllers {
     val heading = position.zip(lookAheadPoint).map(
       p => headingToPoint(p._1, p._2)).map(trigonemtricToCompass(_))
 
-    val clampedTarget = heading.zip(angle.map(limitTo180Range)).map { t =>
+    val clampedError = heading.zip(angle.map(limitTo180Range)).map { t =>
       val (heading, angle) = t
       val error = heading - angle
 
+      println(s"error is $error, heading is $heading")
+
       if (error <= Degrees(-90)) {
-        (heading + Degrees(180), -1D)
+        println(s"reversing direction, new error ${error + Degrees(180)}")
+        (error + Degrees(180), -1D)
       } else if (error >= Degrees(90)) {
-        (heading - Degrees(180), -1D)
+        println(s"reversing direction, new error ${error - Degrees(180)}")
+        (error - Degrees(180), -1D)
       } else {
-        (heading, 1D)
+        (error, 1D)
       }
     }
 
     (
       PIDF.pid(
-        angle.toPeriodic,
-        clampedTarget.map(_._1),
+        Signal.constant(Degrees(0)).toPeriodic,
+        clampedError.map(_._1),
         properties.map(_.turnPositionControlGains)),
-      clampedTarget.map(_._2),
+      clampedError.map(_._2),
       lookAheadPoint
     )
   }
@@ -164,7 +168,9 @@ trait PurePursuitControllers {
     )
   }
 
-  def followWayPointsController(wayPoints: Seq[Point], position: PeriodicSignal[Point])
+  def followWayPointsController(wayPoints: Seq[Point],
+                                position: PeriodicSignal[Point],
+                                turnPosition: Signal[Angle])
                                (implicit hardware: UnicycleHardware,
                                 signal: Signal[UnicycleProperties]): (PeriodicSignal[UnicycleSignal], Signal[Option[Length]]) = {
     var previousLookAheadPoint: Option[Point] = None
@@ -180,17 +186,11 @@ trait PurePursuitControllers {
       )
     }
 
-    var currPath: (Segment, Option[Segment]) = (
-      Segment(wayPoints(0), wayPoints(1)),
-      if (wayPoints.size >= 3) {
-        Some(Segment(wayPoints(1), wayPoints(2)))
-      } else {
-        None
-      }
-    )
+    var currPath: (Segment, Option[Segment]) = biSegmentPaths.next()
 
     val selectedPath = Signal {
-      if (previousLookAheadPoint.forall(p => currPath._2.get.containsInXY(p, Feet(0.1)))) {
+      if (currPath._2.isEmpty) {
+      } else if (previousLookAheadPoint.exists(p => currPath._2.get.containsInXY(p, Feet(0.1)))) {
         if (biSegmentPaths.hasNext) {
           println("**********advancing path ***********")
           currPath = biSegmentPaths.next()
@@ -200,10 +200,8 @@ trait PurePursuitControllers {
       currPath
     }
 
-    val initialTurnPosition = hardware.turnPosition.get
-
-    val (turnOutput, heading, lookAheadPoint) = purePursuitControllerTurn(
-      hardware.turnPosition.map(_ - initialTurnPosition),
+    val (turnOutput, multiplier, lookAheadPoint) = purePursuitControllerTurn(
+      turnPosition,
       position,
       selectedPath)
     val historyUpdatingLookAheadPoint = lookAheadPoint.withCheck{p =>
@@ -223,8 +221,8 @@ trait PurePursuitControllers {
       }).flatten
     }
 
-    (forwardOutput.zip(turnOutput).zip(heading).map { o =>
-      val ((forward, turn), fdMultiplier) = o
+    (forwardOutput.zip(turnOutput).zip(multiplier).zip(distanceToLast).map { o =>
+      val (((forward, turn), fdMultiplier), _) = o
       UnicycleSignal(forward * fdMultiplier, turn)
     }, errorToLast)
   }
