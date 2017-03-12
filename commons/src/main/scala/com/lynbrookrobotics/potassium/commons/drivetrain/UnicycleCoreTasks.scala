@@ -201,6 +201,26 @@ trait UnicycleCoreTasks {
     }
   }
 
+  class RotateToAngle(absoluteAngle: Angle, tolerance: Angle)
+                     (implicit drive: Drivetrain,
+                      hardware: DrivetrainHardware,
+                      props: Signal[DrivetrainProperties]) extends FiniteTask {
+    override def onStart(): Unit = {
+      val (controller, error) = turnPositionControl(absoluteAngle)
+      val checkedController = controller.withCheck { _ =>
+        if (error.get.abs < tolerance) {
+          finished()
+        }
+      }
+
+      drive.setController(lowerLevelVelocityControl(speedControl(checkedController)))
+    }
+
+    override def onEnd(): Unit = {
+      drive.resetToDefault()
+    }
+  }
+
   class CorrectOffsetWithLatency(timestampedOffset: Signal[(Angle, Time)], tolerance: Angle)
     (implicit drive: Drivetrain,
       hardware: DrivetrainHardware,
