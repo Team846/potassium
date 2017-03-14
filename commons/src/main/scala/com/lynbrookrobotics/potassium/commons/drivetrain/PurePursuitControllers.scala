@@ -3,10 +3,10 @@ package com.lynbrookrobotics.potassium.commons.drivetrain
 import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
-import squants.{Angle, Dimensionless, Percent}
+import squants.{Angle, Dimensionless, Percent, Time}
 import squants.space.{Angle, _}
 
-trait PurePursuitControllers {
+trait PurePursuitControllers extends UnicycleCoreControllers {
   /**
     * use pid control on the distance from the target point
     * @param target the target point to reach
@@ -42,7 +42,8 @@ trait PurePursuitControllers {
     * @param lookAheadDistance
     * @return the look ahead point for the given path
     */
-  def getLookAheadPoint(biSegmentPath: (Segment, Option[Segment]),
+  @deprecated
+  def getNonExtrapolatedLookAheadPoint(biSegmentPath: (Segment, Option[Segment]),
                                   currPosition: Point,
                                   lookAheadDistance: Length): Point = {
     import MathUtilities._
@@ -60,7 +61,7 @@ trait PurePursuitControllers {
         println(s"expanding look ahead distance to ${1.1 * lookAheadDistance}")
         println(s"path $biSegmentPath")
         println(s"current position $currPosition")
-        getLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
+        getNonExtrapolatedLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
       }
     )
   }
@@ -80,74 +81,75 @@ trait PurePursuitControllers {
   /**
     * returns an angle limited from -180 to 180 equivalent to the input
     * @param degrees
-    * @return angle betwee -270 and 90
+    * @return angle betwee -90 and 90
     */
-  def limitTo180Range(degrees: Angle): Angle = {
-    if (degrees < Degrees(-270)) {
-      limitTo180Range(degrees + Degrees(360))
+  def limitToPlusMinus90(degrees: Angle): Angle = {
+    if (degrees < Degrees(-90)) {
+      limitToPlusMinus90(degrees + Degrees(180))
     } else if (degrees > Degrees(90)) {
-      limitTo180Range(degrees - Degrees(360))
+      limitToPlusMinus90(degrees - Degrees(180))
     } else {
       degrees
     }
   }
   /**
     * see: https://www.mathworks.com/help/robotics/ug/pure-pursuit-controller.html
-    * @param angle the current compass angle, with the0 degrees defined at the y axis.
     * @param position the current x,y,z position of the robot
     * @param biSegmentPath the path to follow
+    * @param turnPosition the current (relative) compass angle
     * @return turn output, what to multiply forward output by (1 for forward, -1 for backwards),
     *         lookAheadPoint
     */
-  def purePursuitControllerTurn(angle: Signal[Angle],
+  def purePursuitControllerTurn(turnPosition: Signal[Angle],
                                 position: PeriodicSignal[Point],
                                 biSegmentPath: Signal[(Segment, Option[Segment])])
-                               (implicit properties: Signal[UnicycleProperties]): (PeriodicSignal[Dimensionless],
+                               (implicit properties: Signal[DrivetrainProperties], hardware: DrivetrainHardware): (PeriodicSignal[Dimensionless],
                                                                                    PeriodicSignal[Double],
                                                                                    PeriodicSignal[Point]) = {
     val lookAheadPoint = position.zip(properties).zip(biSegmentPath).map{p =>
       val ((pose, props), path) = p
-      getLookAheadPoint(
+      getExtrapolatedLookAheadPoint(
         path,
         pose,
         props.defaultLookAheadDistance
       )
     }
 
-    val heading = position.zip(lookAheadPoint).map(
-      p => headingToPoint(p._1, p._2)).map(trigonemtricToCompass(_))
+    val headingToTarget = position.zip(lookAheadPoint).map(p => headingToPoint(p._1, p._2))
+    val trigHeadingToTarget = headingToTarget.map(h => trigonemtricToCompass(h))
+    val compassHeadingToLookAhead = trigHeadingToTarget.map(h => limitToPlusMinus90(h))
 
-    val clampedError = heading.zip(angle.map(limitTo180Range)).map { t =>
-      val (heading, angle) = t
-      val error = heading - angle
+    val forwardMultiplier = position.zip(lookAheadPoint).zip(biSegmentPath).map{p =>
+      val ((pose, lookAhead), path) = p
+      val lastSegemnt = path._2.getOrElse(path._1)
 
-      println(s"error is $error, heading is $heading")
-
-      if (error <= Degrees(-90)) {
-        println(s"reversing direction, new error ${error + Degrees(180)}")
-        (error + Degrees(180), -1D)
-      } else if (error >= Degrees(90)) {
-        println(s"reversing direction, new error ${error - Degrees(180)}")
-        (error - Degrees(180), -1D)
+      if (lastSegemnt.onLine(lookAhead, Feet(0.1))) {
+        val angleToEndPoint = headingToPoint(pose, lastSegemnt.end)
+        if (angleToEndPoint.abs > Degrees(90)) {
+          -1D
+        } else {
+          1D
+        }
       } else {
-        (error, 1D)
+        1D
       }
     }
 
     (
       PIDF.pid(
-        Signal.constant(Degrees(0)).toPeriodic,
-        clampedError.map(_._1),
-        properties.map(_.turnPositionControlGains)),
-      clampedError.map(_._2),
+        turnPosition.toPeriodic,
+        compassHeadingToLookAhead,
+        properties.map(_.turnPositionControlGains)
+      ),
+      forwardMultiplier,
       lookAheadPoint
     )
   }
 
-  @deprecated
-  def getLookExtrapolatedAheadPoint(biSegmentPath: (Segment, Option[Segment]),
-    currPosition: Point,
-    lookAheadDistance: Length): Point = {
+
+  def getExtrapolatedLookAheadPoint(biSegmentPath: (Segment, Option[Segment]),
+                                    currPosition: Point,
+                                    lookAheadDistance: Length): Point = {
     import MathUtilities._
     val firstLookAheadPoint = intersectionLineCircleFurthestFromStart(
       biSegmentPath._1,
@@ -155,15 +157,13 @@ trait PurePursuitControllers {
       lookAheadDistance)
 
     val secondLookAheadPoint = biSegmentPath._2.flatMap { s =>
-      intersectionClosestToEnd(s, currPosition, lookAheadDistance)
+      intersectionLineCircleFurthestFromStart(s, currPosition, lookAheadDistance)
     }
 
     secondLookAheadPoint.getOrElse(
       firstLookAheadPoint.getOrElse {
         println(s"expanding look ahead distance to ${1.1 * lookAheadDistance}")
-        println(s"path $biSegmentPath")
-        println(s"current position $currPosition")
-        getLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
+        getNonExtrapolatedLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
       }
     )
   }
@@ -171,8 +171,8 @@ trait PurePursuitControllers {
   def followWayPointsController(wayPoints: Seq[Point],
                                 position: PeriodicSignal[Point],
                                 turnPosition: Signal[Angle])
-                               (implicit hardware: UnicycleHardware,
-                                props: Signal[UnicycleProperties]): (PeriodicSignal[UnicycleSignal], Signal[Option[Length]]) = {
+                                (implicit hardware: DrivetrainHardware,
+                                props: Signal[DrivetrainProperties]): (PeriodicSignal[UnicycleSignal], Signal[Option[Length]]) = {
     var previousLookAheadPoint: Option[Point] = None
 
     val biSegmentPaths = wayPoints.sliding(3).map { points =>
@@ -200,10 +200,7 @@ trait PurePursuitControllers {
       currPath
     }
 
-    val (turnOutput, multiplier, lookAheadPoint) = purePursuitControllerTurn(
-      turnPosition,
-      position,
-      selectedPath)
+    val (turnOutput, multiplier, lookAheadPoint) = purePursuitControllerTurn(turnPosition, position, selectedPath)
     val historyUpdatingLookAheadPoint = lookAheadPoint.withCheck{p =>
       previousLookAheadPoint = Some(p)
     }

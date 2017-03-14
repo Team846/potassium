@@ -40,6 +40,30 @@ case class Segment(start: Point, end: Point) {
   val dy = end.y - start.y
   val dx = end.x - start.x
 
+  def onLine(toTest: Point, tolerance: Length): Boolean = {
+    implicit val implicitTolerance = tolerance
+
+    // Uses point slope form of line to determine if the line constructed from
+    // start and end contains the given point
+    if (xySlope != Double.NaN && Math.abs(xySlope) != Double.PositiveInfinity) {
+      (toTest.y - start.y) ~= xySlope * (toTest.x - start.x)
+    } else {
+      // If the segment is directly upwards, slope is Nan or Infinity
+      toTest.x ~= start.x
+    }
+  }
+
+  def withInBoundries(toTest: Point): Boolean = {
+    val minX = (start.x min end.x) - Feet(0.01)
+    val maxX = (start.x max end.x) + Feet(0.01)
+
+    val minY = (start.y min end.y) - Feet(0.01)
+    val maxY = (start.y max end.y) + Feet(0.01)
+
+    toTest.x >= minX && toTest.x <= maxX &&
+      toTest.y >= minY && toTest.y <= maxY
+  }
+
   /**
     *
     * @param toTest to the point to test if contained by this
@@ -47,27 +71,6 @@ case class Segment(start: Point, end: Point) {
     *         plane
     */
   def containsInXY(toTest: Point, tolerance: Length): Boolean = {
-    val minX = (start.x min end.x) - Feet(0.01)
-    val maxX = (start.x max end.x) + Feet(0.01)
-
-    val minY = (start.y min end.y) - Feet(0.01)
-    val maxY = (start.y max end.y) + Feet(0.01)
-
-    val withinBoundaries =
-      toTest.x >= minX && toTest.x <= maxX &&
-        toTest.y >= minY && toTest.y <= maxY
-
-
-    // If the segment is directly upwards, slope is Nan or Infinity
-    if (xySlope != Double.NaN && Math.abs(xySlope) != Double.PositiveInfinity) {
-      // Uses point slope form of line to determine if the line constructed from
-      // start and end contains the given point
-      val onLine = ((toTest.y - start.y) - xySlope * (toTest.x - start.x)).abs <= tolerance
-
-      withinBoundaries && onLine
-    } else {
-      implicit val implicitTolerance = tolerance
-      withinBoundaries && (toTest.x ~= start.x)
-    }
+    withInBoundries(toTest) && onLine(toTest, tolerance)
   }
 }

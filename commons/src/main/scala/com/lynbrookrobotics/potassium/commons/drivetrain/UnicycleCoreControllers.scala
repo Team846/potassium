@@ -122,4 +122,18 @@ trait UnicycleCoreControllers {
 
     (control, error)
   }
+
+  def turnPositionControl(targetAbsolute: PeriodicSignal[Angle])
+    (implicit hardware: DrivetrainHardware,
+      props: Signal[DrivetrainProperties]): (PeriodicSignal[UnicycleSignal], PeriodicSignal[Angle]) = {
+    val error = hardware.turnPosition.toPeriodic.zip(targetAbsolute).map(a => a._1 - a._2)
+
+    val control = PIDF.pid(
+      hardware.turnPosition.toPeriodic,
+      targetAbsolute,
+      props.map(_.turnPositionControlGains)
+    ).map(s => UnicycleSignal(Percent(0), s))
+
+    (control, error)
+  }
 }

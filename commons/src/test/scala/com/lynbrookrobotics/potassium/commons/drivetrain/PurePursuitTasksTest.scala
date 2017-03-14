@@ -123,17 +123,16 @@ class PurePursuitTasksTest extends FunSuite {
 
     ticker(Milliseconds(5))
 
-    assert(lastAppliedSignal.turn.toPercent == 0)
+    assert(lastAppliedSignal.turn.toPercent == 0, s"Turn was ${lastAppliedSignal.turn.toPercent} %")
 
     implicit val tolerance = Each(0.01)
-    assert(lastAppliedSignal.forward ~= Percent(100))
+    assert(lastAppliedSignal.forward ~= Percent(100), s"actual forward ${lastAppliedSignal.forward.toPercent}%")
   }
 
   test("Test that going left and back 1 foot does not result in full turn"){
     var lastAppliedSignal = zeroSignal
     implicit val drivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
 
-    var curTurnPosition = Degrees(0)
 
     implicit val hardware = new UnicycleHardware {
       override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
@@ -141,21 +140,59 @@ class PurePursuitTasksTest extends FunSuite {
       var askedForInitPosition = false
 
       override val forwardPosition: Signal[Length] = Signal.constant(Feet(0))
-      override val turnPosition: Signal[Angle] = Signal(curTurnPosition)
+      var checked = false
+      // turn position in follow way points is relativised, so this is a work arround
+      // to simulate the robot later being at 45 degreees from the inital angle of 0
+      override val turnPosition: Signal[Angle] = Signal{
+        if (!checked) {
+          checked = true
+          Degrees(0)
+        } else {
+          Degrees(45)
+        }
+      }
     }
 
     val target = new Point(Feet(-1), Feet(-1))
     val task = new drive.unicycleTasks.FollowWayPoints(Seq(Point.origin, target), Feet(1))
 
     task.init()
-
-    curTurnPosition = Degrees(45)
     ticker(Milliseconds(5))
 
     implicit val tolerance = Percent(0.01)
-    val result = lastAppliedSignal.turn
+    val turn = lastAppliedSignal.turn
 
-    assert(result ~= Percent(0))
+
+    assert(turn ~= Percent(0), s"Turn was actually $turn")
+  }
+
+  test("test that if near target, do not turn 90 degrees") {
+    var lastAppliedSignal = zeroSignal
+    implicit val testDrivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
+
+    val target = new Point(Feet(0), Feet(1))
+
+    implicit val hardware = new UnicycleHardware {
+      override val forwardVelocity: Signal[Velocity] = null
+
+      override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+
+      override val forwardPosition: Signal[Length] = Signal.constant(Feet(0))
+      override val turnPosition: Signal[Angle] = Signal.constant(Degrees(0))
+    }
+
+    val task = new drive.unicycleTasks.FollowWayPointsWithPosition(
+      Seq(Point.origin, target),
+      Feet(0.1),
+      Signal.constant(new Point(Feet(0.001), Feet(0.999999))).toPeriodic,
+      Signal.constant(Degrees(0))
+    )
+
+    task.init()
+
+    ticker(Milliseconds(5))
+
+    assert(lastAppliedSignal.turn.abs <= Percent(1), s"Turn was ${lastAppliedSignal.turn.toPercent} %")
   }
 }
 
