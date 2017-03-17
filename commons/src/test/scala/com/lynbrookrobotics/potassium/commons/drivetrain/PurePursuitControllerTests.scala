@@ -7,7 +7,7 @@ import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal, SignalLike}
 import squants.motion._
 import squants.space.{Degrees, Feet, Meters}
 import squants.time.{Milliseconds, Seconds}
-import squants.{Acceleration, Length, Percent, Velocity}
+import squants.{Acceleration, Angle, Length, Percent, Velocity}
 import org.scalatest.FunSuite
 
 class PurePursuitControllerTests extends FunSuite {
@@ -42,7 +42,7 @@ class PurePursuitControllerTests extends FunSuite {
     )
   })
 
-  private class TestDrivetrain extends UnicycleDrive {
+  private class TestDrivetrain extends UnicycleDrive with Drive{
     override type DriveSignal = UnicycleSignal
     override type DriveVelocity = UnicycleSignal
 
@@ -66,16 +66,24 @@ class PurePursuitControllerTests extends FunSuite {
 
 
   test("Test if facing target while at start results in driving straight") {
-    val testDrivetrain = new TestDrivetrain
+    implicit val testDrivetrain = new TestDrivetrain
+    implicit val hardware = new UnicycleHardware {
+      override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
+      override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+
+      override val forwardPosition: Signal[Length] = null
+      override val turnPosition: Signal[Angle] = Signal.constant(Degrees(90))
+    }
+
     val controllers = testDrivetrain.UnicycleControllers
 
-    val target = new Point(Feet(1), Feet(0))
+    val target = new Point(Feet(0), Feet(1))
     val path = Signal.constant((Segment(origin, target), None))
 
     val position = Signal.constant(origin).toPeriodic
 
     val output = controllers.purePursuitControllerTurn(
-      Signal.constant(Degrees(90)),
+      Signal.constant(Degrees(0)),
       position,
       path)._1
 
@@ -85,6 +93,14 @@ class PurePursuitControllerTests extends FunSuite {
 
   test("Test if 90 degrees from target turn output >= 100%") {
     val testDrivetrain = new TestDrivetrain
+    implicit val hardware = new UnicycleHardware {
+      override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
+      override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+
+      override val forwardPosition: Signal[Length] = null
+      override val turnPosition: Signal[Angle] = Signal.constant(Degrees(0))
+    }
+
     val controllers = testDrivetrain.UnicycleControllers
 
     val target = new Point(Feet(0), Feet(1))
@@ -95,13 +111,23 @@ class PurePursuitControllerTests extends FunSuite {
     val output = controllers.purePursuitControllerTurn(
       Signal.constant(Degrees(0)),
       position,
-      path)._1
+      path
+    )._1
 
     assert(output.currentValue(Milliseconds(5)).abs >= Percent(100))
   }
 
   test("Test if when -5 degrees from target, turn output is -50%") {
     val testDrivetrain = new TestDrivetrain
+    implicit val hardware = new UnicycleHardware {
+      override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
+      override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+
+      override val forwardPosition: Signal[Length] = null
+      override val turnPosition: Signal[Angle] = Signal{
+        Degrees(0)
+      }
+    }
     val controllers = testDrivetrain.UnicycleControllers
 
     implicit val props = Signal.constant(new UnicycleProperties {
@@ -139,44 +165,37 @@ class PurePursuitControllerTests extends FunSuite {
     val position = Signal.constant(new Point(Feet(1), Feet(1))).toPeriodic
     val path = Signal.constant((Segment(origin, target), None))
 
-
-    val lookAheadPoint = position.zip(path).zip(props).map { p =>
-      val ((pose, path), props) = p
-      controllers.getLookAheadPoint(
-        path,
-        pose,
-        props.defaultLookAheadDistance)
-    }
-
     val output = controllers.purePursuitControllerTurn(
       Signal.constant(Degrees(-85)),
-      position, path)._1
+      position,
+      path
+    )._1
 
     implicit val Tolerance = Percent(0.001)
     val result = output.currentValue(Milliseconds(5))
-    assert(result ~= Percent(-50))
+    assert(result ~= Percent(-50), s"result is ${result.toPercent}")
   }
 
   test("Test if overshooting target results not making full turn"){
     val testDrivetrain = new TestDrivetrain
+    implicit val hardware = new UnicycleHardware {
+      override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
+      override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+
+      override val forwardPosition: Signal[Length] = null
+      override val turnPosition: Signal[Angle] = Signal.constant(Degrees(45))
+    }
     val controllers = testDrivetrain.UnicycleControllers
 
     val target = new Point(Feet(1), Feet(1))
     val position = Signal.constant(new Point(Feet(2), Feet(2))).toPeriodic
     val path = Signal.constant((Segment(origin, target), None))
 
-
-    val lookAheadPoint = position.zip(path).zip(props).map { p =>
-      val ((pose, path), props) = p
-      controllers.getLookAheadPoint(
-        path,
-        pose,
-        props.defaultLookAheadDistance)
-    }
-
     val output = controllers.purePursuitControllerTurn(
-      Signal.constant(Degrees(45)), position,
-      path)._1
+      Signal.constant(Degrees(45)),
+      position,
+      path
+    )._1
 
     implicit val Tolerance = Percent(0.001)
     val result = output.currentValue(Milliseconds(5))

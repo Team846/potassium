@@ -84,14 +84,29 @@ object MathUtilities {
     }
   }
 
-  @deprecated
   def intersectionLineCircleFurthestFromStart(segment: Segment,
                                               center: Point,
                                               radius: Length): Option[Point] = {
     val solutions = interSectionCircleLine(segment, center, radius)
     solutions.flatMap { s =>
       val (positive, negative) = s
-      if ((negative distanceTo segment.start) > (positive distanceTo segment.start)) {
+
+      implicit val Tolerance = Feet(0.001)
+      val negativeToStart = negative distanceTo segment.start
+      val positiveToStart = positive distanceTo segment.start
+
+      // Handle edge case where both solutions are equidistant from start. Then
+      // return solution closest to the endpoint of the segment
+      if (negativeToStart ~= positiveToStart) {
+        val negativeToEnd = negative distanceTo segment.end
+        val positiveToEnd = positive distanceTo segment.end
+
+        if (positiveToEnd < negativeToEnd) {
+          Some(positive)
+        } else {
+          Some(negative)
+        }
+      } else if (negativeToStart > positiveToStart) {
         Some(negative)
       } else {
         Some(positive)

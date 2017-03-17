@@ -25,8 +25,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
 
   class FollowWayPoints(wayPoints: Seq[Point], tolerance: Length)
                        (implicit drive: Drivetrain,
-                        properties: Signal[UnicycleProperties],
-                        hardware: UnicycleHardware) extends FiniteTask {
+                        properties: Signal[DrivetrainProperties],
+                        hardware: DrivetrainHardware) extends FiniteTask {
     override def onStart(): Unit = {
       val initialTurnPosition = hardware.turnPosition.get
 
@@ -37,7 +37,10 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         hardware.forwardPosition
       )
 
-      val (unicycle, error) = followWayPointsController(wayPoints, position, turnPosition)
+      val (unicycle, error) = followWayPointsController(
+        wayPoints,
+        position,
+        turnPosition)
 
       drive.setController(lowerLevelOpenLoop(unicycle.withCheck { _ =>
         if (error.get.exists(_ < tolerance)) {
@@ -56,10 +59,13 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                                     position: PeriodicSignal[Point],
                                     turnPosition: Signal[Angle])
                                    (implicit drive: Drivetrain,
-                                    properties: Signal[UnicycleProperties],
-                                    hardware: UnicycleHardware) extends FiniteTask {
+                                    properties: Signal[DrivetrainProperties],
+                                    hardware: DrivetrainHardware) extends FiniteTask {
     override def onStart(): Unit = {
-      val (unicycle, error) = followWayPointsController(wayPoints, position, turnPosition)
+      val (unicycle, error) = followWayPointsController(
+        wayPoints,
+        position,
+        turnPosition)
 
       drive.setController(lowerLevelOpenLoop(unicycle.withCheck { _ =>
         if (error.get.exists(_ < tolerance)) {
