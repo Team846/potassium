@@ -2,9 +2,10 @@ package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.control.{PIDConfig, PIDF}
+import com.lynbrookrobotics.potassium.tasks.ContinuousTask
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, SignalLike}
-import squants.motion.{AngularVelocity, MetersPerSecond, MetersPerSecondSquared, RadiansPerSecond}
+import squants.motion._
 import squants.space.{Meters, Radians}
 import squants.time.Seconds
 import squants.{Angle, Dimensionless, Each, Length, Percent, Time, Velocity}
@@ -60,8 +61,11 @@ trait TwoSidedDriveProperties extends UnicycleProperties {
   * A drivetrain with two side control (such as a tank drive)
   */
 abstract class TwoSidedDrive(updatePeriod: Time)(implicit clock: Clock)
-  extends UnicycleDrive { self =>
+  extends UnicycleDrive {
+  self =>
+
   case class TwoSidedSignal(left: Dimensionless, right: Dimensionless)
+
   case class TwoSidedVelocity(left: Velocity, right: Velocity)
 
   type DriveSignal = TwoSidedSignal
@@ -72,8 +76,9 @@ abstract class TwoSidedDrive(updatePeriod: Time)(implicit clock: Clock)
 
   /**
     * Output the current signal to actuators with the hardware
+    *
     * @param hardware the hardware to output with
-    * @param signal the signal to output
+    * @param signal   the signal to output
     */
   protected def output(hardware: Hardware, signal: TwoSidedSignal): Unit
 
@@ -92,6 +97,26 @@ abstract class TwoSidedDrive(updatePeriod: Time)(implicit clock: Clock)
                                (implicit hardware: Hardware,
                                 props: Signal[Properties]): PeriodicSignal[TwoSidedSignal] =
     TwoSidedControllers.closedLoopControl(signal)
+
+  object TwoSidedTasks {
+    class SingleSidedContinuousVelocityDrive(forward: Signal[Velocity], driveRightSide: Boolean)
+                                            (implicit drive: Drivetrain,
+                                             hardware: Hardware,
+                                             props: Signal[TwoSidedDrive.this.Properties]) extends ContinuousTask {
+      override def onStart(): Unit = {
+        val target = if (driveRightSide) {
+          forward.map(TwoSidedVelocity(FeetPerSecond(0), _))
+        } else {
+          forward.map(TwoSidedVelocity(_ ,FeetPerSecond(0)))
+        }
+        drive.setController(TwoSidedControllers.velocityControl(target))
+      }
+
+      override def onEnd(): Unit = {
+        drive.resetToDefault()
+      }
+    }
+  }
 
   object TwoSidedControllers {
     def velocityControl(target: SignalLike[TwoSidedVelocity])
@@ -128,4 +153,5 @@ abstract class TwoSidedDrive(updatePeriod: Time)(implicit clock: Clock)
       output(hardware, signal)
     }
   }
+
 }
