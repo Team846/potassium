@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.vision
 
+import edu.wpi.cscore.CvSink
 import org.opencv.core.Mat
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
@@ -19,16 +20,41 @@ class CameraSignal(camera: VideoCapture, frameWidth: Int = 320, frameHeight: Int
   }
 }
 
-class TimestampedCameraSignal(camera: VideoCapture, frameWidth: Int = 320, frameHeight: Int = 200) extends Signal[TimestampedMat] {
-  camera.set(Videoio.CAP_PROP_FRAME_WIDTH, frameWidth)
-  camera.set(Videoio.CAP_PROP_FRAME_HEIGHT, frameHeight)
+sealed abstract class TimestampedMatSource {
+  def get: TimestampedMat
+}
 
-  val mat = new Mat()
+class TimestampedCameraSignal(matSource: TimestampedMatSource) extends Signal[TimestampedMat] {
+  def this(camera: VideoCapture, frameWidth: Int = 320, frameHeight: Int = 200) = {
+    this(new TimestampedMatSource {
+      camera.set(Videoio.CAP_PROP_FRAME_WIDTH, frameWidth)
+      camera.set(Videoio.CAP_PROP_FRAME_HEIGHT, frameHeight)
+
+      val mat = new Mat()
+
+      override def get() = {
+        camera.grab()
+        val timestamp = System.nanoTime / 1e9
+        camera.retrieve(mat)
+        new TimestampedMat(mat, timestamp)
+      }
+    })
+  }
+
+  def this(cvSink: CvSink) = {
+    this(new TimestampedMatSource {
+      val mat = new Mat()
+
+      override def get() = {
+        cvSink.grabFrame(mat)
+        val timestamp = System.nanoTime / 1e9
+        new TimestampedMat(mat, timestamp)
+      }
+    })
+  }
 
   override def get() = {
-    camera.grab()
-    val timestamp = System.nanoTime / 1e9
-    camera.retrieve(mat)
-    new TimestampedMat(mat, timestamp)
+    matSource.get
   }
 }
+
