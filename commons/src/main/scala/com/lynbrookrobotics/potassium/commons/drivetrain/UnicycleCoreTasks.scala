@@ -1,11 +1,11 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.clock.Clock
-import com.lynbrookrobotics.potassium.{Component, Signal, PeriodicSignal}
+import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal}
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask}
 import squants.{Acceleration, Angle, Dimensionless, Length, Velocity}
 import squants.motion.{AngularVelocity, DegreesPerSecond, Distance, FeetPerSecond}
-import squants.space.Feet
+import squants.space.{Degrees, Feet}
 import squants.Time
 import squants.time.Milliseconds
 
@@ -86,11 +86,11 @@ trait UnicycleCoreTasks {
                                             acceleration: Acceleration,
                                             targetDistance: Length,
                                             position: Signal[Length],
-                                            tolerance: Length)
+                                            tolerance: Length,
+                                            toleranceAngle: Angle)
                                            (implicit drive: Drivetrain,
                                             hardware: DrivetrainHardware,
-                                            properties: Signal[DrivetrainProperties],
-                                            clock: Clock) extends FiniteTask {
+                                            properties: Signal[DrivetrainProperties]) extends FiniteTask {
     if (cruisingVelocity.abs > properties.get.maxForwardVelocity) {
       throw new IllegalArgumentException("Input speed: " +
         cruisingVelocity.abs.toFeetPerSecond +
@@ -98,7 +98,7 @@ trait UnicycleCoreTasks {
     }
 
     override final def onStart(): Unit = {
-      val (velocity, error) = trapezoidalDriveControl(
+      val (velocity, forwardError) = trapezoidalDriveControl(
         hardware.forwardVelocity.get, // not map because we need position at this time
         cruisingVelocity,
         finalVelocity,
@@ -109,10 +109,13 @@ trait UnicycleCoreTasks {
         tolerance
       )
 
-      val unicycleOutput = velocity.map(UnicycleVelocity(_, DegreesPerSecond(0)).toUnicycleSignal)
+      val absoluteAngle = hardware.turnPosition.get
+      val (turnController, turnError) = turnPositionControl(absoluteAngle)
+      val forwardOutput = velocity.map(UnicycleVelocity(_, DegreesPerSecond(0)).toUnicycleSignal)
+      val combinedController = forwardOutput.zip(turnController).map(t => t._1 + t._2)
 
-      drive.setController(lowerLevelVelocityControl(unicycleOutput).withCheck { _ =>
-          if (error.get.abs < tolerance) {
+      drive.setController(lowerLevelVelocityControl(speedControl(combinedController)).withCheck { _ =>
+          if (forwardError.get.abs < tolerance && turnError.get.abs < toleranceAngle) {
             finished()
           }
         })
@@ -135,14 +138,14 @@ trait UnicycleCoreTasks {
   class DriveDistanceSmooth(targetForwardDistance: Length, finalVelocity: Velocity)
                            (implicit drive: Drivetrain,
                             hardware: DrivetrainHardware,
-                            properties: Signal[DrivetrainProperties], // TODO: clock is temporary for loggin reasons
-                            clock: Clock) extends DriveDistanceWithTrapazoidalProfile(
-                                0.5 * properties.get.maxForwardVelocity,
-                                finalVelocity,
-                                properties.get.maxAcceleration,
-                                targetForwardDistance,
-                                hardware.forwardPosition,
-                                Feet(.1))
+                            properties: Signal[DrivetrainProperties]) extends DriveDistanceWithTrapazoidalProfile(
+                              0.5 * properties.get.maxForwardVelocity,
+                              finalVelocity,
+                              properties.get.maxAcceleration,
+                              targetForwardDistance,
+                              hardware.forwardPosition,
+                              Feet(.1),
+                              Degrees(5))
 
   class DriveDistanceStraight(distance: Length,
                               toleranceForward: Length,
