@@ -98,7 +98,7 @@ abstract class TwoSidedDrive(updatePeriod: Time)(implicit clock: Clock)
                                 props: Signal[Properties]): PeriodicSignal[TwoSidedSignal] =
     TwoSidedControllers.closedLoopControl(signal)
 
-  object TwoSidedTasks {
+  object twoSidedTasks {
     class SingleSidedContinuousVelocityDrive(forward: Signal[Velocity], driveRightSide: Boolean)
                                             (implicit drive: Drivetrain,
                                              hardware: Hardware,
