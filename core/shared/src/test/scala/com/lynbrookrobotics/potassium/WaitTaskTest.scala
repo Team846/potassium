@@ -2,6 +2,7 @@ package com.lynbrookrobotics.potassium
 
 import com.lynbrookrobotics.potassium.tasks.WaitTask
 import org.scalatest.FunSuite
+import squants.Time
 import squants.time.Seconds
 
 class WaitTaskTest extends FunSuite {

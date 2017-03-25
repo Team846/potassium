@@ -272,7 +272,7 @@ class UnicycleDriveTaskTest extends FunSuite {
     }
 
     val task = new drive.unicycleTasks.RotateByAngle(
-      Degrees(5), Degrees(0.1))(
+      Degrees(5), Degrees(0.1), 1)(
       drivetrain,
       hardware,
       props

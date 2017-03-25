@@ -183,15 +183,24 @@ trait UnicycleCoreTasks {
     }
   }
 
-  class RotateByAngle(relativeAngle: Angle, tolerance: Angle)
+  class RotateByAngle(relativeAngle: Angle, tolerance: Angle, timeWithinTolerance: Int)
                      (implicit drive: Drivetrain,
                       hardware: DrivetrainHardware,
                       props: Signal[DrivetrainProperties]) extends FiniteTask {
     override def onStart(): Unit = {
       val absoluteAngle = hardware.turnPosition.get + relativeAngle
       val (controller, error) = turnPositionControl(absoluteAngle)
+
+      var ticksWithinTolerance = 0
+
       val checkedController = controller.withCheck { _ =>
         if (error.get.abs < tolerance) {
+          ticksWithinTolerance += 1
+        } else {
+          ticksWithinTolerance = 0
+        }
+
+        if (ticksWithinTolerance >= timeWithinTolerance) {
           finished()
         }
       }
