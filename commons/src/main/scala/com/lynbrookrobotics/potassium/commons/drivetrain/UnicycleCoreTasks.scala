@@ -3,10 +3,9 @@ package com.lynbrookrobotics.potassium.commons.drivetrain
 import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal}
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask}
-import squants.{Acceleration, Angle, Dimensionless, Length, Velocity}
+import squants.{Acceleration, Angle, Dimensionless, Length, Percent, Time, Velocity}
 import squants.motion.{AngularVelocity, DegreesPerSecond, Distance, FeetPerSecond}
 import squants.space.{Degrees, Feet}
-import squants.Time
 import squants.time.Milliseconds
 
 import scala.collection.immutable.Queue
@@ -169,6 +168,55 @@ trait UnicycleCoreTasks {
 
       val checkedController = combinedController.withCheck { _ =>
         if (forwardError.get.abs < toleranceForward && turnError.get.abs < toleranceAngle) {
+          finished()
+        }
+      }
+
+      drive.setController(
+        lowerLevelVelocityControl(speedControl(checkedController))
+      )
+    }
+
+    override def onEnd(): Unit = {
+      drive.resetToDefault()
+    }
+  }
+
+  class DriveBeyondStraight(distance: Length,
+                              toleranceForward: Length,
+                              toleranceAngle: Angle,
+                              maxSpeed: Dimensionless)
+                             (implicit drive: Drivetrain,
+                              hardware: DrivetrainHardware,
+                              props: Signal[DrivetrainProperties]) extends FiniteTask {
+    override def onStart(): Unit = {
+      val absoluteDistance = hardware.forwardPosition.get + distance
+      val (forwardController, forwardError) = (
+        if (distance.value > 0) {
+          Signal.constant(maxSpeed).toPeriodic
+        } else {
+          Signal.constant(-maxSpeed).toPeriodic
+        },
+        hardware.forwardPosition.map(absoluteDistance - _)
+      )
+
+      val limitedForward = forwardController.map { u =>
+        UnicycleSignal(u, Percent(0))
+      }
+
+      val absoluteAngle = hardware.turnPosition.get
+      val (turnController, turnError) = turnPositionControl(absoluteAngle)
+
+      val combinedController = limitedForward.zip(turnController).map(t => t._1 + t._2)
+
+      val checkedController = combinedController.withCheck { _ =>
+        val beyond = if (distance.value > 0) {
+          forwardError.get.abs.value < 0
+        } else {
+          forwardError.get.abs.value > 0
+        }
+
+        if (beyond && turnError.get.abs < toleranceAngle) {
           finished()
         }
       }
