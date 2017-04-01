@@ -211,9 +211,9 @@ trait UnicycleCoreTasks {
 
       val checkedController = combinedController.withCheck { _ =>
         val beyond = if (distance.value > 0) {
-          forwardError.get.abs.value < 0
+          forwardError.get.value < 0
         } else {
-          forwardError.get.abs.value > 0
+          forwardError.get.value > 0
         }
 
         if (beyond && turnError.get.abs < toleranceAngle) {
