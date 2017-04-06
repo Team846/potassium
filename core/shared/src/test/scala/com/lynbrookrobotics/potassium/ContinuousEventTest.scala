@@ -78,4 +78,85 @@ class ContinuousEventTest extends FunSuite {
     eventUpdateSource.fire()
     assert(taskStarted && taskEnded)
   }
+
+  test("Mapped continuous task signal launched correctly") {
+    var condition = false
+    val event = Signal(condition).filter(identity)
+
+    var taskStarted = false
+    var taskEnded = false
+
+    event.foreach(Signal(new ContinuousTask {
+      override def onStart(): Unit = {
+        taskStarted = true
+      }
+
+      override def onEnd(): Unit = {
+        taskEnded = true
+      }
+    }))
+
+    eventUpdateSource.fire()
+    assert(!taskStarted && !taskEnded)
+
+    condition = true
+
+    eventUpdateSource.fire()
+    assert(taskStarted && !taskEnded)
+
+    condition = false
+
+    eventUpdateSource.fire()
+    assert(taskStarted && taskEnded)
+  }
+
+  test("Combined events fired correctly") {
+    var conditionA = false
+    var conditionB = false
+
+    var callbackRun = false
+
+    val eventA = Signal(conditionA).filter(identity)
+    val eventB = Signal(conditionB).filter(identity)
+
+    (eventA && eventB).foreach(() => {
+      callbackRun = true
+    })
+
+    eventUpdateSource.fire()
+    assert(!callbackRun)
+
+    conditionA = true
+    eventUpdateSource.fire()
+    assert(!callbackRun)
+
+    conditionA = false
+    conditionB = true
+    eventUpdateSource.fire()
+    assert(!callbackRun)
+
+    conditionA = true
+    conditionB = true
+    eventUpdateSource.fire()
+    assert(callbackRun)
+  }
+
+  test("Opposite event fired correctly") {
+    var condition = true
+
+    var callbackRun = false
+
+    val event = Signal(condition).filter(identity)
+
+    (!event).foreach(() => {
+      callbackRun = true
+    })
+
+    eventUpdateSource.fire()
+    assert(!callbackRun)
+
+    condition = false
+    eventUpdateSource.fire()
+    assert(callbackRun)
+  }
 }
