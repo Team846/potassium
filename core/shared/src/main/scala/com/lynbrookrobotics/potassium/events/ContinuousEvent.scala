@@ -12,6 +12,8 @@ class ContinuousEvent(condition: => Boolean)(implicit polling: ImpulseEvent) {
   private val onStartSource = new ImpulseEventSource
   private val onEndSource = new ImpulseEventSource
 
+  private[ContinuousEvent] def conditionValue: Boolean = condition
+
   /**
     * An event that is fired when the continuous event starts
     */
@@ -83,11 +85,11 @@ class ContinuousEvent(condition: => Boolean)(implicit polling: ImpulseEvent) {
     * Returns a continuous event that is an intersection of both events
     * @param event the event to intersect with the original
     */
-  def and(event: ContinuousEvent): ContinuousEvent = {
-    Signal(event.isRunning && this.isRunning).filter(identity)
+  def &&(event: ContinuousEvent): ContinuousEvent = {
+    Signal(event.conditionValue && this.conditionValue).filter(identity)
   }
 
   def unary_!(): ContinuousEvent = {
-    Signal(!this.isRunning).filter(identity)
+    Signal(!conditionValue).filter(identity)
   }
 }
