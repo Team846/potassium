@@ -1,7 +1,8 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 import com.lynbrookrobotics.potassium.clock.Clock
+import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
 import com.lynbrookrobotics.potassium.control.PIDF
-import com.lynbrookrobotics.potassium.units.{GenericDerivative, Ratio}
+import com.lynbrookrobotics.potassium.units.{GenericDerivative, Point, Ratio, Value3D}
 import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, SignalLike}
 import org.scalatest.time.Milliseconds
 import squants.Quantity
@@ -20,26 +21,28 @@ class SimulatedUnicycleHardware(
     maxAcceleration: Acceleration,
     maxTurnAcceleration: GenericDerivative[AngularVelocity],
     maxVelocity: Velocity,
-    maxTurnVelocity: AngularVelocity) extends UnicycleHardware {
+    maxTurnVelocity: AngularVelocity,
+    accelerationDueToFriction: Acceleration) extends UnicycleHardware {
 
-  def this(maxAcceleration: Acceleration, maxVelocity: Velocity, track: Length) {
+  def this(maxAcceleration: Acceleration, maxVelocity: Velocity, track: Length, frictionDecceleration: Acceleration) {
     this(
       maxAcceleration,
       unitTools.linearToAngular(maxAcceleration, track),
       maxVelocity,
-      unitTools.linearToAngular(maxVelocity, track))
+      unitTools.linearToAngular(maxVelocity, track),
+      frictionDecceleration)
   }
 
-  def this(properties: UnicycleProperties, track: Length) {
-    this(properties.maxAcceleration, properties.maxForwardVelocity, track)
+  def this(properties: UnicycleProperties, track: Length, frictionDecceleration: Acceleration) {
+    this(properties.maxAcceleration, properties.maxForwardVelocity, track, frictionDecceleration)
   }
 
   private def capAt100Percent(input: Dimensionless) = {
     input min Percent(100) max Percent(-100)
   }
 
-  val history = new mutable.ArrayBuffer[(Time, Length, Angle, Velocity, AngularVelocity)]
-  var time: Time = Seconds(0)
+  val history = new mutable.ArrayBuffer[(Time, Length, Angle, Velocity, AngularVelocity, Point)]
+  var time = Seconds(0)
 
   def clearHistory() {
     history.clear()
@@ -53,7 +56,8 @@ class SimulatedUnicycleHardware(
         forwardPosition.get,
         turnPosition.get,
         forwardVelocity.get,
-        turnVelocity.get
+        turnVelocity.get,
+        peekedPosition.get
       ))
   }
   var lastOutput: UnicycleSignal = _
@@ -61,7 +65,9 @@ class SimulatedUnicycleHardware(
   def updateData(dt: Time): Unit = {
     periodicForwardPosition.currentValue(dt)
     periodicTurnPosition.currentValue(dt)
+    position.currentValue(dt)
   }
+
   /**
     * component's applySignal method should call this method
     * @param unicycleSignal
@@ -72,7 +78,7 @@ class SimulatedUnicycleHardware(
     updateData(period)
   }
 
-  var inputForwardAcceleration = Signal(capAt100Percent(lastOutput.forward).toEach * maxAcceleration).toPeriodic
+  val inputForwardAcceleration = Signal(capAt100Percent(lastOutput.forward).toEach * maxAcceleration).toPeriodic
 
   val periodicVelocity = inputForwardAcceleration.scanLeft(FeetPerSecond(0)){
     case (velocity, inputAcceleration, dt) =>
@@ -80,33 +86,11 @@ class SimulatedUnicycleHardware(
       // motor back emf is proportional to speed
       val frictionAcceleration = -1 * maxAcceleration * (velocity / maxVelocity)
 
-      // newton's second law
+      // newton's second law, mass is unknown
       val acceleration = inputAcceleration + frictionAcceleration
 
       velocity + acceleration * dt
   }
-
-//  def incrementVelocity[T <: Quantity[T]](accum: GenericDerivative[T],
-//                           maxVelocity: GenericDerivative[T],
-//                           inputAcceleration: GenericDerivative[GenericDerivative[T]],
-//                           maxAcceleration: GenericDerivative[GenericDerivative[T]],
-//                           dt: Time): GenericDerivative[T] = {
-//    val frictionAcceleration = maxAcceleration * (accum / maxVelocity)
-//
-//    val acceleration = if (frictionAcceleration.abs > inputAcceleration.abs) {
-//
-//      // friction is always in the opposite direction of motion
-//      if (frictionAcceleration.value.signum != accum.value.signum) {
-//        inputAcceleration - frictionAcceleration
-//      } else {
-//        MetersPerSecondSquared(0)
-//      }
-//    } else {
-//      inputAcceleration - frictionAcceleration
-//    }
-//
-//    (acceleration * dt).asInstanceOf
-//  }
 
   override val forwardVelocity = peekVelocity(periodicVelocity)
 
@@ -148,6 +132,8 @@ class SimulatedUnicycleHardware(
   def peekVelocity(toPeek: PeriodicSignal[Velocity]) = {
     toPeek.peek.map(_.getOrElse(MetersPerSecond(0)))
   }
+  val position = XYPosition(turnPosition, forwardPosition)
+  val peekedPosition = position.peek.map(_.getOrElse(new Point(Feet(0), Feet(0))))
 }
 
 object unitTools {
@@ -207,10 +193,6 @@ class SimulatedUnicycleDriveComponent(period: Time)
   override def defaultController: PeriodicSignal[UnicycleSignal] = Signal.constant(
     UnicycleSignal(Percent(0), Percent(0))
   ).toPeriodic
-//
-//  override def setController(controller: PeriodicSignal[UnicycleSignal]): Unit = {
-//    super.setController(controller.withCheck((d) => hardware.updateData(Seconds(5))))
-//  }
 
   /**
     * Applies the latest control signal value.

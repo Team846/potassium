@@ -48,7 +48,7 @@ class SimulateDrivetrainDynamics extends FunSuite {
     )
   })
 
-  implicit val hardware = new SimulatedUnicycleHardware(props.get, Feet(2))
+  implicit val hardware = new SimulatedUnicycleHardware(props.get, Feet(2), MetersPerSecondSquared(0))
 
   test("Test drive forward controller oscilates about end point") {
     implicit val (clock, ticker) = ClockMocking.mockedClockTicker
