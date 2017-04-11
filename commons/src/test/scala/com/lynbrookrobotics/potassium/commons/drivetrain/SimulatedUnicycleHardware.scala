@@ -83,8 +83,11 @@ class SimulatedUnicycleHardware(
   val periodicVelocity = inputForwardAcceleration.scanLeft(FeetPerSecond(0)){
     case (velocity, inputAcceleration, dt) =>
       time += dt
+      val directionFriction = -1 * Math.signum(velocity.value)
+
       // motor back emf is proportional to speed
-      val frictionAcceleration = -1 * maxAcceleration * (velocity / maxVelocity)
+      val emfDecceleration = maxAcceleration * (velocity / maxVelocity)
+      val frictionAcceleration = directionFriction * (emfDecceleration + accelerationDueToFriction)
 
       // newton's second law, mass is unknown
       val acceleration = inputAcceleration + frictionAcceleration
@@ -98,9 +101,13 @@ class SimulatedUnicycleHardware(
 
   val periodicTurnVelocity = lastTurnAcceleration.toPeriodic.scanLeft(DegreesPerSecond(0)){
     case (velocity, inputAcceleration, dt) =>
-      val frictionAcceleration = maxTurnAcceleration * (velocity / maxTurnVelocity)
+      val directionFriction = -1 * Math.signum(velocity.value)
 
-      val acceleration = inputAcceleration + frictionAcceleration
+      val emfDecceleration = maxTurnAcceleration * (velocity.abs / maxTurnVelocity)
+      val frictionAcceleration = directionFriction * (emfDecceleration)
+      // TODO: include turning friction similar to what is in forward motion
+
+      val acceleration = inputAcceleration + emfDecceleration
 
       velocity + acceleration * dt
   }
