@@ -84,4 +84,7 @@ abstract class WrapperTask { self =>
       }
     }
   }
+
+  def toContinuous: ContinuousTask = apply(ContinuousTask.empty)
+  def toFinite: FiniteTask = apply(FiniteTask.empty)
 }

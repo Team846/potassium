@@ -38,23 +38,6 @@ abstract class Flywheel {
   }
 
   object velocityTasks {
-    class WaitForVelocity(vel: Signal[Frequency], tolerance: Frequency)
-                         (implicit properties: Signal[Properties],
-                          hardware: Hardware, component: Comp) extends FiniteTask {
-      override def onStart(): Unit = {
-        val (error, control) = velocityControllers.velocityControl(vel)
-        component.setController(control.withCheck { _ =>
-          if (error.get.abs < tolerance) {
-            finished()
-          }
-        })
-      }
-
-      override def onEnd(): Unit = {
-        component.resetToDefault()
-      }
-    }
-
     class WhileAtVelocity(vel: Signal[Frequency], tolerance: Frequency)
                          (implicit properties: Signal[Properties],
                           hardware: Hardware, component: Comp) extends WrapperTask {
@@ -65,19 +48,6 @@ abstract class Flywheel {
             readyToRunInner()
           }
         })
-      }
-
-      override def onEnd(): Unit = {
-        component.resetToDefault()
-      }
-    }
-
-    class SpinAtVelocity(vel: Signal[Frequency])
-                        (implicit properties: Signal[Properties],
-                         hardware: Hardware, component: Comp) extends ContinuousTask {
-      override def onStart(): Unit = {
-        val (_, control) = velocityControllers.velocityControl(vel)
-        component.setController(control)
       }
 
       override def onEnd(): Unit = {
