@@ -19,18 +19,19 @@ abstract class Component[T](period: Time)(implicit val clock: Clock) {
   def defaultController: PeriodicSignal[T]
   private var currentController: PeriodicSignal[T] = defaultController
 
-  private var lastOutput: Option[T] = None
+  private var lastControlSignal: Option[T] = None
 
   val peekedController: Signal[Option[T]] = Signal {
-    lastOutput
+    lastControlSignal
   }
+
+  def shouldComponentUpdate(previousSignal: T, newSignal: T): Boolean = true
 
   /**
     * Sets the controller to be used by the component during updates.
     * @param controller the new controller to use
     */
   def setController(controller: PeriodicSignal[T]): Unit = {
-//    println("setting controller")
     currentController.detachTickSource(this)
     controller.attachTickSource(this)
     currentController = controller
@@ -40,8 +41,6 @@ abstract class Component[T](period: Time)(implicit val clock: Clock) {
     * Resets the component to use its default controller.
     */
   def resetToDefault(): Unit = {
-//    println(s"reseting to default $lastOutput")
-//    println(Thread.currentThread().getStackTrace)
     setController(defaultController)
   }
 
@@ -62,9 +61,13 @@ abstract class Component[T](period: Time)(implicit val clock: Clock) {
     // scalastyle:on
 
     val value = currentController.currentValue(dt)
+    val shouldUpdate = lastControlSignal.isEmpty ||
+      shouldComponentUpdate(lastControlSignal.get, value)
 
-    lastOutput = Some(value)
+    lastControlSignal = Some(value)
 
-    applySignal(value)
+    if (shouldUpdate) {
+      applySignal(value)
+    }
   }
 }
