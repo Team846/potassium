@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import sbtcrossproject.{crossProject, CrossType, CrossClasspathDependency}
+=======
+import org.scalajs.sbtplugin.cross.CrossProject
+>>>>>>> Add two-sided hardware simulation with turning
 
 enablePlugins(GitVersioning, TravisScalaStylePlugin)
 
@@ -77,7 +81,7 @@ lazy val testingJVM = testing.jvm
 lazy val testingJS = testing.js
 lazy val testingNative = testing.native
 
-lazy val model = project.dependsOn(coreJVM).settings(
+lazy val model = project.dependsOn(coreJVM, commons.jvm).settings(
   name := "potassium-model",
   libraryDependencies ++= sharedDependencies.value,
   libraryDependencies ++= jvmDependencies
@@ -129,14 +133,13 @@ lazy val sensors = project.dependsOn(coreJVM).settings(
   libraryDependencies ++= jvmDependencies
 )
 
-lazy val commons = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).
-  dependsOn(
-    control,
-    (testing: CrossClasspathDependency.Constructor) % Test
-  ).settings(
+
+lazy val commons: CrossProject = crossProject.crossType(CrossType.Pure).
+  dependsOn(control, testing % Test).settings(
   name := "potassium-commons",
   libraryDependencies ++= sharedDependencies.value
 ).nativeSettings(nativeSettings)
+
 
 lazy val commonsJVM = commons.jvm
 lazy val commonsJS = commons.js

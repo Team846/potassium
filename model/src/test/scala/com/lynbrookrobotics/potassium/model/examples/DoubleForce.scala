@@ -6,8 +6,10 @@ import com.lynbrookrobotics.potassium.model.StateSpace
 import squants.mass.Kilograms
 import squants.motion.MetersPerSecondSquared
 import squants.time.Milliseconds
+import com.lynbrookrobotics.potassium.Component
 
 object DoubleForce extends App {
+
   val NumIterations = 100
 
   val times     = new Array[Double](NumIterations)
