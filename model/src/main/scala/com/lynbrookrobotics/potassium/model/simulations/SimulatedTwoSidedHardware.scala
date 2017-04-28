@@ -1,13 +1,13 @@
-package com.lynbrookrobotics.potassium.commons.drivetrain.Simulations
+package com.lynbrookrobotics.potassium.model.simulations
 
 import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
 import com.lynbrookrobotics.potassium.commons.drivetrain._
-import com.lynbrookrobotics.potassium.units.{MomentOfInertia, NewtonMeters, Point, Torque}
+import com.lynbrookrobotics.potassium.units.{MomentOfInertia, Point, Torque}
 import squants.{Acceleration, Angle, Dimensionless, Length, Mass, Percent, Velocity}
 import squants.motion.{AngularVelocity, Force, _}
-import squants.space.{Degrees, Meters}
+import squants.space.{Degrees, Meters, Radians}
 import squants.time.{Seconds, Time}
 import com.lynbrookrobotics.potassium.units.Conversions._
 
@@ -43,9 +43,7 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
 
   def update(dt: Time): Unit = {
     // force periodic signals to update
-    wheelPositions.currentValue(dt)
-//    leftPositionPeriodic.currentValue(dt)
-//    rightPositionPeriodic.currentValue(dt)
+    DrivetrainPositions.currentValue(dt)
     position.currentValue(dt)
 
     time += dt
@@ -63,10 +61,10 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
                           rightInputForce: Force,
                           leftVelocity: Velocity,
                           rightVelocity: Velocity,
-                          dt: Time): (Velocity, Velocity) = {
+                          angularVelocity: AngularVelocity,
+                          dt: Time): (Velocity, Velocity, AngularVelocity) = {
     val leftFriction = PhysicsUtil.friction(leftVelocity, constantFriction)
     val netLeftForce = leftInputForce + leftFriction
-
     val rightFriction = PhysicsUtil.friction(rightVelocity, constantFriction)
     val netRightForce = rightInputForce + rightFriction
 
@@ -74,50 +72,73 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
     val radius = track / 2
     val torque: Torque = netRightForce * radius - netLeftForce * radius
 
-    // Newton's second law
+    // Newton's second laws
     val angularAcceleration = torque / momentOfInertia
     val linearAcceleration  = (netLeftForce + netRightForce) / mass
 
-    // TODO: do this with implicit class conversions or define
-    // TODO: AngularAcceleration class
-    val newLeftVelocity = leftVelocity +
-      (linearAcceleration - angularAcceleration.value * radius / (Seconds(1) * Seconds(1))) * dt
-    val newRightVelocity = rightVelocity +
-      (linearAcceleration + angularAcceleration.value * radius / (Seconds(1) * Seconds(1))) * dt
 
-    (newLeftVelocity, newRightVelocity)
+    // Linear acceleration caused by angular acceleration about the center
+    // TODO: define AngularAcceleration class to simplify this
+    val tangentialAcceleration = angularAcceleration.value * radius / angularAcceleration.time.squared
+
+    // Use Euler's method to integrate velocities
+    val newLeftVelocity = leftVelocity + (linearAcceleration - tangentialAcceleration) * dt
+    val newRightVelocity = rightVelocity + (linearAcceleration + tangentialAcceleration) * dt
+    val newAngularVelocity = angularVelocity + angularAcceleration * dt
+
+    (newLeftVelocity, newRightVelocity, newAngularVelocity)
   }
 
-  private val velocities = leftForceOutput.zip(rightForceOutput).scanLeft((MetersPerSecond(0), MetersPerSecond(0))) {
-    case((leftVelocity, rightVelocity), (leftForceOut, rightForceOut), dt) =>
-      incrementVelocities(leftForceOut, rightForceOut, leftVelocity, rightVelocity, dt)
+  private val InitialSpeeds = (MetersPerSecond(0), MetersPerSecond(0), RadiansPerSecond(0))
+  private val velocities = leftForceOutput.zip(rightForceOutput).scanLeft(InitialSpeeds) {
+    case ((leftVelocity, rightVelocity, turnVelocity), (leftForceOut, rightForceOut), dt) =>
+      incrementVelocities(leftForceOut, rightForceOut, leftVelocity, rightVelocity, turnVelocity, dt)
   }
 
+  private val leftSpeedPeriodic: PeriodicSignal[Velocity] = velocities.map(_._1)
+  private val rightSpeedPeriodic: PeriodicSignal[Velocity] = velocities.map(_._2)
 
-  private val leftSpeedPeriodic = velocities.map(_._1)
-  private val rightSpeedPeriodic = velocities.map(_._2)
+  // convert triginometric velocity to compass velocity
+  private val turnVelocityPeriodic: PeriodicSignal[AngularVelocity] = velocities.map(-1 * _._3)
 
-  override val leftVelocity: Signal[Velocity] = peekVelocity(leftSpeedPeriodic)
-  override val rightVelocity: Signal[Velocity] = peekVelocity(rightSpeedPeriodic)
+  private val leftPositionPeriodic: PeriodicSignal[Length] = leftSpeedPeriodic.integral
+  private val rightPositionPeriodic: PeriodicSignal[Length] = rightSpeedPeriodic.integral
+  private val turnPositionPeriodic: PeriodicSignal[Angle] = turnVelocityPeriodic.integral
 
-  val leftPositionPeriodic = leftSpeedPeriodic.integral
-  val rightPositionPeriodic = rightSpeedPeriodic.integral
+  // zip all position signals together so that when this value is updated,
+  // all positions are updated only once
+  private val DrivetrainPositions = leftPositionPeriodic.zip(rightPositionPeriodic).zip(turnPositionPeriodic)
 
-  override val leftPosition: Signal[Length] = peekLength(leftPositionPeriodic)
-  override val rightPosition: Signal[Length] = peekLength(rightPositionPeriodic)
-
-  val wheelPositions = leftPositionPeriodic.zip(rightPositionPeriodic)
-
-  val position = XYPosition(turnPosition.map(a => Degrees(90) - a), forwardPosition)
-  val peekedPosition: Signal[Point] = position.peek.map(_.getOrElse(Point.origin))
-
-  def peekLength(toPeek: PeriodicSignal[Length]): Signal[Length] = {
+  private def peekLength(toPeek: PeriodicSignal[Length]): Signal[Length] = {
     toPeek.peek.map(_.getOrElse(Meters(0)))
   }
 
   private def peekVelocity(toPeek: PeriodicSignal[Velocity]) = {
     toPeek.peek.map(_.getOrElse(MetersPerSecond(0)))
   }
+
+  private def peekAngularVelocity(toPeek: PeriodicSignal[AngularVelocity]) = {
+    toPeek.peek.map(_.getOrElse(RadiansPerSecond(0)))
+  }
+
+  private def peekAngle(toPeek: PeriodicSignal[Angle]) = {
+    toPeek.peek.map(_.getOrElse(Radians(0)))
+  }
+
+  val position = XYPosition(turnPosition.map(a => Degrees(90) - a), forwardPosition)
+
+  override val leftVelocity: Signal[Velocity]             = peekVelocity(leftSpeedPeriodic)
+  override val rightVelocity: Signal[Velocity]            = peekVelocity(rightSpeedPeriodic)
+  val trigSpeed = peekAngularVelocity(turnVelocityPeriodic)
+  override lazy val turnVelocity: Signal[AngularVelocity] = peekAngularVelocity(turnVelocityPeriodic)
+
+  // I have absolutely no idea why, but marking these as lazy fixes null
+  // pointer exceptions
+  override lazy val leftPosition: Signal[Length]  = peekLength(leftPositionPeriodic)
+  override lazy val rightPosition: Signal[Length] = peekLength(rightPositionPeriodic)
+
+  override lazy val turnPosition: Signal[Angle]   = peekAngle(turnPositionPeriodic)
+  private val peekedPosition: Signal[Point]       = position.peek.map(_.getOrElse(Point.origin))
 }
 
 class TwoSidedDriveContainerSimulator(period: Time)(implicit clock: Clock) extends TwoSidedDrive(period) {

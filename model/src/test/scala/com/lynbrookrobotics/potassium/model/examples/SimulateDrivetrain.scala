@@ -1,7 +1,7 @@
 package com.lynbrookrobotics.potassium.model.examples
 
 import com.lynbrookrobotics.potassium.{ClockMocking, Signal}
-import com.lynbrookrobotics.potassium.commons.drivetrain.Simulations.TwoSidedDriveContainerSimulator
+import com.lynbrookrobotics.potassium.model.simulations.TwoSidedDriveContainerSimulator
 import com.lynbrookrobotics.potassium.commons.drivetrain.TwoSidedDriveProperties
 import com.lynbrookrobotics.potassium.control.PIDConfig
 import com.lynbrookrobotics.potassium.units.GenericValue._
@@ -38,7 +38,7 @@ object SimulateDrivetrain extends App {
       Percent(0) / DegreesPerSecond(1))
 
     override val leftControlGains = PIDConfig(
-      Percent(10) / FeetPerSecond(5),
+      Percent(100) / FeetPerSecond(1),
       Percent(0) / Meters(1),
       Percent(0) / MetersPerSecondSquared(1))
 
@@ -62,10 +62,6 @@ object SimulateDrivetrain extends App {
     Inches(0),
     Degrees(5),
     Percent(100))
-//  val task = new drivetrainContainer.unicycleTasks.RotateByAngle(
-//    Degrees(90),
-//    Degrees(0),
-//  5)
 
   task.init()
 
@@ -74,7 +70,5 @@ object SimulateDrivetrain extends App {
   }
 
   hardware.history.foreach(e =>
-    println(s"${e.time}\t${e.forwardVelocity}\t${e.forwardPosition}\t${e.turnSpeed}\t${e.angle}"))
-
-  hardware.history.clear()
+    println(s"${e.time.toSeconds}\t${e.forwardVelocity.toFeetPerSecond}\t${e.forwardPosition.toFeet}"))
 }

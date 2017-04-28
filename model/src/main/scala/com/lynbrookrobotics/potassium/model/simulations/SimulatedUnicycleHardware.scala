@@ -1,4 +1,4 @@
-package com.lynbrookrobotics.potassium.commons.drivetrain.Simulations
+package com.lynbrookrobotics.potassium.model.simulations
 
 import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
