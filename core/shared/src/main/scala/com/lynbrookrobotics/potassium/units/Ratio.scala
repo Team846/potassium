@@ -13,7 +13,6 @@ import squants.{Angle, Dimension, Quantity, UnitOfMeasure}
   * @tparam D the units of the denominator
   */
 case class Ratio[N <: Quantity[N], D <: Quantity[D]](num: N, den: D) {
-
   def abs: Ratio[N, D] = Ratio(num.abs, den.abs)
   def value: Double = num.value / den.value
 
@@ -25,5 +24,9 @@ case class Ratio[N <: Quantity[N], D <: Quantity[D]](num: N, den: D) {
   override def toString: String = {
     num.toString() + " / " + den.toString()
   }
+}
+
+abstract class ScalarQuantity[A <: ScalarQuantity[A]](value: Double) extends Quantity[A] {self: A ⇒
+  assert(value > 0, "Moment of inertia must be positive")
 }
 

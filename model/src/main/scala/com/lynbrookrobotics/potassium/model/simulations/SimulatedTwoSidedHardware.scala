@@ -4,12 +4,13 @@ import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
 import com.lynbrookrobotics.potassium.commons.drivetrain._
-import com.lynbrookrobotics.potassium.units.{MomentOfInertia, Point, Torque}
+import com.lynbrookrobotics.potassium.units.Point
 import squants.{Acceleration, Angle, Dimensionless, Length, Mass, Percent, Velocity}
 import squants.motion.{AngularVelocity, Force, _}
 import squants.space.{Degrees, Meters, Radians}
 import squants.time.{Seconds, Time}
-import com.lynbrookrobotics.potassium.units.Conversions._
+import com.lynbrookrobotics.potassium.units.rotation.Conversions._
+import com.lynbrookrobotics.potassium.units.rotation.{MomentOfInertia, Torque}
 
 import scala.collection.mutable
 
@@ -53,9 +54,9 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
   val leftMotor = new SimulatedSpeedController
   val rightMotor = new SimulatedSpeedController
 
-  implicit val MaxMotorForce = mass * props.maxAcceleration / 2
-  private val leftForceOutput = leftMotor.outputSignal.map(o => o.toEach * MaxMotorForce)
-  private val rightForceOutput = rightMotor.outputSignal.map(o => o.toEach * MaxMotorForce)
+  private val maxMotorForce = mass * props.maxAcceleration / 2
+  private val leftForceOutput = leftMotor.outputSignal.map(o => o.toEach * maxMotorForce)
+  private val rightForceOutput = rightMotor.outputSignal.map(o => o.toEach * maxMotorForce)
 
   def incrementVelocities(leftInputForce: Force,
                           rightInputForce: Force,
@@ -63,25 +64,23 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
                           rightVelocity: Velocity,
                           angularVelocity: AngularVelocity,
                           dt: Time): (Velocity, Velocity, AngularVelocity) = {
-    val leftFriction = PhysicsUtil.friction(leftVelocity, constantFriction)
+    val leftFriction = PhysicsUtil.friction(leftVelocity, constantFriction, maxMotorForce)
     val netLeftForce = leftInputForce + leftFriction
-    val rightFriction = PhysicsUtil.friction(rightVelocity, constantFriction)
+    val rightFriction = PhysicsUtil.friction(rightVelocity, constantFriction, maxMotorForce)
     val netRightForce = rightInputForce + rightFriction
 
     // radius from center, located halfway between wheels
     val radius = track / 2
-    val torque: Torque = netRightForce * radius - netLeftForce * radius
+    val netTorque = netRightForce * radius - netLeftForce * radius
 
     // Newton's second laws
-    val angularAcceleration = torque / momentOfInertia
+    val angularAcceleration = netTorque / momentOfInertia
     val linearAcceleration  = (netLeftForce + netRightForce) / mass
 
-
     // Linear acceleration caused by angular acceleration about the center
-    // TODO: define AngularAcceleration class to simplify this
-    val tangentialAcceleration = angularAcceleration.value * radius / angularAcceleration.time.squared
+    val tangentialAcceleration = angularAcceleration * radius
 
-    // Use Euler's method to integrate velocities
+    // Euler's method to integrate velocities
     val newLeftVelocity = leftVelocity + (linearAcceleration - tangentialAcceleration) * dt
     val newRightVelocity = rightVelocity + (linearAcceleration + tangentialAcceleration) * dt
     val newAngularVelocity = angularVelocity + angularAcceleration * dt
@@ -170,9 +169,8 @@ object PhysicsUtil {
     * @param props
     * @return
     */
-  private def emfForce(velocity: Velocity)
-                      (implicit props: UnicycleProperties,
-                        maxMotorForce: Force): Force = {
+  private def emfForce(velocity: Velocity, maxMotorForce: Force)
+                      (implicit props: UnicycleProperties): Force = {
     val normalizedVelocity = velocity / props.maxForwardVelocity
     normalizedVelocity * maxMotorForce
   }
@@ -184,11 +182,10 @@ object PhysicsUtil {
     * @param props
     * @return
     */
-  def friction(velocity: Velocity, constantFriction: Force)
-              (implicit props: TwoSidedDriveProperties,
-                        maxMotorForce: Force): Force = {
+  def friction(velocity: Velocity, constantFriction: Force, maxMotorForce: Force)
+              (implicit props: TwoSidedDriveProperties): Force = {
     val direction = -1 * Math.signum(velocity.value)
 
-    direction * (emfForce(velocity) + constantFriction)
+    direction * (emfForce(velocity, maxMotorForce) + constantFriction)
   }
 }

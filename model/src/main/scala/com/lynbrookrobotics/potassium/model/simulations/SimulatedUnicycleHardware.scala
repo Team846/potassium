@@ -4,6 +4,7 @@ import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
 import com.lynbrookrobotics.potassium.commons.drivetrain._
 import com.lynbrookrobotics.potassium.control.PIDF
+import com.lynbrookrobotics.potassium.units.rotation.AngularAcceleration
 import com.lynbrookrobotics.potassium.units.{GenericDerivative, GenericValue, Point}
 import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, SignalLike}
 import squants.motion._
@@ -15,13 +16,14 @@ import scala.collection.mutable
 
 
 
+@Deprecated
 /**
   * Simulate inputs and motor back emf (friction) to model kinematics of
   * a unicycleDrivetrain
   */
 class SimulatedUnicycleHardware(
     props: UnicycleProperties,
-    maxTurnAcceleration: GenericDerivative[AngularVelocity],
+    maxTurnAcceleration: AngularAcceleration,
     accelerationDueToFriction: Acceleration) extends UnicycleHardware {
 
   val maxAcceleration: Acceleration =  props.maxAcceleration
