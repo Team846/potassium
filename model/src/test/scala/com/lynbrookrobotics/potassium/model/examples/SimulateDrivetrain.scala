@@ -29,7 +29,7 @@ object SimulateDrivetrain extends App {
       Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)))
 
     override val forwardPositionControlGains = PIDConfig(
-      Percent(100) / Feet(2),
+      Percent(100) / Feet(4),
       Percent(0) / (Meters(1).toGeneric * Seconds(1)),
       Percent(0) / MetersPerSecond(1))
 
@@ -71,5 +71,5 @@ object SimulateDrivetrain extends App {
   }
 
   hardware.history.foreach(e =>
-    println(s"${e.time.toSeconds}\t${e.forwardVelocity.toFeetPerSecond}\t${e.forwardPosition.toFeet}"))
+    println(s"${e.time.toSeconds}\t${e.position.x.toFeet}\t${e.position.y.toFeet}"))
 }

@@ -44,8 +44,8 @@ object ArcsecondsPerSecondSquared extends AngularAccelerationUnit{
 }
 
 final class AngularAcceleration(val value: Double,
-                                val unit: AngularAccelerationUnit) extends Quantity[AngularAcceleration] with
-                                                                           TimeDerivative[AngularVelocity]{
+                                val unit: AngularAccelerationUnit) extends Quantity[AngularAcceleration]
+    /*with TimeDerivative[AngularVelocity]*/{
   override def dimension: Dimension[AngularAcceleration] = AngularAcceleration
 
   def toRadiansPerSecondSquared: Double = to(RadiansPerSecondSquared)
@@ -58,14 +58,20 @@ final class AngularAcceleration(val value: Double,
     NewtonMeters(toRadiansPerSecondSquared * that.toKilogramsMetersSquared)
   }
 
-  override protected[squants] def timeIntegrated: AngularVelocity = RadiansPerSecond(toRadiansPerSecondSquared)
+  @Deprecated
+  /**
+    * depracated until squants pr for rotional dynamics is merged
+    */
+  def *(that: Time): AngularVelocity = RadiansPerSecond(toRadiansPerSecondSquared * that.toSeconds)
 
-  override protected[squants] def time: Time = Seconds(1)
+//  override def timeIntegrated: AngularVelocity = RadiansPerSecond(toRadiansPerSecondSquared)
+//
+//  override def time: Time = Seconds(1)
 }
 
 
 object AngularAcceleration extends Dimension[AngularAcceleration] {
-  private[motion] def apply[A](n: A, unit: AngularAccelerationUnit)(implicit num: Numeric[A]) = new AngularAcceleration(num.toDouble(n), unit)
+  private def apply[A](n: A, unit: AngularAccelerationUnit)(implicit num: Numeric[A]) = new AngularAcceleration(num.toDouble(n), unit)
   def apply = parse _
   def name = "AngularAcceleration"
   def primaryUnit = RadiansPerSecondSquared
