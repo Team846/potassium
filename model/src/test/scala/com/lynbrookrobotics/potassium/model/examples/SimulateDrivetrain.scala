@@ -21,7 +21,7 @@ object SimulateDrivetrain extends App {
 
     override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(16.5)
-    override val defaultLookAheadDistance: Length = null
+    override val defaultLookAheadDistance: Length = Feet(1)
 
     override val turnControlGains = PIDConfig(
       Percent(10) / DegreesPerSecond(1),
@@ -50,7 +50,8 @@ object SimulateDrivetrain extends App {
 
   implicit val (clock, ticker) = mockedClockTicker
 
-  implicit val drivetrainContainer = new TwoSidedDriveContainerSimulator(Milliseconds(5))
+  val period = Milliseconds(0.001)
+  implicit val drivetrainContainer = new TwoSidedDriveContainerSimulator(period)
   implicit val hardware = new drivetrainContainer.Hardware(
     Pounds(88) * MetersPerSecondSquared(1) / 2,
     Inches(21.75),
@@ -58,16 +59,19 @@ object SimulateDrivetrain extends App {
     KilogramsMetersSquared(3.909))
 
   implicit val simulatedComponent = new drivetrainContainer.Drivetrain
-  val task = new drivetrainContainer.unicycleTasks.DriveDistanceStraight(
-    Meters(1),
-    Inches(0),
-    Degrees(5),
-    Percent(100))
+  val task = /*new drivetrainContainer.unicycleTasks.RotateByAngle(
+    Degrees(90),
+    Degrees(0),
+    5
+  )*/ new drivetrainContainer.unicycleTasks.FollowWayPoints(
+    Point.origin :: new Point(Meters(2), Meters(2)) :: Nil,
+    Inches(0)
+  )
 
   task.init()
 
-  for (_ <- 1 to 1500) {
-    ticker(Milliseconds(5))
+  for (_ <- 1 to (2D / period.toSeconds).round.toInt) {
+    ticker(period)
   }
 
   hardware.history.foreach(e =>

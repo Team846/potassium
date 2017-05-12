@@ -108,7 +108,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                                                                                    PeriodicSignal[Point]) = {
     val lookAheadPoint = position.zip(properties).zip(biSegmentPath).map{p =>
       val ((pose, props), path) = p
-      getExtrapolatedLookAheadPoint(
+      getNonExtrapolatedLookAheadPoint(
         path,
         pose,
         props.defaultLookAheadDistance
@@ -220,6 +220,9 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
 
     (forwardOutput.zip(turnOutput).zip(multiplier).zip(distanceToLast).zip(props).zip(forwardError).map { o =>
       val (((((forward, turn), fdMultiplier), _), props), frdError) = o
+      val turnPos = turnPosition.get
+      val currPos = position.peek.get
+
       if (frdError > props.defaultLookAheadDistance / 2) {
         UnicycleSignal(forward * fdMultiplier, turn)
       } else {
