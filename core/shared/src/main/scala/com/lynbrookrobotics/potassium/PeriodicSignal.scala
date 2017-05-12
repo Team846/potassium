@@ -187,6 +187,7 @@ abstract class PeriodicSignal[+T] { self =>
     * Calculates the integral of the signal, producing units of
     * The integral of the signal's units. More appropriate for
     * non-linear forms of motion.
+    * See: http://mathworld.wolfram.com/SimpsonsRule.html
     */
   def simpsonsIntegral[I <: Quantity[I] with TimeIntegral[_]](implicit derivEv: T => TimeDerivative[I]): PeriodicSignal[I] = {
     // scalastyle:off
@@ -195,7 +196,7 @@ abstract class PeriodicSignal[+T] { self =>
     previousValues.scanLeft(null.asInstanceOf[I]){(acc, current3Values, dt) =>
       if (current3Values.head != null) {
         val secondVelocity = current3Values.dequeue._2.dequeue._1
-        acc + (2 * dt * current3Values.head + 2 * dt * secondVelocity * 4.0 + 2 * dt * current3Values.last) / 6
+        acc + (dt * current3Values.head + 4 * dt * secondVelocity + dt * current3Values.last) / 6
       } else {
         (current3Values.last: TimeDerivative[I]) * dt
       }

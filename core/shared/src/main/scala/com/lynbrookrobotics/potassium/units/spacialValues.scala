@@ -29,6 +29,14 @@ class Point(override val x: Length,
 
 object Point {
   def origin: Point = new Point(Feet(0), Feet(0))
+
+  def apply(x: Length, y: Length, z: Length): Point = {
+    new Point(x, y, z)
+  }
+
+  def apply(x: Length, y: Length): Point = {
+    new Point(x, y)
+  }
 }
 
 case class Segment(start: Point, end: Point) {

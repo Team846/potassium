@@ -6,70 +6,89 @@ import com.lynbrookrobotics.potassium.units.Point
 import org.scalatest.FunSuite
 import squants.motion.{DegreesPerSecond, FeetPerSecond}
 import squants.space.{Degrees, Feet}
-import squants.time.Milliseconds
+import squants.time.{Milliseconds, Seconds}
 
 class TestXYPosition extends FunSuite{
-  val origin = new Point(Feet(0), Feet(0))
+  val period = Milliseconds(5)
+  val periodsPerSecond = (1 / period.toSeconds).toInt
 
-  test("Test moving straight at 2 ft/s for 1 sec results in moving 2 ft forward") {
-    implicit val tolerance = Feet(0.05)
-    val distance = Signal.constant(FeetPerSecond(2)).toPeriodic.integral
+  test("Test moving straight at 1 ft/s for 1 sec results in moving 1 ft forward") {
+    val periodicDistance = Signal.constant(FeetPerSecond(1)).toPeriodic.integral
+    val distance = periodicDistance.peek.map(_.getOrElse(Feet(0)))
 
-    val targetPosition = new Point(Feet(0), Feet(2))
+    val angle = Signal.constant(Degrees(90))
 
-    val position = XYPosition(
-      Signal.constant(Degrees(90)),
-      distance.peek.map(_.getOrElse(Feet(0))))
+    val targetPosition = Point(Feet(0), Feet(1))
 
-    for(_ <- 1 to 200){
-      distance.currentValue(Milliseconds(5))
-      position.currentValue(Milliseconds(5))
+    val position = XYPosition(angle, distance)
+    val simpsonsPosition = XYPosition.positionWithSimpsons(
+      angle,
+      distance)
+
+    for(_ <- 1 to periodsPerSecond){
+      periodicDistance.currentValue(period)
+      position.currentValue(period)
+      simpsonsPosition.currentValue(period)
     }
 
+    implicit val tolerance = Feet(0.05)
     assert(position.peek.get.get ~= targetPosition)
+    assert(simpsonsPosition.peek.get.get ~= targetPosition)
   }
 
   test("Test moving 45 degrees at 1 ft/s for 1 sec results in (sqrt(2)/2,sqrt(2)/2) ") {
-    implicit val tolerance = Feet(0.05)
-    val distance = Signal.constant(FeetPerSecond(1)).toPeriodic.integral
+    val periodicDistance = Signal.constant(FeetPerSecond(1)).toPeriodic.integral
+    val distance = periodicDistance.peek.map(_.getOrElse(Feet(0)))
 
     val angle = Signal.constant(Degrees(45))
-    val targetPosition = new Point(
-      Feet(Math.cos(angle.get.toRadians)),
-      Feet(Math.sin(angle.get.toRadians)))
+    val targetPosition = Point(
+      Feet(1 * Degrees(45).cos),
+      Feet(1 * Degrees(45).sin))
 
-    val position = XYPosition(angle, distance.peek.map(_.getOrElse(Feet(0))))
+    val position = XYPosition(angle, distance)
+    val simpsonsPosition = XYPosition.positionWithSimpsons(
+      angle,
+      distance)
 
-    for (_ <- 1 to 200) {
-      distance.currentValue(Milliseconds(5))
-      position.currentValue(Milliseconds(5))
+    for (_ <- 1 to periodsPerSecond) {
+      periodicDistance.currentValue(period)
+      position.currentValue(period)
+      simpsonsPosition.currentValue(period)
     }
 
+    implicit val tolerance = Feet(0.05)
     assert(position.peek.get.get ~= targetPosition)
+    assert(simpsonsPosition.peek.get.get ~= targetPosition)
   }
 
   test("Test rotating 90 degrees/s with radius 1 starting angle 90 " +
        "degrees for 1 sec results in (-1,1) ") {
-    implicit val tolerance = Feet(0.05)
-    val periodicAngularSpeed = Signal.constant(DegreesPerSecond(90)).toPeriodic
-    val angle = periodicAngularSpeed.integral.map(_ + Degrees(90))
-    val distance = angle.map{ angle =>
-      (angle.toRadians - Degrees(90).toRadians) * Feet(1)
-    }
+    val angularSpeed = Signal.constant(DegreesPerSecond(90))
+    val periodicAngle = angularSpeed.toPeriodic.integral.map(_ + Degrees(90))
+    val angle = periodicAngle.peek.map(_.getOrElse(Degrees(90)))
 
-    val targetPosition = new Point(
+    val periodicDistance = periodicAngle.map{ angle =>
+      (angle - Degrees(90)).toRadians * Feet(1)
+    }
+    val distance = periodicDistance.peek.map(_.getOrElse(Feet(0)))
+
+    val targetPosition = Point(
       Feet(-1),
       Feet(1))
 
-    val position = XYPosition(
-      Signal(angle.peek.get.getOrElse(Degrees(90))),
-      distance.peek.map(_.getOrElse(Feet(0))))
+    val position = XYPosition(angle, distance)
+    val simpsonsPosition = XYPosition.positionWithSimpsons(
+      angle,
+      distance)
 
-    for(_ <- 1 to 200){
-      distance.currentValue(Milliseconds(5))
-      position.currentValue(Milliseconds(5))
+    for(_ <- 1 to periodsPerSecond){
+      periodicDistance.currentValue(period)
+      position.currentValue(period)
+      simpsonsPosition.currentValue(period)
     }
 
+    implicit val tolerance = Feet(0.05)
     assert(position.peek.get.get ~= targetPosition)
+    assert(simpsonsPosition.peek.get.get ~= targetPosition)
   }
 }
