@@ -8,6 +8,6 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
 
 addSbtPlugin("com.lynbrookrobotics" % "travis-scalastyle" % "0.2.0-SNAPSHOT")
 
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.14")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.16")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.8.5")
