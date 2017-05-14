@@ -6,7 +6,7 @@ import squants.{Dimension, Length, Quantity, UnitOfMeasure}
 import squants.electro.Volts
 import squants.motion.MetersPerSecond
 import squants.space.{Degrees, Feet, Meters}
-import squants.time.{Milliseconds, Time, TimeDerivative, TimeIntegral}
+import squants.time._
 
 class PeriodicSignalTest extends FunSuite {
   test("Converted from constant signal") {
@@ -135,12 +135,15 @@ class PeriodicSignalTest extends FunSuite {
     }
   }
 
-  test("Simpson's Integral of a certain value produces an appropriate value") {
-    val sig = Signal(MetersPerSecond(-5)).toPeriodic.simpsonsIntegral
-    (1 to 500).foreach { _ =>
+  test("Simpson's Integral of -1 from 0 to 1 is -1") {
+    implicit val tolerance = Meters(0.00000001)
+
+    val sig = Signal(MetersPerSecond(-1)).toPeriodic.simpsonsIntegral
+    (1 to (1 / Milliseconds(5).toSeconds).toInt).foreach { _ =>
       sig.currentValue(Milliseconds(5))
     }
-    assert((sig.currentValue(Milliseconds(5))- Meters(-25)).abs < Meters(0.05))
+
+    assert(sig.currentValue(Milliseconds(5)) ~= Meters(-1))
   }
 
   test("Integral of one always produces ascending values") {
