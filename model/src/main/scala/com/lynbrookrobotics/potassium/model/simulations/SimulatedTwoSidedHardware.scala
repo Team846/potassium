@@ -5,12 +5,11 @@ import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
 import com.lynbrookrobotics.potassium.commons.drivetrain._
 import com.lynbrookrobotics.potassium.units.Point
+import squants.mass.MomentOfInertia
 import squants.{Acceleration, Angle, Dimensionless, Length, Mass, Percent, Velocity}
 import squants.motion.{AngularVelocity, Force, _}
 import squants.space.{Degrees, Meters, Radians}
 import squants.time.{Seconds, Time}
-import com.lynbrookrobotics.potassium.units.rotation.Conversions._
-import com.lynbrookrobotics.potassium.units.rotation.{MomentOfInertia, Torque}
 
 import scala.collection.mutable
 
@@ -71,14 +70,14 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
 
     // radius from center, located halfway between wheels
     val radius = track / 2
-    val netTorque = netRightForce * radius - netLeftForce * radius
+    val netTorque = (netRightForce * radius - netLeftForce * radius).asTorque
 
     // Newton's second laws
     val angularAcceleration = netTorque / momentOfInertia
     val linearAcceleration  = (netLeftForce + netRightForce) / mass
 
     // Linear acceleration caused by angular acceleration about the center
-    val tangentialAcceleration = angularAcceleration * radius
+    val tangentialAcceleration = angularAcceleration onRadius radius
 
     // Euler's method to integrate velocities
     val newLeftVelocity = leftVelocity + (linearAcceleration - tangentialAcceleration) * dt

@@ -1,7 +1,7 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
-import squants.{Dimensionless, Each, Percent}
+import squants.{Dimensionless, Each}
 import squants.space.{Feet, Length}
 
 
@@ -27,7 +27,8 @@ object MathUtilities {
     val discriminant = dr_squared * radius.toFeet * radius.toFeet - det * det
 
     if (dr_squared == 0) {
-      throw new IllegalArgumentException("Segment is a point, so no line can be fit through it")
+      throw new IllegalArgumentException("Segment is a point, so no line can be fit through it. Segment" +
+        s"$segment center $center radius $radius")
     }
 
     if (discriminant < 0) None else {
@@ -74,23 +75,24 @@ object MathUtilities {
         positiveSolution
       }
 
-      // Intersection is found between the LINE formed by the start and end
-      // point of given segment. This means that the given solution might
-      // extend past end point of segment. In this case, just return the end
-      if (segment.containsInXY(solutionClosestToEnd, Feet(0.2))) {
-        Some(solutionClosestToEnd)
-      } else {
-        Some(segment.end)
-      }
+      Some(solutionClosestToEnd)
+//      // Intersection is found between the LINE formed by the start and end
+//      // point of given segment. This means that the given solution might
+//      // extend past end point of segment. In this case, just return the end
+//      if (segment.containsInXY(solutionClosestToEnd, Feet(0.2))) {
+//        Some(solutionClosestToEnd)
+//      } else {
+//        Some(segment.end)
+//      }
     }
   }
 
-  def intersectionLineCircleFurthestFromStart(segment: Segment,
+  def intersectionFurthestFromStart(segment: Segment,
                                               center: Point,
                                               radius: Length): Option[Point] = {
     val solutions = interSectionCircleLine(segment, center, radius)
     solutions.flatMap { s =>
-      val (positive, negative) = s
+      val (negative, positive) = s
 
       implicit val Tolerance = Feet(0.001)
       val negativeToStart = negative distanceTo segment.start
@@ -112,6 +114,21 @@ object MathUtilities {
       } else {
         Some(positive)
       }
+    }
+  }
+
+  def optimalPurePursuitInterSection(segment: Segment,
+    center: Point,
+    radius: Length): Option[Point] = {
+    val toStart = center distanceTo segment.start
+    val toEnd   = center distanceTo segment.end
+
+    // TODO: Include detailed explanations, with diagrams, explaining how this
+    // TODO: handles edge cases. THESE ARE NOT INDENTICAL!!!
+    if (toStart < toEnd) {
+      intersectionClosestToEnd(segment, center, radius)
+    } else {
+      intersectionFurthestFromStart(segment, center, radius)
     }
   }
 

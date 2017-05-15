@@ -4,7 +4,6 @@ import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
 import com.lynbrookrobotics.potassium.commons.drivetrain._
 import com.lynbrookrobotics.potassium.control.PIDF
-import com.lynbrookrobotics.potassium.units.rotation.AngularAcceleration
 import com.lynbrookrobotics.potassium.units.{GenericDerivative, GenericValue, Point}
 import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, SignalLike}
 import squants.motion._

@@ -82,10 +82,7 @@ class PurePursuitControllerTests extends FunSuite {
 
     val position = Signal.constant(origin).toPeriodic
 
-    val output = controllers.purePursuitControllerTurn(
-      Signal.constant(Degrees(0)),
-      position,
-      path)._1
+    val output = controllers.purePursuitControllerTurn(Signal.constant(Degrees(0)), position, path)._1
 
     val currOutput = output.currentValue(Milliseconds(5))
     assert(currOutput == Percent(0), "Output is: " + currOutput)
@@ -108,11 +105,7 @@ class PurePursuitControllerTests extends FunSuite {
 
     val position = Signal.constant(new Point(Feet(1), Feet(1))).toPeriodic
 
-    val output = controllers.purePursuitControllerTurn(
-      Signal.constant(Degrees(0)),
-      position,
-      path
-    )._1
+    val output = controllers.purePursuitControllerTurn(Signal.constant(Degrees(0)), position, path)._1
 
     assert(output.currentValue(Milliseconds(5)).abs >= Percent(100))
   }
@@ -165,11 +158,7 @@ class PurePursuitControllerTests extends FunSuite {
     val position = Signal.constant(new Point(Feet(1), Feet(1))).toPeriodic
     val path = Signal.constant((Segment(origin, target), None))
 
-    val output = controllers.purePursuitControllerTurn(
-      Signal.constant(Degrees(-85)),
-      position,
-      path
-    )._1
+    val output = controllers.purePursuitControllerTurn(Signal.constant(Degrees(-85)), position, path)._1
 
     implicit val Tolerance = Percent(0.001)
     val result = output.currentValue(Milliseconds(5))
@@ -191,11 +180,7 @@ class PurePursuitControllerTests extends FunSuite {
     val position = Signal.constant(new Point(Feet(2), Feet(2))).toPeriodic
     val path = Signal.constant((Segment(origin, target), None))
 
-    val output = controllers.purePursuitControllerTurn(
-      Signal.constant(Degrees(45)),
-      position,
-      path
-    )._1
+    val output = controllers.purePursuitControllerTurn(Signal.constant(Degrees(45)), position, path)._1
 
     implicit val Tolerance = Percent(0.001)
     val result = output.currentValue(Milliseconds(5))

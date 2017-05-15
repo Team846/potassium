@@ -11,8 +11,7 @@ import squants.motion._
 import squants.space.{Degrees, Feet, Inches, Meters}
 import squants.time.{Milliseconds, Seconds}
 import com.lynbrookrobotics.potassium.testing.ClockMocking._
-import com.lynbrookrobotics.potassium.units.rotation.KilogramsMetersSquared
-import squants.mass.Pounds
+import squants.mass.{KilogramsMetersSquared, Pounds}
 
 object SimulateDrivetrain extends App {
   implicit val propsVal: TwoSidedDriveProperties = new TwoSidedDriveProperties {
@@ -50,7 +49,7 @@ object SimulateDrivetrain extends App {
 
   implicit val (clock, ticker) = mockedClockTicker
 
-  val period = Milliseconds(0.001)
+  val period = Milliseconds(1)
   implicit val drivetrainContainer = new TwoSidedDriveContainerSimulator(period)
   implicit val hardware = new drivetrainContainer.Hardware(
     Pounds(88) * MetersPerSecondSquared(1) / 2,
@@ -64,16 +63,22 @@ object SimulateDrivetrain extends App {
     Degrees(0),
     5
   )*/ new drivetrainContainer.unicycleTasks.FollowWayPoints(
-    Point.origin :: new Point(Meters(2), Meters(2)) :: Nil,
-    Inches(0)
+    Point.origin :: Point(Meters(0), Meters(1)) :: Point(Meters(1), Meters(2)) :: Nil,
+    Inches(5)
   )
 
   task.init()
 
-  for (_ <- 1 to (2D / period.toSeconds).round.toInt) {
+  for (_ <- 1 to (20D / period.toSeconds).round.toInt) {
     ticker(period)
   }
 
-  hardware.history.foreach(e =>
-    println(s"${e.time.toSeconds}\t${e.position.x.toFeet}\t${e.position.y.toFeet}"))
+  var itr = 0
+  hardware.history.foreach { e =>
+    if (itr % 10 == 0) {
+      println(s"${e.time.toSeconds}\t${e.position.x.toFeet}\t${e.position.y.toFeet}")
+    }
+
+    itr += 1
+  }
 }
