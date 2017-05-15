@@ -1,3 +1,5 @@
+import sbtcrossproject.{crossProject, CrossType, CrossClasspathDependency}
+
 enablePlugins(GitVersioning, TravisScalaStylePlugin)
 
 name := "potassium"
@@ -16,7 +18,7 @@ scalaVersion in ThisBuild := "2.12.1"
 resolvers in ThisBuild += "Funky-Repo" at "http://team846.github.io/repo"
 
 lazy val sharedDependencies = Def.setting(Seq(
-  "org.typelevel"  %%% "squants"  % "1.2.0",
+  "org.typelevel"  %%% "squants"  % "1.3.0-1",
   "org.scalatest" %%% "scalatest" % "3.0.1" % Test,
   "org.scalacheck" %%% "scalacheck" % "1.13.4" % Test
 ))
@@ -30,40 +32,50 @@ parallelExecution in ThisBuild := false
 
 lazy val potassium = project.in(file(".")).
   aggregate(
-    coreJVM, coreJS,
-    testingJVM, testingJS,
+    coreJVM, coreJS, coreNative,
+    testingJVM, testingJS, testingNative,
     model,
-    controlJVM, controlJS,
+    controlJVM, controlJS, controlNative,
     remote,
     vision,
     frc,
     config,
     sensors,
-    commonsJVM, commonsJS,
+    commonsJVM, commonsJS, commonsNative,
     lighting
   ).settings(
   publish := {},
   publishLocal := {}
 )
 
-lazy val core = crossProject.crossType(CrossType.Full).settings(
+lazy val nativeSettings = Def.settings(
+  scalaVersion := "2.11.11",
+  libraryDependencies := libraryDependencies.value.filterNot(_.configurations.exists(_ == Test.name)),
+  test := {
+    (compile in Compile).value
+  }
+)
+
+lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Full).settings(
   name := "potassium-core",
   libraryDependencies ++= sharedDependencies.value
 ).jvmSettings(libraryDependencies ++= jvmDependencies).jsSettings(
   requiresDOM := true,
   coverageEnabled := false
-)
+).nativeSettings(nativeSettings)
 
 lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
+lazy val coreNative = core.native
 
-lazy val testing = crossProject.crossType(CrossType.Pure).dependsOn(core).settings(
+lazy val testing = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core).settings(
   name := "potassium-testing",
   libraryDependencies ++= sharedDependencies.value
-)
+).nativeSettings(nativeSettings)
 
 lazy val testingJVM = testing.jvm
 lazy val testingJS = testing.js
+lazy val testingNative = testing.native
 
 lazy val model = project.dependsOn(coreJVM).settings(
   name := "potassium-model",
@@ -71,13 +83,14 @@ lazy val model = project.dependsOn(coreJVM).settings(
   libraryDependencies ++= jvmDependencies
 )
 
-lazy val control = crossProject.crossType(CrossType.Pure).dependsOn(core).settings(
+lazy val control = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core).settings(
   name := "potassium-control",
   libraryDependencies ++= sharedDependencies.value
-)
+).nativeSettings(nativeSettings)
 
 lazy val controlJVM = control.jvm
 lazy val controlJS = control.js
+lazy val controlNative = control.native
 
 lazy val remote = project.dependsOn(coreJVM).settings(
   name := "potassium-remote",
@@ -116,14 +129,18 @@ lazy val sensors = project.dependsOn(coreJVM).settings(
   libraryDependencies ++= jvmDependencies
 )
 
-lazy val commons = crossProject.crossType(CrossType.Pure).
-  dependsOn(control, testing % Test).settings(
+lazy val commons = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).
+  dependsOn(
+    control,
+    (testing: CrossClasspathDependency.Constructor) % Test
+  ).settings(
   name := "potassium-commons",
   libraryDependencies ++= sharedDependencies.value
-)
+).nativeSettings(nativeSettings)
 
 lazy val commonsJVM = commons.jvm
 lazy val commonsJS = commons.js
+lazy val commonsNative = commons.native
 
 publishArtifact := false
 

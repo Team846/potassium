@@ -9,7 +9,7 @@ install:
   - npm install
   - npm install jsdom
 script:
-  - 'sbt "clean" "coverage" "+ testOnly * -- -l com.lynbrookrobotics.potassium.PerfTest" "coverageReport"'
+  - 'sbt "clean" "coverage" "test" "coverageReport"'
   - 'sbt coverageAggregate'
   - 'if [[ $TRAVIS_PULL_REQUEST != "false" ]]; then bash ./style-checks.sh; fi'
 jdk: oraclejdk8
