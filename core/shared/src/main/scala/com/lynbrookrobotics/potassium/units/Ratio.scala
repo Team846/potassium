@@ -25,8 +25,3 @@ case class Ratio[N <: Quantity[N], D <: Quantity[D]](num: N, den: D) {
     num.toString() + " / " + den.toString()
   }
 }
-
-abstract class ScalarQuantity[A <: ScalarQuantity[A]](value: Double) extends Quantity[A] {self: A ⇒
-  assert(value > 0, "Moment of inertia must be positive")
-}
-
