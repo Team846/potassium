@@ -77,7 +77,7 @@ lazy val testingJVM = testing.jvm
 lazy val testingJS = testing.js
 lazy val testingNative = testing.native
 
-lazy val model = project.dependsOn(coreJVM, commonsJVM).settings(
+lazy val model = project.dependsOn(coreJVM, commonsJVM, testingJVM).settings(
   name := "potassium-model",
   libraryDependencies ++= sharedDependencies.value,
   libraryDependencies ++= jvmDependencies
