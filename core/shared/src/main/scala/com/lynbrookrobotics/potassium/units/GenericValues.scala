@@ -58,7 +58,7 @@ class GenericValue[T <: Quantity[T]](val value: Double, val uom: UnitOfMeasure[T
 
   override def dimension: Dimension[GenericValue[T]] = null
 
-  override def timeDerived: GenericDerivative[T] = new GenericDerivative[T](value, uom)
+  override protected def timeDerived: GenericDerivative[T] = new GenericDerivative[T](value, uom)
 
   override def timeIntegrated: GenericIntegral[T] = new GenericIntegral[T](value, uom)
 

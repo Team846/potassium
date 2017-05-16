@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.model.examples
 
-import com.lynbrookrobotics.potassium.{ClockMocking, Signal}
+import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.model.simulations.TwoSidedDriveContainerSimulator
 import com.lynbrookrobotics.potassium.commons.drivetrain.TwoSidedDriveProperties
 import com.lynbrookrobotics.potassium.control.PIDConfig

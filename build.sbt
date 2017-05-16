@@ -131,10 +131,11 @@ lazy val sensors = project.dependsOn(coreJVM).settings(
 
 lazy val commons = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).
   dependsOn(
-  control,
-  (testing: CrossClasspathDependency.Constructor) % Test).settings(
-  name := "potassium-commons",
-  libraryDependencies ++= sharedDependencies.value
+    control,
+    (testing: CrossClasspathDependency.Constructor) % Test
+  ).settings(
+    name := "potassium-commons",
+    libraryDependencies ++= sharedDependencies.value
 ).nativeSettings(nativeSettings)
 
 
