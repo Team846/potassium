@@ -40,7 +40,8 @@ trait UnicycleMotionProfileControllers extends UnicycleCoreControllers {
     val distanceTraveled = position.map(_ - initPosition)
 
     // Travel at 0.1 ft/s for the first 0.25 feet
-    val KickstartDistance = Feet(0.06)
+    val KickstartDistance = Feet(0.25)
+    val Tolerance         = Feet(0.1)
     val KickStartVelocity = FeetPerSecond(1)
 
     /**
