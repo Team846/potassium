@@ -77,7 +77,7 @@ lazy val testingJVM = testing.jvm
 lazy val testingJS = testing.js
 lazy val testingNative = testing.native
 
-lazy val model = project.dependsOn(coreJVM).settings(
+lazy val model = project.dependsOn(coreJVM, commonsJVM, testingJVM).settings(
   name := "potassium-model",
   libraryDependencies ++= sharedDependencies.value,
   libraryDependencies ++= jvmDependencies
@@ -134,9 +134,10 @@ lazy val commons = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossTy
     control,
     (testing: CrossClasspathDependency.Constructor) % Test
   ).settings(
-  name := "potassium-commons",
-  libraryDependencies ++= sharedDependencies.value
+    name := "potassium-commons",
+    libraryDependencies ++= sharedDependencies.value
 ).nativeSettings(nativeSettings)
+
 
 lazy val commonsJVM = commons.jvm
 lazy val commonsJS = commons.js
