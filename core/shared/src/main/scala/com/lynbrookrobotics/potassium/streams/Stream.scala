@@ -15,6 +15,13 @@ abstract class Stream[T] {
     // TODO: more stuff maybe
   }
 
+  /**
+    * Merges two streams, with a value published from the resulting stream
+    * whenever the parent streams have both published a new value
+    * @param other the stream to merge with
+    * @tparam O the type of values from the other stream
+    * @return a stream with the values from both streams brought together
+    */
   def zip[O](other: Stream[O]): Stream[(T, O)] = {
     val ret = new ZippedStream[T, O](expectedPeriodicity, other.expectedPeriodicity)
     val ptr = WeakReference(ret)
@@ -35,6 +42,43 @@ abstract class Stream[T] {
       ptr.get match {
         case Some(s) =>
           s.receiveB(b)
+        case None =>
+          bCancel()
+      }
+    }
+
+    ret
+  }
+
+  /**
+    * Merges two streams with the second stream included asynchronously, with
+    * a value published from the resulting stream whenever this stream
+    * publishes a value. The periodicity of the resulting stream matches
+    * the periodicity of this stream.
+    * @param other the stream to merge with
+    * @tparam O the type of values from the other stream
+    * @return a stream with the values from both streams brought together
+    */
+  def zipAsync[O](other: Stream[O]): Stream[(T, O)] = {
+    val ret = new AsyncZippedStream[T, O](expectedPeriodicity)
+    val ptr = WeakReference(ret)
+
+    var aCancel: Cancel = null
+    aCancel = this.foreach { a =>
+      ptr.get match {
+        case Some(s) =>
+          s.receiveMaster(a)
+        case None =>
+          aCancel()
+      }
+    }
+
+    var bCancel: Cancel = null
+
+    bCancel = other.foreach { b =>
+      ptr.get match {
+        case Some(s) =>
+          s.receiveFollower(b)
         case None =>
           bCancel()
       }
