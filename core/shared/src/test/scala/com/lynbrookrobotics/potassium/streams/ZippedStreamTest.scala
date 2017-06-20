@@ -99,4 +99,42 @@ class ZippedStreamTest extends FunSuite {
     assert(lastValue == 4)
   }
 
+  test("Eager zipped stream is triggered correctly") {
+    val (a, pushA) = Stream.manual[Int]
+    val (b, pushB) = Stream.manual[Int]
+    val zipped = a.zipEager(b)
+
+    var lastValue = -1
+
+    zipped.foreach { case (aVal, bVal) =>
+      lastValue = aVal * bVal
+    }
+
+    assert(lastValue == -1)
+
+    pushA(1)
+
+    assert(lastValue == -1)
+
+    pushB(2)
+
+    assert(lastValue == 2)
+
+    pushA(2)
+
+    assert(lastValue == 4)
+
+    pushA(3)
+
+    assert(lastValue == 6)
+
+    pushB(4)
+
+    assert(lastValue == 12)
+
+    pushB(2)
+
+    assert(lastValue == 6)
+  }
+
 }
