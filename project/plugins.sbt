@@ -17,3 +17,5 @@ addSbtPlugin("org.scala-native" % "sbt-scalajs-crossproject" % "0.1.0")
 addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.2.1")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.8.5")
+
+addSbtPlugin("com.47deg"  % "sbt-microsites" % "0.6.1")

@@ -143,6 +143,11 @@ lazy val commonsJVM = commons.jvm
 lazy val commonsJS = commons.js
 lazy val commonsNative = commons.native
 
+lazy val docs = project
+  .dependsOn(coreJVM, testingJVM, model, controlJVM,
+             remote, vision, frc, config, sensors,
+             commonsJVM, lighting)
+
 publishArtifact := false
 
 publishMavenStyle := true
