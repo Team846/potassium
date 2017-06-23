@@ -1,0 +1,28 @@
+options:
+  - title: Getting Started
+    url: intro/
+    menu_type: intro
+    menu_section: intro
+
+  - title: Potassium Principles
+    url: intro/principles.html
+    menu_type: intro
+    menu_section: intro
+
+  - title: FIRST Robotics
+    url: intro/frc.html
+    menu_type: intro
+    menu_section: intro
+
+  - title: Core
+    url: core/
+    menu_type: core
+    menu_section: core
+
+  - title: Tasks
+    url: core/tasks/
+    menu_type: core
+    menu_section: tasks
+    nested_options:
+     - title: Finite Tasks
+       url: core/tasks/finite.html

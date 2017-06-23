@@ -27,7 +27,7 @@ class JSClockTest extends AsyncFunSuite {
       }
     })
 
-    future.map(t => assert(t <= 250))
+    future.map(t => assert(t <= 500))
   }
 
   test("Single execution happens at correct time") {

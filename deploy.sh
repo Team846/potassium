@@ -4,7 +4,11 @@ set -e # exit with nonzero exit code if anything fails
 
 # install ssh keys
 openssl aes-256-cbc -K $encrypted_1df6839761c3_key -iv $encrypted_1df6839761c3_iv -in .travisdeploykey.enc -out .travisdeploykey -d
+openssl aes-256-cbc -K $encrypted_2aaf6d71beae_key -iv $encrypted_2aaf6d71beae_iv -in travis-deploy-key.enc -out travis-deploy-key -d
+
 chmod go-rwx .travisdeploykey
+chmod go-rwx travis-deploy-key
+
 eval `ssh-agent -s`
 ssh-add .travisdeploykey
 
@@ -17,8 +21,8 @@ sbt publish
 cd repo
 
 # inside this git repo we'll pretend to be a new user
-git config user.name "Travis CI"
-git config user.email "robot@lynbrookrobotics.com"
+git config --global user.name "Travis CI"
+git config --global user.email "robot@lynbrookrobotics.com"
 
 # The first and only commit to this new Git repo contains all the
 # files present with the commit message "Deploy to GitHub Pages".
@@ -30,3 +34,10 @@ git commit -m "Automated deploy to GitHub Pages"
 # will be lost, since we are overwriting it.) We redirect any output to
 # /dev/null to hide any sensitive credential data that might otherwise be exposed.
 git push --force --quiet "git@github.com:Team846/repo.git" gh-pages:gh-pages > /dev/null 2>&1
+
+cd ..
+
+ssh-add -D
+ssh-add travis-deploy-key
+
+sbt ';project docs; publishMicrosite'

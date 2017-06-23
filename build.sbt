@@ -17,6 +17,8 @@ scalaVersion in ThisBuild := "2.12.1"
 
 resolvers in ThisBuild += "Funky-Repo" at "http://team846.github.io/repo"
 
+parallelExecution in Test in ThisBuild := false
+
 lazy val sharedDependencies = Def.setting(Seq(
   "org.typelevel"  %%% "squants"  % "1.3.0-1",
   "org.scalatest" %%% "scalatest" % "3.0.1" % Test,
@@ -142,6 +144,11 @@ lazy val commons = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossTy
 lazy val commonsJVM = commons.jvm
 lazy val commonsJS = commons.js
 lazy val commonsNative = commons.native
+
+lazy val docs = project
+  .dependsOn(coreJVM, testingJVM, model, controlJVM,
+             remote, vision, frc, config, sensors,
+             commonsJVM, lighting)
 
 publishArtifact := false
 
