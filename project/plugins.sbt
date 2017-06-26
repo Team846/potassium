@@ -6,7 +6,7 @@ addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.1.0")
 
 addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
 
-addSbtPlugin("com.lynbrookrobotics" % "travis-scalastyle" % "0.2.0-SNAPSHOT")
+addSbtPlugin("com.lynbrookrobotics" % "travis-scalastyle" % "0.2.0")
 
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.16")
 

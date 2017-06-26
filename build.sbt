@@ -20,7 +20,7 @@ resolvers in ThisBuild += "Funky-Repo" at "http://team846.github.io/repo"
 parallelExecution in Test in ThisBuild := false
 
 lazy val sharedDependencies = Def.setting(Seq(
-  "org.typelevel"  %%% "squants"  % "1.3.0-1",
+  "org.typelevel"  %%% "squants"  % "1.3.0",
   "org.scalatest" %%% "scalatest" % "3.0.1" % Test,
   "org.scalacheck" %%% "scalacheck" % "1.13.4" % Test
 ))
