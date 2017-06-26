@@ -1,18 +1,47 @@
 package com.lynbrookrobotics.potassium.streams
 
 import com.lynbrookrobotics.potassium.clock.Clock
-import squants.time.Time
+import squants.time.{Milliseconds, Time}
 
 import scala.collection.mutable
 import scala.ref.WeakReference
 
-abstract class Stream[T] {
+abstract class Stream[T] { self =>
+  final type Value = T
+
   val expectedPeriodicity: ExpectedPeriodicity
   private[this] val listeners = mutable.Queue.empty[T => Unit]
 
   protected def publishValue(value: T): Unit = {
     listeners.foreach(_(value))
     // TODO: more stuff maybe
+  }
+
+  /**
+    * Transforms a stream using a single value function from original stream
+    * input to new stream emission
+    * @param f the function to use to transform values
+    * @tparam O the type of values in the new stream
+    * @return a stream with values transformed by the given function
+    */
+  def map[O](f: T => O): Stream[O] = {
+    val ret = new Stream[O] {
+      override val expectedPeriodicity = self.expectedPeriodicity
+    }
+
+    val ptr = WeakReference(ret)
+
+    var cancel: Cancel = null
+    cancel = this.foreach { v =>
+      ptr.get match {
+        case Some(s) =>
+          s.publishValue(f(v))
+        case None =>
+          cancel()
+      }
+    }
+
+    ret
   }
 
   /**
@@ -124,6 +153,16 @@ abstract class Stream[T] {
   }
 
   /**
+    * Zips a stream with the time of value emission, for use in situations such as
+    * synchronizing data sent over the network or calculating time deltas
+    *
+    * @return a stream with tuples of emitted values and the time of emission
+    */
+  def zipWithTime: Stream[(T, Time)] = {
+    map(v => (v, Milliseconds(System.currentTimeMillis())))
+  }
+
+  /**
     * Adds a listener for elements of this stream. Callbacks will be executed
     * whenever a new value is published in order of when the callbacks were added.
     * Callbacks added first will be called first and callbacks added last will
@@ -153,14 +192,10 @@ object Stream {
   }
 
   def manual[T]: (Stream[T], T => Unit) = {
-    var publish: T => Unit = null
-
     val stream = new Stream[T] {
       override val expectedPeriodicity: ExpectedPeriodicity = NonPeriodic
-
-      publish = publishValue
     }
 
-    (stream, publish)
+    (stream, stream.publishValue)
   }
 }

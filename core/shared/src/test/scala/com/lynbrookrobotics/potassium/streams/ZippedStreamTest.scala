@@ -136,5 +136,4 @@ class ZippedStreamTest extends FunSuite {
 
     assert(lastValue == 6)
   }
-
 }
