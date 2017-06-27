@@ -199,6 +199,16 @@ abstract class Stream[T] { self =>
   }
 
   /**
+    * Zips the stream with the periods between when values were published
+    * @return a stream of values and times in tuples
+    */
+  def zipWithDt: Stream[(T, Time)] = {
+    zipWithTime.sliding(2).map { q =>
+      (q.last._1, q.last._2 - q.head._2)
+    }
+  }
+
+  /**
     * Adds a listener for elements of this stream. Callbacks will be executed
     * whenever a new value is published in order of when the callbacks were added.
     * Callbacks added first will be called first and callbacks added last will
