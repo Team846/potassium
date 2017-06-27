@@ -80,6 +80,8 @@ class StreamTest extends FunSuite {
   }
 
   test("Derivative of constant values is always zero") {
+    implicit val (clock, update) = ClockMocking.mockedClockTicker
+
     val (str, pub) = Stream.manual[Length]
     val derivative = str.derivative
 
@@ -91,13 +93,16 @@ class StreamTest extends FunSuite {
     assert(lastValue == null)
 
     (1 to 100).foreach { _ =>
-      Thread.sleep(1)
+      update(Milliseconds(1))
       pub(Feet(1))
       assert(lastValue.toMetersPerSecond == 0)
     }
   }
 
   test("Derivative of increasing values is always positive") {
+    implicit val (clock, update) = ClockMocking.mockedClockTicker
+    implicit val tolerance = Feet(0.001) / Milliseconds(1)
+
     val (str, pub) = Stream.manual[Length]
     val derivative = str.derivative
 
@@ -109,13 +114,15 @@ class StreamTest extends FunSuite {
     assert(lastValue == null)
 
     (1 to 100).foreach { n =>
-      Thread.sleep(1)
+      update(Milliseconds(1))
       pub(Feet(n))
-      assert(lastValue.toMetersPerSecond > 0)
+      assert(lastValue ~= Feet(1) / Milliseconds(1))
     }
   }
 
   test("Integral of zero is always zero") {
+    implicit val (clock, update) = ClockMocking.mockedClockTicker
+
     val (str, pub) = Stream.manual[Velocity]
     val integral = str.integral
 
@@ -127,30 +134,34 @@ class StreamTest extends FunSuite {
     assert(lastValue == null)
 
     (1 to 100).foreach { _ =>
-      Thread.sleep(1)
+      update(Milliseconds(1))
       pub(FeetPerSecond(0))
       assert(lastValue.toMeters == 0)
     }
   }
 
   test("Integral of positive values always increases") {
+    implicit val (clock, update) = ClockMocking.mockedClockTicker
+    implicit val tolerance = FeetPerSecond(0.001) * Milliseconds(1)
+
     val (str, pub) = Stream.manual[Velocity]
     val integral = str.integral
 
     var lastValue: Length = null
     integral.foreach(lastValue = _)
 
-    pub(FeetPerSecond(1))
+    pub(FeetPerSecond(0))
 
     assert(lastValue == null)
 
-    pub(FeetPerSecond(1))
+    update(Milliseconds(1))
+    pub(FeetPerSecond(0))
 
-    (1 to 100).foreach { _ =>
-      Thread.sleep(1)
+    (1 to 100).foreach { n =>
+      update(Milliseconds(1))
       val prev = lastValue
       pub(FeetPerSecond(1))
-      assert(lastValue > prev)
+      assert(lastValue ~= FeetPerSecond(1) * Milliseconds(n))
     }
   }
 }

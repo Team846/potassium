@@ -31,4 +31,6 @@ object JSClock extends Clock {
       thunk
     }, delay.toMilliseconds)
   }
+
+  override def currentTime: Time = Milliseconds(System.currentTimeMillis())
 }

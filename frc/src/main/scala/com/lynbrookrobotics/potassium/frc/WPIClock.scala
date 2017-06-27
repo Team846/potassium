@@ -35,4 +35,6 @@ object WPIClock extends Clock {
 
     notifier.startSingle(delay.to(Seconds))
   }
+
+  override def currentTime: Time = Microseconds(Utility.getFPGATime)
 }

@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.streams
 
+import com.lynbrookrobotics.potassium.ClockMocking
 import org.scalatest.FunSuite
 
 import scala.ref.WeakReference
@@ -58,6 +59,8 @@ class DeallocationTest extends FunSuite {
   }
 
   test("Zipped with time streams can be deallocated") {
+    implicit val (clock, update) = ClockMocking.mockedClockTicker
+
     val parent = Stream.manual[Int]
     val ptr = WeakReference(parent._1.zipWithTime)
     parent._2(0)
