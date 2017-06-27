@@ -8,6 +8,8 @@ import squants.time.Milliseconds
 
 import scala.collection.immutable.Queue
 
+import com.lynbrookrobotics.potassium.Platform
+
 class StreamTest extends FunSuite {
   test("Manually created stream runs callbacks appropriately") {
     val (str, pub) = Stream.manual[Int]
@@ -180,6 +182,32 @@ class StreamTest extends FunSuite {
     assert(lastValue == -1)
 
     pubReference(1)
+
+    assert(lastValue == 1)
+  }
+
+  test("Deferring values produces correct values") {
+    val (str, pub) = Stream.manual[Int]
+    val deferred = str.defer
+    var lastValue = -1
+
+    val rootThread = Thread.currentThread()
+
+    deferred.foreach { v =>
+      if (Platform.isJVM) {
+        assert(Thread.currentThread() != rootThread)
+      }
+
+      lastValue = v
+    }
+
+    assert(lastValue == -1)
+
+    pub(1)
+
+    if (Platform.isJVM) {
+      Thread.sleep(10)
+    }
 
     assert(lastValue == 1)
   }

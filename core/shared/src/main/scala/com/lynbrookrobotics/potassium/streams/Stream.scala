@@ -1,5 +1,7 @@
 package com.lynbrookrobotics.potassium.streams
 
+import java.util.concurrent.Semaphore
+
 import com.lynbrookrobotics.potassium.clock.Clock
 import squants.Quantity
 import squants.time.{Milliseconds, Time, TimeDerivative, TimeIntegral}
@@ -7,6 +9,8 @@ import squants.time.{Milliseconds, Time, TimeDerivative, TimeIntegral}
 import scala.collection.immutable.Queue
 import scala.collection.mutable
 import scala.ref.WeakReference
+
+import com.lynbrookrobotics.potassium.Platform
 
 abstract class Stream[T] { self =>
   final type Value = T
@@ -271,6 +275,59 @@ abstract class Stream[T] { self =>
 
       case _ =>
         o.zipAsync(this).map(_._2)
+    }
+  }
+
+  /**
+    * Defers emitted values from this stream to another thread
+    * @return a stream that emits values in the context of a new thread
+    */
+  def defer: Stream[T] = {
+    if (Platform.isJVM) {
+      val ret = new Stream[T] {
+        override val expectedPeriodicity = self.expectedPeriodicity
+      }
+
+      val ptr = WeakReference(ret)
+
+      var lastValue: Option[T] = None
+      val semaphore = new Semaphore(0)
+      val thread = new Thread(new Runnable {
+        override def run(): Unit = {
+          var shouldRun = true
+          while (shouldRun) {
+            semaphore.acquire()
+
+            if (lastValue == null) {
+              shouldRun = false
+            } else {
+              lastValue.foreach { v =>
+                ptr.get.foreach(_.publishValue(v))
+              }
+            }
+          }
+        }
+      })
+
+      thread.start()
+
+
+      var cancel: Cancel = null
+      cancel = foreach { v =>
+        ptr.get match {
+          case Some(s) =>
+            lastValue = Some(v)
+            semaphore.release()
+
+          case None =>
+            lastValue = null
+            semaphore.release()
+        }
+      }
+
+      ret
+    } else {
+      this
     }
   }
 
