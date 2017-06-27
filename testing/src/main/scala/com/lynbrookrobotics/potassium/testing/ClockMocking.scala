@@ -4,7 +4,6 @@ import com.lynbrookrobotics.potassium.clock.Clock
 import squants.Time
 import squants.time.Seconds
 
-// copied from testing
 object ClockMocking {
   def mockedClockTicker: (Clock, Time => Unit) = {
     var thunks: Map[Time, List[(Time) => Unit]] = Map.empty
@@ -18,7 +17,7 @@ object ClockMocking {
           thunk :: thunks.getOrElse(period, List.empty)
         )
 
-        () => thunks.updated(period, thunks(period).filterNot(_ == thunk))
+        () => thunks = thunks.updated(period, thunks(period).filterNot(_ == thunk))
       }
 
       override def singleExecution(delay: Time)(thunk: => Unit): Unit = {
