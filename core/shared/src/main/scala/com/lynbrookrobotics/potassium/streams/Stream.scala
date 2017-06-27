@@ -259,6 +259,22 @@ abstract class Stream[T] { self =>
   }
 
   /**
+    * Produces a stream that emits values at the same rate as the given
+    * stream through polling
+    * @param o the stream to use as a reference for emission triggers
+    * @return a stream producing values in-sync with the given stream
+    */
+  def syncTo(o: Stream[_]): Stream[T] = {
+    (expectedPeriodicity, o.expectedPeriodicity) match {
+      case (Periodic(a), Periodic(b)) if a eq b =>
+        this
+
+      case _ =>
+        o.zipAsync(this).map(_._2)
+    }
+  }
+
+  /**
     * Adds a listener for elements of this stream. Callbacks will be executed
     * whenever a new value is published in order of when the callbacks were added.
     * Callbacks added first will be called first and callbacks added last will

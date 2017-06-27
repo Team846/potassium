@@ -75,4 +75,13 @@ class DeallocationTest extends FunSuite {
 
     testDeallocates(ptr)
   }
+
+  test("Synced streams can be deallocated") {
+    val ref = Stream.manual[Int]
+    val str = Stream.manual[Int]
+    val ptr = WeakReference(str._1.syncTo(ref._1))
+    ref._2(0)
+
+    testDeallocates(ptr)
+  }
 }

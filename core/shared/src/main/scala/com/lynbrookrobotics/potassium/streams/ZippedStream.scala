@@ -4,7 +4,7 @@ class ZippedStream[A, B](aPeriodicity: ExpectedPeriodicity,
                          bPeriodicity: ExpectedPeriodicity) extends Stream[(A, B)] {
   override val expectedPeriodicity: ExpectedPeriodicity = (aPeriodicity, bPeriodicity) match {
     case (Periodic(a), Periodic(b)) =>
-      if (a == b) {
+      if (a eq b) {
         Periodic(a)
       } else {
         NonPeriodic

@@ -164,4 +164,23 @@ class StreamTest extends FunSuite {
       assert(lastValue ~= FeetPerSecond(1) * Milliseconds(n))
     }
   }
+
+  test("Syncing to another stream produces values at correct rate") {
+    val (strReference, pubReference) = Stream.manual[Int]
+    val (str, pub) = Stream.manual[Int]
+    val strSynced = str.syncTo(strReference)
+
+    var lastValue = -1
+    strSynced.foreach(lastValue = _)
+
+    assert(lastValue == -1)
+
+    pub(1)
+
+    assert(lastValue == -1)
+
+    pubReference(1)
+
+    assert(lastValue == 1)
+  }
 }
