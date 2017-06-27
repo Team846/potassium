@@ -7,8 +7,10 @@ import squants.space.{Feet, Length}
 import squants.time.Milliseconds
 
 import scala.collection.immutable.Queue
-
 import com.lynbrookrobotics.potassium.Platform
+
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Promise}
 
 class StreamTest extends FunSuite {
   test("Manually created stream runs callbacks appropriately") {
@@ -193,12 +195,14 @@ class StreamTest extends FunSuite {
 
     val rootThread = Thread.currentThread()
 
+    val triggeredPromise = Promise[Unit]()
     deferred.foreach { v =>
       if (Platform.isJVM) {
         assert(Thread.currentThread() != rootThread)
       }
 
       lastValue = v
+      triggeredPromise.success(())
     }
 
     assert(lastValue == -1)
@@ -206,7 +210,7 @@ class StreamTest extends FunSuite {
     pub(1)
 
     if (Platform.isJVM) {
-      Thread.sleep(10)
+      Await.result(triggeredPromise.future, Duration.Inf)
     }
 
     assert(lastValue == 1)
