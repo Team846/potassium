@@ -29,7 +29,7 @@ class RemoteSignalsTest extends FunSuite {
 
     assert(clientSignal.get == number)
 
-    actorSystem.shutdown
+    Await.result(actorSystem.terminate(), Duration.Inf)
   }
 
   test("RemoteSignal successfully polls from a RemoteSignalProvider over the network") {
@@ -57,7 +57,7 @@ class RemoteSignalsTest extends FunSuite {
     clientSignal.actor ! PoisonPill
     hostActorRef ! PoisonPill
 
-    hostActorSystem.shutdown
-    clientActorSystem.shutdown
+    Await.result(hostActorSystem.terminate(), Duration.Inf)
+    Await.result(clientActorSystem.terminate(), Duration.Inf)
   }
 }
