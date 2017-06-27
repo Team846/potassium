@@ -1,7 +1,8 @@
 package com.lynbrookrobotics.potassium.streams
 
 import com.lynbrookrobotics.potassium.clock.Clock
-import squants.time.{Milliseconds, Time}
+import squants.Quantity
+import squants.time.{Milliseconds, Time, TimeDerivative, TimeIntegral}
 
 import scala.collection.immutable.Queue
 import scala.collection.mutable
@@ -199,6 +200,23 @@ abstract class Stream[T] { self =>
   }
 
   /**
+    * Applies an accumulator to the stream, combining the accumulated value
+    * with each emitted value of this stream to produce a new value
+    * @param initialValue the initial accumulated value
+    * @param f the accumulator to combine the value built and the latest emitted value
+    * @tparam U the type of the accumulated value
+    * @return a stream accumulating according to the given function
+    */
+  def scanLeft[U](initialValue: U)(f: (U, T) => U): Stream[U] = {
+    var latest = initialValue
+
+    map { v =>
+      latest = f(latest, v)
+      latest
+    }
+  }
+
+  /**
     * Zips the stream with the periods between when values were published
     * @return a stream of values and times in tuples
     */
@@ -206,6 +224,38 @@ abstract class Stream[T] { self =>
     zipWithTime.sliding(2).map { q =>
       (q.last._1, q.last._2 - q.head._2)
     }
+  }
+
+  /**
+    * Calculates the derivative of the stream, producing units of
+    * the derivative of the stream's units
+    * @return a stream producing values that are the derivative of the stream
+    */
+  def derivative[D <: Quantity[D] with TimeDerivative[_]](implicit intEv: T => TimeIntegral[D]): Stream[D] = {
+    zipWithTime.sliding(2).map { q =>
+      val dt = q.last._2 - q.head._2
+      (q.last._1 / dt) - (q.head._1 / dt)
+    }
+  }
+
+  /**
+    * Calculates the integral of the signal, producing units of
+    * the integral of the signal's units
+    * @return a signal producing values that are the integral of the signal
+    */
+  def integral[I <: Quantity[I] with TimeIntegral[_]](implicit derivEv: T => TimeDerivative[I]): Stream[I] = {
+    // We use null as a cheap way to handle the initial value since there is
+    // no way to get a "zero" for I
+
+    // scalastyle:off
+    zipWithDt.scanLeft(null.asInstanceOf[I]) { case (acc, (cur, dt)) =>
+      if (acc != null) {
+        acc + (cur: TimeDerivative[I]) * dt
+      } else {
+        (cur: TimeDerivative[I]) * dt
+      }
+    }
+    // scalastyle:on
   }
 
   /**

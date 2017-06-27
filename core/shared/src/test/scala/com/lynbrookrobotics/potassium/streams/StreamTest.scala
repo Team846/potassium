@@ -2,6 +2,8 @@ package com.lynbrookrobotics.potassium.streams
 
 import com.lynbrookrobotics.potassium.ClockMocking
 import org.scalatest.FunSuite
+import squants.motion.{FeetPerSecond, Velocity}
+import squants.space.{Feet, Length}
 import squants.time.Milliseconds
 
 import scala.collection.immutable.Queue
@@ -75,5 +77,80 @@ class StreamTest extends FunSuite {
     pub(3)
 
     assert(lastValue == Queue(2, 3))
+  }
+
+  test("Derivative of constant values is always zero") {
+    val (str, pub) = Stream.manual[Length]
+    val derivative = str.derivative
+
+    var lastValue: Velocity = null
+    derivative.foreach(lastValue = _)
+
+    pub(Feet(1))
+
+    assert(lastValue == null)
+
+    (1 to 100).foreach { _ =>
+      Thread.sleep(1)
+      pub(Feet(1))
+      assert(lastValue.toMetersPerSecond == 0)
+    }
+  }
+
+  test("Derivative of increasing values is always positive") {
+    val (str, pub) = Stream.manual[Length]
+    val derivative = str.derivative
+
+    var lastValue: Velocity = null
+    derivative.foreach(lastValue = _)
+
+    pub(Feet(0))
+
+    assert(lastValue == null)
+
+    (1 to 100).foreach { n =>
+      Thread.sleep(1)
+      pub(Feet(n))
+      assert(lastValue.toMetersPerSecond > 0)
+    }
+  }
+
+  test("Integral of zero is always zero") {
+    val (str, pub) = Stream.manual[Velocity]
+    val integral = str.integral
+
+    var lastValue: Length = null
+    integral.foreach(lastValue = _)
+
+    pub(FeetPerSecond(0))
+
+    assert(lastValue == null)
+
+    (1 to 100).foreach { _ =>
+      Thread.sleep(1)
+      pub(FeetPerSecond(0))
+      assert(lastValue.toMeters == 0)
+    }
+  }
+
+  test("Integral of positive values always increases") {
+    val (str, pub) = Stream.manual[Velocity]
+    val integral = str.integral
+
+    var lastValue: Length = null
+    integral.foreach(lastValue = _)
+
+    pub(FeetPerSecond(1))
+
+    assert(lastValue == null)
+
+    pub(FeetPerSecond(1))
+
+    (1 to 100).foreach { _ =>
+      Thread.sleep(1)
+      val prev = lastValue
+      pub(FeetPerSecond(1))
+      assert(lastValue > prev)
+    }
   }
 }
