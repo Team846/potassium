@@ -4,6 +4,8 @@ import com.lynbrookrobotics.potassium.ClockMocking
 import org.scalatest.FunSuite
 import squants.time.Milliseconds
 
+import scala.collection.immutable.Queue
+
 class StreamTest extends FunSuite {
   test("Manually created stream runs callbacks appropriately") {
     val (str, pub) = Stream.manual[Int]
@@ -40,7 +42,7 @@ class StreamTest extends FunSuite {
     assert(count == 2)
   }
 
-  test("Mapping stream produces corret values") {
+  test("Mapping stream produces correct values") {
     val (str, pub) = Stream.manual[Int]
     var lastValue = -1
 
@@ -52,5 +54,26 @@ class StreamTest extends FunSuite {
     pub(0)
 
     assert(lastValue == 1)
+  }
+
+  test("Sliding over a stream produces correct values") {
+    val (str, pub) = Stream.manual[Int]
+    var lastValue: Queue[Int] = null
+    val slid = str.sliding(2)
+    slid.foreach(lastValue = _)
+
+    assert(lastValue == null)
+
+    pub(1)
+
+    assert(lastValue == null)
+
+    pub(2)
+
+    assert(lastValue == Queue(1, 2))
+
+    pub(3)
+
+    assert(lastValue == Queue(2, 3))
   }
 }

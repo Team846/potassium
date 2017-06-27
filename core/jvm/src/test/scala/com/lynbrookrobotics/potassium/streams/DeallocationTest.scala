@@ -64,4 +64,12 @@ class DeallocationTest extends FunSuite {
 
     testDeallocates(ptr)
   }
+
+  test("Sliding streams can be deallocated") {
+    val parent = Stream.manual[Int]
+    val ptr = WeakReference(parent._1.sliding(2))
+    parent._2(0)
+
+    testDeallocates(ptr)
+  }
 }

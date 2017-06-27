@@ -3,6 +3,7 @@ package com.lynbrookrobotics.potassium.streams
 import com.lynbrookrobotics.potassium.clock.Clock
 import squants.time.{Milliseconds, Time}
 
+import scala.collection.immutable.Queue
 import scala.collection.mutable
 import scala.ref.WeakReference
 
@@ -160,6 +161,41 @@ abstract class Stream[T] { self =>
     */
   def zipWithTime: Stream[(T, Time)] = {
     map(v => (v, Milliseconds(System.currentTimeMillis())))
+  }
+
+  /**
+    * Applies a fixed size sliding window over the stream
+    * @param size the size of the window
+    * @return a stream returning complete windows
+    */
+  def sliding(size: Int): Stream[Queue[T]] = {
+    var last = Queue.empty[T]
+
+    val ret = new Stream[Queue[T]] {
+      override val expectedPeriodicity = self.expectedPeriodicity
+    }
+
+    val ptr = WeakReference(ret)
+
+    var cancel: Cancel = null
+    cancel = this.foreach { v =>
+      ptr.get match {
+        case Some(s) =>
+          if (last.size == size) {
+            last = last.tail
+          }
+
+          last = last :+ v
+
+          if (last.size == size) {
+            s.publishValue(last)
+          }
+        case None =>
+          cancel()
+      }
+    }
+
+    ret
   }
 
   /**
