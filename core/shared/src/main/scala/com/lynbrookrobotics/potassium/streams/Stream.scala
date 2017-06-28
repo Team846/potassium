@@ -280,6 +280,7 @@ abstract class Stream[T] { self =>
 
   /**
     * Defers emitted values from this stream to another thread
+    * Note: right now, this only works on the JVM
     * @return a stream that emits values in the context of a new thread
     */
   def defer: Stream[T] = {
@@ -329,6 +330,17 @@ abstract class Stream[T] { self =>
     } else {
       this
     }
+  }
+
+  /**
+    * Creates a stream that emits values at the given rate by polling
+    * from the original stream
+    * @param period the period to poll at
+    * @param clock the clock to use to schedule periodic events
+    * @return a stream emitting values from the original stream at the new rate
+    */
+  def pollPeriodic(period: Time)(implicit clock: Clock): Stream[T] = {
+    syncTo(Stream.periodic(period)(()))
   }
 
   /**

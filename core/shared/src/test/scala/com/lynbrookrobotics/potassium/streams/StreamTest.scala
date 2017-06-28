@@ -215,4 +215,23 @@ class StreamTest extends FunSuite {
 
     assert(lastValue == 1)
   }
+
+  test("Periodically polling a stream produces values at correct rate") {
+    implicit val (clock, update) = ClockMocking.mockedClockTicker
+    val (str, pub) = Stream.manual[Int]
+    val polled = str.pollPeriodic(Milliseconds(5))
+
+    var lastValue = -1
+    polled.foreach(lastValue = _)
+
+    assert(lastValue == -1)
+
+    pub(1)
+
+    assert(lastValue == -1)
+
+    update(Milliseconds(5))
+
+    assert(lastValue == 1)
+  }
 }
