@@ -234,4 +234,17 @@ class StreamTest extends FunSuite {
 
     assert(lastValue == 1)
   }
+
+  test("Check callbacks are called with correct values") {
+    val (str, pub) = Stream.manual[Int]
+
+    var emitted = -1
+    val checked = str.withCheck(emitted = _)
+
+    assert(emitted == -1)
+
+    pub(1)
+
+    assert(emitted == 1)
+  }
 }

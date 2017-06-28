@@ -344,6 +344,19 @@ abstract class Stream[T] { self =>
   }
 
   /**
+    * Adds a "check" in the stream pipeline, which can be used for things
+    * such as ending a task when a condition is met
+    * @param check the function to run on each value of the stream
+    * @return a stream that contains the check in the pipeline
+    */
+  def withCheck(check: T => Unit): Stream[T] = {
+    map { v =>
+      check(v)
+      v
+    }
+  }
+
+  /**
     * Adds a listener for elements of this stream. Callbacks will be executed
     * whenever a new value is published in order of when the callbacks were added.
     * Callbacks added first will be called first and callbacks added last will
