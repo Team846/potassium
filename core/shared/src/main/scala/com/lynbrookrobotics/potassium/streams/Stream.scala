@@ -357,6 +357,33 @@ abstract class Stream[T] { self =>
   }
 
   /**
+    * Filters a stream to only emit values that pass a certain condition
+    * @param condition the condition to filter stream values with
+    * @return a stream that only emits values that pass the condition
+    */
+  def filter(condition: T => Boolean): Stream[T] = {
+    val ret = new Stream[T] {
+      override val expectedPeriodicity = NonPeriodic
+    }
+
+    val ptr = WeakReference(ret)
+
+    var cancel: Cancel = null
+    cancel = this.foreach { v =>
+      ptr.get match {
+        case Some(s) =>
+          if (condition(v)) {
+            s.publishValue(v)
+          }
+        case None =>
+          cancel()
+      }
+    }
+
+    ret
+  }
+
+  /**
     * Adds a listener for elements of this stream. Callbacks will be executed
     * whenever a new value is published in order of when the callbacks were added.
     * Callbacks added first will be called first and callbacks added last will

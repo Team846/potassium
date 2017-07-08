@@ -247,4 +247,31 @@ class StreamTest extends FunSuite {
 
     assert(emitted == 1)
   }
+
+  test("Filter only lets passed values through") {
+    val (str, pub) = Stream.manual[Int]
+
+    var lastValue = -1
+
+    val filtered = str.filter(_ % 2 == 0)
+    filtered.foreach(lastValue = _)
+
+    assert(lastValue == -1)
+
+    pub(1)
+
+    assert(lastValue == -1)
+
+    pub(2)
+
+    assert(lastValue == 2)
+
+    pub(4)
+
+    assert(lastValue == 4)
+
+    pub(5)
+
+    assert(lastValue == 5)
+  }
 }
