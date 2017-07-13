@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.streams
 
-class AsyncZippedStream[A, B](master: ExpectedPeriodicity) extends Stream[(A, B)] {
+class AsyncZippedStream[A, B](master: ExpectedPeriodicity, parentA: Stream[A], parentB: Stream[B]) extends Stream[(A, B)] {
   override val expectedPeriodicity: ExpectedPeriodicity = master
 
   private[this] var followerSlot: Option[B] = None

@@ -272,6 +272,6 @@ class StreamTest extends FunSuite {
 
     pub(5)
 
-    assert(lastValue == 5)
+    assert(lastValue == 4)
   }
 }

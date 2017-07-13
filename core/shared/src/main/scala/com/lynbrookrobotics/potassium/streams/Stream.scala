@@ -4,7 +4,7 @@ import java.util.concurrent.Semaphore
 
 import com.lynbrookrobotics.potassium.clock.Clock
 import squants.Quantity
-import squants.time.{Milliseconds, Time, TimeDerivative, TimeIntegral}
+import squants.time.{Time, TimeDerivative, TimeIntegral}
 
 import scala.collection.immutable.Queue
 import scala.collection.mutable
@@ -16,6 +16,7 @@ abstract class Stream[T] { self =>
   final type Value = T
 
   val expectedPeriodicity: ExpectedPeriodicity
+
   private[this] val listeners = mutable.Queue.empty[T => Unit]
 
   protected def publishValue(value: T): Unit = {
@@ -32,6 +33,7 @@ abstract class Stream[T] { self =>
     */
   def map[O](f: T => O): Stream[O] = {
     val ret = new Stream[O] {
+      val parent = self
       override val expectedPeriodicity = self.expectedPeriodicity
     }
 
@@ -58,7 +60,7 @@ abstract class Stream[T] { self =>
     * @return a stream with the values from both streams brought together
     */
   def zip[O](other: Stream[O]): Stream[(T, O)] = {
-    val ret = new ZippedStream[T, O](expectedPeriodicity, other.expectedPeriodicity)
+    val ret = new ZippedStream[T, O](expectedPeriodicity, other.expectedPeriodicity, this, other)
     val ptr = WeakReference(ret)
 
     var aCancel: Cancel = null
@@ -95,7 +97,7 @@ abstract class Stream[T] { self =>
     * @return a stream with the values from both streams brought together
     */
   def zipAsync[O](other: Stream[O]): Stream[(T, O)] = {
-    val ret = new AsyncZippedStream[T, O](expectedPeriodicity)
+    val ret = new AsyncZippedStream[T, O](expectedPeriodicity, this, other)
     val ptr = WeakReference(ret)
 
     var aCancel: Cancel = null
@@ -131,7 +133,7 @@ abstract class Stream[T] { self =>
     * @return a stream with the values from both streams brought together
     */
   def zipEager[O](other: Stream[O]): Stream[(T, O)] = {
-    val ret = new EagerZippedStream[T, O]
+    val ret = new EagerZippedStream[T, O](this, other)
     val ptr = WeakReference(ret)
 
     var aCancel: Cancel = null
@@ -286,6 +288,7 @@ abstract class Stream[T] { self =>
   def defer: Stream[T] = {
     if (Platform.isJVM) {
       val ret = new Stream[T] {
+        val parent = self
         override val expectedPeriodicity = self.expectedPeriodicity
       }
 
@@ -363,6 +366,7 @@ abstract class Stream[T] { self =>
     */
   def filter(condition: T => Boolean): Stream[T] = {
     val ret = new Stream[T] {
+      val parent = self
       override val expectedPeriodicity = NonPeriodic
     }
 

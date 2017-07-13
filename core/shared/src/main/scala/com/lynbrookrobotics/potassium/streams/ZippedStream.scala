@@ -1,7 +1,8 @@
 package com.lynbrookrobotics.potassium.streams
 
 class ZippedStream[A, B](aPeriodicity: ExpectedPeriodicity,
-                         bPeriodicity: ExpectedPeriodicity) extends Stream[(A, B)] {
+                         bPeriodicity: ExpectedPeriodicity,
+                         parentA: Stream[A], parentB: Stream[B]) extends Stream[(A, B)] {
   override val expectedPeriodicity: ExpectedPeriodicity = (aPeriodicity, bPeriodicity) match {
     case (Periodic(a), Periodic(b)) =>
       if (a eq b) {
