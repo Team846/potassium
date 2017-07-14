@@ -97,14 +97,14 @@ abstract class Stream[T] { self =>
     * @return a stream with the values from both streams brought together
     */
   def zipAsync[O](other: Stream[O]): Stream[(T, O)] = {
-    val ret = new AsyncZippedStream[T, O](expectedPeriodicity, this, other)
+    val ret = new AsyncZippedStream[T, O](this, other)
     val ptr = WeakReference(ret)
 
     var aCancel: Cancel = null
     aCancel = this.foreach { a =>
       ptr.get match {
         case Some(s) =>
-          s.receiveMaster(a)
+          s.receivePrimary(a)
         case None =>
           aCancel()
       }
@@ -115,7 +115,7 @@ abstract class Stream[T] { self =>
     bCancel = other.foreach { b =>
       ptr.get match {
         case Some(s) =>
-          s.receiveFollower(b)
+          s.receiveSecondary(b)
         case None =>
           bCancel()
       }
