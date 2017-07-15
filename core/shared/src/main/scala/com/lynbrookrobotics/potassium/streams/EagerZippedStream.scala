@@ -6,7 +6,7 @@ class EagerZippedStream[A, B](parentA: Stream[A], parentB: Stream[B]) extends St
   private[this] var lastASlot : Option[A] = None
   private[this] var lastBSlot : Option[B] = None
 
-  def maybePublish(): Unit = {
+  def attemptPublish(): Unit = {
     if (lastASlot.isDefined && lastBSlot.isDefined) {
       publishValue((lastASlot.get, lastBSlot.get))
     }
@@ -14,11 +14,11 @@ class EagerZippedStream[A, B](parentA: Stream[A], parentB: Stream[B]) extends St
 
   def receiveA(value: A): Unit = {
     lastASlot = Some(value)
-    maybePublish()
+    attemptPublish()
   }
 
   def receiveB(value: B): Unit = {
     lastBSlot = Some(value)
-    maybePublish()
+    attemptPublish()
   }
 }

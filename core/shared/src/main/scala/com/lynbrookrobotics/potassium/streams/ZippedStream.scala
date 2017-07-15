@@ -17,7 +17,7 @@ class ZippedStream[A, B](aPeriodicity: ExpectedPeriodicity,
   private[this] var aSlot: Option[A] = None
   private[this] var bSlot: Option[B] = None
 
-  def maybePublishPair(): Unit = {
+  def attemptPublish(): Unit = {
     if (aSlot.isDefined && bSlot.isDefined) {
       publishValue((aSlot.get, bSlot.get))
       aSlot = None
@@ -27,11 +27,11 @@ class ZippedStream[A, B](aPeriodicity: ExpectedPeriodicity,
 
   def receiveA(aValue: A): Unit = {
     aSlot = Some(aValue)
-    maybePublishPair()
+    attemptPublish()
   }
 
   def receiveB(bValue: B): Unit = {
     bSlot = Some(bValue)
-    maybePublishPair()
+    attemptPublish()
   }
 }
