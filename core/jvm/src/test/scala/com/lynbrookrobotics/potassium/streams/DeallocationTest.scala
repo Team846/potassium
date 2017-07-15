@@ -10,7 +10,7 @@ class DeallocationTest extends FunSuite {
     var count = 0
 
     while (value.get.isDefined) {
-      if (count >= 10) {
+      if (count >= 20) {
         assert(false, "Did not deallocate")
       }
 
