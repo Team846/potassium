@@ -19,6 +19,14 @@ class DeallocationTest extends FunSuite {
     }
   }
 
+  private def testDoesNotDeallocate[T <: AnyRef](value: WeakReference[T]): Unit = {
+    (1 to 20).foreach(_ => System.gc())
+
+    if (value.get.isEmpty) {
+      assert(false, "Did deallocate")
+    }
+  }
+
   test("Mapped streams can be deallocated") {
     val parent = Stream.manual[Int]
     val ptr = WeakReference(parent._1.map(_ + 1))
@@ -83,5 +91,15 @@ class DeallocationTest extends FunSuite {
     ref._2(0)
 
     testDeallocates(ptr)
+  }
+
+  test("Mapped intermediate streams are not deallocated") {
+    val (parent, pub) = Stream.manual[Int]
+    var middle = parent.map(_ + 1)
+    val ptr = WeakReference(middle)
+    val last = middle.map(_ + 1)
+    middle = null
+
+    testDoesNotDeallocate(ptr)
   }
 }
