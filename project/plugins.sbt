@@ -19,3 +19,5 @@ addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.2.1")
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.8.5")
 
 addSbtPlugin("com.47deg"  % "sbt-microsites" % "0.6.1")
+
+addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.0")

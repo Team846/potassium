@@ -145,10 +145,21 @@ lazy val commonsJVM = commons.jvm
 lazy val commonsJS = commons.js
 lazy val commonsNative = commons.native
 
+lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site target directory for api docs")
+
 lazy val docs = project
+  .enablePlugins(ScalaUnidocPlugin)
   .dependsOn(coreJVM, testingJVM, model, controlJVM,
              remote, vision, frc, config, sensors,
              commonsJVM, lighting)
+  .settings(
+    autoAPIMappings := true,
+    docsMappingsAPIDir := "api",
+    addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docsMappingsAPIDir),
+    unidocProjectFilter in (ScalaUnidoc, unidoc) :=
+      inProjects(coreJVM, testingJVM, model, controlJVM,
+        remote, vision, frc, config, lighting, sensors, commonsJVM)
+  )
 
 publishArtifact := false
 
