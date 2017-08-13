@@ -6,7 +6,7 @@ micrositeDescription := "A framework for writing robot software in Scala"
 
 micrositeAuthor := "Lynbrook Robotics"
 
-micrositeDocumentationUrl := "/docs"
+micrositeDocumentationUrl := "api"
 
 micrositeOrganizationHomepage := "http://lynbrookrobotics.com"
 
