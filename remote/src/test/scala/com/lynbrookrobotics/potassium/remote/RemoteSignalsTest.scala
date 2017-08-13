@@ -44,7 +44,7 @@ class RemoteSignalsTest extends FunSuite {
     val provider = new RemoteSignalProvider[Double]("sample-signal", signalOnHost)(hostActorSystem)
 
     val clientActorSystem = ActorSystem("client", ConfigFactory.load("client-test.conf"))
-    val hostActorSelection = clientActorSystem.actorSelection("akka.udp://host@localhost:10846/user/sample-signal")
+    val hostActorSelection = clientActorSystem.actorSelection("akka.udp://host@127.0.0.1:10846/user/sample-signal")
     val selectionFuture = hostActorSelection.resolveOne(5 second)
     val hostActorRef: ActorRef = Await.result(selectionFuture, 5 second)
 
