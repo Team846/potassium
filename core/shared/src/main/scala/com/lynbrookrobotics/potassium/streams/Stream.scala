@@ -47,7 +47,7 @@ abstract class Stream[T] { self =>
         case Some(s) =>
           s.publishValue(f(v))
         case None =>
-          cancel()
+          cancel.apply()
       }
     }
 
@@ -71,7 +71,7 @@ abstract class Stream[T] { self =>
         case Some(s) =>
           s.receiveA(a)
         case None =>
-          aCancel()
+          aCancel.apply()
       }
     }
 
@@ -82,7 +82,7 @@ abstract class Stream[T] { self =>
         case Some(s) =>
           s.receiveB(b)
         case None =>
-          bCancel()
+          bCancel.apply()
       }
     }
 
@@ -108,7 +108,7 @@ abstract class Stream[T] { self =>
         case Some(s) =>
           s.receivePrimary(a)
         case None =>
-          aCancel()
+          aCancel.apply()
       }
     }
 
@@ -119,7 +119,7 @@ abstract class Stream[T] { self =>
         case Some(s) =>
           s.receiveSecondary(b)
         case None =>
-          bCancel()
+          bCancel.apply()
       }
     }
 
@@ -144,7 +144,7 @@ abstract class Stream[T] { self =>
         case Some(s) =>
           s.receiveA(a)
         case None =>
-          aCancel()
+          aCancel.apply()
       }
     }
 
@@ -155,7 +155,7 @@ abstract class Stream[T] { self =>
         case Some(s) =>
           s.receiveB(b)
         case None =>
-          bCancel()
+          bCancel.apply()
       }
     }
 
@@ -200,7 +200,7 @@ abstract class Stream[T] { self =>
             s.publishValue(last)
           }
         case None =>
-          cancel()
+          cancel.apply()
       }
     }
 
@@ -382,7 +382,7 @@ abstract class Stream[T] { self =>
             s.publishValue(v)
           }
         case None =>
-          cancel()
+          cancel.apply()
       }
     }
 
