@@ -20,7 +20,7 @@ abstract class Stream[T] { self =>
   private[this] val listeners = mutable.Queue.empty[T => Unit]
 
   protected def publishValue(value: T): Unit = {
-    synchronized {
+    listeners.synchronized {
       listeners.foreach(_.apply(value))
     }
     // TODO: more stuff maybe
@@ -399,12 +399,12 @@ abstract class Stream[T] { self =>
     * @return a function to call to remove the listener
     */
   def foreach(thunk: T => Unit): Cancel = {
-    synchronized {
+    listeners.synchronized {
       listeners.enqueue(thunk)
     }
 
     () => {
-      synchronized {
+      listeners.synchronized {
         listeners.dequeueFirst(_ eq thunk)
       }
     }
