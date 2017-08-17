@@ -38,4 +38,6 @@ trait Clock {
 
     source.event
   }
+
+  def currentTime: Time
 }

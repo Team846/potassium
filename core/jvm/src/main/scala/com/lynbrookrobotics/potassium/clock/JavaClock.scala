@@ -37,4 +37,6 @@ object JavaClock extends Clock {
       }
     }, delay.to(Milliseconds).toLong, TimeUnit.MILLISECONDS)
   }
+
+  override def currentTime: Time = Milliseconds(System.currentTimeMillis())
 }
