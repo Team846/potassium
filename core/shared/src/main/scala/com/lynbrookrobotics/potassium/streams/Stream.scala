@@ -55,6 +55,24 @@ abstract class Stream[T] { self =>
   }
 
   /**
+    * Relativizes the stream according to the given function, which takes a base value
+    * and the current value and returns the meaningful difference between them
+    * @param f the function producing a difference between the base and latest value
+    * @tparam O the type of values in the new stream
+    * @return a new stream with values relativized against the next value from this stream
+    */
+  def relativize[O](f: (T, T) => O): Stream[O] = {
+    var lastValue: Option[T] = None
+    map { v =>
+      if (lastValue.isEmpty) {
+        lastValue = Some(v)
+      }
+
+      f(lastValue.get, v)
+    }
+  }
+
+  /**
     * Merges two streams, with a value published from the resulting stream
     * whenever the parent streams have both published a new value
     * @param other the stream to merge with

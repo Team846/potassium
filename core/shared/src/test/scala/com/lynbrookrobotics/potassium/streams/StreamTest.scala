@@ -274,4 +274,29 @@ class StreamTest extends FunSuite {
 
     assert(lastValue == 4)
   }
+
+  test("Relativized stream produces correct values") {
+    val (str, pub) = Stream.manual[Int]
+
+    pub(1)
+
+    var emitted = -1
+
+    val relativized = str.relativize((b, c) => c - b)
+    relativized.foreach(emitted = _)
+
+    assert(emitted == -1)
+
+    pub(2)
+
+    assert(emitted == 0)
+
+    pub(3)
+
+    assert(emitted == 1)
+
+    pub(5)
+
+    assert(emitted == 3)
+  }
 }
