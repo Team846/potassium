@@ -1,36 +1,37 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
+import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.control.{PIDConfig, PIDF}
 import com.lynbrookrobotics.potassium.units._
-import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, SignalLike}
+import com.lynbrookrobotics.potassium.{Component, Signal}
 import squants.motion.{AngularVelocity, MetersPerSecond, MetersPerSecondSquared, RadiansPerSecond}
 import squants.space.{Meters, Radians}
 import squants.time.Seconds
 import squants.{Angle, Dimensionless, Each, Length, Percent, Time, Velocity}
 
 trait TwoSidedDriveHardware extends UnicycleHardware {
-  val leftVelocity: Signal[Velocity]
-  val rightVelocity: Signal[Velocity]
+  val leftVelocity: Stream[Velocity]
+  val rightVelocity: Stream[Velocity]
 
-  val leftPosition: Signal[Length]
-  val rightPosition: Signal[Length]
+  val leftPosition: Stream[Length]
+  val rightPosition: Stream[Length]
 
   val track: Length
 
-  lazy val forwardVelocity: Signal[Velocity] =
+  lazy val forwardVelocity: Stream[Velocity] =
     leftVelocity.zip(rightVelocity).map(t => (t._1 + t._2) / 2)
 
-  lazy val turnVelocity: Signal[AngularVelocity] = {
+  lazy val turnVelocity: Stream[AngularVelocity] = {
     rightVelocity.zip(leftVelocity).map { case (r, l) =>
       RadiansPerSecond(((l - r) * Seconds(1)) / track)
     }
   }
 
-  lazy val forwardPosition: Signal[Length] =
+  lazy val forwardPosition: Stream[Length] =
     leftPosition.zip(rightPosition).map(t => (t._1 + t._2) / 2)
 
-  lazy val turnPosition: Signal[Angle] = leftPosition.zip(rightPosition).map(t =>
+  lazy val turnPosition: Stream[Angle] = leftPosition.zip(rightPosition).map(t =>
     Radians((t._1 - t._2) / track)
   )
 }
@@ -88,41 +89,41 @@ abstract class TwoSidedDrive(updatePeriod: Time)(implicit clock: Clock)
     TwoSidedVelocity(props.maxLeftVelocity * drive.left, props.maxRightVelocity * drive.right)
   }
 
-  protected def driveClosedLoop(signal: SignalLike[TwoSidedSignal])
+  protected def driveClosedLoop(signal: Stream[TwoSidedSignal])
                                (implicit hardware: Hardware,
-                                props: Signal[Properties]): PeriodicSignal[TwoSidedSignal] =
+                                props: Signal[Properties]): Stream[TwoSidedSignal] =
     TwoSidedControllers.closedLoopControl(signal)
 
   object TwoSidedControllers {
-    def velocityControl(target: SignalLike[TwoSidedVelocity])
+    def velocityControl(target: Stream[TwoSidedVelocity])
                        (implicit hardware: Hardware,
-                        props: Signal[Properties]): PeriodicSignal[TwoSidedSignal] = {
+                        props: Signal[Properties]): Stream[TwoSidedSignal] = {
       import hardware._
 
       val leftControl = PIDF.pidf(
-        leftVelocity.toPeriodic,
-        target.map(_.left).toPeriodic,
+        leftVelocity,
+        target.map(_.left),
         props.map(_.leftControlGainsFull)
       )
 
       val rightControl = PIDF.pidf(
-        rightVelocity.toPeriodic,
-        target.map(_.right).toPeriodic,
+        rightVelocity,
+        target.map(_.right),
         props.map(_.rightControlGainsFull)
       )
 
       leftControl.zip(rightControl).map(s => TwoSidedSignal(s._1, s._2))
     }
 
-    def closedLoopControl(signal: SignalLike[TwoSidedSignal])
+    def closedLoopControl(signal: Stream[TwoSidedSignal])
                          (implicit hardware: Hardware,
-                          props: Signal[Properties]): PeriodicSignal[TwoSidedSignal] = {
+                          props: Signal[Properties]): Stream[TwoSidedSignal] = {
       velocityControl(signal.map(s => expectedVelocity(s)(props.get)))
     }
   }
 
   class Drivetrain(implicit hardware: Hardware, props: Signal[Properties]) extends Component[TwoSidedSignal](updatePeriod) {
-    override def defaultController: PeriodicSignal[TwoSidedSignal] = self.defaultController
+    override def defaultController: Stream[TwoSidedSignal] = self.defaultController
 
     override def applySignal(signal: TwoSidedSignal): Unit = {
       output(hardware, signal)

@@ -1,7 +1,8 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.clock.Clock
-import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal}
+import com.lynbrookrobotics.potassium.{Component, Signal}
+import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask}
 import squants.{Acceleration, Angle, Dimensionless, Length, Percent, Time, Velocity}
 import squants.motion.{AngularVelocity, DegreesPerSecond, Distance, FeetPerSecond}
@@ -17,7 +18,7 @@ trait UnicycleCoreTasks {
 
   import controllers._
 
-  class DriveOpenLoop(forward: Signal[Dimensionless], turn: Signal[Dimensionless])
+  class DriveOpenLoop(forward: Stream[Dimensionless], turn: Stream[Dimensionless])
     (implicit drive: Drivetrain, hardware: DrivetrainHardware,
       props: Signal[DrivetrainProperties]) extends ContinuousTask {
     override def onStart(): Unit = {
@@ -31,7 +32,7 @@ trait UnicycleCoreTasks {
   }
 
 
-  class ContinuousClosedDrive(forward: Signal[Dimensionless], turn: Signal[Dimensionless])
+  class ContinuousClosedDrive(forward: Stream[Dimensionless], turn: Stream[Dimensionless])
                              (implicit drive: Drivetrain, hardware: DrivetrainHardware,
                               props: Signal[DrivetrainProperties]) extends ContinuousTask {
     override def onStart(): Unit = {
@@ -44,7 +45,7 @@ trait UnicycleCoreTasks {
     }
   }
 
-  class ContinuousVelocityDrive(forward: Signal[Velocity], turn: Signal[AngularVelocity])
+  class ContinuousVelocityDrive(forward: Stream[Velocity], turn: Stream[AngularVelocity])
                                (implicit drive: Drivetrain,
                                 hardware: DrivetrainHardware,
                                 props: Signal[DrivetrainProperties]) extends ContinuousTask {
@@ -63,11 +64,13 @@ trait UnicycleCoreTasks {
                       hardware: DrivetrainHardware,
                       props: Signal[DrivetrainProperties]) extends FiniteTask {
     override def onStart(): Unit = {
+      // TODO: case for Stream.get
       val absoluteDistance = hardware.forwardPosition.get + distance
+//      val absoluteDistance = hardware.forwardPosition.get + distance
       val (controller, error) = forwardPositionControl(absoluteDistance)
 
-      val checkedController = controller.withCheck { _ =>
-        if (error.get.abs < tolerance) {
+      val checkedController = controller.withCheckZipped(error) { error =>
+        if (error.abs < tolerance) {
           finished()
         }
       }
@@ -84,7 +87,7 @@ trait UnicycleCoreTasks {
                                             finalVelocity: Velocity,
                                             acceleration: Acceleration,
                                             targetDistance: Length,
-                                            position: Signal[Length],
+                                            position: Stream[Length],
                                             tolerance: Length,
                                             toleranceAngle: Angle)
                                            (implicit drive: Drivetrain,
@@ -113,7 +116,8 @@ trait UnicycleCoreTasks {
       val forwardOutput = velocity.map(UnicycleVelocity(_, DegreesPerSecond(0)).toUnicycleSignal)
       val combinedController = forwardOutput.zip(turnController).map(t => t._1 + t._2)
 
-      drive.setController(lowerLevelVelocityControl(speedControl(combinedController)).withCheck { _ =>
+      val uncCheckedController = lowerLevelVelocityControl(speedControl(combinedController))
+      drive.setController(uncCheckedController.withCheck { _ =>
           if (forwardError.get.abs < tolerance && turnError.get.abs < toleranceAngle) {
             finished()
           }
@@ -193,9 +197,9 @@ trait UnicycleCoreTasks {
       val absoluteDistance = hardware.forwardPosition.get + distance
       val (forwardController, forwardError) = (
         if (distance.value > 0) {
-          Signal.constant(maxSpeed).toPeriodic
+          hardware.forwardPosition.mapToConstant(maxSpeed)
         } else {
-          Signal.constant(-maxSpeed).toPeriodic
+          hardware.forwardPosition.mapToConstant(-maxSpeed)
         },
         hardware.forwardPosition.map(absoluteDistance - _)
       )
@@ -281,12 +285,12 @@ trait UnicycleCoreTasks {
     }
   }
 
-  class CorrectOffsetWithLatency(timestampedOffset: Signal[(Angle, Time)], tolerance: Angle)
+  class CorrectOffsetWithLatency(timestampedOffset: Stream[(Angle, Time)], tolerance: Angle)
     (implicit drive: Drivetrain,
       hardware: DrivetrainHardware,
       props: Signal[DrivetrainProperties]) extends FiniteTask {
 
-    val positionSlide: PeriodicSignal[Queue[(Angle, Time)]] = hardware.turnPosition.toPeriodic.zipWithTime.sliding(
+    val positionSlide: Stream[Queue[(Angle, Time)]] = hardware.turnPosition.zipWithTime.sliding(
       20, (hardware.turnPosition.get, Milliseconds(System.currentTimeMillis()))
     )
 

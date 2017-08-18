@@ -3,7 +3,10 @@ package com.lynbrookrobotics.potassium.commons.drivetrain
 import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
+import com.lynbrookrobotics.potassium.streams.Stream
+
 import squants.{Angle, Dimensionless, Percent, Time}
+
 import squants.space.{Angle, _}
 
 trait PurePursuitControllers extends UnicycleCoreControllers {
@@ -14,17 +17,17 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     * @param hardware unicycle hardware
     * @return dimensionless, forward output value and distance to target
     */
-  def pointDistanceControl(position: PeriodicSignal[Point],
-                           target: PeriodicSignal[Point])
+  def pointDistanceControl(position: Stream[Point],
+                           target: Stream[Point])
                           (implicit properties: Signal[UnicycleProperties],
-                           hardware: UnicycleHardware): (PeriodicSignal[Dimensionless],
-                                                   PeriodicSignal[Length]) = {
+                           hardware: UnicycleHardware): (Stream[Dimensionless],
+                                                   Stream[Length]) = {
     val distanceToTarget = position.zip(target).map { p =>
       p._1 distanceTo p._2
     }
 
     (PIDF.pid(
-      Signal.constant(Feet(0)).toPeriodic,
+      distanceToTarget.mapToConstant(Feet(0)),
       distanceToTarget,
       properties.map(_.forwardPositionControlGains)),
       distanceToTarget)
@@ -100,18 +103,18 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     * @return turn output, what to multiply forward output by (1 for forward, -1 for backwards),
     *         lookAheadPoint
     */
-  def purePursuitControllerTurn(turnPosition: Signal[Angle],
-                                position: PeriodicSignal[Point],
-                                biSegmentPath: Signal[(Segment, Option[Segment])])
-                               (implicit properties: Signal[DrivetrainProperties], hardware: DrivetrainHardware): (PeriodicSignal[Dimensionless],
-                                                                                   PeriodicSignal[Double],
-                                                                                   PeriodicSignal[Point]) = {
-    val lookAheadPoint = position.zip(properties).zip(biSegmentPath).map{p =>
-      val ((pose, props), path) = p
+  def purePursuitControllerTurn(turnPosition: Stream[Angle],
+                                position: Stream[Point],
+                                biSegmentPath: Stream[(Segment, Option[Segment])])
+                               (implicit props: Signal[DrivetrainProperties], hardware: DrivetrainHardware): (Stream[Dimensionless],
+                                                                                   Stream[Double],
+                                                                                   Stream[Point]) = {
+    val lookAheadPoint = position.zip(biSegmentPath).map{p =>
+      val (pose, path) = p
       getExtrapolatedLookAheadPoint(
         path,
         pose,
-        props.defaultLookAheadDistance
+        props.get.defaultLookAheadDistance
       )
     }
 
@@ -137,9 +140,9 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
 
     (
       PIDF.pid(
-        turnPosition.toPeriodic,
+        turnPosition,
         compassHeadingToLookAhead,
-        properties.map(_.turnPositionControlGains)
+        props.map(_.turnPositionControlGains)
       ),
       forwardMultiplier,
       lookAheadPoint
@@ -169,10 +172,10 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
   }
 
   def followWayPointsController(wayPoints: Seq[Point],
-                                position: PeriodicSignal[Point],
-                                turnPosition: Signal[Angle])
+                                position: Stream[Point],
+                                turnPosition: Stream[Angle])
                                 (implicit hardware: DrivetrainHardware,
-                                props: Signal[DrivetrainProperties]): (PeriodicSignal[UnicycleSignal], Signal[Option[Length]]) = {
+                                props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
     var previousLookAheadPoint: Option[Point] = None
 
     val biSegmentPaths = wayPoints.sliding(3).map { points =>
@@ -188,7 +191,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
 
     var currPath: (Segment, Option[Segment]) = biSegmentPaths.next()
 
-    val selectedPath = Signal {
+    val selectedPath = position.map{_ =>
       if (currPath._2.isEmpty) {
       } else if (previousLookAheadPoint.exists(p => currPath._2.get.containsInXY(p, Feet(0.1)))) {
         if (biSegmentPaths.hasNext) {
@@ -210,17 +213,23 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       historyUpdatingLookAheadPoint)
     val distanceToLast = position.map(_ distanceTo wayPoints.last)
 
-    val errorToLast = distanceToLast.peek.map { d =>
-      (if (!biSegmentPaths.hasNext) {
+    val errorToLast = distanceToLast.map { d =>
+      // error does not exist of we are not on our last segment
+      if (!biSegmentPaths.hasNext) {
         Some(d)
       } else {
         None
-      }).flatten
+      }
+//      (if (!biSegmentPaths.hasNext) {
+//        Some(d)
+//      } else {
+//        None
+//      }).flatten
     }
 
-    (forwardOutput.zip(turnOutput).zip(multiplier).zip(distanceToLast).zip(props).zip(forwardError).map { o =>
-      val (((((forward, turn), fdMultiplier), _), props), frdError) = o
-      if (frdError > props.defaultLookAheadDistance / 2) {
+    (forwardOutput.zip(turnOutput).zip(multiplier).zip(distanceToLast).zip(forwardError).map { o =>
+      val ((((forward, turn), fdMultiplier), _), frdError) = o
+      if (frdError > props.get.defaultLookAheadDistance / 2) {
         UnicycleSignal(forward * fdMultiplier, turn)
       } else {
         UnicycleSignal(forward * fdMultiplier, Percent(0))

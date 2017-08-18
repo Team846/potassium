@@ -1,8 +1,7 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
-import java.lang.Math._
+import com.lynbrookrobotics.potassium.streams.Stream
 
-import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
 import squants.motion._
 import squants.space.Feet
 
@@ -32,8 +31,8 @@ trait UnicycleMotionProfileControllers extends UnicycleCoreControllers {
                               acceleration: Acceleration,
                               initPosition: Distance,
                               targetForwardTravel: Distance,
-                              position: Signal[Distance],
-                              tolerance: Distance): (PeriodicSignal[Velocity], Signal[Distance]) = {
+                              position: Stream[Distance],
+                              tolerance: Distance): (Stream[Velocity], Stream[Distance]) = {
     val targetPosition   = initPosition + targetForwardTravel
     val error            = position.map(targetPosition - _)
     val signError        = error.map(error => Math.signum(error.toFeet))
@@ -83,8 +82,8 @@ trait UnicycleMotionProfileControllers extends UnicycleCoreControllers {
         val accelerationValue = acceleration.toFeetPerSecondSquared
 
         FeetPerSecond(
-          sqrt(
-            abs(
+          math.sqrt(
+            math.abs(
               finalVelocitySquared + 2 * accelerationValue * errorValue)))
       }
     }
@@ -92,7 +91,7 @@ trait UnicycleMotionProfileControllers extends UnicycleCoreControllers {
     // Ensure that motion is in the direction of the error
     val velocityOutput = velocityDeccel.zip(velocityAccel).zip(signError).map {
       case ((velDec, velAcc), sign) => sign * velDec min cruisingVelocity min velAcc
-    }.toPeriodic
+    }
 
     (velocityOutput, error)
   }

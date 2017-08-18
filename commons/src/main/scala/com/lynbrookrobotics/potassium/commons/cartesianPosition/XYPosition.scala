@@ -1,7 +1,8 @@
 package com.lynbrookrobotics.potassium.commons.cartesianPosition
 
+import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.units.Point
-import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
+import com.lynbrookrobotics.potassium.streams.Stream
 import squants.Angle
 import squants.space._
 
@@ -17,14 +18,12 @@ object XYPosition {
     * @param distanceTraveled the total distance/arclength traveled. Used as the
     *                         magnitude of the vectore used in vector addition
     */
-  def apply(angle: Signal[Angle],
-            distanceTraveled: Signal[Length]): PeriodicSignal[Point] = {
-    val initAngle = angle.get
-    val averageAngle = angle.toPeriodic.sliding(2, initAngle).map(angles =>
+  def apply(angle: Stream[Angle],
+            distanceTraveled: Stream[Length]): Stream[Point] = {
+    val averageAngle = angle.sliding(2).map(angles =>
       (angles.head + angles.last) / 2D)
 
-    val initDistanceTraveled = distanceTraveled.get
-    val deltaDistance = distanceTraveled.toPeriodic.sliding(2, initDistanceTraveled).map { distances =>
+    val deltaDistance = distanceTraveled.sliding(2).map { distances =>
       distances.last - distances.head
     }
 
@@ -35,7 +34,7 @@ object XYPosition {
     // approximate that robot traveled in a straight line at the average
     // angle over the course of 1 tick
     deltaDistance.zip(averageAngle).scanLeft(origin){
-      case (acc, (distance, avrgAngle), _) =>
+      case (acc, (distance, avrgAngle)) =>
         acc + Point(
           distance * avrgAngle.cos,
           distance * avrgAngle.sin)
@@ -48,13 +47,17 @@ object XYPosition {
     * @param distanceTraveled
     * @return
     */
-  def positionWithSimpsons(angle: Signal[Angle],
-                           distanceTraveled: Signal[Length]): PeriodicSignal[Point] = {
-    val initAngle = angle.get
-    val averageAngle = angle.toPeriodic.sliding(2, initAngle).map(angles =>
+  def positionWithSimpsons(angle: Stream[Angle],
+                           distanceTraveled: Stream[Length]): Stream[Point] = {
+    // temporary to make integral and derivative compile because implicit clock
+    // is required. In the end, the time of emission should be measured, not
+    // remeasuing the time
+    implicit val tempClock: Clock = ???
+
+    val averageAngle = angle.sliding(2).map(angles =>
       (angles.head + angles.last) / 2D)
 
-    val velocity = distanceTraveled.toPeriodic.derivative
+    val velocity = distanceTraveled.derivative
     val velocityX = velocity.zip(averageAngle).map{v =>
       val (speed, angle) = v
       angle.cos * speed

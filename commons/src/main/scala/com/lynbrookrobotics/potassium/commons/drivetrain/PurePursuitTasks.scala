@@ -1,8 +1,10 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
-import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
+import com.lynbrookrobotics.potassium.streams.Stream
+import com.lynbrookrobotics.potassium.{ Signal}
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
 import com.lynbrookrobotics.potassium.tasks.FiniteTask
+import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import squants.space.{Angle, Degrees, Feet, Length}
 import squants.{Dimensionless, Each}
@@ -28,9 +30,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                         properties: Signal[DrivetrainProperties],
                         hardware: DrivetrainHardware) extends FiniteTask {
     override def onStart(): Unit = {
-      val initialTurnPosition = hardware.turnPosition.get
-
-      val turnPosition = hardware.turnPosition.map(_ - initialTurnPosition)
+      val turnPosition = hardware.turnPosition.relativize(
+        (initialTurnPosition, curr) => curr - initialTurnPosition)
 
       val position = XYPosition(
         turnPosition.map(compassToTrigonometric),
@@ -42,8 +43,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         position,
         turnPosition)
 
-      drive.setController(lowerLevelOpenLoop(unicycle.withCheck { _ =>
-        if (error.get.exists(_ < tolerance)) {
+      drive.setController(lowerLevelOpenLoop(unicycle.withCheckZipped(error){e =>
+        if (e.exists(_ < tolerance)) {
           finished()
         }
       }))
@@ -56,8 +57,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
 
   class FollowWayPointsWithPosition(wayPoints: Seq[Point],
                                     tolerance: Length,
-                                    position: PeriodicSignal[Point],
-                                    turnPosition: Signal[Angle])
+                                    position: Stream[Point],
+                                    turnPosition: Stream[Angle])
                                    (implicit drive: Drivetrain,
                                     properties: Signal[DrivetrainProperties],
                                     hardware: DrivetrainHardware) extends FiniteTask {
@@ -67,8 +68,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         position,
         turnPosition)
 
-      drive.setController(lowerLevelOpenLoop(unicycle.withCheck { _ =>
-        if (error.get.exists(_ < tolerance)) {
+      drive.setController(lowerLevelOpenLoop(unicycle.withCheckZipped(error) {e =>
+        if (e.exists(_ < tolerance)) {
           println("finished")
           finished()
         }

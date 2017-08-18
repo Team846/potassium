@@ -1,14 +1,16 @@
 package com.lynbrookrobotics.potassium.lighting
 
 import com.lynbrookrobotics.potassium.clock.Clock
-import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal}
+import com.lynbrookrobotics.potassium.streams.Stream
+import com.lynbrookrobotics.potassium.Component
 import squants.time.Milliseconds
 
 class LightingComponent(numLEDs: Int, comm: TwoWayComm)(implicit clock: Clock) extends Component[Int](Milliseconds(20)) {
 
   var debug = false
 
-  override def defaultController: PeriodicSignal[Int] = Signal[Int](0).toPeriodic
+  // TODO: Please review: seems suspicious
+  override def defaultController: Stream[Int] = Stream.periodic(this.period)(0)
   /**
     * Applies the latest control signal value.
     *

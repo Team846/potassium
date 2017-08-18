@@ -1,11 +1,13 @@
 package com.lynbrookrobotics.potassium.model.simulations
 
-import com.lynbrookrobotics.potassium.Signal
-import squants.{Acceleration, Dimensionless, Percent}
+import com.lynbrookrobotics.potassium.streams._
+import squants.{Dimensionless, Percent}
 
 class SimulatedSpeedController {
   var lastOutput = Percent(0)
-  val outputSignal = Signal(lastOutput).toPeriodic
+
+  val (manualStream, publish) = Stream.manual
+  val outputStream = manualStream.map(_ => lastOutput)
 
   private def capAt100Percent(input: Dimensionless) = {
     input min Percent(100) max Percent(-100)
@@ -15,4 +17,3 @@ class SimulatedSpeedController {
     lastOutput = capAt100Percent(toSet)
   }
 }
-

@@ -17,7 +17,7 @@ object MathUtilities {
   def interSectionCircleLine(segment: Segment,
                              center: Point,
                              radius: Length): Option[(Point, Point)] = {
-    import Math._
+    import math._
     val diffEnd   = segment.end - center
     val diffStart = segment.start - center
 

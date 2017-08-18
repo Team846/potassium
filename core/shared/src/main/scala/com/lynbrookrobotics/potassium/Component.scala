@@ -2,6 +2,7 @@ package com.lynbrookrobotics.potassium
 
 import com.lynbrookrobotics.potassium.clock.Clock
 import squants.Time
+import com.lynbrookrobotics.potassium.streams.{NonPeriodic, Stream}
 
 /**
   * Represents a single robotic component, which translates signal data into action
@@ -15,15 +16,11 @@ import squants.Time
   * @param clock the clock to use to schedule periodic updates
   * @tparam T the type of values produced by signals for the component
   */
-abstract class Component[T](period: Time)(implicit val clock: Clock) {
-  def defaultController: PeriodicSignal[T]
-  private var currentController: PeriodicSignal[T] = defaultController
+abstract class Component[T](val period: Time)(implicit val clock: Clock) {
+  def defaultController: Stream[T]
+  private var currentController: Stream[T] = defaultController
 
   private var lastControlSignal: Option[T] = None
-
-  val peekedController: Signal[Option[T]] = Signal {
-    lastControlSignal
-  }
 
   def shouldComponentUpdate(previousSignal: T, newSignal: T): Boolean = true
 
@@ -31,10 +28,22 @@ abstract class Component[T](period: Time)(implicit val clock: Clock) {
     * Sets the controller to be used by the component during updates.
     * @param controller the new controller to use
     */
-  def setController(controller: PeriodicSignal[T]): Unit = {
-    currentController.detachTickSource(this)
-    controller.attachTickSource(this)
+  def setController(controller: Stream[T]): Unit = {
+    if (controller.expectedPeriodicity == NonPeriodic) {
+      throw new IllegalArgumentException("Controller must be periodic")
+    }
+
     currentController = controller
+    controller.foreach{ value =>
+      val shouldUpdate = lastControlSignal.isEmpty ||
+        shouldComponentUpdate(lastControlSignal.get, value)
+
+      if (shouldUpdate) {
+        applySignal(value)
+      }
+
+      lastControlSignal = Some(value)
+    }
   }
 
   /**
@@ -49,25 +58,4 @@ abstract class Component[T](period: Time)(implicit val clock: Clock) {
     * @param signal the signal value to act on
     */
   def applySignal(signal: T): Unit
-
-  clock(period) { dt =>
-    // Because of unusual initialization orders, currentController may sometimes be null,
-    // so we make sure to have it initialized here.
-
-    // scalastyle:off
-    if (currentController == null) {
-      currentController = defaultController
-    }
-    // scalastyle:on
-
-    val value = currentController.currentValue(dt)
-    val shouldUpdate = lastControlSignal.isEmpty ||
-      shouldComponentUpdate(lastControlSignal.get, value)
-
-    lastControlSignal = Some(value)
-
-    if (shouldUpdate) {
-      applySignal(value)
-    }
-  }
 }

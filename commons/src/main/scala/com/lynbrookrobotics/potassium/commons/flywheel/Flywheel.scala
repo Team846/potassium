@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.commons.flywheel
 
+import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, SignalLike}
 import com.lynbrookrobotics.potassium.control.{PIDF, PIDFConfig}
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask, WrapperTask}
@@ -17,7 +18,7 @@ trait FlywheelProperties {
 }
 
 trait FlywheelHardware {
-  def velocity: Signal[Frequency]
+  def velocity: Stream[Frequency]
 }
 
 abstract class Flywheel {
@@ -25,13 +26,13 @@ abstract class Flywheel {
   type Hardware <: FlywheelHardware
 
   object velocityControllers {
-    def velocityControl(target: Signal[Frequency])
+    def velocityControl(target: Stream[Frequency])
                        (implicit properties: Signal[Properties],
-                        hardware: Hardware): (Signal[Frequency], PeriodicSignal[Dimensionless]) = {
+                        hardware: Hardware): (Stream[Frequency], Stream[Dimensionless]) = {
       val error = hardware.velocity.zip(target).map(t => t._2 - t._1)
       (error, PIDF.pidf(
-        hardware.velocity.toPeriodic,
-        target.toPeriodic,
+        hardware.velocity,
+        target,
         properties.map(_.velocityGains)
       ).map(_ max Percent(0)))
     }

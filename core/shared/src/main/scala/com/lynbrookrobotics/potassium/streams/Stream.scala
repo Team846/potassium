@@ -54,6 +54,10 @@ abstract class Stream[T] { self =>
     ret
   }
 
+  def mapToConstant[O](output: O): Stream[O] = {
+    map(_ => output)
+  }
+
   /**
     * Relativizes the stream according to the given function, which takes a base value
     * and the current value and returns the meaningful difference between them
@@ -62,13 +66,13 @@ abstract class Stream[T] { self =>
     * @return a new stream with values relativized against the next value from this stream
     */
   def relativize[O](f: (T, T) => O): Stream[O] = {
-    var lastValue: Option[T] = None
+    var firstValue: Option[T] = None
     map { v =>
-      if (lastValue.isEmpty) {
-        lastValue = Some(v)
+      if (firstValue.isEmpty) {
+        firstValue = Some(v)
       }
 
-      f(lastValue.get, v)
+      f(firstValue.get, v)
     }
   }
 
@@ -242,6 +246,15 @@ abstract class Stream[T] { self =>
     }
   }
 
+  def scanLeftWithdt[U](initialValue: U)(f: (U, T, Time) => U)(implicit clock: Clock): Stream[U] = {
+    var latest = initialValue
+
+    zipWithDt.map { case (v, dt) =>
+      latest = f(latest, v, dt)
+      latest
+    }
+  }
+
   /**
     * Zips the stream with the periods between when values were published
     * @return a stream of values and times in tuples
@@ -284,6 +297,20 @@ abstract class Stream[T] { self =>
     // scalastyle:on
   }
 
+  def simpsonsIntegral[I <: Quantity[I] with TimeIntegral[_]](implicit derivEv: T => TimeDerivative[I], clock: Clock): Stream[I] = {
+    val previousValues = sliding(3)
+
+    // scalastyle:off
+    previousValues.zipWithDt.scanLeft(null.asInstanceOf[I]){case (acc, (current3Values, dt)) =>
+      if (current3Values.head != null) {
+        val secondVelocity = current3Values.dequeue._2.dequeue._1
+        acc + (dt * current3Values.head + 4 * dt * secondVelocity + dt * current3Values.last) / 6
+      } else {
+        (current3Values.last: TimeDerivative[I]) * dt
+      }
+    }
+    //scalastyle:on
+  }
   /**
     * Produces a stream that emits values at the same rate as the given
     * stream through polling
@@ -378,7 +405,12 @@ abstract class Stream[T] { self =>
       v
     }
   }
-
+  def withCheckZipped[O](checkingStream: Stream[O])(check: O => Unit): Stream[T] = {
+    zip(checkingStream).map{ case (v, checkedValue) =>
+      check(checkedValue)
+      v
+    }
+  }
   /**
     * Filters a stream to only emit values that pass a certain condition
     * @param condition the condition to filter stream values with
