@@ -76,6 +76,16 @@ abstract class Stream[T] { self =>
     }
   }
 
+  // TODO: requires review
+  /**
+    *
+    * @return returns a stream of first value this stream will publish
+    *         from the time this method is called
+    */
+  def currentValue: Stream[T] = {
+    relativize((firstValue, _) => firstValue)
+  }
+
   /**
     * Merges two streams, with a value published from the resulting stream
     * whenever the parent streams have both published a new value
@@ -478,5 +488,18 @@ object Stream {
     }
 
     (stream, stream.publishValue)
+  }
+
+  /**
+    * Subtracts to quantities, the second from the first. AKA: minued - toSubtract
+    * @param minued what to subtract from
+    * @param toSubtract how much to subtract
+    * @tparam O a type that is a quantity
+    * @return stream where every value is the minued minus toSubtract
+    */
+  def subtract[O <: Quantity[O]](minued: Stream[O], toSubtract: Stream[O]): Stream[O] = {
+    minued.zip(toSubtract).map {
+      case (minued, toSub) => minued - toSub
+    }
   }
 }

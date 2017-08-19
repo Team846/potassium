@@ -14,7 +14,7 @@ import squants.Time
 class TalonEncoder(talon: CANTalon,
                    talonUpdateRate: Time,
                    conversionFactor: Ratio[Angle, Dimensionless]) {
-  // TODO: does not grantee synchronous with other data
+  // TODO: Not granteed to be synchronous with other data
   val angle: Stream[Angle] = Stream.periodic(talonUpdateRate) (
     conversionFactor * Each(talon.getPosition)
   )
