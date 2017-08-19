@@ -257,12 +257,8 @@ abstract class Stream[T] { self =>
   }
 
   def scanLeftWithdt[U](initialValue: U)(f: (U, T, Time) => U)(implicit clock: Clock): Stream[U] = {
-    var latest = initialValue
-
-    zipWithDt.map { case (v, dt) =>
-      latest = f(latest, v, dt)
-      latest
-    }
+    zipWithDt.scanLeft(initialValue)(
+      (acc, curr) => f(acc, curr._1, curr._2))
   }
 
   /**
@@ -490,6 +486,7 @@ object Stream {
     (stream, stream.publishValue)
   }
 
+  // TODO: Make this a member method of Stream?
   /**
     * Subtracts to quantities, the second from the first. AKA: minued - toSubtract
     * @param minued what to subtract from

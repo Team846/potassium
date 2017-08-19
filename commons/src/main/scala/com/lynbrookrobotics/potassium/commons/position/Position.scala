@@ -1,6 +1,7 @@
 package com.lynbrookrobotics.potassium.commons.position
 
-import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, SignalLike}
+import com.lynbrookrobotics.potassium.{Component, Signal}
+import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.control.{PIDF, PIDFConfig}
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask}
 import squants.Quantity
@@ -16,7 +17,7 @@ trait PositionProperties[S <: Quantity[S],
 }
 
 trait PositionHardware[S <: Quantity[S]] {
-  def position: Signal[S]
+  def position: Stream[S]
 }
 
 abstract class Position[S <: Quantity[S],
@@ -29,18 +30,28 @@ abstract class Position[S <: Quantity[S],
   type Hardware <: PositionHardware[S]
 
   object positionControllers {
-    def positionControl(target: S)(implicit properties: Signal[Properties], hardware: Hardware): (Signal[S], PeriodicSignal[U]) = {
+    def positionControl(target: S)
+                       (implicit properties: Signal[Properties],
+                        hardware: Hardware): (Stream[S], Stream[U]) = {
       val error = hardware.position.map(target - _)
-      (error, PIDF.pidf(hardware.position.toPeriodic, Signal.constant(target).toPeriodic, properties.map(_.positionGains)))
+      (
+        error,
+        PIDF.pidf(
+          hardware.position,
+          hardware.position.mapToConstant(target),
+          properties.map(_.positionGains)))
     }
   }
 
   object positionTasks {
-    class MoveToPosition(pos: S, tolerance: S)(implicit properties: Signal[Properties], hardware: Hardware, comp: Comp) extends FiniteTask {
+    class MoveToPosition(pos: S,
+                         tolerance: S)
+                        (implicit properties: Signal[Properties],
+                         hardware: Hardware, comp: Comp) extends FiniteTask {
       override def onStart(): Unit = {
         val (error, control) = positionControllers.positionControl(pos)
-        comp.setController(control.withCheck { _ =>
-          if (error.get.abs < tolerance) {
+        comp.setController(control.withCheckZipped(error) { error =>
+          if (error.abs < tolerance) {
             finished()
           }
         })

@@ -98,20 +98,17 @@ trait UnicycleCoreTasks {
     }
 
     override final def onStart(): Unit = {
-      val (velocity, forwardError) = trapezoidalDriveControl(
-        hardware.forwardVelocity.get, // not map because we need position at this time
-        cruisingVelocity,
-        finalVelocity,
-        acceleration,
-        hardware.forwardPosition.get, // not map because we need position at this time
-        targetDistance,
-        position,
-        tolerance
-      )
+      val (idealVelocity, forwardError) = trapezoidalDriveControl(
+          cruisingVelocity = cruisingVelocity,
+          finalVelocity = finalVelocity,
+          acceleration = acceleration,
+          targetForwardTravel = targetDistance,
+          position = position,
+          velocity = hardware.forwardVelocity)
 
       val absoluteAngleTarget = hardware.turnPosition.currentValue
       val (turnController, turnError) = turnPositionControl(absoluteAngleTarget)
-      val forwardOutput = velocity.map(UnicycleVelocity(_, DegreesPerSecond(0)).toUnicycleSignal)
+      val forwardOutput = idealVelocity.map(UnicycleVelocity(_, DegreesPerSecond(0)).toUnicycleSignal)
       val combinedController = forwardOutput.zip(turnController).map(t => t._1 + t._2)
 
       val uncheckedController = lowerLevelVelocityControl(speedControl(combinedController))
@@ -298,7 +295,8 @@ trait UnicycleCoreTasks {
   class CorrectOffsetWithLatency(timestampedOffset: Stream[(Angle, Time)], tolerance: Angle)
     (implicit drive: Drivetrain,
       hardware: DrivetrainHardware,
-      props: Signal[DrivetrainProperties]) extends FiniteTask {
+      props: Signal[DrivetrainProperties],
+      clock: Clock) extends FiniteTask {
 
     // TODO: requires review
     val positionSlide: Stream[Queue[(Angle, Time)]] = hardware.turnPosition.zipWithTime.sliding(20)

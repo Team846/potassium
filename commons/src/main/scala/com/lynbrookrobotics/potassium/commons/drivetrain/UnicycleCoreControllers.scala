@@ -3,8 +3,9 @@ package com.lynbrookrobotics.potassium.commons.drivetrain
 import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.control.PIDF
-import squants.{Angle, Dimensionless, Length, Percent, Quantity, Time}
+import squants.{Angle, Dimensionless, Length, Percent, Quantity, Time, Velocity}
 import com.lynbrookrobotics.potassium.units._
+import squants.time.{TimeDerivative, TimeIntegral}
 
 import scala.collection.immutable.Queue
 
@@ -93,19 +94,18 @@ trait UnicycleCoreControllers {
     (control, error)
   }
 
-    def forwardPositionControl(targetAbsolute: Stream[Length])
-                              (implicit hardware: DrivetrainHardware,
-                               props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Length]) = {
-    // TODO: Make this a member method of Stream?
-    val error = Stream.subtract(targetAbsolute, hardware.forwardPosition)
+  def forwardPositionControl(targetAbsolute: Stream[Length])
+                            (implicit hardware: DrivetrainHardware,
+                             props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Length]) = {
+      val error: Stream[Length] = Stream.subtract(targetAbsolute, hardware.forwardPosition)
 
-    val control = PIDF.pid(
-      hardware.forwardPosition,
-      hardware.forwardPosition.mapToConstant(targetAbsolute),
-      props.map(_.forwardPositionControlGains)
-    ).map(s => UnicycleSignal(s, Percent(0)))
+      val control = PIDF.pid(
+        hardware.forwardPosition,
+        targetAbsolute,
+        props.map(_.forwardPositionControlGains)
+      ).map(s => UnicycleSignal(s, Percent(0)))
 
-    (control, error)
+      (control, error)
   }
 
   def continuousTurnPositionControl(targetAbsolute: Stream[Angle])

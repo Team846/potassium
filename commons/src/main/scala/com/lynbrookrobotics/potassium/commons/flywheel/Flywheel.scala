@@ -1,7 +1,8 @@
 package com.lynbrookrobotics.potassium.commons.flywheel
 
 import com.lynbrookrobotics.potassium.streams.Stream
-import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, SignalLike}
+import com.lynbrookrobotics.potassium.{Component, Signal}
+import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.control.{PIDF, PIDFConfig}
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask, WrapperTask}
 import com.lynbrookrobotics.potassium.units.{GenericDerivative, GenericValue}
@@ -39,13 +40,13 @@ abstract class Flywheel {
   }
 
   object velocityTasks {
-    class WhileAtVelocity(vel: Signal[Frequency], tolerance: Frequency)
+    class WhileAtVelocity(vel: Stream[Frequency], tolerance: Frequency)
                          (implicit properties: Signal[Properties],
                           hardware: Hardware, component: Comp) extends WrapperTask {
       override def onStart(): Unit = {
         val (error, control) = velocityControllers.velocityControl(vel)
-        component.setController(control.withCheck { _ =>
-          if (error.get.abs < tolerance) {
+        component.setController(control.withCheckZipped(error) { error =>
+          if (error.abs < tolerance) {
             readyToRunInner()
           }
         })

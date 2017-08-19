@@ -5,9 +5,6 @@ import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal, SignalLike}
 import squants.motion.AngularVelocity
 import com.lynbrookrobotics.potassium.streams.Stream
 import squants.{Acceleration, Angle, Dimensionless, Each, Length, Percent, Velocity}
-import com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleMotionProfileControllers
-import squants.space.Feet
-import squants.time.Milliseconds
 
 trait UnicycleProperties {
   val maxForwardVelocity: Velocity

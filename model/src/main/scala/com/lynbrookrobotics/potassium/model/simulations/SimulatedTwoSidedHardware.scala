@@ -38,8 +38,9 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
   private var time = Seconds(0)
 
   def update(dt: Time): Unit = {
-    leftMotor.publish
-    rightMotor.publish
+    // TODO: gives warning about pure expressions
+    leftMotor.publishLastOutput()
+    rightMotor.publishLastOutput()
 
     time += dt
   }
@@ -73,6 +74,7 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
     // Linear acceleration caused by angular acceleration about the center
     val tangentialAcceleration = angularAcceleration onRadius radius
 
+    // TODO: This is very suspicious and most likely wrong
     // Euler's method to integrate velocities
     val newLeftVelocity = leftVelocity + (linearAcceleration - tangentialAcceleration) * dt
     val newRightVelocity = rightVelocity + (linearAcceleration + tangentialAcceleration) * dt
@@ -85,25 +87,31 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
 
   private val twoSidedOutputs = leftForceOutput.zip(rightForceOutput).map(o =>
     TwoSidedDriveForce(o._1, o._2))
+
+  // TODO:
+  // temporary to make integral and derivative compile because implicit clock
+  // is required. In the end, the time of emission should be measured, not
+  // remeasuing the time
+  implicit val tempClock: Clock = ???
   private val velocities = twoSidedOutputs.scanLeftWithdt(InitialSpeeds) {
-    (velocities, outputs, dt) => incrementVelocities(
-      leftInputForce = outputs.left,
-      rightInputForce = outputs.right,
-      leftVelocity = velocities.left,
-      rightVelocity = velocities.right,
-      angularVelocity = velocities.angular,
-      dt = dt)
+    case (accVelocities, outputs, dt) => incrementVelocities(
+      outputs.left,
+      outputs.right,
+      accVelocities.left,
+      accVelocities.right,
+      accVelocities.angular,
+      dt)
   }
 
   override val leftVelocity = velocities.map(_.left)
   override val rightVelocity = velocities.map(_.right)
 
   // convert triginometric velocity to compass velocity
-  override val turnVelocity = velocities.map(-1 * _.angular)
+  override lazy val turnVelocity = velocities.map(-1 * _.angular)
 
   override val leftPosition = leftVelocity.integral
   override val rightPosition = rightVelocity.integral
-  override val turnPosition = turnVelocity.integral
+  override lazy val turnPosition = turnVelocity.integral
 
   val position = XYPosition(turnPosition.map(a => Degrees(90) - a), forwardPosition)
 

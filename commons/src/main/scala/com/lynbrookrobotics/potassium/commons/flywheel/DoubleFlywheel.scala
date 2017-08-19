@@ -73,7 +73,7 @@ abstract class DoubleFlywheel {
 
   object velocityTasks {
     class WhileAtVelocity(vel: Stream[Frequency], tolerance: Frequency)
-                         (implicit properties: Stream[Properties],
+                         (implicit properties: Signal[Properties],
                           hardware: Hardware, component: Comp) extends WrapperTask {
       override def onStart(): Unit = {
         val (errorLeft, errorRight, control) =
@@ -95,7 +95,7 @@ abstract class DoubleFlywheel {
     class WhileAtDoubleVelocity(leftVel: Stream[Frequency],
                           rightVel: Stream[Frequency],
                           tolerance: Frequency)
-                         (implicit properties: Stream[Properties],
+                         (implicit properties: Signal[Properties],
                           hardware: Hardware, component: Comp) extends WrapperTask {
       override def onStart(): Unit = {
         val (errorLeft, errorRight, control) =
