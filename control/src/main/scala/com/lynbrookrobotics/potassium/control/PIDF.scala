@@ -33,7 +33,7 @@ object PIDF {
   // remeasuing the time
   implicit val tempClock: Clock = ???
 
-  // TODO: Does this makes sense with arbitrary periodicity streams
+  // TODO: Does this makes sense with arbitrary periodicity streams?
   def proportionalControl[S <: Quantity[S], U <: Quantity[U]](current: Stream[S],
                                                               target: Stream[S], gain: Signal[Ratio[U, S]]): Stream[U] = {
     current.zip(target).map(p => (p._2 - p._1) ** gain.get)
@@ -50,9 +50,12 @@ object PIDF {
   def integralControl[S <: Quantity[S] with TimeDerivative[I],
                       U <: Quantity[U],
                       I <: Quantity[I] with TimeIntegral[S]](current: Stream[S],
+                                                             target: Stream[S],
                                                              gain: Signal[Ratio[U, I]]): Stream[U] = {
-    current.integral.map(d => d ** gain.get)
+      target.minus(current).integral.map(d => d ** gain.get)
   }
+
+
 
   def feedForwardControl[S <: Quantity[S], U <: Quantity[U]](current: Stream[S], gain: Signal[Ratio[U, S]]): Stream[U] = {
     current.map(v => v ** gain.get)
@@ -66,7 +69,7 @@ object PIDF {
           U <: Quantity[U]](current: Stream[S], target: Stream[S], config: Signal[PIDConfig[S, SWithD, SWithI, D, I, U]])
                    (implicit exD: S => SWithD, exI: S => SWithI): Stream[U] = {
     proportionalControl(current, target, config.map(_.kp)).
-      zip(integralControl(current.map(exI), config.map(_.ki))).
+      zip(integralControl(current.map(exI), target.map(exI), config.map(_.ki))).
       zip(derivativeControl(current.map(exD), config.map(_.kd))).map { pid =>
       val ((p, i), d) = pid
       p + i + d
@@ -82,7 +85,7 @@ object PIDF {
                              target: Stream[S], config: Signal[PIDFConfig[S, SWithD, SWithI, D, I, U]])
                             (implicit exD: S => SWithD, exI: S => SWithI): Stream[U] = {
     proportionalControl(signal, target, config.map(_.kp)).
-      zip(integralControl(signal.map(exI), config.map(_.ki))).
+      zip(integralControl(signal.map(exI), target.map(exI), config.map(_.ki))).
       zip(derivativeControl(signal.map(exD), config.map(_.kd))).
       zip(feedForwardControl(target, config.map(_.kf))).map { pidf =>
       val (((p, i), d), f) = pidf

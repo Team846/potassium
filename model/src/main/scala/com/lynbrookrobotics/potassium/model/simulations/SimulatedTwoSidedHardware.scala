@@ -1,7 +1,6 @@
 package com.lynbrookrobotics.potassium.model.simulations
 
 import com.lynbrookrobotics.potassium.clock.Clock
-import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
 import com.lynbrookrobotics.potassium.commons.drivetrain._
 import com.lynbrookrobotics.potassium.commons.drivetrain.TwoSidedDrive

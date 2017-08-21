@@ -299,4 +299,22 @@ class StreamTest extends FunSuite {
 
     assert(emitted == 3)
   }
+
+  test("Stream of 3 ft minus Stream of 2 ft produces stream of 1") {
+    // minuend is what to subtract from
+    val (minuend, pubMinuend) = Stream.manual[Length]
+
+    // subtractand is what to subtract from minuend
+    val (subtractand, pubSubtractand) = Stream.manual[Length]
+
+    val difference = minuend.minus(subtractand)
+
+    var lastDifference = Feet(-10)
+    difference.foreach(lastDifference = _)
+
+    pubMinuend(Feet(3))
+    pubSubtractand(Feet(2))
+
+    assert(lastDifference == Feet(1))
+  }
 }

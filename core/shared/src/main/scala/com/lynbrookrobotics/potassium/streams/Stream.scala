@@ -317,6 +317,18 @@ abstract class Stream[T] { self =>
     }
     //scalastyle:on
   }
+
+  /**
+    * Subtracts other from this
+    * @param toSubtract how much to subtract
+    * @return stream where every value is the minued minus toSubtract
+    */
+  def minus[Q <: Quantity[Q]](toSubtract: Stream[Q])(implicit intEv: T => Quantity[Q]): Stream[Q] = {
+    zip(toSubtract).map{ case (minuend, subtractand) =>
+      minuend - subtractand
+    }
+  }
+
   /**
     * Produces a stream that emits values at the same rate as the given
     * stream through polling
@@ -478,25 +490,15 @@ object Stream {
     }
   }
 
-  def manual[T]: (Stream[T], T => Unit) = {
+  def manual[T](periodicity: ExpectedPeriodicity): (Stream[T], T => Unit) = {
     val stream = new Stream[T] {
-      override val expectedPeriodicity: ExpectedPeriodicity = NonPeriodic
+      override val expectedPeriodicity: ExpectedPeriodicity = periodicity
     }
 
     (stream, stream.publishValue)
   }
 
-  // TODO: Make this a member method of Stream?
-  /**
-    * Subtracts to quantities, the second from the first. AKA: minued - toSubtract
-    * @param minued what to subtract from
-    * @param toSubtract how much to subtract
-    * @tparam O a type that is a quantity
-    * @return stream where every value is the minued minus toSubtract
-    */
-  def subtract[O <: Quantity[O]](minued: Stream[O], toSubtract: Stream[O]): Stream[O] = {
-    minued.zip(toSubtract).map {
-      case (minued, toSub) => minued - toSub
-    }
+  def manual[T]: (Stream[T], T => Unit) = {
+    manual[T](NonPeriodic)
   }
 }

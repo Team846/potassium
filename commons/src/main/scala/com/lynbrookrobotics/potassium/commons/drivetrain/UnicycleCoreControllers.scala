@@ -97,7 +97,7 @@ trait UnicycleCoreControllers {
   def forwardPositionControl(targetAbsolute: Stream[Length])
                             (implicit hardware: DrivetrainHardware,
                              props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Length]) = {
-      val error: Stream[Length] = Stream.subtract(targetAbsolute, hardware.forwardPosition)
+      val error: Stream[Length] = targetAbsolute.minus(hardware.forwardPosition)
 
       val control = PIDF.pid(
         hardware.forwardPosition,

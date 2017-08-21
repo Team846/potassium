@@ -30,9 +30,9 @@ trait UnicycleMotionProfileControllers extends UnicycleCoreControllers {
                               position: Stream[Distance],
                               velocity: Stream[Velocity]): (Stream[Velocity], Stream[Distance]) = {
     val targetPosition   = position.currentValue.map(_ + targetForwardTravel)
-    val error            = Stream.subtract(targetPosition, position)
+    val error            = targetPosition.minus(position)
     val signError        = error.map(error => Math.signum(error.toFeet))
-    val distanceTraveled = Stream.subtract(position, position.currentValue)
+    val distanceTraveled = position.minus(position.currentValue)
 
     // Travel at 0.1 ft/s for the first 0.25 feet
     val KickstartDistance = Feet(0.25)
