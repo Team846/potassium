@@ -6,6 +6,7 @@ import com.lynbrookrobotics.potassium.streams._
 import com.lynbrookrobotics.potassium.units._
 import squants.Quantity
 import squants.time.{TimeDerivative, TimeIntegral}
+import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 case class PIDConfig[S <: Quantity[S],
                      SWithD <: Quantity[SWithD] with TimeIntegral[D],
@@ -28,23 +29,34 @@ case class PIDFConfig[S <: Quantity[S],
                       U <: Quantity[U]](kp: Ratio[U, S], ki: Ratio[U, I], kd: Ratio[U, D], kf: Ratio[U, S])
 
 object PIDF {
-  // temporary to make integral and derivative compile because implicit clock
-  // is required. In the end, the time of emission should be measured, not
-  // remeasuing the time
-  implicit val tempClock: Clock = ???
 
-  // TODO: Does this makes sense with arbitrary periodicity streams?
+  /**
+    * most control loops have current values updating with greater periodicity
+    * than the target values. This method returns an error that updates in the
+    * manner described in AsyncZipped stream, with the periodicity of current
+    * @param current
+    * @param target
+    * @tparam S
+    * @return
+    */
+  def asyncError[S <: Quantity[S]](current: Stream[S], target: Stream[S]): Stream[S] = {
+    throw new NotImplementedException()
+  }
+
+  // TODO: Use zipAsync instead of zip as used in minus
   def proportionalControl[S <: Quantity[S], U <: Quantity[U]](current: Stream[S],
                                                               target: Stream[S], gain: Signal[Ratio[U, S]]): Stream[U] = {
-    current.zip(target).map(p => (p._2 - p._1) ** gain.get)
+    target.minus(current).map(_ ** gain.get)
   }
 
   def derivativeControl[S <: Quantity[S] with TimeIntegral[D],
                         U <: Quantity[U],
                         D <: Quantity[D] with TimeDerivative[S]](current: Stream[S],
+                                                                 target: Stream[S],
                                                                  gain: Signal[Ratio[U, D]]): Stream[U] = {
-    // TODO: implicit clock paramter
-    current.derivative.map(d => d ** gain.get)
+    // TODO: Review please
+    implicit val clock = current.originClock
+    target.minus(current).derivative.map(d => d ** gain.get)
   }
 
   def integralControl[S <: Quantity[S] with TimeDerivative[I],
@@ -52,7 +64,9 @@ object PIDF {
                       I <: Quantity[I] with TimeIntegral[S]](current: Stream[S],
                                                              target: Stream[S],
                                                              gain: Signal[Ratio[U, I]]): Stream[U] = {
-      target.minus(current).integral.map(d => d ** gain.get)
+    // TODO: Review please
+    implicit val clock = current.originClock
+    target.minus(current).integral.map(d => d ** gain.get)
   }
 
 
@@ -70,7 +84,7 @@ object PIDF {
                    (implicit exD: S => SWithD, exI: S => SWithI): Stream[U] = {
     proportionalControl(current, target, config.map(_.kp)).
       zip(integralControl(current.map(exI), target.map(exI), config.map(_.ki))).
-      zip(derivativeControl(current.map(exD), config.map(_.kd))).map { pid =>
+      zip(derivativeControl(current.map(exD), target.map(exD), config.map(_.kd))).map { pid =>
       val ((p, i), d) = pid
       p + i + d
     }
@@ -86,7 +100,7 @@ object PIDF {
                             (implicit exD: S => SWithD, exI: S => SWithI): Stream[U] = {
     proportionalControl(signal, target, config.map(_.kp)).
       zip(integralControl(signal.map(exI), target.map(exI), config.map(_.ki))).
-      zip(derivativeControl(signal.map(exD), config.map(_.kd))).
+      zip(derivativeControl(signal.map(exD), target.map(exD), config.map(_.kd))).
       zip(feedForwardControl(target, config.map(_.kf))).map { pidf =>
       val (((p, i), d), f) = pidf
       p + i + d + f

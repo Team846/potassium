@@ -136,8 +136,8 @@ lazy val commons = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossTy
     control,
     (testing: CrossClasspathDependency.Constructor) % Test
   ).settings(
-    name := "potassium-commons",
-    libraryDependencies ++= sharedDependencies.value
+  name := "potassium-commons",
+  libraryDependencies ++= sharedDependencies.value
 ).nativeSettings(nativeSettings)
 
 
@@ -150,8 +150,8 @@ lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site t
 lazy val docs = project
   .enablePlugins(ScalaUnidocPlugin)
   .dependsOn(coreJVM, testingJVM, model, controlJVM,
-             remote, vision, frc, config, sensors,
-             commonsJVM, lighting)
+    remote, vision, frc, config, sensors,
+    commonsJVM, lighting)
   .settings(
     autoAPIMappings := true,
     docsMappingsAPIDir := "api",

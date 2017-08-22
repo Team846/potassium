@@ -17,6 +17,9 @@ abstract class Stream[T] { self =>
 
   val expectedPeriodicity: ExpectedPeriodicity
 
+  // TODO: review please
+  val originClock: Clock
+
   private[this] val listeners = mutable.Queue.empty[T => Unit]
 
   protected def publishValue(value: T): Unit = {
@@ -37,6 +40,7 @@ abstract class Stream[T] { self =>
     val ret = new Stream[O] {
       val parent = self
       override val expectedPeriodicity = self.expectedPeriodicity
+      override val originClock = self.originClock
     }
 
     val ptr = WeakReference(ret)
@@ -214,6 +218,7 @@ abstract class Stream[T] { self =>
 
     val ret = new Stream[Queue[T]] {
       override val expectedPeriodicity = self.expectedPeriodicity
+      override val originClock = self.originClock
     }
 
     val ptr = WeakReference(ret)
@@ -319,7 +324,7 @@ abstract class Stream[T] { self =>
   }
 
   /**
-    * Subtracts other from this
+    * Subtracts toSubtract from this
     * @param toSubtract how much to subtract
     * @return stream where every value is the minued minus toSubtract
     */
@@ -328,6 +333,7 @@ abstract class Stream[T] { self =>
       minuend - subtractand
     }
   }
+
 
   /**
     * Produces a stream that emits values at the same rate as the given
@@ -355,6 +361,7 @@ abstract class Stream[T] { self =>
       val ret = new Stream[T] {
         val parent = self
         override val expectedPeriodicity = self.expectedPeriodicity
+        override val originClock = self.originClock
       }
 
       val ptr = WeakReference(ret)
@@ -438,6 +445,7 @@ abstract class Stream[T] { self =>
     val ret = new Stream[T] {
       val parent = self
       override val expectedPeriodicity = NonPeriodic
+      override val originClock = self.originClock
     }
 
     val ptr = WeakReference(ret)
@@ -482,7 +490,8 @@ abstract class Stream[T] { self =>
 object Stream {
   def periodic[T](period: Time)(value: => T)(implicit clock: Clock): Stream[T] = {
     new Stream[T] {
-      val expectedPeriodicity = Periodic(period)
+      override val expectedPeriodicity = Periodic(period)
+      override val originClock = clock
 
       clock(period) { _ =>
         publishValue(value)
@@ -490,15 +499,22 @@ object Stream {
     }
   }
 
-  def manual[T](periodicity: ExpectedPeriodicity): (Stream[T], T => Unit) = {
+  def manual[T](periodicity: ExpectedPeriodicity, clock: Clock): (Stream[T], T => Unit) = {
     val stream = new Stream[T] {
       override val expectedPeriodicity: ExpectedPeriodicity = periodicity
+      override val originClock = clock
     }
 
     (stream, stream.publishValue)
   }
 
+  def manual[T](periodicity: ExpectedPeriodicity): (Stream[T], T => Unit) = {
+    // TODO better solution. Maybe options?
+    manual(periodicity, null)
+  }
+
   def manual[T]: (Stream[T], T => Unit) = {
-    manual[T](NonPeriodic)
+    // TODO better solution. Maybe options?
+    manual[T](NonPeriodic, null)
   }
 }
