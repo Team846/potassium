@@ -1,8 +1,8 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
+import com.lynbrookrobotics.potassium.ClockMocking
 import com.lynbrookrobotics.potassium.streams.{Periodic, Stream}
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
-import com.lynbrookrobotics.potassium.testing.ClockMocking
 import com.lynbrookrobotics.potassium.units.Point
 import org.scalatest.FunSuite
 import squants.{Angle, Length, Velocity}
@@ -13,11 +13,13 @@ import squants.time.{Milliseconds, Seconds}
 class TestXYPosition extends FunSuite{
   val period = Milliseconds(5)
   val periodsPerSecond = (1 / period.toSeconds).toInt
+  val unitializedPose = Point(Feet(-1), Feet(-1))
+
 
   test("Test moving straight at 1 ft/s for 1 sec results in moving 1 ft forward") {
-    implicit val (clock, clockTrigger) = ClockMocking.mockedClockTicker
+    val (clock, clockTrigger) = ClockMocking.mockedClockTicker
 
-    val (velocity, pubVelocity) = Stream.manual[Velocity](Periodic(period))
+    val (velocity, pubVelocity) = Stream.manual[Velocity](Periodic(period), clock)
     val distance = velocity.integral
 
     val (angle, pubAngle) = Stream.manual[Angle]
@@ -29,8 +31,8 @@ class TestXYPosition extends FunSuite{
       angle,
       distance)
 
-    var lastPosition: Point = _
-    var lastSimpsonPosition: Point = _
+    var lastPosition = unitializedPose
+    var lastSimpsonPosition = unitializedPose
 
     position.foreach(lastPosition = _)
     simpsonsPosition.foreach(lastSimpsonPosition = _)
@@ -47,10 +49,12 @@ class TestXYPosition extends FunSuite{
   }
 
   test("Test moving 45 degrees at 1 ft/s for 1 sec results in (sqrt(2)/2,sqrt(2)/2) ") {
-    val (velocity, pubVel) = Stream.manual[Velocity](Periodic(period))
+    val (clock, clockTrigger) = ClockMocking.mockedClockTicker
+
+    val (velocity, pubVel) = Stream.manual[Velocity](Periodic(period), clock)
     val distance = velocity.integral
 
-    val (angle, pubAngle) = Stream.manual[Angle]
+    val (angle, pubAngle) = Stream.manual[Angle](Periodic(period), clock)
     val targetPosition = Point(
       Feet(1 * Degrees(45).cos),
       Feet(1 * Degrees(45).sin))
@@ -60,13 +64,14 @@ class TestXYPosition extends FunSuite{
       angle,
       distance)
 
-    var lastPose: Point = _
-    var lastSimpsonsPose: Point = _
+    var lastPose = unitializedPose
+    var lastSimpsonsPose = unitializedPose
 
     position.foreach(lastPose = _)
     simpsonsPosition.foreach(lastSimpsonsPose = _)
 
     for (_ <- 1 to periodsPerSecond) {
+      clockTrigger.apply(period)
       pubVel(FeetPerSecond(1))
       pubAngle(Degrees(45))
     }
@@ -78,7 +83,9 @@ class TestXYPosition extends FunSuite{
 
   test("Test rotating 90 degrees/s with radius 1 starting angle 90 " +
        "degrees for 1 sec results in (-1,1) ") {
-    val (angularSpeed, pubTurnSpeed) = Stream.manual[AngularVelocity](Periodic(period))
+    val (clock, clockTrigger) = ClockMocking.mockedClockTicker
+
+    val (angularSpeed, pubTurnSpeed) = Stream.manual[AngularVelocity](Periodic(period), clock)
     val angle = angularSpeed.integral.map(_ + Degrees(90))
 
     val distance = angle.map{ angle =>
@@ -94,13 +101,14 @@ class TestXYPosition extends FunSuite{
       angle,
       distance)
 
-    var lastPose: Point = _
-    var lastSimpPose: Point = _
+    var lastPose = unitializedPose
+    var lastSimpPose = unitializedPose
 
     position.foreach(lastPose = _)
     simpsonsPosition.foreach(lastSimpPose = _)
 
     for(_ <- 1 to periodsPerSecond){
+      clockTrigger.apply(period)
       pubTurnSpeed(DegreesPerSecond(90))
     }
 

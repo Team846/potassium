@@ -1,14 +1,14 @@
 package com.lynbrookrobotics.potassium.lighting
 
-import java.awt.Color
-
-import com.lynbrookrobotics.potassium.Signal
-import com.lynbrookrobotics.potassium.testing.ClockMocking
+import com.lynbrookrobotics.potassium.{ClockMocking, Signal}
+import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.Task
 import org.scalatest.FunSuite
 import squants.time.Milliseconds
 
 class LightingTest extends FunSuite {
+  val period = Milliseconds(20)
+
   test("Test static color"){
     val comm = new RXTXTwoWayComms {
       connected = true
@@ -17,19 +17,20 @@ class LightingTest extends FunSuite {
       }
     }
 
-    val (mockedClock, trigger) = ClockMocking.mockedClockTicker
+    implicit val (mockedClock, trigger) = ClockMocking.mockedClockTicker
     val dummyComponent = new LightingComponent(1, comm)(mockedClock)
-    val task = new DisplayLighting(Signal[Int](2), dummyComponent)
+    val twoStream = Stream.periodic[Int](period)(2)
+    val task = new DisplayLighting(twoStream, dummyComponent)
 
     dummyComponent.debug = true
 
     Task.executeTask(task)
-    trigger(Milliseconds(20))
+    trigger(period)
     comm.dataToLog()
     assertResult("2")(comm.pullLog())
 
     Task.abortCurrentTask()
-    trigger(Milliseconds(20))
+    trigger(period)
     comm.dataToLog()
     assertResult("0")(comm.pullLog())
 
@@ -43,19 +44,20 @@ class LightingTest extends FunSuite {
         logQueue.enqueue(data.toString)
       }
     }
-    val (mockedClock, trigger) = ClockMocking.mockedClockTicker
+    implicit val (mockedClock, trigger) = ClockMocking.mockedClockTicker
     val dummyComponent = new LightingComponent(1, comm)(mockedClock)
-    val task = new DisplayLighting(Signal[Int](2), dummyComponent)
+    val twoStream = Stream.periodic(period)(2)
+    val task = new DisplayLighting(twoStream, dummyComponent)
 
     dummyComponent.debug = true
 
     Task.executeTask(task)
-    trigger(Milliseconds(20))
+    trigger(period)
     comm.dataToLog()
     assertResult("No data to show")(comm.pullLog())
 
     Task.abortCurrentTask()
-    trigger(Milliseconds(20))
+    trigger(period)
     comm.dataToLog()
     assertResult("No data to show")(comm.pullLog())
   }

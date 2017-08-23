@@ -49,11 +49,6 @@ object XYPosition {
     */
   def positionWithSimpsons(angle: Stream[Angle],
                            distanceTraveled: Stream[Length]): Stream[Point] = {
-    // temporary to make integral and derivative compile because implicit clock
-    // is required. In the end, the time of emission should be measured, not
-    // remeasuing the time
-    implicit val tempClock: Clock = ???
-
     val averageAngle = angle.sliding(2).map(angles =>
       (angles.head + angles.last) / 2D)
 

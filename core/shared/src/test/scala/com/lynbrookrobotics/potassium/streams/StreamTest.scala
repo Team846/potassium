@@ -1,13 +1,12 @@
 package com.lynbrookrobotics.potassium.streams
 
-import com.lynbrookrobotics.potassium.ClockMocking
 import org.scalatest.FunSuite
 import squants.motion.{FeetPerSecond, Velocity}
 import squants.space.{Feet, Length}
 import squants.time.Milliseconds
 
 import scala.collection.immutable.Queue
-import com.lynbrookrobotics.potassium.Platform
+import com.lynbrookrobotics.potassium.{ClockMocking, Platform}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Promise}
@@ -86,7 +85,7 @@ class StreamTest extends FunSuite {
   test("Derivative of constant values is always zero") {
     implicit val (clock, update) = ClockMocking.mockedClockTicker
 
-    val (str, pub) = Stream.manual[Length]
+    val (str, pub) = Stream.manual[Length](NonPeriodic, clock)
     val derivative = str.derivative
 
     var lastValue: Velocity = null
@@ -107,7 +106,7 @@ class StreamTest extends FunSuite {
     implicit val (clock, update) = ClockMocking.mockedClockTicker
     implicit val tolerance = Feet(0.001) / Milliseconds(1)
 
-    val (str, pub) = Stream.manual[Length]
+    val (str, pub) = Stream.manual[Length](NonPeriodic, clock)
     val derivative = str.derivative
 
     var lastValue: Velocity = null
@@ -127,7 +126,7 @@ class StreamTest extends FunSuite {
   test("Integral of zero is always zero") {
     implicit val (clock, update) = ClockMocking.mockedClockTicker
 
-    val (str, pub) = Stream.manual[Velocity]
+    val (str, pub) = Stream.manual[Velocity](NonPeriodic, clock)
     val integral = str.integral
 
     var lastValue: Length = null
@@ -148,7 +147,7 @@ class StreamTest extends FunSuite {
     implicit val (clock, update) = ClockMocking.mockedClockTicker
     implicit val tolerance = FeetPerSecond(0.001) * Milliseconds(1)
 
-    val (str, pub) = Stream.manual[Velocity]
+    val (str, pub) = Stream.manual[Velocity](NonPeriodic, clock)
     val integral = str.integral
 
     var lastValue: Length = null

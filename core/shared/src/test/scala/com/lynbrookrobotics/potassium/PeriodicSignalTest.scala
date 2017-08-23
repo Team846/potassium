@@ -1,5 +1,4 @@
 package com.lynbrookrobotics.potassium
-
 import org.scalacheck.Prop.forAll
 import org.scalatest.FunSuite
 import squants.{Dimension, Length, Quantity, UnitOfMeasure}

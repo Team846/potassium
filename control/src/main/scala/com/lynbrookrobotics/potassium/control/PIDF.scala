@@ -1,7 +1,6 @@
 package com.lynbrookrobotics.potassium.control
 
-import com.lynbrookrobotics.potassium.clock.Clock
-import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
+import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.streams._
 import com.lynbrookrobotics.potassium.units._
 import squants.Quantity

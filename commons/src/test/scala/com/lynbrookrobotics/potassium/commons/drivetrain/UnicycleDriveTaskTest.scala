@@ -1,15 +1,17 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.control.PIDConfig
-import com.lynbrookrobotics.potassium.testing.ClockMocking
+import com.lynbrookrobotics.potassium.ClockMocking
+import com.lynbrookrobotics.potassium.streams.{Periodic, Stream}
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
-import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal, SignalLike}
+import com.lynbrookrobotics.potassium._
+import com.lynbrookrobotics.potassium.clock.Clock
 import squants.motion.{AngularVelocity, DegreesPerSecond, MetersPerSecond, MetersPerSecondSquared}
 import squants.motion._
 import squants.space.{Degrees, Meters}
 import squants.time.{Milliseconds, Seconds}
-import squants.{Acceleration, Angle, Length, Percent, Velocity}
+import squants.{Acceleration, Angle, Length, Percent, Time, Velocity}
 import org.scalatest.FunSuite
 
 class UnicycleDriveTaskTest extends FunSuite {
@@ -25,19 +27,25 @@ class UnicycleDriveTaskTest extends FunSuite {
     override protected def controlMode(implicit hardware: Hardware,
                                        props: Properties): UnicycleControlMode = NoOperation
 
-    override protected def driveClosedLoop(signal: SignalLike[DriveSignal])
+    override protected def driveClosedLoop(signal: Stream[DriveSignal])
                                           (implicit hardware: Hardware,
-                                           props: Signal[Properties]): PeriodicSignal[DriveSignal] = signal.toPeriodic
+                                           props: Signal[Properties]): Stream[DriveSignal] = signal
 
     override type Drivetrain = Component[DriveSignal]
   }
 
-  implicit val hardware: UnicycleHardware = new UnicycleHardware {
-    override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
-    override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
 
-    override val forwardPosition: Signal[Length] = null
-    override val turnPosition: Signal[Angle] = null
+  val period = Milliseconds(5)
+  val periodicity = Periodic(period)
+  implicit val (clock, triggerClock) = ClockMocking.mockedClockTicker
+
+  implicit val hardware: UnicycleHardware = new UnicycleHardware {
+    // MetersPerSecond(0)
+    override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
+    override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
+
+    override val forwardPosition: Stream[Length] = null
+    override val turnPosition: Stream[Angle] = null
   }
 
 
@@ -76,8 +84,8 @@ class UnicycleDriveTaskTest extends FunSuite {
     var lastAppliedSignal: UnicycleSignal = null
 
     val drivetrain = new Component[UnicycleSignal](Milliseconds(5)) {
-      override def defaultController: PeriodicSignal[UnicycleSignal] =
-        Signal.constant(UnicycleSignal(Percent(0), Percent(0))).toPeriodic
+      override def defaultController: Stream[UnicycleSignal] =
+        Stream.periodic(period)(UnicycleSignal(Percent(0), Percent(0)))
 
       override def applySignal(signal: UnicycleSignal): Unit = {
         lastAppliedSignal = signal
@@ -87,11 +95,11 @@ class UnicycleDriveTaskTest extends FunSuite {
     var currentPosition = Meters(5)
 
     val hardware: UnicycleHardware = new UnicycleHardware {
-      override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
-      override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
 
-      override val forwardPosition: Signal[Length] = Signal(currentPosition)
-      override val turnPosition: Signal[Angle] = null
+      override val forwardPosition: Stream[Length] = Stream.periodic(period)(currentPosition)
+      override val turnPosition: Stream[Angle] = null
     }
 
     val task = new drive.unicycleTasks.DriveDistance(
@@ -159,8 +167,8 @@ class UnicycleDriveTaskTest extends FunSuite {
     implicit val (clock, ticker) = ClockMocking.mockedClockTicker
 
     val drivetrain = new Component[UnicycleSignal](Milliseconds(5)) {
-      override def defaultController: PeriodicSignal[UnicycleSignal] =
-        Signal.constant(UnicycleSignal(Percent(0), Percent(0))).toPeriodic
+      override def defaultController: Stream[UnicycleSignal] =
+        Stream.periodic(period)(UnicycleSignal(Percent(0), Percent(0)))
 
       override def applySignal(signal: UnicycleSignal): Unit = {
         lastAppliedSignal = signal
@@ -171,11 +179,11 @@ class UnicycleDriveTaskTest extends FunSuite {
     var currentPositionTurn = Degrees(5)
 
     val hardware: UnicycleHardware = new UnicycleHardware {
-      override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
-      override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
 
-      override val forwardPosition: Signal[Length] = Signal(currentPositionForward)
-      override val turnPosition: Signal[Angle] = Signal(currentPositionTurn)
+      override val forwardPosition: Stream[Length] = Stream.periodic(period)(currentPositionForward)
+      override val turnPosition: Stream[Angle] = Stream.periodic(period)(currentPositionTurn)
     }
 
     val task = new drive.unicycleTasks.DriveDistanceStraight(
@@ -253,8 +261,8 @@ class UnicycleDriveTaskTest extends FunSuite {
     implicit val (clock, ticker) = ClockMocking.mockedClockTicker
 
     val drivetrain = new Component[UnicycleSignal](Milliseconds(5)) {
-      override def defaultController: PeriodicSignal[UnicycleSignal] =
-        Signal.constant(UnicycleSignal(Percent(0), Percent(0))).toPeriodic
+      override def defaultController: Stream[UnicycleSignal] =
+        Stream.periodic(period)(UnicycleSignal(Percent(0), Percent(0)))
 
       override def applySignal(signal: UnicycleSignal): Unit = {
         lastAppliedSignal = signal
@@ -264,11 +272,11 @@ class UnicycleDriveTaskTest extends FunSuite {
     var currentPosition = Degrees(5)
 
     val hardware: UnicycleHardware = new UnicycleHardware {
-      override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
-      override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
 
-      override val forwardPosition: Signal[Length] = null
-      override val turnPosition: Signal[Angle] = Signal(currentPosition)
+      override val forwardPosition: Stream[Length] = null
+      override val turnPosition: Stream[Angle] = Stream.periodic(period)(currentPosition)
     }
 
     val task = new drive.unicycleTasks.RotateByAngle(

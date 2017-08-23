@@ -1,4 +1,4 @@
-import com.lynbrookrobotics.potassium.{ClockMocking, Signal}
+import com.lynbrookrobotics.potassium.{ClockMocking, Signal, units}
 import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.streams.{Periodic, Stream}
 import com.lynbrookrobotics.potassium.units.{GenericIntegral, Ratio}
@@ -8,7 +8,6 @@ import squants.time.{Seconds, TimeIntegral}
 import squants.{Dimensionless, Percent, Time}
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
-import com.lynbrookrobotics.potassium.units
 import squants.motion.{FeetPerSecond, Velocity}
 
 class PIDFTest extends FunSuite {

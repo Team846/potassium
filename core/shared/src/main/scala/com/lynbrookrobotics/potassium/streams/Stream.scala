@@ -204,8 +204,8 @@ abstract class Stream[T] { self =>
     *
     * @return a stream with tuples of emitted values and the time of emission
     */
-  def zipWithTime(implicit clock: Clock): Stream[(T, Time)] = {
-    map(v => (v, clock.currentTime))
+  def zipWithTime: Stream[(T, Time)] = {
+    map(v => (v, originClock.currentTime))
   }
 
   /**
@@ -270,7 +270,7 @@ abstract class Stream[T] { self =>
     * Zips the stream with the periods between when values were published
     * @return a stream of values and times in tuples
     */
-  def zipWithDt(implicit clock: Clock): Stream[(T, Time)] = {
+  def zipWithDt: Stream[(T, Time)] = {
     zipWithTime.sliding(2).map { q =>
       (q.last._1, q.last._2 - q.head._2)
     }
@@ -293,7 +293,7 @@ abstract class Stream[T] { self =>
     * the integral of the signal's units
     * @return a signal producing values that are the integral of the signal
     */
-  def integral[I <: Quantity[I] with TimeIntegral[_]](implicit derivEv: T => TimeDerivative[I], clock: Clock): Stream[I] = {
+  def integral[I <: Quantity[I] with TimeIntegral[_]](implicit derivEv: T => TimeDerivative[I]): Stream[I] = {
     // We use null as a cheap way to handle the initial value since there is
     // no way to get a "zero" for I
 

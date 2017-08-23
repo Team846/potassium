@@ -16,8 +16,7 @@ object CurrentLimiting {
       }
     }
 
-    // TODO: Fix
-    input.zipWithDt(null).scanLeft(Percent(0)) { case (acc, (target, dt)) =>
+    input.zipWithDt.scanLeft(Percent(0)) { case (acc, (target, dt)) =>
       if (target < Percent(0)) {
         -limit(-acc, -target, dt)
       } else {

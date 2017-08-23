@@ -10,7 +10,7 @@ import squants.{Acceleration, Length, Percent, Velocity}
 import squants.motion._
 import squants.space.{Degrees, Feet, Inches, Meters}
 import squants.time.{Milliseconds, Seconds}
-import com.lynbrookrobotics.potassium.testing.ClockMocking._
+import com.lynbrookrobotics.potassium.ClockMocking._
 import squants.mass.{KilogramsMetersSquared, Pounds}
 
 object SimulateDrivetrain extends App {
