@@ -499,7 +499,6 @@ object Stream {
       })
 
       override def publishValue(value: T): Unit = {
-        println(s"publishing value $value")
         originTimeStream.get.publishValue(clock.currentTime)
         super.publishValue(value)
       }

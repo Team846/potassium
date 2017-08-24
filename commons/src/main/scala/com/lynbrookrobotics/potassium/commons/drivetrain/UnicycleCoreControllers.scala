@@ -56,7 +56,9 @@ trait UnicycleCoreControllers {
       props.map(_.turnControlGainsFull)
     )
 
-    forwardControl.zip(turnControl).map(s => UnicycleSignal(s._1, s._2))
+    forwardControl.zip(turnControl).map { s =>
+      UnicycleSignal(s._1, s._2)
+    }
   }
 
   def speedControl(unicycle: Stream[UnicycleSignal])
@@ -97,15 +99,15 @@ trait UnicycleCoreControllers {
   def forwardPositionControl(targetAbsolute: Stream[Length])
                             (implicit hardware: DrivetrainHardware,
                              props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Length]) = {
-      val error: Stream[Length] = targetAbsolute.minus(hardware.forwardPosition)
+    val error: Stream[Length] = targetAbsolute.minus(hardware.forwardPosition)
 
-      val control = PIDF.pid(
-        hardware.forwardPosition,
-        targetAbsolute,
-        props.map(_.forwardPositionControlGains)
-      ).map(s => UnicycleSignal(s, Percent(0)))
+    val control = PIDF.pid(
+      hardware.forwardPosition,
+      targetAbsolute,
+      props.map(_.forwardPositionControlGains)
+    ).map(s => UnicycleSignal(s, Percent(0)))
 
-      (control, error)
+    (control, error)
   }
 
   def continuousTurnPositionControl(targetAbsolute: Stream[Angle])

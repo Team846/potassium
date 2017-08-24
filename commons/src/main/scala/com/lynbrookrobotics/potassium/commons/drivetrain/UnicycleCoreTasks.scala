@@ -64,7 +64,7 @@ trait UnicycleCoreTasks {
                       hardware: DrivetrainHardware,
                       props: Signal[DrivetrainProperties]) extends FiniteTask {
     override def onStart(): Unit = {
-      val absoluteDistance = hardware.forwardPosition.currentValue.map(_ + distance).withCheck(v => println(s"absolute distance $v"))
+      val absoluteDistance = hardware.forwardPosition.currentValue.map(_ + distance)
       val (controller, error) = forwardPositionControl(absoluteDistance)
 
       val checkedController = controller.withCheckZipped(error) { error =>

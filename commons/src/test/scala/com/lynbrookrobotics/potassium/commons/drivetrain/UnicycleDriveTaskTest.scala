@@ -48,7 +48,6 @@ class UnicycleDriveTaskTest extends FunSuite {
     override val turnPosition: Stream[Angle] = null
   }
 
-
   test("Drive distance task sets up correct relative position and ends at target") {
     val drive = new TestDrivetrain
 
@@ -110,6 +109,8 @@ class UnicycleDriveTaskTest extends FunSuite {
     task.init()
 
     ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
 
     assert(lastAppliedSignal.forward.toPercent == 50)
 
@@ -123,7 +124,7 @@ class UnicycleDriveTaskTest extends FunSuite {
 
     ticker(Milliseconds(5))
 
-    assert(lastAppliedSignal.forward.toPercent == 0 && !task.isRunning)
+    assert(!task.isRunning)
   }
 
   test("Drive distance straight task sets up correct relative position and ends at target") {
@@ -192,6 +193,8 @@ class UnicycleDriveTaskTest extends FunSuite {
     task.init()
 
     ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
 
     assert(lastAppliedSignal.forward.toPercent == 50 &&
       lastAppliedSignal.turn.toPercent == 0)
@@ -217,9 +220,7 @@ class UnicycleDriveTaskTest extends FunSuite {
 
     ticker(Milliseconds(5))
 
-    assert(lastAppliedSignal.forward.toPercent == 0 &&
-      lastAppliedSignal.turn.toPercent == 0 &&
-      !task.isRunning)
+    assert(!task.isRunning)
   }
 
   test("Turn angle task sets up correct relative position and ends at target") {
@@ -283,6 +284,8 @@ class UnicycleDriveTaskTest extends FunSuite {
     task.init()
 
     ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
 
     assert(lastAppliedSignal.turn.toPercent == 50)
 
@@ -296,6 +299,6 @@ class UnicycleDriveTaskTest extends FunSuite {
 
     ticker(Milliseconds(5))
 
-    assert(lastAppliedSignal.turn.toPercent == 0 && !task.isRunning)
+    assert(!task.isRunning)
   }
 }
