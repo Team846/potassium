@@ -18,6 +18,7 @@ scalaVersion in ThisBuild := "2.12.1"
 resolvers in ThisBuild += "Funky-Repo" at "http://team846.github.io/repo"
 
 concurrentRestrictions in Global += Tags.limit(Tags.Test, 1)
+parallelExecution in Global := false
 
 lazy val sharedDependencies = Def.setting(Seq(
   "org.typelevel"  %%% "squants"  % "1.3.0",
