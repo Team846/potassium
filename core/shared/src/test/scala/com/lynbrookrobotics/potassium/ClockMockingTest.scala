@@ -1,4 +1,4 @@
-package com.lynbrookrobotics.potassium.testing
+package com.lynbrookrobotics.potassium
 
 import squants.Time
 import squants.time.Milliseconds
