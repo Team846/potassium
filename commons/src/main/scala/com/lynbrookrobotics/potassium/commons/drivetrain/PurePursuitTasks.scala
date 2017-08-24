@@ -41,9 +41,10 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
       val (unicycle, error) = followWayPointsController(
         wayPoints,
         position,
-        turnPosition)
+        turnPosition
+      )
 
-      drive.setController(lowerLevelOpenLoop(unicycle.withCheckZipped(error){e =>
+      drive.setController(lowerLevelOpenLoop(unicycle.withCheckZipped(error) { e =>
         if (e.exists(_ < tolerance)) {
           finished()
         }

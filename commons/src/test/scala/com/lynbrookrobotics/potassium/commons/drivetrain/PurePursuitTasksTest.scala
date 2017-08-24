@@ -100,6 +100,9 @@ class PurePursuitTasksTest extends FunSuite {
     task.init()
 
     ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
+
     assert(!task.isRunning)
   }
 
@@ -122,6 +125,8 @@ class PurePursuitTasksTest extends FunSuite {
 
     task.init()
 
+    ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
     ticker(Milliseconds(5))
 
     assert(lastAppliedSignal.turn.toPercent == 0, s"Turn was ${lastAppliedSignal.turn.toPercent} %")
