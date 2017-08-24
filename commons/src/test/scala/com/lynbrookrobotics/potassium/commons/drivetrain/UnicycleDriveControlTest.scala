@@ -133,6 +133,7 @@ class UnicycleDriveControlTest extends FunSuite {
 
       // TODO: this does not trigger an update in function defined in above foreach
       trigggerClock.apply(period)
+      trigggerClock.apply(period)
 
       (math.abs(forwardOut.toEach - (fwd.toMetersPerSecond / 10)) <= 0.01) &&
         (math.abs(turnOut.toEach - (turn.toDegreesPerSecond / 10)) <= 0.01)
@@ -179,6 +180,7 @@ class UnicycleDriveControlTest extends FunSuite {
     })
 
     trigggerClock.apply(period)
+    trigggerClock.apply(period)
 
     assert(forwardOut.toPercent == 0)
   }
@@ -222,6 +224,7 @@ class UnicycleDriveControlTest extends FunSuite {
       turnOut = o.turn
     })
 
+    trigggerClock.apply(period)
     trigggerClock.apply(period)
 
     assert(forwardOut.toPercent == 50)
@@ -267,6 +270,7 @@ class UnicycleDriveControlTest extends FunSuite {
     })
 
     trigggerClock.apply(period)
+    trigggerClock.apply(period)
 
     assert(forwardOut.toPercent == -50)
   }
@@ -310,6 +314,7 @@ class UnicycleDriveControlTest extends FunSuite {
       turnOut = o.turn
     })
 
+    trigggerClock.apply(period)
     trigggerClock.apply(period)
 
     assert(turnOut.toPercent == 0)
@@ -355,6 +360,7 @@ class UnicycleDriveControlTest extends FunSuite {
     })
 
     trigggerClock.apply(period)
+    trigggerClock.apply(period)
 
     assert(turnOut.toPercent == 50)
   }
@@ -398,6 +404,7 @@ class UnicycleDriveControlTest extends FunSuite {
       turnOut = o.turn
     })
 
+    trigggerClock.apply(period)
     trigggerClock.apply(period)
 
     assert(turnOut.toPercent == -50)
