@@ -7,7 +7,6 @@ import squants.Quantity
 import squants.time.{Time, TimeDerivative, TimeIntegral}
 
 import scala.collection.immutable.Queue
-import scala.collection.mutable
 import scala.ref.WeakReference
 import com.lynbrookrobotics.potassium.Platform
 
@@ -226,6 +225,11 @@ abstract class Stream[T] { self =>
       ptr.get match {
         case Some(s) =>
           if (last.size == size) {
+            println("sup!")
+            if (last.size == 0) {
+              val wait = true
+              println("sliding size: 0")
+            }
             last = last.tail
           }
 
@@ -313,6 +317,9 @@ abstract class Stream[T] { self =>
     previousValues.zipWithDt.scanLeft(null.asInstanceOf[I]){case (acc, (current3Values, dt)) =>
       // TODO: review please
       if (acc != null) {
+        if (current3Values.isEmpty) {
+          println("empty 3 values")
+        }
         acc + (dt * current3Values.head + 4 * dt * current3Values(1) + dt * current3Values(2)) / 6
       } else {
         (current3Values.last: TimeDerivative[I]) * dt

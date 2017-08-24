@@ -38,6 +38,7 @@ class TestXYPosition extends FunSuite{
     simpsonsPosition.foreach(lastSimpsonPosition = _)
 
     for(i <- 1 to periodsPerSecond){
+//      println(s"i $i")
       clockTrigger.apply(period)
       pubVelocity.apply(FeetPerSecond(1))
       pubAngle.apply(Degrees(90))

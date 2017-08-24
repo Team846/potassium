@@ -27,13 +27,9 @@ object XYPosition {
       distances.last - distances.head
     }
 
-    val origin = Point(
-      Feet(0),
-      Feet(0))
-
     // approximate that robot traveled in a straight line at the average
     // angle over the course of 1 tick
-    deltaDistance.zip(averageAngle).scanLeft(origin){
+    deltaDistance.zip(averageAngle).scanLeft(Point.origin){
       case (acc, (distance, avrgAngle)) =>
         acc + Point(
           distance * avrgAngle.cos,
@@ -42,7 +38,7 @@ object XYPosition {
   }
 
   /**
-    * differentiats position, then reintegrates with Simpsons integration
+    * differentiats x and y position, then reintegrates with Simpsons integration
     * @param angle
     * @param distanceTraveled
     * @return
@@ -53,21 +49,19 @@ object XYPosition {
       (angles.head + angles.last) / 2D)
 
     val velocity = distanceTraveled.derivative
-    val velocityX = velocity.zip(averageAngle).map{v =>
-      val (speed, angle) = v
-      angle.cos * speed
+    val velocityX = velocity.zip(averageAngle).map{ case(speed, avrgAngle) =>
+      avrgAngle.cos * speed
     }
 
-    val velocityY = velocity.zip(averageAngle).map{v =>
-      val (speed, angle) = v
-      angle.sin * speed
+    val velocityY = velocity.zip(averageAngle).map{ case(speed, avrgAngle)  =>
+      avrgAngle.sin * speed
     }
 
     val xPosition = velocityX.simpsonsIntegral
     val yPosition = velocityY.simpsonsIntegral
 
-    xPosition.zip(yPosition).map { pose =>
-      Point(pose._1, pose._2)
+    xPosition.zip(yPosition).map { case (xPose, yPose) =>
+      Point(xPose, yPose)
     }
   }
 }
