@@ -83,20 +83,21 @@ class PurePursuitControllerTests extends FunSuite {
     val target = new Point(Feet(0), Feet(1))
 
     // TODO: Why is this not inferred?
-    val path = hardware.forwardPosition.mapToConstant[(Segment, Option[Segment])](
+    val path = hardware.turnPosition.mapToConstant[(Segment, Option[Segment])](
       (Segment(origin, target), None)
     )
 
-    val position = hardware.forwardPosition.mapToConstant(origin)
+    val position = hardware.turnPosition.mapToConstant(origin)
 
     val output = controllers.purePursuitControllerTurn(
-      hardware.forwardPosition.mapToConstant(Degrees(0)),
+      hardware.turnPosition.mapToConstant(Degrees(0)),
       position,
       path)._1
 
     var lastOutput = Percent(-10)
     output.foreach(lastOutput = _)
 
+    triggerClock.apply(period)
     triggerClock.apply(period)
 
     assert(lastOutput == Percent(0), "Output is: " + lastOutput)
@@ -131,6 +132,7 @@ class PurePursuitControllerTests extends FunSuite {
     var out = Percent(-10)
 
     output.foreach(out = _)
+    triggerClock.apply(period)
     triggerClock.apply(period)
 
     assert(out.abs >= Percent(100))
@@ -193,6 +195,7 @@ class PurePursuitControllerTests extends FunSuite {
     var out = Percent(-10)
     output.foreach(out = _)
     triggerClock.apply(Milliseconds(5))
+    triggerClock.apply(Milliseconds(5))
 
     implicit val Tolerance = Percent(0.001)
     assert(out ~= Percent(-50), s"result is ${out.toPercent}")
@@ -222,6 +225,7 @@ class PurePursuitControllerTests extends FunSuite {
     var out = Percent(-10)
     output.foreach(out = _)
 
+    triggerClock.apply(period)
     triggerClock.apply(period)
 
     implicit val Tolerance = Percent(0.001)
