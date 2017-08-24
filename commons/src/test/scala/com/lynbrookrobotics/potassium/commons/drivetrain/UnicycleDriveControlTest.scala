@@ -21,8 +21,8 @@ class UnicycleDriveControlTest extends FunSuite {
   implicit val hardware: UnicycleHardware = new UnicycleHardware {
 
 
-    override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
-    override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
+    override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))(clock)
+    override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))(clock)
 
     override val forwardPosition: Stream[Length] = null
     override val turnPosition: Stream[Angle] = null
@@ -61,7 +61,7 @@ class UnicycleDriveControlTest extends FunSuite {
 
     check(forAll { x: Double =>
       val out = drive.UnicycleControllers.openForwardOpenDrive(
-        hardware.forwardPosition.mapToConstant(Each(x)))
+        hardware.forwardVelocity.mapToConstant(Each(x)))
 
       var forward = Percent(-10)
       var turn = Percent(-10)
@@ -91,7 +91,7 @@ class UnicycleDriveControlTest extends FunSuite {
 
       trigggerClock.apply(period)
 
-      turn.toEach == x && turn.toEach == 0
+      turn.toEach == x && forward.toEach == 0
     })
   }
 
@@ -131,6 +131,7 @@ class UnicycleDriveControlTest extends FunSuite {
         turnOut = o.turn
       })
 
+      // TODO: this does not trigger an update in function defined in above foreach
       trigggerClock.apply(period)
 
       (math.abs(forwardOut.toEach - (fwd.toMetersPerSecond / 10)) <= 0.01) &&

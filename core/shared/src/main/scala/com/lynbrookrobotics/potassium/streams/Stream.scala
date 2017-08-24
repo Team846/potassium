@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.streams
 
+import java.util
 import java.util.concurrent.Semaphore
 
 import com.lynbrookrobotics.potassium.clock.Clock
@@ -9,7 +10,6 @@ import squants.time.{Time, TimeDerivative, TimeIntegral}
 import scala.collection.immutable.Queue
 import scala.collection.mutable
 import scala.ref.WeakReference
-
 import com.lynbrookrobotics.potassium.Platform
 
 abstract class Stream[T] { self =>
@@ -281,7 +281,7 @@ abstract class Stream[T] { self =>
     * the derivative of the stream's units
     * @return a stream producing values that are the derivative of the stream
     */
-  def derivative[D <: Quantity[D] with TimeDerivative[_]](implicit intEv: T => TimeIntegral[D], clock: Clock): Stream[D] = {
+  def derivative[D <: Quantity[D] with TimeDerivative[_]](implicit intEv: T => TimeIntegral[D]): Stream[D] = {
     zipWithTime.sliding(2).map { q =>
       val dt = q.last._2 - q.head._2
       (q.last._1 / dt) - (q.head._1 / dt)
@@ -308,14 +308,14 @@ abstract class Stream[T] { self =>
     // scalastyle:on
   }
 
-  def simpsonsIntegral[I <: Quantity[I] with TimeIntegral[_]](implicit derivEv: T => TimeDerivative[I], clock: Clock): Stream[I] = {
+  def simpsonsIntegral[I <: Quantity[I] with TimeIntegral[_]](implicit derivEv: T => TimeDerivative[I]): Stream[I] = {
     val previousValues = sliding(3)
 
     // scalastyle:off
     previousValues.zipWithDt.scanLeft(null.asInstanceOf[I]){case (acc, (current3Values, dt)) =>
-      if (current3Values.head != null) {
-        val secondVelocity = current3Values.dequeue._2.dequeue._1
-        acc + (dt * current3Values.head + 4 * dt * secondVelocity + dt * current3Values.last) / 6
+      // TODO: review please
+      if (acc != null) {
+        acc + (dt * current3Values.head + 4 * dt * current3Values(1) + dt * current3Values(2)) / 6
       } else {
         (current3Values.last: TimeDerivative[I]) * dt
       }

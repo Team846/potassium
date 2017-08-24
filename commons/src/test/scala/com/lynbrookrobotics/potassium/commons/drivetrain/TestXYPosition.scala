@@ -22,7 +22,7 @@ class TestXYPosition extends FunSuite{
     val (velocity, pubVelocity) = Stream.manual[Velocity](Periodic(period), clock)
     val distance = velocity.integral
 
-    val (angle, pubAngle) = Stream.manual[Angle]
+    val (angle, pubAngle) = Stream.manual[Angle](Periodic(period), clock)
 
     val targetPosition = Point(Feet(0), Feet(1))
 
@@ -37,7 +37,7 @@ class TestXYPosition extends FunSuite{
     position.foreach(lastPosition = _)
     simpsonsPosition.foreach(lastSimpsonPosition = _)
 
-    for(_ <- 1 to periodsPerSecond){
+    for(i <- 1 to periodsPerSecond){
       clockTrigger.apply(period)
       pubVelocity.apply(FeetPerSecond(1))
       pubAngle.apply(Degrees(90))
