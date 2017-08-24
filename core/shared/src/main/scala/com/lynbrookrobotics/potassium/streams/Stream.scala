@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.streams
 
-import java.util.concurrent.{ConcurrentLinkedQueue, Semaphore}
+import java.util.concurrent.Semaphore
 
 import com.lynbrookrobotics.potassium.clock.Clock
 import squants.Quantity
@@ -18,10 +18,10 @@ abstract class Stream[T] { self =>
 
   val originTimeStream: Option[Stream[Time]]
 
-  private[this] val listeners = new ConcurrentLinkedQueue[T => Unit]
+  private[this] var listeners = Vector.empty[T => Unit]
 
   protected def publishValue(value: T): Unit = {
-    listeners.forEach(_.apply(value))
+    listeners.foreach(_.apply(value))
     // TODO: more stuff maybe
   }
 
@@ -474,13 +474,13 @@ abstract class Stream[T] { self =>
     * @return a function to call to remove the listener
     */
   def foreach(thunk: T => Unit): Cancel = {
-    listeners.synchronized {
-      listeners.add(thunk)
+    self.synchronized {
+      listeners = listeners :+ thunk
     }
 
     () => {
-      listeners.synchronized {
-        listeners.remove(thunk)
+      self.synchronized {
+        listeners = listeners.filterNot(_ eq thunk)
       }
     }
   }
