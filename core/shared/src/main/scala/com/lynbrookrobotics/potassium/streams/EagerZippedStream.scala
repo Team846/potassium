@@ -4,7 +4,7 @@ class EagerZippedStream[A, B](parentA: Stream[A], parentB: Stream[B]) extends St
   override val expectedPeriodicity: ExpectedPeriodicity = NonPeriodic
 
   // TODO: Review please. Use Option maybe?
-  override val originClock = null
+  override val originTimeStream = null
 
   private[this] var lastASlot : Option[A] = None
   private[this] var lastBSlot : Option[B] = None

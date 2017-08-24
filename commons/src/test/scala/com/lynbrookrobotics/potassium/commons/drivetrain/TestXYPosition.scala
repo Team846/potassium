@@ -17,12 +17,12 @@ class TestXYPosition extends FunSuite{
 
 
   test("Test moving straight at 1 ft/s for 1 sec results in moving 1 ft forward") {
-    val (clock, clockTrigger) = ClockMocking.mockedClockTicker
+    implicit val (clock, clockTrigger) = ClockMocking.mockedClockTicker
 
-    val (velocity, pubVelocity) = Stream.manual[Velocity](Periodic(period), clock)
+    val (velocity, pubVelocity) = Stream.manualWithTime[Velocity](Periodic(period))
     val distance = velocity.integral
 
-    val (angle, pubAngle) = Stream.manual[Angle](Periodic(period), clock)
+    val (angle, pubAngle) = Stream.manualWithTime[Angle](Periodic(period))
 
     val targetPosition = Point(Feet(0), Feet(1))
 
@@ -49,12 +49,12 @@ class TestXYPosition extends FunSuite{
   }
 
   test("Test moving 45 degrees at 1 ft/s for 1 sec results in (sqrt(2)/2,sqrt(2)/2) ") {
-    val (clock, clockTrigger) = ClockMocking.mockedClockTicker
+    implicit val (clock, clockTrigger) = ClockMocking.mockedClockTicker
 
-    val (velocity, pubVel) = Stream.manual[Velocity](Periodic(period), clock)
+    val (velocity, pubVel) = Stream.manualWithTime[Velocity](Periodic(period))
     val distance = velocity.integral
 
-    val (angle, pubAngle) = Stream.manual[Angle](Periodic(period), clock)
+    val (angle, pubAngle) = Stream.manualWithTime[Angle](Periodic(period))
     val targetPosition = Point(
       Feet(1 * Degrees(45).cos),
       Feet(1 * Degrees(45).sin))
@@ -83,9 +83,9 @@ class TestXYPosition extends FunSuite{
 
   test("Test rotating 90 degrees/s with radius 1 starting angle 90 " +
        "degrees for 1 sec results in (-1,1) ") {
-    val (clock, clockTrigger) = ClockMocking.mockedClockTicker
+    implicit val (clock, clockTrigger) = ClockMocking.mockedClockTicker
 
-    val (angularSpeed, pubTurnSpeed) = Stream.manual[AngularVelocity](Periodic(period), clock)
+    val (angularSpeed, pubTurnSpeed) = Stream.manualWithTime[AngularVelocity](Periodic(period))
     val angle = angularSpeed.integral.map(_ + Degrees(90))
 
     val distance = angle.map{ angle =>

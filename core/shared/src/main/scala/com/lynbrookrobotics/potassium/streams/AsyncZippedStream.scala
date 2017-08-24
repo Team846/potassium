@@ -6,7 +6,7 @@ class AsyncZippedStream[A, B](parentA: Stream[A], parentB: Stream[B]) extends St
   override val expectedPeriodicity: ExpectedPeriodicity = parentA.expectedPeriodicity
 
   // TODO: Review please
-  override val originClock: Clock = parentA.originClock
+  override val originTimeStream = parentA.originTimeStream
 
   private[this] var secondarySlot: Option[B] = None
 

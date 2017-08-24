@@ -37,7 +37,7 @@ class UnicycleDriveTaskTest extends FunSuite {
 
   val period = Milliseconds(5)
   val periodicity = Periodic(period)
-  implicit val (clock, triggerClock) = ClockMocking.mockedClockTicker
+  implicit val (clock, ticker) = ClockMocking.mockedClockTicker
 
   implicit val hardware: UnicycleHardware = new UnicycleHardware {
     // MetersPerSecond(0)
@@ -50,8 +50,6 @@ class UnicycleDriveTaskTest extends FunSuite {
 
 
   test("Drive distance task sets up correct relative position and ends at target") {
-    implicit val (clock, ticker) = ClockMocking.mockedClockTicker
-
     val drive = new TestDrivetrain
 
     val props = Signal.constant(new UnicycleProperties {
@@ -164,8 +162,6 @@ class UnicycleDriveTaskTest extends FunSuite {
 
     var lastAppliedSignal: UnicycleSignal = null
 
-    implicit val (clock, ticker) = ClockMocking.mockedClockTicker
-
     val drivetrain = new Component[UnicycleSignal](Milliseconds(5)) {
       override def defaultController: Stream[UnicycleSignal] =
         Stream.periodic(period)(UnicycleSignal(Percent(0), Percent(0)))
@@ -257,8 +253,6 @@ class UnicycleDriveTaskTest extends FunSuite {
     })
 
     var lastAppliedSignal: UnicycleSignal = null
-
-    implicit val (clock, ticker) = ClockMocking.mockedClockTicker
 
     val drivetrain = new Component[UnicycleSignal](Milliseconds(5)) {
       override def defaultController: Stream[UnicycleSignal] =

@@ -53,8 +53,6 @@ object PIDF {
                         D <: Quantity[D] with TimeDerivative[S]](current: Stream[S],
                                                                  target: Stream[S],
                                                                  gain: Signal[Ratio[U, D]]): Stream[U] = {
-    // TODO: Review please
-    implicit val clock = current.originClock
     target.minus(current).derivative.map(d => d ** gain.get)
   }
 
@@ -63,8 +61,6 @@ object PIDF {
                       I <: Quantity[I] with TimeIntegral[S]](current: Stream[S],
                                                              target: Stream[S],
                                                              gain: Signal[Ratio[U, I]]): Stream[U] = {
-    // TODO: Review please
-    implicit val clock = current.originClock
     target.minus(current).integral.map(d => d ** gain.get)
   }
 

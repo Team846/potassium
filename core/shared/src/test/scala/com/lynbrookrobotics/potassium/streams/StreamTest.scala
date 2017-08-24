@@ -85,7 +85,7 @@ class StreamTest extends FunSuite {
   test("Derivative of constant values is always zero") {
     implicit val (clock, update) = ClockMocking.mockedClockTicker
 
-    val (str, pub) = Stream.manual[Length](NonPeriodic, clock)
+    val (str, pub) = Stream.manualWithTime[Length](Periodic(Milliseconds(1)))
     val derivative = str.derivative
 
     var lastValue: Velocity = null
@@ -106,7 +106,7 @@ class StreamTest extends FunSuite {
     implicit val (clock, update) = ClockMocking.mockedClockTicker
     implicit val tolerance = Feet(0.001) / Milliseconds(1)
 
-    val (str, pub) = Stream.manual[Length](NonPeriodic, clock)
+    val (str, pub) = Stream.manualWithTime[Length](Periodic(Milliseconds(1)))
     val derivative = str.derivative
 
     var lastValue: Velocity = null
@@ -126,7 +126,7 @@ class StreamTest extends FunSuite {
   test("Integral of zero is always zero") {
     implicit val (clock, update) = ClockMocking.mockedClockTicker
 
-    val (str, pub) = Stream.manual[Velocity](NonPeriodic, clock)
+    val (str, pub) = Stream.manualWithTime[Velocity](Periodic(Milliseconds(1)))
     val integral = str.integral
 
     var lastValue: Length = null
@@ -147,7 +147,7 @@ class StreamTest extends FunSuite {
     implicit val (clock, update) = ClockMocking.mockedClockTicker
     implicit val tolerance = FeetPerSecond(0.001) * Milliseconds(1)
 
-    val (str, pub) = Stream.manual[Velocity](NonPeriodic, clock)
+    val (str, pub) = Stream.manualWithTime[Velocity](Periodic(Milliseconds(1)))
     val integral = str.integral
 
     var lastValue: Length = null

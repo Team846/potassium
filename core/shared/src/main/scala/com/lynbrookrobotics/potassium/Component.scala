@@ -13,12 +13,12 @@ import com.lynbrookrobotics.potassium.streams.{NonPeriodic, Stream}
   * is the place to implement safeties, as it is the last layer of signal transformation.
   *
   * @param period the update rate of the component
-  * @param clock the clock to use to schedule periodic updates
   * @tparam T the type of values produced by signals for the component
   */
-abstract class Component[T](val period: Time)(implicit val clock: Clock) {
+abstract class Component[T](val period: Time) {
   def defaultController: Stream[T]
-  private var currentController: Stream[T] = defaultController
+  private var currentControllerHandle: Option[() => Unit] = None
+  setController(defaultController)
 
   private var lastControlSignal: Option[T] = None
 
@@ -33,8 +33,9 @@ abstract class Component[T](val period: Time)(implicit val clock: Clock) {
       throw new IllegalArgumentException("Controller must be periodic")
     }
 
-    currentController = controller
-    controller.foreach{ value =>
+    currentControllerHandle.foreach(_.apply())
+
+    currentControllerHandle = Some(controller.foreach { value =>
       val shouldUpdate = lastControlSignal.isEmpty ||
         shouldComponentUpdate(lastControlSignal.get, value)
 
@@ -43,7 +44,7 @@ abstract class Component[T](val period: Time)(implicit val clock: Clock) {
       }
 
       lastControlSignal = Some(value)
-    }
+    })
   }
 
   /**

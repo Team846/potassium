@@ -1,6 +1,5 @@
 package com.lynbrookrobotics.potassium.streams
 
-import java.util
 import java.util.concurrent.Semaphore
 
 import com.lynbrookrobotics.potassium.clock.Clock
@@ -17,8 +16,7 @@ abstract class Stream[T] { self =>
 
   val expectedPeriodicity: ExpectedPeriodicity
 
-  // TODO: review please
-  val originClock: Clock
+  val originTimeStream: Option[Stream[Time]]
 
   private[this] val listeners = mutable.Queue.empty[T => Unit]
 
@@ -40,7 +38,7 @@ abstract class Stream[T] { self =>
     val ret = new Stream[O] {
       val parent = self
       override val expectedPeriodicity = self.expectedPeriodicity
-      override val originClock = self.originClock
+      override val originTimeStream = self.originTimeStream
     }
 
     val ptr = WeakReference(ret)
@@ -205,7 +203,7 @@ abstract class Stream[T] { self =>
     * @return a stream with tuples of emitted values and the time of emission
     */
   def zipWithTime: Stream[(T, Time)] = {
-    map(v => (v, originClock.currentTime))
+    zip(originTimeStream.get)
   }
 
   /**
@@ -218,7 +216,9 @@ abstract class Stream[T] { self =>
 
     val ret = new Stream[Queue[T]] {
       override val expectedPeriodicity = self.expectedPeriodicity
-      override val originClock = self.originClock
+      override val originTimeStream = self.originTimeStream.map { o =>
+        o.sliding(size).map(_.last)
+      }
     }
 
     val ptr = WeakReference(ret)
@@ -361,7 +361,7 @@ abstract class Stream[T] { self =>
       val ret = new Stream[T] {
         val parent = self
         override val expectedPeriodicity = self.expectedPeriodicity
-        override val originClock = self.originClock
+        override val originTimeStream = self.originTimeStream
       }
 
       val ptr = WeakReference(ret)
@@ -445,7 +445,8 @@ abstract class Stream[T] { self =>
     val ret = new Stream[T] {
       val parent = self
       override val expectedPeriodicity = NonPeriodic
-      override val originClock = self.originClock
+      // TODO: optimize
+      override val originTimeStream = self.originTimeStream.map(_.zip(self).filter(t => condition(t._2)).map(_._1))
     }
 
     val ptr = WeakReference(ret)
@@ -489,9 +490,19 @@ abstract class Stream[T] { self =>
 
 object Stream {
   def periodic[T](period: Time)(value: => T)(implicit clock: Clock): Stream[T] = {
-    new Stream[T] {
+    new Stream[T] { self =>
       override val expectedPeriodicity = Periodic(period)
-      override val originClock = clock
+
+      override val originTimeStream = Some(new Stream[Time] {
+        override val expectedPeriodicity: ExpectedPeriodicity = self.expectedPeriodicity
+        override val originTimeStream = None
+      })
+
+      override def publishValue(value: T): Unit = {
+        println(s"publishing value $value")
+        originTimeStream.get.publishValue(clock.currentTime)
+        super.publishValue(value)
+      }
 
       clock(period) { _ =>
         publishValue(value)
@@ -499,22 +510,43 @@ object Stream {
     }
   }
 
-  def manual[T](periodicity: ExpectedPeriodicity, clock: Clock): (Stream[T], T => Unit) = {
+  def manual[T]: (Stream[T], T => Unit) = {
+    manual(NonPeriodic)
+  }
+
+  def manual[T](periodicity: ExpectedPeriodicity): (Stream[T], T => Unit) = {
     val stream = new Stream[T] {
       override val expectedPeriodicity: ExpectedPeriodicity = periodicity
-      override val originClock = clock
+
+      override val originTimeStream = None
+
+      override def publishValue(value: T): Unit = {
+        super.publishValue(value)
+      }
     }
 
     (stream, stream.publishValue)
   }
 
-  def manual[T](periodicity: ExpectedPeriodicity): (Stream[T], T => Unit) = {
-    // TODO better solution. Maybe options?
-    manual(periodicity, null)
+  def manualWithTime[T](implicit clock: Clock): (Stream[T], T => Unit) = {
+    manualWithTime(NonPeriodic)
   }
 
-  def manual[T]: (Stream[T], T => Unit) = {
-    // TODO better solution. Maybe options?
-    manual[T](NonPeriodic, null)
+  def manualWithTime[T](periodicity: ExpectedPeriodicity)(implicit clock: Clock): (Stream[T], T => Unit) = {
+    val stream = new Stream[T] {
+      override val expectedPeriodicity: ExpectedPeriodicity = periodicity
+
+      override val originTimeStream = Some(new Stream[Time] {
+        override val expectedPeriodicity: ExpectedPeriodicity = periodicity
+        override val originTimeStream = None
+      })
+
+      override def publishValue(value: T): Unit = {
+        originTimeStream.get.publishValue(clock.currentTime)
+        super.publishValue(value)
+      }
+    }
+
+    (stream, stream.publishValue)
   }
 }

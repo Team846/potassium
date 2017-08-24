@@ -17,15 +17,15 @@ class ZippedStream[A, B](aPeriodicity: ExpectedPeriodicity,
   }
 
   // TODO: Review please
-  override val originClock: Clock = (aPeriodicity, bPeriodicity) match {
-      case (Periodic(a), Periodic(b)) =>
-        if (a eq b) {
-          parentA.originClock
-        } else {
-          null
-        }
+  override val originTimeStream = (aPeriodicity, bPeriodicity) match {
+    case (Periodic(a), Periodic(b)) =>
+      if (a eq b) {
+        parentA.originTimeStream
+      } else {
+        None // TODO: alternatives?
+      }
 
-      case _ => null
+    case _ => None
   }
 
   private[this] var aSlot: Option[A] = None
