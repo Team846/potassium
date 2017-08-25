@@ -225,11 +225,6 @@ abstract class Stream[T] { self =>
       ptr.get match {
         case Some(s) =>
           if (last.size == size) {
-            println("sup!")
-            if (last.size == 0) {
-              val wait = true
-              println("sliding size: 0")
-            }
             last = last.tail
           }
 
