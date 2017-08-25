@@ -9,7 +9,6 @@ class LightingComponent(numLEDs: Int, comm: TwoWayComm)(implicit clock: Clock) e
 
   var debug = false
 
-  // TODO: Please review: seems suspicious
   override def defaultController: Stream[Int] = Stream.periodic(this.period)(0)
   /**
     * Applies the latest control signal value.
