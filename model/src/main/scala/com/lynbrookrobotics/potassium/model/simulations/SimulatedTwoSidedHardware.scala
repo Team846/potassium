@@ -31,21 +31,15 @@ case class TwoSidedDriveForce(left: Force, right: Force)
 class SimulatedTwoSidedHardware(constantFriction: Force,
                                 override val track: Length,
                                 mass: Mass,
-                                momentOfInertia: MomentOfInertia)
+                                momentOfInertia: MomentOfInertia,
+                                clock: Clock,
+                                period: Time)
                                 (implicit props: TwoSidedDriveProperties) extends TwoSidedDriveHardware {
   val history = new mutable.ArrayBuffer[MomentInHistory]
-  private var time = Seconds(0)
 
-  def update(dt: Time): Unit = {
-    // TODO: gives warning about pure expressions
-    leftMotor.publishLastOutput()
-    rightMotor.publishLastOutput()
-
-    time += dt
-  }
-
-  val leftMotor = new SimulatedSpeedController
-  val rightMotor = new SimulatedSpeedController
+  // TODO: breaks without a non null period
+  val leftMotor = new SimulatedMotor(clock, period)
+  val rightMotor = new SimulatedMotor(clock, period)
 
   private val maxMotorForce = mass * props.maxAcceleration / 2
   private val leftForceOutput = leftMotor.outputStream.map(_.toEach * maxMotorForce)
@@ -57,9 +51,9 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
                           rightVelocity: Velocity,
                           angularVelocity: AngularVelocity,
                           dt: Time): RobotVelocities = {
-    val leftFriction = PhysicsUtil.friction(leftVelocity, constantFriction, maxMotorForce)
+    val leftFriction = PhysicsUtil.frictionAndEMF(leftVelocity, constantFriction, maxMotorForce)
     val netLeftForce = leftInputForce + leftFriction
-    val rightFriction = PhysicsUtil.friction(rightVelocity, constantFriction, maxMotorForce)
+    val rightFriction = PhysicsUtil.frictionAndEMF(rightVelocity, constantFriction, maxMotorForce)
     val netRightForce = rightInputForce + rightFriction
 
     // radius from center, located halfway between wheels
@@ -87,11 +81,12 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
   private val twoSidedOutputs = leftForceOutput.zip(rightForceOutput).map(o =>
     TwoSidedDriveForce(o._1, o._2))
 
-  // TODO:
-  // temporary to make integral and derivative compile because implicit clock
-  // is required. In the end, the time of emission should be measured, not
-  // remeasuing the time
-  implicit val tempClock: Clock = ???
+  twoSidedOutputs.foreach(_ => {
+    if(debugMode) {
+      println("two sided published")
+    }
+  })
+
   private val velocities = twoSidedOutputs.scanLeftWithdt(InitialSpeeds) {
     case (accVelocities, outputs, dt) => incrementVelocities(
       outputs.left,
@@ -105,32 +100,93 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
   override val leftVelocity = velocities.map(_.left)
   override val rightVelocity = velocities.map(_.right)
 
+  leftVelocity.foreach{_ => {
+    if(debugMode) {
+      println("left velocity updated")
+    }
+  }}
+
+  rightVelocity.foreach{_ => {
+    if(debugMode) {
+      println("right velocity updated")
+    }
+  }}
+
+  forwardVelocity.foreach{_ => {
+    if(debugMode) {
+      println("forward velocity updated")
+    }
+  }}
+
   // convert triginometric velocity to compass velocity
   override lazy val turnVelocity = velocities.map(-1 * _.angular)
 
   override val leftPosition = leftVelocity.integral
   override val rightPosition = rightVelocity.integral
+
+  leftPosition.foreach(_ => {
+    if(debugMode) {
+      println("left position updated")
+    }
+  })
+
+  rightPosition.foreach(_ => {
+    if(debugMode) {
+      println("right position updated")
+    }
+  })
+
+
   override lazy val turnPosition = turnVelocity.integral
 
   val position = XYPosition(turnPosition.map(a => Degrees(90) - a), forwardPosition)
 
-  // ensure that history is updated
-  forwardPosition.zip(turnPosition).zip(forwardVelocity).zip(turnVelocity).zip(position).foreach{p =>
-    val ((((fPos, tPos), fVel), tVel), pos) = p
-    history.append(
+  val zippedPositions = forwardPosition.zip(turnPosition).zip(position)
+
+  var debugMode = false
+
+  forwardPosition.foreach(_ => {
+    if (debugMode) {
+      println("forward position updated")
+    }
+  })
+
+  turnPosition.foreach(_ => {
+    if (debugMode) {
+      println("turn position updated")
+    }
+  })
+
+  position.foreach(_ => {
+    if (debugMode) {
+      println("2d position updated")
+    }
+  })
+
+
+
+  zippedPositions.foreach(_ => {
+    if (debugMode) {
+      println("zipped positions updated")
+    }
+  })
+  val historyStream = zippedPositions.zip(forwardVelocity).zip(turnVelocity).zipWithTime.map{
+    case (((((fPos, tPos), pos), fVel), tVel), time) =>
       MomentInHistory(
         time = time,
         forwardPosition = fPos,
         forwardVelocity = fVel,
         angle = tPos,
         position = pos,
-        turnSpeed = tVel
-      )
-    )
+        turnSpeed = tVel)
+  }
+
+  historyStream.foreach {
+    history.append(_)
   }
 }
 
-class TwoSidedDriveContainerSimulator(period: Time)(implicit clock: Clock) extends TwoSidedDrive(period) {
+class TwoSidedDriveContainerSimulator(period: Time)(val clock: Clock) extends TwoSidedDrive(period)(clock) {
   override type Hardware = SimulatedTwoSidedHardware
   override type Properties = TwoSidedDriveProperties
 
@@ -145,7 +201,6 @@ class TwoSidedDriveContainerSimulator(period: Time)(implicit clock: Clock) exten
   override protected def output(hardware: Hardware, signal: TwoSidedSignal): Unit = {
     hardware.leftMotor.set(signal.left)
     hardware.rightMotor.set(signal.right)
-    hardware.update(period)
   }
 
   override protected def controlMode(implicit hardware: SimulatedTwoSidedHardware,
@@ -174,8 +229,8 @@ object PhysicsUtil {
     * @param props
     * @return
     */
-  def friction(velocity: Velocity, constantFriction: Force, maxMotorForce: Force)
-              (implicit props: TwoSidedDriveProperties): Force = {
+  def frictionAndEMF(velocity: Velocity, constantFriction: Force, maxMotorForce: Force)
+                    (implicit props: TwoSidedDriveProperties): Force = {
     val direction = -1 * Math.signum(velocity.value)
 
     direction * (emfForce(velocity, maxMotorForce) + constantFriction)

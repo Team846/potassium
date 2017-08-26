@@ -258,7 +258,7 @@ abstract class Stream[T] { self =>
     }
   }
 
-  def scanLeftWithdt[U](initialValue: U)(f: (U, T, Time) => U)(implicit clock: Clock): Stream[U] = {
+  def scanLeftWithdt[U](initialValue: U)(f: (U, T, Time) => U): Stream[U] = {
     zipWithDt.scanLeft(initialValue)(
       (acc, curr) => f(acc, curr._1, curr._2))
   }
@@ -494,7 +494,7 @@ object Stream {
       override val expectedPeriodicity = Periodic(period)
 
       override val originTimeStream = Some(new Stream[Time] {
-        override val expectedPeriodicity: ExpectedPeriodicity = self.expectedPeriodicity
+        override val expectedPeriodicity = self.expectedPeriodicity
         override val originTimeStream = None
       })
 

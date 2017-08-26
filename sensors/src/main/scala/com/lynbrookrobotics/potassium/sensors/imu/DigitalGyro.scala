@@ -31,7 +31,7 @@ abstract class DigitalGyro(tickPeriod: Time) {
   def retrieveVelocity: Value3D[AngularVelocity]
 
   /**
-    * Update values for the angle on the gyro.
+    * End the collection of values used to calibrate
     */
   def endCalibration(): Unit = {
     if (calibrating) {
@@ -45,7 +45,8 @@ abstract class DigitalGyro(tickPeriod: Time) {
     }
   }
 
-  val velocity: PeriodicSignal[Value3D[AngularVelocity]] = Signal {
+  // TODO: is there a way to keep integration at the gyro level?
+  def getVelocities: Value3D[AngularVelocity] = {
     if (calibrating) {
       calibrationVelocities.enqueue(retrieveVelocity)
 
@@ -54,21 +55,6 @@ abstract class DigitalGyro(tickPeriod: Time) {
       Value3D(DegreesPerSecond(0), DegreesPerSecond(0), DegreesPerSecond(0))
     } else {
       retrieveVelocity - currentDrift
-    }
-  }.toPeriodic
-
-  val velocityX: PeriodicSignal[AngularVelocity] = velocity.map(_.x)
-  val velocityY: PeriodicSignal[AngularVelocity] = velocity.map(_.y)
-  val velocityZ: PeriodicSignal[AngularVelocity] = velocity.map(_.z)
-
-  val positionX: PeriodicSignal[Angle] = velocityX.integral
-  val positionY: PeriodicSignal[Angle] = velocityY.integral
-  val positionZ: PeriodicSignal[Angle] = velocityZ.integral
-
-  val position: PeriodicSignal[Value3D[Angle]] = {
-    positionX.zip(positionY).zip(positionZ).map { t =>
-      val ((x, y), z) = t
-      Value3D(x, y, z)
     }
   }
 }

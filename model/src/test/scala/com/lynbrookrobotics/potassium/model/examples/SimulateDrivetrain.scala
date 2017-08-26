@@ -50,14 +50,26 @@ object SimulateDrivetrain extends App {
   implicit val (clock, ticker) = mockedClockTicker
 
   val period = Milliseconds(1)
-  implicit val drivetrainContainer = new TwoSidedDriveContainerSimulator(period)
+  implicit val drivetrainContainer = new TwoSidedDriveContainerSimulator(period)(clock)
   implicit val hardware = new drivetrainContainer.Hardware(
     Pounds(88) * MetersPerSecondSquared(1) / 2,
     Inches(21.75),
     Pounds(88),
-    KilogramsMetersSquared(3.909))
+    KilogramsMetersSquared(3.909),
+    drivetrainContainer.clock,
+    period)
 
   implicit val simulatedComponent = new drivetrainContainer.Drivetrain
+
+  var itr = 0
+  hardware.historyStream.foreach { e =>
+    if (itr % 10 == 0) {
+      println(s"${e.time.toSeconds}\t${e.position.x.toFeet}\t${e.position.y.toFeet}")
+    }
+
+    itr += 1
+  }
+
   val task = /*new drivetrainContainer.unicycleTasks.RotateByAngle(
     Degrees(90),
     Degrees(0),
@@ -67,18 +79,12 @@ object SimulateDrivetrain extends App {
     Inches(5)
   )
 
+
   task.init()
 
-  for (_ <- 1 to (20D / period.toSeconds).round.toInt) {
+  for (i <- 1 to (20D / period.toSeconds).round.toInt) {
+//    val startTime = System.nanoTime()
     ticker(period)
-  }
-
-  var itr = 0
-  hardware.history.foreach { e =>
-    if (itr % 10 == 0) {
-      println(s"${e.time.toSeconds}\t${e.position.x.toFeet}\t${e.position.y.toFeet}")
-    }
-
-    itr += 1
+//    println((System.nanoTime() - startTime) / 10e6)
   }
 }
