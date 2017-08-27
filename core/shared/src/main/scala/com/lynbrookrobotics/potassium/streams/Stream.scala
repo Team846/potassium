@@ -46,7 +46,6 @@ abstract class Stream[T] { self =>
         case Some(s) =>
           s.publishValue(f(v))
         case None =>
-          println("clearing out empty map target!")
           cancel.apply()
       }
     }
