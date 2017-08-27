@@ -35,14 +35,14 @@ class UnicycleDriveTaskTest extends FunSuite {
   }
 
 
-  val period = Milliseconds(5)
-  val periodicity = Periodic(period)
+  val tickPeriod = Milliseconds(5)
+  val periodicity = Periodic(tickPeriod)
   implicit val (clock, ticker) = ClockMocking.mockedClockTicker
 
   implicit val hardware: UnicycleHardware = new UnicycleHardware {
     // MetersPerSecond(0)
-    override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
-    override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
+    override val forwardVelocity: Stream[Velocity] = Stream.periodic(tickPeriod)(MetersPerSecond(0))
+    override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(tickPeriod)(DegreesPerSecond(0))
 
     override val forwardPosition: Stream[Length] = null
     override val turnPosition: Stream[Angle] = null
@@ -82,7 +82,7 @@ class UnicycleDriveTaskTest extends FunSuite {
 
     val drivetrain = new Component[UnicycleSignal](Milliseconds(5)) {
       override def defaultController: Stream[UnicycleSignal] =
-        Stream.periodic(period)(UnicycleSignal(Percent(0), Percent(0)))
+        Stream.periodic(tickPeriod)(UnicycleSignal(Percent(0), Percent(0)))
 
       override def applySignal(signal: UnicycleSignal): Unit = {
         lastAppliedSignal = signal
@@ -92,10 +92,10 @@ class UnicycleDriveTaskTest extends FunSuite {
     var currentPosition = Meters(5)
 
     val hardware: UnicycleHardware = new UnicycleHardware {
-      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
-      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(tickPeriod)(MetersPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(tickPeriod)(DegreesPerSecond(0))
 
-      override val forwardPosition: Stream[Length] = Stream.periodic(period)(currentPosition)
+      override val forwardPosition: Stream[Length] = Stream.periodic(tickPeriod)(currentPosition)
       override val turnPosition: Stream[Angle] = null
     }
 
@@ -176,11 +176,11 @@ class UnicycleDriveTaskTest extends FunSuite {
     var currentPositionTurn = Degrees(5)
 
     val hardware: UnicycleHardware = new UnicycleHardware {
-      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
-      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(tickPeriod)(MetersPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(tickPeriod)(DegreesPerSecond(0))
 
-      override val forwardPosition: Stream[Length] = Stream.periodic(period)(currentPositionForward)
-      override val turnPosition: Stream[Angle] = Stream.periodic(period)(currentPositionTurn)
+      override val forwardPosition: Stream[Length] = Stream.periodic(tickPeriod)(currentPositionForward)
+      override val turnPosition: Stream[Angle] = Stream.periodic(tickPeriod)(currentPositionTurn)
     }
 
     val task = new drive.unicycleTasks.DriveDistanceStraight(
@@ -267,11 +267,11 @@ class UnicycleDriveTaskTest extends FunSuite {
     var currentPosition = Degrees(5)
 
     val hardware: UnicycleHardware = new UnicycleHardware {
-      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
-      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(tickPeriod)(MetersPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(tickPeriod)(DegreesPerSecond(0))
 
       override val forwardPosition: Stream[Length] = null
-      override val turnPosition: Stream[Angle] = Stream.periodic(period)(currentPosition)
+      override val turnPosition: Stream[Angle] = Stream.periodic(tickPeriod)(currentPosition)
     }
 
     val task = new drive.unicycleTasks.RotateByAngle(

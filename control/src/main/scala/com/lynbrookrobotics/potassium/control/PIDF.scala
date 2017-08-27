@@ -85,7 +85,7 @@ object PIDF {
           I <: Quantity[I] with TimeIntegral[SWithI],
           U <: Quantity[U]](current: Stream[S], target: Stream[S], config: Signal[PIDConfig[S, SWithD, SWithI, D, I, U]])
                    (implicit exD: S => SWithD, exI: S => SWithI): Stream[U] = {
-    proportionalControl(current, target, config.map(_.kp)).sliding(2).map(_.last).
+    proportionalControl(current, target, config.map(_.kp)).drop(1).
       zip(integralControl(current.map(exI), target.map(exI), config.map(_.ki))).
       zip(derivativeControl(current.map(exD), target.map(exD), config.map(_.kd))).map { pid =>
       val ((p, i), d) = pid
@@ -101,10 +101,10 @@ object PIDF {
            U <: Quantity[U]](signal: Stream[S],
                              target: Stream[S], config: Signal[PIDFConfig[S, SWithD, SWithI, D, I, U]])
                             (implicit exD: S => SWithD, exI: S => SWithI): Stream[U] = {
-    proportionalControl(signal, target, config.map(_.kp)).sliding(2).map(_.last).
+    proportionalControl(signal, target, config.map(_.kp)).drop(1).
       zip(integralControl(signal.map(exI), target.map(exI), config.map(_.ki))).
       zip(derivativeControl(signal.map(exD), target.map(exD), config.map(_.kd))).
-      zip(feedForwardControl(target, config.map(_.kf)).sliding(2).map(_.last)).map { pidf =>
+      zip(feedForwardControl(target, config.map(_.kf)).drop(1)).map { pidf =>
       val (((p, i), d), f) = pidf
       p + i + d + f
     }

@@ -270,6 +270,37 @@ abstract class Stream[T] { self =>
   }
 
   /**
+    * Returns a stream that skips emitting the first n values
+    * @param n the number of values to skip
+    */
+  def drop(n: Int): Stream[T] = {
+    val ret = new Stream[T] {
+      private val parent = self
+      override val expectedPeriodicity = self.expectedPeriodicity
+      override val originTimeStream = self.originTimeStream.map(_.drop(n))
+    }
+
+    val ptr = WeakReference(ret)
+
+    var emittedValues = 0
+
+    var cancel: Cancel = null
+    cancel = this.foreach { v =>
+      ptr.get match {
+        case Some(s) =>
+          emittedValues += 1
+          if (emittedValues > n) {
+            s.publishValue(v)
+          }
+        case None =>
+          cancel.apply()
+      }
+    }
+
+    ret
+  }
+
+  /**
     * Calculates the derivative of the stream, producing units of
     * the derivative of the stream's units
     * @return a stream producing values that are the derivative of the stream

@@ -5,7 +5,6 @@ import com.lynbrookrobotics.potassium.clock.Clock
 class AsyncZippedStream[A, B](private val parentA: Stream[A], private val parentB: Stream[B]) extends Stream[(A, B)] {
   override val expectedPeriodicity: ExpectedPeriodicity = parentA.expectedPeriodicity
 
-  // TODO: Review please
   override val originTimeStream = parentA.originTimeStream
 
   private[this] var secondarySlot: Option[B] = None
