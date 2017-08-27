@@ -33,7 +33,7 @@ abstract class Stream[T] { self =>
     */
   def map[O](f: T => O): Stream[O] = {
     val ret = new Stream[O] {
-      val parent = self
+      private val parent = self
       override val expectedPeriodicity = self.expectedPeriodicity
       override val originTimeStream = self.originTimeStream
     }
@@ -46,6 +46,7 @@ abstract class Stream[T] { self =>
         case Some(s) =>
           s.publishValue(f(v))
         case None =>
+          println("clearing out empty map target!")
           cancel.apply()
       }
     }
@@ -93,7 +94,7 @@ abstract class Stream[T] { self =>
     * @return a stream with the values from both streams brought together
     */
   def zip[O](other: Stream[O]): Stream[(T, O)] = {
-    val ret = new ZippedStream[T, O](expectedPeriodicity, other.expectedPeriodicity, this, other)
+    val ret = new ZippedStream[T, O](this, other)
     val ptr = WeakReference(ret)
 
     var aCancel: Cancel = null
@@ -212,6 +213,7 @@ abstract class Stream[T] { self =>
     var last = Queue.empty[T]
 
     val ret = new Stream[Queue[T]] {
+      private val parent = self
       override val expectedPeriodicity = self.expectedPeriodicity
       override val originTimeStream = self.originTimeStream.map { o =>
         o.sliding(size).map(_.last)
@@ -256,11 +258,6 @@ abstract class Stream[T] { self =>
       latest = f(latest, v)
       latest
     }
-  }
-
-  def scanLeftWithdt[U](initialValue: U)(f: (U, T, Time) => U): Stream[U] = {
-    zipWithDt.scanLeft(initialValue)(
-      (acc, curr) => f(acc, curr._1, curr._2))
   }
 
   /**
@@ -359,7 +356,7 @@ abstract class Stream[T] { self =>
   def defer: Stream[T] = {
     if (Platform.isJVM) {
       val ret = new Stream[T] {
-        val parent = self
+        private val parent = self
         override val expectedPeriodicity = self.expectedPeriodicity
         override val originTimeStream = self.originTimeStream
       }
@@ -443,7 +440,7 @@ abstract class Stream[T] { self =>
     */
   def filter(condition: T => Boolean): Stream[T] = {
     val ret = new Stream[T] {
-      val parent = self
+      private val parent = self
       override val expectedPeriodicity = NonPeriodic
       // TODO: optimize
       override val originTimeStream = self.originTimeStream.map(_.zip(self).filter(t => condition(t._2)).map(_._1))

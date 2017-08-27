@@ -126,4 +126,15 @@ class DeallocationTest extends FunSuite {
 
     testDoesNotDeallocate(ptr)
   }
+
+  test("Zipped intermediate streams are not deallocated") {
+    val (parent, _) = Stream.manual[Int]
+    val (other, _) = Stream.manual[Int]
+    var middle = parent.zip(other)
+    val ptr = WeakReference(middle)
+    val last = middle.map(identity)
+    middle = null
+
+    testDoesNotDeallocate(ptr)
+  }
 }

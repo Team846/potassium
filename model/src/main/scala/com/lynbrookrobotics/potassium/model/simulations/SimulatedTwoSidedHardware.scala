@@ -35,8 +35,6 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
                                 clock: Clock,
                                 period: Time)
                                 (implicit props: TwoSidedDriveProperties) extends TwoSidedDriveHardware {
-  val history = new mutable.ArrayBuffer[MomentInHistory]
-
   // TODO: breaks without a non null period
   val leftMotor = new SimulatedMotor(clock, period)
   val rightMotor = new SimulatedMotor(clock, period)
@@ -81,42 +79,19 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
   private val twoSidedOutputs = leftForceOutput.zip(rightForceOutput).map(o =>
     TwoSidedDriveForce(o._1, o._2))
 
-  twoSidedOutputs.foreach(_ => {
-    if(debugMode) {
-      println("two sided published")
-    }
-  })
-
-  private val velocities = twoSidedOutputs.scanLeftWithdt(InitialSpeeds) {
-    case (accVelocities, outputs, dt) => incrementVelocities(
-      outputs.left,
-      outputs.right,
-      accVelocities.left,
-      accVelocities.right,
-      accVelocities.angular,
-      dt)
+  private val velocities = twoSidedOutputs.zipWithDt.scanLeft(InitialSpeeds) {
+    case (accVelocities, (outputs, dt)) =>
+      incrementVelocities(
+        outputs.left,
+        outputs.right,
+        accVelocities.left,
+        accVelocities.right,
+        accVelocities.angular,
+        dt)
   }
 
   override val leftVelocity = velocities.map(_.left)
   override val rightVelocity = velocities.map(_.right)
-
-  leftVelocity.foreach{_ => {
-    if(debugMode) {
-      println("left velocity updated")
-    }
-  }}
-
-  rightVelocity.foreach{_ => {
-    if(debugMode) {
-      println("right velocity updated")
-    }
-  }}
-
-  forwardVelocity.foreach{_ => {
-    if(debugMode) {
-      println("forward velocity updated")
-    }
-  }}
 
   // convert triginometric velocity to compass velocity
   override lazy val turnVelocity = velocities.map(-1 * _.angular)
@@ -124,53 +99,13 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
   override val leftPosition = leftVelocity.integral
   override val rightPosition = rightVelocity.integral
 
-  leftPosition.foreach(_ => {
-    if(debugMode) {
-      println("left position updated")
-    }
-  })
-
-  rightPosition.foreach(_ => {
-    if(debugMode) {
-      println("right position updated")
-    }
-  })
-
-
   override lazy val turnPosition = turnVelocity.integral
 
   val position = XYPosition(turnPosition.map(a => Degrees(90) - a), forwardPosition)
 
   val zippedPositions = forwardPosition.zip(turnPosition).zip(position)
 
-  var debugMode = false
-
-  forwardPosition.foreach(_ => {
-    if (debugMode) {
-      println("forward position updated")
-    }
-  })
-
-  turnPosition.foreach(_ => {
-    if (debugMode) {
-      println("turn position updated")
-    }
-  })
-
-  position.foreach(_ => {
-    if (debugMode) {
-      println("2d position updated")
-    }
-  })
-
-
-
-  zippedPositions.foreach(_ => {
-    if (debugMode) {
-      println("zipped positions updated")
-    }
-  })
-  val historyStream = zippedPositions.zip(forwardVelocity).zip(turnVelocity).zipWithTime.map{
+  val historyStream = zippedPositions.zip(forwardVelocity).zip(turnVelocity).zipWithTime.map {
     case (((((fPos, tPos), pos), fVel), tVel), time) =>
       MomentInHistory(
         time = time,
@@ -179,10 +114,6 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
         angle = tPos,
         position = pos,
         turnSpeed = tVel)
-  }
-
-  historyStream.foreach {
-    history.append(_)
   }
 }
 

@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.streams
 
-class EagerZippedStream[A, B](parentA: Stream[A], parentB: Stream[B]) extends Stream[(A, B)] {
+class EagerZippedStream[A, B](private val parentA: Stream[A], private val parentB: Stream[B]) extends Stream[(A, B)] {
   override val expectedPeriodicity: ExpectedPeriodicity = NonPeriodic
 
   // TODO: Review please. Use Option maybe?

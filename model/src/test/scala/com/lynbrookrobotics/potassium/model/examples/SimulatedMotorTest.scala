@@ -9,7 +9,7 @@ import squants.time.{Milliseconds, Seconds}
 class SimulatedMotorTest extends FunSuite {
   val period = Milliseconds(5)
 
-  test("test simulated moter updates when clock is triggered") {
+  test("Simulated motor updates when clock is triggered") {
     implicit val (clock, triggerClock) = ClockMocking.mockedClockTicker
     val simulatedMotor = new SimulatedMotor(clock, period)
 
@@ -21,7 +21,7 @@ class SimulatedMotorTest extends FunSuite {
     assert(lastOut == simulatedMotor.initialOutput)
   }
 
-  test("test simulated motor publishes value from set method") {
+  test("Simulated motor publishes value from set method") {
     implicit val (clock, triggerClock) = ClockMocking.mockedClockTicker
     val simulatedMotor = new SimulatedMotor(clock, period)
 

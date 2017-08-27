@@ -62,7 +62,7 @@ object SimulateDrivetrain extends App {
   implicit val simulatedComponent = new drivetrainContainer.Drivetrain
 
   var itr = 0
-  hardware.historyStream.foreach { e =>
+  val streamPrintingCancel = hardware.historyStream.foreach { e =>
     if (itr % 10 == 0) {
       println(s"${e.time.toSeconds}\t${e.position.x.toFeet}\t${e.position.y.toFeet}")
     }
@@ -70,14 +70,14 @@ object SimulateDrivetrain extends App {
     itr += 1
   }
 
-  val task = /*new drivetrainContainer.unicycleTasks.RotateByAngle(
+  val task = new drivetrainContainer.unicycleTasks.RotateByAngle(
     Degrees(90),
     Degrees(0),
     5
-  )*/ new drivetrainContainer.unicycleTasks.FollowWayPoints(
+  )/* new drivetrainContainer.unicycleTasks.FollowWayPoints(
     Point.origin :: Point(Meters(0), Meters(1)) :: Point(Meters(1), Meters(2)) :: Nil,
     Inches(5)
-  )
+  )*/
 
 
   task.init()
