@@ -45,7 +45,6 @@ abstract class DigitalGyro(tickPeriod: Time) {
     }
   }
 
-  // TODO: is there a way to keep integration at the gyro level?
   def getVelocities: Value3D[AngularVelocity] = {
     if (calibrating) {
       calibrationVelocities.enqueue(retrieveVelocity)
