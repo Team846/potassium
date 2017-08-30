@@ -12,23 +12,21 @@ import squants.electro.Volts
 class InterfaceSignalsTest extends FunSuite with MockitoSugar {
   test("Analog input produces correct voltage") {
     val mockedAnalogIn = mock[AnalogInput]
-    val voltageSignal = mockedAnalogIn.voltage
 
     check(forAll { d: Double =>
       when(mockedAnalogIn.getVoltage).thenReturn(d)
 
-      voltageSignal.get.toVolts == d
+      mockedAnalogIn.voltage.toVolts == d
     })
   }
 
   test("Analog input produces correct average voltage") {
     val mockedAnalogIn = mock[AnalogInput]
-    val voltageSignal = mockedAnalogIn.averageVoltage
 
     check(forAll { d: Double =>
       when(mockedAnalogIn.getAverageVoltage).thenReturn(d)
 
-      voltageSignal.get.toVolts == d
+      mockedAnalogIn.averageVoltage.toVolts == d
     })
   }
 }

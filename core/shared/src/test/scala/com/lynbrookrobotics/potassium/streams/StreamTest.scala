@@ -3,7 +3,7 @@ package com.lynbrookrobotics.potassium.streams
 import org.scalatest.FunSuite
 import squants.motion.{FeetPerSecond, Velocity}
 import squants.space.{Feet, Length}
-import squants.time.Milliseconds
+import squants.time.{Milliseconds, Nanoseconds}
 
 import scala.collection.immutable.Queue
 import com.lynbrookrobotics.potassium.{ClockMocking, Platform}
