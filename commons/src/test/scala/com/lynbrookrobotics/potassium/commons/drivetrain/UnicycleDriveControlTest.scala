@@ -131,7 +131,6 @@ class UnicycleDriveControlTest extends FunSuite {
         turnOut = o.turn
       })
 
-      // TODO: this does not trigger an update in function defined in above foreach
       trigggerClock.apply(period)
       trigggerClock.apply(period)
 

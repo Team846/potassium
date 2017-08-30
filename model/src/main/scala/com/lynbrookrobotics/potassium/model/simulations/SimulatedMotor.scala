@@ -8,7 +8,6 @@ import squants.{Dimensionless, Percent}
 class SimulatedMotor(clock: Clock, period: Time) {
   val initialOutput = Percent(0)
 
-  // TODO: better?
   private var lastOutput = initialOutput
   val outputStream = Stream.periodic(period)(lastOutput)(clock)
 

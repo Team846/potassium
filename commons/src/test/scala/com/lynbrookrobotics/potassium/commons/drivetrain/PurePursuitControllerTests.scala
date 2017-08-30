@@ -82,7 +82,6 @@ class PurePursuitControllerTests extends FunSuite {
 
     val target = new Point(Feet(0), Feet(1))
 
-    // TODO: Why is this not inferred?
     val path = hardware.turnPosition.mapToConstant[(Segment, Option[Segment])](
       (Segment(origin, target), None)
     )
