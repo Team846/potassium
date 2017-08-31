@@ -185,6 +185,44 @@ trait UnicycleCoreTasks {
     }
   }
 
+  class DriveDistanceAtAngle(distance: Length,
+                             toleranceForward: Length,
+                             targetAngle: Angle,
+                             toleranceAngle: Angle,
+                             maxSpeed: Dimensionless)
+                             (implicit drive: Drivetrain,
+                              hardware: DrivetrainHardware,
+                              props: Signal[DrivetrainProperties]) extends FiniteTask {
+    override def onStart(): Unit = {
+      val absoluteDistance = hardware.forwardPosition.currentValue.map(_ + distance)
+      val (forwardController, forwardError) = forwardPositionControl(absoluteDistance)
+
+      val limitedForward = forwardController.map { u =>
+        UnicycleSignal(u.forward max (-maxSpeed) min maxSpeed, u.turn)
+      }
+
+      val (turnController, turnError) = turnPositionControl(targetAngle)
+
+      val combinedController = limitedForward.zip(turnController).map(t => t._1 + t._2)
+
+      val zippedError = forwardError.zip(turnError)
+      val checkedController = combinedController.withCheckZipped(zippedError) {
+        case  (forwardError, turnError) =>
+          if (forwardError.abs < toleranceForward && turnError.abs < toleranceAngle) {
+            finished()
+          }
+      }
+
+      drive.setController(
+        lowerLevelVelocityControl(speedControl(checkedController))
+      )
+    }
+
+    override def onEnd(): Unit = {
+      drive.resetToDefault()
+    }
+  }
+
   class DriveBeyondStraight(distance: Length,
                             toleranceForward: Length,
                             toleranceAngle: Angle,
@@ -239,6 +277,8 @@ trait UnicycleCoreTasks {
       drive.resetToDefault()
     }
   }
+
+
 
   class RotateByAngle(relativeAngle: Angle, tolerance: Angle, timeWithinTolerance: Int)
                      (implicit drive: Drivetrain,

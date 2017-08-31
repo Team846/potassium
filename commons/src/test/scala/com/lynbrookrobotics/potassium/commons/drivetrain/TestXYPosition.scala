@@ -13,7 +13,7 @@ import squants.time.{Milliseconds, Seconds}
 class TestXYPosition extends FunSuite{
   val period = Milliseconds(5)
   val periodsPerSecond = (1 / period.toSeconds).toInt
-  val unitializedPose = Point(Feet(-1), Feet(-1))
+  val unitializedPose = Point(Feet(-10), Feet(-10))
 
 
   test("Test moving straight at 1 ft/s for 1 sec results in moving 1 ft forward") {
@@ -37,8 +37,7 @@ class TestXYPosition extends FunSuite{
     position.foreach(lastPosition = _)
     simpsonsPosition.foreach(lastSimpsonPosition = _)
 
-    for(i <- 1 to periodsPerSecond){
-//      println(s"i $i")
+    for(_ <- 1 to periodsPerSecond){
       clockTrigger.apply(period)
       pubVelocity.apply(FeetPerSecond(1))
       pubAngle.apply(Degrees(90))
@@ -86,11 +85,13 @@ class TestXYPosition extends FunSuite{
        "degrees for 1 sec results in (-1,1) ") {
     implicit val (clock, clockTrigger) = ClockMocking.mockedClockTicker
 
+    val initialAngle = Degrees(90)
+
     val (angularSpeed, pubTurnSpeed) = Stream.manualWithTime[AngularVelocity](Periodic(period))
-    val angle = angularSpeed.integral.map(_ + Degrees(90))
+    val angle = angularSpeed.integral.map(_ + initialAngle)
 
     val distance = angle.map{ angle =>
-      (angle - Degrees(90)).toRadians * Feet(1)
+      (angle - initialAngle) onRadius Feet(1)
     }
 
     val targetPosition = Point(
