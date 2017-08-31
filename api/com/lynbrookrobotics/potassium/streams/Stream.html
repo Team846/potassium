@@ -328,6 +328,22 @@
       </span>
       
       
+    </li><li name="com.lynbrookrobotics.potassium.streams.Stream#originTimeStream" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="originTimeStream:Option[com.lynbrookrobotics.potassium.streams.Stream[squants.time.Time]]"></a><a id="originTimeStream:Option[Stream[Time]]"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/Stream.html#originTimeStream:Option[com.lynbrookrobotics.potassium.streams.Stream[squants.time.Time]]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">originTimeStream</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.time.Time">Time</span>]]</span>
+      </span>
+      
+      
     </li></ol>
             </div>
 
@@ -420,6 +436,23 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.streams.Stream#currentValue" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="currentValue:com.lynbrookrobotics.potassium.streams.Stream[T]"></a><a id="currentValue:Stream[T]"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/Stream.html#currentValue:com.lynbrookrobotics.potassium.streams.Stream[T]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">currentValue</span><span class="result">: <a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.T">T</span>]</span>
+      </span>
+      
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>returns a stream of first value this stream will publish
+        from the time this method is called</p></dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.streams.Stream#defer" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="defer:com.lynbrookrobotics.potassium.streams.Stream[T]"></a><a id="defer:Stream[T]"></a>
       <span class="permalink">
@@ -439,9 +472,9 @@
 Note: right now, this only works on the JVM</p><div class="fullcomment"><div class="comment cmt"><p>Defers emitted values from this stream to another thread
 Note: right now, this only works on the JVM</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a stream that emits values in the context of a new thread</p></dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.streams.Stream#derivative" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="derivative[D&lt;:squants.Quantity[D]withsquants.time.TimeDerivative[_]](implicitintEv:T=&gt;squants.time.TimeIntegral[D],implicitclock:com.lynbrookrobotics.potassium.clock.Clock):com.lynbrookrobotics.potassium.streams.Stream[D]"></a><a id="derivative[D&lt;:Quantity[D]withTimeDerivative[_]]((T)⇒TimeIntegral[D],Clock):Stream[D]"></a>
+      <a id="derivative[D&lt;:squants.Quantity[D]withsquants.time.TimeDerivative[_]](implicitintEv:T=&gt;squants.time.TimeIntegral[D]):com.lynbrookrobotics.potassium.streams.Stream[D]"></a><a id="derivative[D&lt;:Quantity[D]withTimeDerivative[_]]((T)⇒TimeIntegral[D]):Stream[D]"></a>
       <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/streams/Stream.html#derivative[D&lt;:squants.Quantity[D]withsquants.time.TimeDerivative[_]](implicitintEv:T=&gt;squants.time.TimeIntegral[D],implicitclock:com.lynbrookrobotics.potassium.clock.Clock):com.lynbrookrobotics.potassium.streams.Stream[D]" title="Permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/Stream.html#derivative[D&lt;:squants.Quantity[D]withsquants.time.TimeDerivative[_]](implicitintEv:T=&gt;squants.time.TimeIntegral[D]):com.lynbrookrobotics.potassium.streams.Stream[D]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -450,12 +483,28 @@ Note: right now, this only works on the JVM</p></div><dl class="paramcmts block"
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">derivative</span><span class="tparams">[<span name="D">D &lt;: <span class="extype" name="squants.Quantity">Quantity</span>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.derivative.D">D</span>] with <span class="extype" name="squants.time.TimeDerivative">TimeDerivative</span>[_]</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="intEv">intEv: (<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.T">T</span>) ⇒ <span class="extype" name="squants.time.TimeIntegral">TimeIntegral</span>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.derivative.D">D</span>]</span>, <span name="clock">clock: <a href="../clock/Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a></span>)</span><span class="result">: <a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.derivative.D">D</span>]</span>
+        <span class="name">derivative</span><span class="tparams">[<span name="D">D &lt;: <span class="extype" name="squants.Quantity">Quantity</span>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.derivative.D">D</span>] with <span class="extype" name="squants.time.TimeDerivative">TimeDerivative</span>[_]</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="intEv">intEv: (<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.T">T</span>) ⇒ <span class="extype" name="squants.time.TimeIntegral">TimeIntegral</span>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.derivative.D">D</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.derivative.D">D</span>]</span>
       </span>
       
       <p class="shortcomment cmt">Calculates the derivative of the stream, producing units of
 the derivative of the stream's units</p><div class="fullcomment"><div class="comment cmt"><p>Calculates the derivative of the stream, producing units of
 the derivative of the stream's units</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a stream producing values that are the derivative of the stream</p></dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.streams.Stream#drop" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="drop(n:Int):com.lynbrookrobotics.potassium.streams.Stream[T]"></a><a id="drop(Int):Stream[T]"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/Stream.html#drop(n:Int):com.lynbrookrobotics.potassium.streams.Stream[T]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">drop</span><span class="params">(<span name="n">n: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.T">T</span>]</span>
+      </span>
+      
+      <p class="shortcomment cmt">Returns a stream that skips emitting the first n values</p><div class="fullcomment"><div class="comment cmt"><p>Returns a stream that skips emitting the first n values</p></div><dl class="paramcmts block"><dt class="param">n</dt><dd class="cmt"><p>the number of values to skip</p></dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -579,9 +628,9 @@ be called last.
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.streams.Stream#integral" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="integral[I&lt;:squants.Quantity[I]withsquants.time.TimeIntegral[_]](implicitderivEv:T=&gt;squants.time.TimeDerivative[I],implicitclock:com.lynbrookrobotics.potassium.clock.Clock):com.lynbrookrobotics.potassium.streams.Stream[I]"></a><a id="integral[I&lt;:Quantity[I]withTimeIntegral[_]]((T)⇒TimeDerivative[I],Clock):Stream[I]"></a>
+      <a id="integral[I&lt;:squants.Quantity[I]withsquants.time.TimeIntegral[_]](implicitderivEv:T=&gt;squants.time.TimeDerivative[I]):com.lynbrookrobotics.potassium.streams.Stream[I]"></a><a id="integral[I&lt;:Quantity[I]withTimeIntegral[_]]((T)⇒TimeDerivative[I]):Stream[I]"></a>
       <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/streams/Stream.html#integral[I&lt;:squants.Quantity[I]withsquants.time.TimeIntegral[_]](implicitderivEv:T=&gt;squants.time.TimeDerivative[I],implicitclock:com.lynbrookrobotics.potassium.clock.Clock):com.lynbrookrobotics.potassium.streams.Stream[I]" title="Permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/Stream.html#integral[I&lt;:squants.Quantity[I]withsquants.time.TimeIntegral[_]](implicitderivEv:T=&gt;squants.time.TimeDerivative[I]):com.lynbrookrobotics.potassium.streams.Stream[I]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -590,7 +639,7 @@ be called last.
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">integral</span><span class="tparams">[<span name="I">I &lt;: <span class="extype" name="squants.Quantity">Quantity</span>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.integral.I">I</span>] with <span class="extype" name="squants.time.TimeIntegral">TimeIntegral</span>[_]</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="derivEv">derivEv: (<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.T">T</span>) ⇒ <span class="extype" name="squants.time.TimeDerivative">TimeDerivative</span>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.integral.I">I</span>]</span>, <span name="clock">clock: <a href="../clock/Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a></span>)</span><span class="result">: <a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.integral.I">I</span>]</span>
+        <span class="name">integral</span><span class="tparams">[<span name="I">I &lt;: <span class="extype" name="squants.Quantity">Quantity</span>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.integral.I">I</span>] with <span class="extype" name="squants.time.TimeIntegral">TimeIntegral</span>[_]</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="derivEv">derivEv: (<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.T">T</span>) ⇒ <span class="extype" name="squants.time.TimeDerivative">TimeDerivative</span>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.integral.I">I</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.integral.I">I</span>]</span>
       </span>
       
       <p class="shortcomment cmt">Calculates the integral of the signal, producing units of
@@ -630,6 +679,38 @@ the integral of the signal's units</p></div><dl class="paramcmts block"><dt>retu
       <p class="shortcomment cmt">Transforms a stream using a single value function from original stream
 input to new stream emission</p><div class="fullcomment"><div class="comment cmt"><p>Transforms a stream using a single value function from original stream
 input to new stream emission</p></div><dl class="paramcmts block"><dt class="tparam">O</dt><dd class="cmt"><p>the type of values in the new stream</p></dd><dt class="param">f</dt><dd class="cmt"><p>the function to use to transform values</p></dd><dt>returns</dt><dd class="cmt"><p>a stream with values transformed by the given function</p></dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.streams.Stream#mapToConstant" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="mapToConstant[O](output:O):com.lynbrookrobotics.potassium.streams.Stream[O]"></a><a id="mapToConstant[O](O):Stream[O]"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/Stream.html#mapToConstant[O](output:O):com.lynbrookrobotics.potassium.streams.Stream[O]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">mapToConstant</span><span class="tparams">[<span name="O">O</span>]</span><span class="params">(<span name="output">output: <span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.mapToConstant.O">O</span></span>)</span><span class="result">: <a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.mapToConstant.O">O</span>]</span>
+      </span>
+      
+      
+    </li><li name="com.lynbrookrobotics.potassium.streams.Stream#minus" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="minus[Q&lt;:squants.Quantity[Q]](toSubtract:com.lynbrookrobotics.potassium.streams.Stream[Q])(implicitintEv:T=&gt;squants.Quantity[Q]):com.lynbrookrobotics.potassium.streams.Stream[Q]"></a><a id="minus[Q&lt;:Quantity[Q]](Stream[Q])((T)⇒Quantity[Q]):Stream[Q]"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/Stream.html#minus[Q&lt;:squants.Quantity[Q]](toSubtract:com.lynbrookrobotics.potassium.streams.Stream[Q])(implicitintEv:T=&gt;squants.Quantity[Q]):com.lynbrookrobotics.potassium.streams.Stream[Q]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">minus</span><span class="tparams">[<span name="Q">Q &lt;: <span class="extype" name="squants.Quantity">Quantity</span>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.minus.Q">Q</span>]</span>]</span><span class="params">(<span name="toSubtract">toSubtract: <a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.minus.Q">Q</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="intEv">intEv: (<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.T">T</span>) ⇒ <span class="extype" name="squants.Quantity">Quantity</span>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.minus.Q">Q</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.minus.Q">Q</span>]</span>
+      </span>
+      
+      <p class="shortcomment cmt">Subtracts toSubtract from this</p><div class="fullcomment"><div class="comment cmt"><p>Subtracts toSubtract from this</p></div><dl class="paramcmts block"><dt class="param">toSubtract</dt><dd class="cmt"><p>how much to subtract</p></dd><dt>returns</dt><dd class="cmt"><p>stream where every value is the minued minus toSubtract</p></dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -712,6 +793,24 @@ from the original stream</p></div><dl class="paramcmts block"><dt class="param">
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.streams.Stream#relativize" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="relativize[O](f:(T,T)=&gt;O):com.lynbrookrobotics.potassium.streams.Stream[O]"></a><a id="relativize[O]((T,T)⇒O):Stream[O]"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/Stream.html#relativize[O](f:(T,T)=&gt;O):com.lynbrookrobotics.potassium.streams.Stream[O]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">relativize</span><span class="tparams">[<span name="O">O</span>]</span><span class="params">(<span name="f">f: (<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.T">T</span>, <span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.T">T</span>) ⇒ <span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.relativize.O">O</span></span>)</span><span class="result">: <a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.relativize.O">O</span>]</span>
+      </span>
+      
+      <p class="shortcomment cmt">Relativizes the stream according to the given function, which takes a base value
+and the current value and returns the meaningful difference between them</p><div class="fullcomment"><div class="comment cmt"><p>Relativizes the stream according to the given function, which takes a base value
+and the current value and returns the meaningful difference between them</p></div><dl class="paramcmts block"><dt class="tparam">O</dt><dd class="cmt"><p>the type of values in the new stream</p></dd><dt class="param">f</dt><dd class="cmt"><p>the function producing a difference between the base and latest value</p></dd><dt>returns</dt><dd class="cmt"><p>a new stream with values relativized against the next value from this stream</p></dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.streams.Stream#scanLeft" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="scanLeft[U](initialValue:U)(f:(U,T)=&gt;U):com.lynbrookrobotics.potassium.streams.Stream[U]"></a><a id="scanLeft[U](U)((U,T)⇒U):Stream[U]"></a>
       <span class="permalink">
@@ -730,6 +829,22 @@ from the original stream</p></div><dl class="paramcmts block"><dt class="param">
       <p class="shortcomment cmt">Applies an accumulator to the stream, combining the accumulated value
 with each emitted value of this stream to produce a new value</p><div class="fullcomment"><div class="comment cmt"><p>Applies an accumulator to the stream, combining the accumulated value
 with each emitted value of this stream to produce a new value</p></div><dl class="paramcmts block"><dt class="tparam">U</dt><dd class="cmt"><p>the type of the accumulated value</p></dd><dt class="param">initialValue</dt><dd class="cmt"><p>the initial accumulated value</p></dd><dt class="param">f</dt><dd class="cmt"><p>the accumulator to combine the value built and the latest emitted value</p></dd><dt>returns</dt><dd class="cmt"><p>a stream accumulating according to the given function</p></dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.streams.Stream#simpsonsIntegral" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="simpsonsIntegral[I&lt;:squants.Quantity[I]withsquants.time.TimeIntegral[_]](implicitderivEv:T=&gt;squants.time.TimeDerivative[I]):com.lynbrookrobotics.potassium.streams.Stream[I]"></a><a id="simpsonsIntegral[I&lt;:Quantity[I]withTimeIntegral[_]]((T)⇒TimeDerivative[I]):Stream[I]"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/Stream.html#simpsonsIntegral[I&lt;:squants.Quantity[I]withsquants.time.TimeIntegral[_]](implicitderivEv:T=&gt;squants.time.TimeDerivative[I]):com.lynbrookrobotics.potassium.streams.Stream[I]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">simpsonsIntegral</span><span class="tparams">[<span name="I">I &lt;: <span class="extype" name="squants.Quantity">Quantity</span>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.simpsonsIntegral.I">I</span>] with <span class="extype" name="squants.time.TimeIntegral">TimeIntegral</span>[_]</span>]</span><span class="params">(<span class="implicit">implicit </span><span name="derivEv">derivEv: (<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.T">T</span>) ⇒ <span class="extype" name="squants.time.TimeDerivative">TimeDerivative</span>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.simpsonsIntegral.I">I</span>]</span>)</span><span class="result">: <a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.simpsonsIntegral.I">I</span>]</span>
+      </span>
+      
+      
     </li><li name="com.lynbrookrobotics.potassium.streams.Stream#sliding" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="sliding(size:Int):com.lynbrookrobotics.potassium.streams.Stream[scala.collection.immutable.Queue[T]]"></a><a id="sliding(Int):Stream[Queue[T]]"></a>
       <span class="permalink">
@@ -880,6 +995,22 @@ stream through polling</p></div><dl class="paramcmts block"><dt class="param">o<
       <p class="shortcomment cmt">Adds a &quot;check&quot; in the stream pipeline, which can be used for things
 such as ending a task when a condition is met</p><div class="fullcomment"><div class="comment cmt"><p>Adds a &quot;check&quot; in the stream pipeline, which can be used for things
 such as ending a task when a condition is met</p></div><dl class="paramcmts block"><dt class="param">check</dt><dd class="cmt"><p>the function to run on each value of the stream</p></dd><dt>returns</dt><dd class="cmt"><p>a stream that contains the check in the pipeline</p></dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.streams.Stream#withCheckZipped" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="withCheckZipped[O](checkingStream:com.lynbrookrobotics.potassium.streams.Stream[O])(check:O=&gt;Unit):com.lynbrookrobotics.potassium.streams.Stream[T]"></a><a id="withCheckZipped[O](Stream[O])((O)⇒Unit):Stream[T]"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/Stream.html#withCheckZipped[O](checkingStream:com.lynbrookrobotics.potassium.streams.Stream[O])(check:O=&gt;Unit):com.lynbrookrobotics.potassium.streams.Stream[T]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">withCheckZipped</span><span class="tparams">[<span name="O">O</span>]</span><span class="params">(<span name="checkingStream">checkingStream: <a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.withCheckZipped.O">O</span>]</span>)</span><span class="params">(<span name="check">check: (<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.withCheckZipped.O">O</span>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span><span class="result">: <a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.T">T</span>]</span>
+      </span>
+      
+      
     </li><li name="com.lynbrookrobotics.potassium.streams.Stream#zip" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="zip[O](other:com.lynbrookrobotics.potassium.streams.Stream[O]):com.lynbrookrobotics.potassium.streams.Stream[(T,O)]"></a><a id="zip[O](Stream[O]):Stream[(T,O)]"></a>
       <span class="permalink">
@@ -939,9 +1070,9 @@ of its parents produce a new value.</p><div class="fullcomment"><div class="comm
 of its parents produce a new value. The resulting stream <u>does not</u> have
 a periodic nature.</p></div><dl class="paramcmts block"><dt class="tparam">O</dt><dd class="cmt"><p>the type of values from the other stream</p></dd><dt class="param">other</dt><dd class="cmt"><p>the stream to merge with</p></dd><dt>returns</dt><dd class="cmt"><p>a stream with the values from both streams brought together</p></dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.streams.Stream#zipWithDt" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="zipWithDt(implicitclock:com.lynbrookrobotics.potassium.clock.Clock):com.lynbrookrobotics.potassium.streams.Stream[(T,squants.time.Time)]"></a><a id="zipWithDt(Clock):Stream[(T,Time)]"></a>
+      <a id="zipWithDt:com.lynbrookrobotics.potassium.streams.Stream[(T,squants.time.Time)]"></a><a id="zipWithDt:Stream[(T,Time)]"></a>
       <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/streams/Stream.html#zipWithDt(implicitclock:com.lynbrookrobotics.potassium.clock.Clock):com.lynbrookrobotics.potassium.streams.Stream[(T,squants.time.Time)]" title="Permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/Stream.html#zipWithDt:com.lynbrookrobotics.potassium.streams.Stream[(T,squants.time.Time)]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -950,14 +1081,14 @@ a periodic nature.</p></div><dl class="paramcmts block"><dt class="tparam">O</dt
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">zipWithDt</span><span class="params">(<span class="implicit">implicit </span><span name="clock">clock: <a href="../clock/Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a></span>)</span><span class="result">: <a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[(<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.T">T</span>, <span class="extype" name="squants.time.Time">Time</span>)]</span>
+        <span class="name">zipWithDt</span><span class="result">: <a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[(<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.T">T</span>, <span class="extype" name="squants.time.Time">Time</span>)]</span>
       </span>
       
       <p class="shortcomment cmt">Zips the stream with the periods between when values were published</p><div class="fullcomment"><div class="comment cmt"><p>Zips the stream with the periods between when values were published</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a stream of values and times in tuples</p></dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.streams.Stream#zipWithTime" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="zipWithTime(implicitclock:com.lynbrookrobotics.potassium.clock.Clock):com.lynbrookrobotics.potassium.streams.Stream[(T,squants.time.Time)]"></a><a id="zipWithTime(Clock):Stream[(T,Time)]"></a>
+      <a id="zipWithTime:com.lynbrookrobotics.potassium.streams.Stream[(T,squants.time.Time)]"></a><a id="zipWithTime:Stream[(T,Time)]"></a>
       <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/streams/Stream.html#zipWithTime(implicitclock:com.lynbrookrobotics.potassium.clock.Clock):com.lynbrookrobotics.potassium.streams.Stream[(T,squants.time.Time)]" title="Permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/Stream.html#zipWithTime:com.lynbrookrobotics.potassium.streams.Stream[(T,squants.time.Time)]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -966,7 +1097,7 @@ a periodic nature.</p></div><dl class="paramcmts block"><dt class="tparam">O</dt
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">zipWithTime</span><span class="params">(<span class="implicit">implicit </span><span name="clock">clock: <a href="../clock/Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a></span>)</span><span class="result">: <a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[(<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.T">T</span>, <span class="extype" name="squants.time.Time">Time</span>)]</span>
+        <span class="name">zipWithTime</span><span class="result">: <a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[(<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.T">T</span>, <span class="extype" name="squants.time.Time">Time</span>)]</span>
       </span>
       
       <p class="shortcomment cmt">Zips a stream with the time of value emission, for use in situations such as

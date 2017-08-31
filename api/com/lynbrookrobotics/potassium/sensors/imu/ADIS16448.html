@@ -456,7 +456,8 @@
         <span class="name">endCalibration</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <p class="shortcomment cmt">Update values for the angle on the gyro.</p><div class="fullcomment"><div class="comment cmt"><p>Update values for the angle on the gyro.
+      <p class="shortcomment cmt">End the collection of values used to calibrate
+</p><div class="fullcomment"><div class="comment cmt"><p>End the collection of values used to calibrate
 </p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="DigitalGyro.html" class="extype" name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro">DigitalGyro</a></dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
@@ -528,6 +529,22 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro#getVelocities" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getVelocities:com.lynbrookrobotics.potassium.units.Value3D[squants.motion.AngularVelocity]"></a><a id="getVelocities:Value3D[AngularVelocity]"></a>
+      <span class="permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/sensors/imu/ADIS16448.html#getVelocities:com.lynbrookrobotics.potassium.units.Value3D[squants.motion.AngularVelocity]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getVelocities</span><span class="result">: <a href="../../units/Value3D.html" class="extype" name="com.lynbrookrobotics.potassium.units.Value3D">Value3D</a>[<span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="DigitalGyro.html" class="extype" name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro">DigitalGyro</a></dd></dl></div>
     </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <span class="permalink">
@@ -624,70 +641,6 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro#position" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="position:com.lynbrookrobotics.potassium.PeriodicSignal[com.lynbrookrobotics.potassium.units.Value3D[squants.Angle]]"></a><a id="position:PeriodicSignal[Value3D[Angle]]"></a>
-      <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/sensors/imu/ADIS16448.html#position:com.lynbrookrobotics.potassium.PeriodicSignal[com.lynbrookrobotics.potassium.units.Value3D[squants.Angle]]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">position</span><span class="result">: <a href="../../PeriodicSignal.html" class="extype" name="com.lynbrookrobotics.potassium.PeriodicSignal">PeriodicSignal</a>[<a href="../../units/Value3D.html" class="extype" name="com.lynbrookrobotics.potassium.units.Value3D">Value3D</a>[<span class="extype" name="squants.Angle">Angle</span>]]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="DigitalGyro.html" class="extype" name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro">DigitalGyro</a></dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro#positionX" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="positionX:com.lynbrookrobotics.potassium.PeriodicSignal[squants.Angle]"></a><a id="positionX:PeriodicSignal[Angle]"></a>
-      <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/sensors/imu/ADIS16448.html#positionX:com.lynbrookrobotics.potassium.PeriodicSignal[squants.Angle]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">positionX</span><span class="result">: <a href="../../PeriodicSignal.html" class="extype" name="com.lynbrookrobotics.potassium.PeriodicSignal">PeriodicSignal</a>[<span class="extype" name="squants.Angle">Angle</span>]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="DigitalGyro.html" class="extype" name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro">DigitalGyro</a></dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro#positionY" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="positionY:com.lynbrookrobotics.potassium.PeriodicSignal[squants.Angle]"></a><a id="positionY:PeriodicSignal[Angle]"></a>
-      <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/sensors/imu/ADIS16448.html#positionY:com.lynbrookrobotics.potassium.PeriodicSignal[squants.Angle]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">positionY</span><span class="result">: <a href="../../PeriodicSignal.html" class="extype" name="com.lynbrookrobotics.potassium.PeriodicSignal">PeriodicSignal</a>[<span class="extype" name="squants.Angle">Angle</span>]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="DigitalGyro.html" class="extype" name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro">DigitalGyro</a></dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro#positionZ" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="positionZ:com.lynbrookrobotics.potassium.PeriodicSignal[squants.Angle]"></a><a id="positionZ:PeriodicSignal[Angle]"></a>
-      <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/sensors/imu/ADIS16448.html#positionZ:com.lynbrookrobotics.potassium.PeriodicSignal[squants.Angle]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">positionZ</span><span class="result">: <a href="../../PeriodicSignal.html" class="extype" name="com.lynbrookrobotics.potassium.PeriodicSignal">PeriodicSignal</a>[<span class="extype" name="squants.Angle">Angle</span>]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="DigitalGyro.html" class="extype" name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro">DigitalGyro</a></dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.sensors.imu.ADIS16448#retrieveVelocity" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="retrieveVelocity:com.lynbrookrobotics.potassium.units.Value3D[squants.motion.AngularVelocity]"></a><a id="retrieveVelocity:Value3D[AngularVelocity]"></a>
       <span class="permalink">
@@ -736,70 +689,6 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro#velocity" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="velocity:com.lynbrookrobotics.potassium.PeriodicSignal[com.lynbrookrobotics.potassium.units.Value3D[squants.motion.AngularVelocity]]"></a><a id="velocity:PeriodicSignal[Value3D[AngularVelocity]]"></a>
-      <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/sensors/imu/ADIS16448.html#velocity:com.lynbrookrobotics.potassium.PeriodicSignal[com.lynbrookrobotics.potassium.units.Value3D[squants.motion.AngularVelocity]]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">velocity</span><span class="result">: <a href="../../PeriodicSignal.html" class="extype" name="com.lynbrookrobotics.potassium.PeriodicSignal">PeriodicSignal</a>[<a href="../../units/Value3D.html" class="extype" name="com.lynbrookrobotics.potassium.units.Value3D">Value3D</a>[<span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span>]]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="DigitalGyro.html" class="extype" name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro">DigitalGyro</a></dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro#velocityX" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="velocityX:com.lynbrookrobotics.potassium.PeriodicSignal[squants.motion.AngularVelocity]"></a><a id="velocityX:PeriodicSignal[AngularVelocity]"></a>
-      <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/sensors/imu/ADIS16448.html#velocityX:com.lynbrookrobotics.potassium.PeriodicSignal[squants.motion.AngularVelocity]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">velocityX</span><span class="result">: <a href="../../PeriodicSignal.html" class="extype" name="com.lynbrookrobotics.potassium.PeriodicSignal">PeriodicSignal</a>[<span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span>]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="DigitalGyro.html" class="extype" name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro">DigitalGyro</a></dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro#velocityY" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="velocityY:com.lynbrookrobotics.potassium.PeriodicSignal[squants.motion.AngularVelocity]"></a><a id="velocityY:PeriodicSignal[AngularVelocity]"></a>
-      <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/sensors/imu/ADIS16448.html#velocityY:com.lynbrookrobotics.potassium.PeriodicSignal[squants.motion.AngularVelocity]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">velocityY</span><span class="result">: <a href="../../PeriodicSignal.html" class="extype" name="com.lynbrookrobotics.potassium.PeriodicSignal">PeriodicSignal</a>[<span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span>]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="DigitalGyro.html" class="extype" name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro">DigitalGyro</a></dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro#velocityZ" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="velocityZ:com.lynbrookrobotics.potassium.PeriodicSignal[squants.motion.AngularVelocity]"></a><a id="velocityZ:PeriodicSignal[AngularVelocity]"></a>
-      <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/sensors/imu/ADIS16448.html#velocityZ:com.lynbrookrobotics.potassium.PeriodicSignal[squants.motion.AngularVelocity]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">velocityZ</span><span class="result">: <a href="../../PeriodicSignal.html" class="extype" name="com.lynbrookrobotics.potassium.PeriodicSignal">PeriodicSignal</a>[<span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span>]</span>
-      </span>
-      
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="DigitalGyro.html" class="extype" name="com.lynbrookrobotics.potassium.sensors.imu.DigitalGyro">DigitalGyro</a></dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
