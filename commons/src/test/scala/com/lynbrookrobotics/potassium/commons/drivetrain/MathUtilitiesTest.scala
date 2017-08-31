@@ -5,7 +5,7 @@ import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import squants.space.Feet
 
 class MathUtilitiesTest extends FunSuite {
-  val origin = new Point(Feet(0), Feet(0))
+  val origin = Point.origin
 
   test("Test circle intersection with vertical line") {
     val firstPoint = new Point(Feet(0), Feet(-2))

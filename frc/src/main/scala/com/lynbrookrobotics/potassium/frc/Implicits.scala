@@ -10,17 +10,17 @@ import squants.time.{Frequency, Seconds}
 object Implicits {
   // Interface -> signals
   implicit class AnalogInSignals(val analog: AnalogInput) extends AnyVal {
-    def voltage: Signal[ElectricPotential] = Signal(Volts(analog.getVoltage))
-    def averageVoltage: Signal[ElectricPotential] = Signal(Volts(analog.getAverageVoltage))
+    def voltage: ElectricPotential = Volts(analog.getVoltage)
+    def averageVoltage: ElectricPotential = Volts(analog.getAverageVoltage)
 
-    def value: Signal[Int] = Signal(analog.getValue)
-    def averageValue: Signal[Int] = Signal(analog.getAverageValue)
+    def value: Int = analog.getValue
+    def averageValue: Int = analog.getAverageValue
   }
 
   implicit class JoystickSignals(val joystick: Joystick) extends AnyVal {
-    def x: Signal[Dimensionless] = Signal(Each(joystick.getX()))
-    def y: Signal[Dimensionless] = Signal(Each(joystick.getY()))
-    def z: Signal[Dimensionless] = Signal(Each(joystick.getZ()))
+    def x: Dimensionless = Each(joystick.getX())
+    def y: Dimensionless = Each(joystick.getY())
+    def z: Dimensionless = Each(joystick.getZ())
 
     def buttonPressed(button: Int)(implicit polling: ImpulseEvent): ContinuousEvent = {
       Signal(joystick.getRawButton(button)).filter(down => down)
@@ -28,8 +28,8 @@ object Implicits {
   }
 
   implicit class CounterSignals(val counter: Counter) extends AnyVal {
-    def period: Signal[Time] = Signal(Seconds(counter.getPeriod))
-    def frequency: Signal[Frequency] = period.map(t => Each(1) / t)
+    def period: Time = Seconds(counter.getPeriod)
+    def frequency: Frequency = Each(1) / period
   }
 
   // interface conversions

@@ -1,7 +1,8 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.clock.Clock
-import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal}
+import com.lynbrookrobotics.potassium.{Component, Signal}
+import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask}
 import squants.{Acceleration, Angle, Dimensionless, Length, Percent, Time, Velocity}
 import squants.motion.{AngularVelocity, DegreesPerSecond, Distance, FeetPerSecond}
@@ -17,7 +18,7 @@ trait UnicycleCoreTasks {
 
   import controllers._
 
-  class DriveOpenLoop(forward: Signal[Dimensionless], turn: Signal[Dimensionless])
+  class DriveOpenLoop(forward: Stream[Dimensionless], turn: Stream[Dimensionless])
     (implicit drive: Drivetrain, hardware: DrivetrainHardware,
       props: Signal[DrivetrainProperties]) extends ContinuousTask {
     override def onStart(): Unit = {
@@ -31,7 +32,7 @@ trait UnicycleCoreTasks {
   }
 
 
-  class ContinuousClosedDrive(forward: Signal[Dimensionless], turn: Signal[Dimensionless])
+  class ContinuousClosedDrive(forward: Stream[Dimensionless], turn: Stream[Dimensionless])
                              (implicit drive: Drivetrain, hardware: DrivetrainHardware,
                               props: Signal[DrivetrainProperties]) extends ContinuousTask {
     override def onStart(): Unit = {
@@ -44,7 +45,7 @@ trait UnicycleCoreTasks {
     }
   }
 
-  class ContinuousVelocityDrive(forward: Signal[Velocity], turn: Signal[AngularVelocity])
+  class ContinuousVelocityDrive(forward: Stream[Velocity], turn: Stream[AngularVelocity])
                                (implicit drive: Drivetrain,
                                 hardware: DrivetrainHardware,
                                 props: Signal[DrivetrainProperties]) extends ContinuousTask {
@@ -63,11 +64,11 @@ trait UnicycleCoreTasks {
                       hardware: DrivetrainHardware,
                       props: Signal[DrivetrainProperties]) extends FiniteTask {
     override def onStart(): Unit = {
-      val absoluteDistance = hardware.forwardPosition.get + distance
+      val absoluteDistance = hardware.forwardPosition.currentValue.map(_ + distance)
       val (controller, error) = forwardPositionControl(absoluteDistance)
 
-      val checkedController = controller.withCheck { _ =>
-        if (error.get.abs < tolerance) {
+      val checkedController = controller.withCheckZipped(error) { error =>
+        if (error.abs < tolerance) {
           finished()
         }
       }
@@ -84,7 +85,7 @@ trait UnicycleCoreTasks {
                                             finalVelocity: Velocity,
                                             acceleration: Acceleration,
                                             targetDistance: Length,
-                                            position: Signal[Length],
+                                            position: Stream[Length],
                                             tolerance: Length,
                                             toleranceAngle: Angle)
                                            (implicit drive: Drivetrain,
@@ -97,24 +98,24 @@ trait UnicycleCoreTasks {
     }
 
     override final def onStart(): Unit = {
-      val (velocity, forwardError) = trapezoidalDriveControl(
-        hardware.forwardVelocity.get, // not map because we need position at this time
-        cruisingVelocity,
-        finalVelocity,
-        acceleration,
-        hardware.forwardPosition.get, // not map because we need position at this time
-        targetDistance,
-        position,
-        tolerance
-      )
+      val (idealVelocity, forwardError) = trapezoidalDriveControl(
+          cruisingVelocity = cruisingVelocity,
+          finalVelocity = finalVelocity,
+          acceleration = acceleration,
+          targetForwardTravel = targetDistance,
+          position = position,
+          velocity = hardware.forwardVelocity)
 
-      val absoluteAngle = hardware.turnPosition.get
-      val (turnController, turnError) = turnPositionControl(absoluteAngle)
-      val forwardOutput = velocity.map(UnicycleVelocity(_, DegreesPerSecond(0)).toUnicycleSignal)
+      val absoluteAngleTarget = hardware.turnPosition.currentValue
+      val (turnController, turnError) = turnPositionControl(absoluteAngleTarget)
+      val forwardOutput = idealVelocity.map(UnicycleVelocity(_, DegreesPerSecond(0)).toUnicycleSignal)
       val combinedController = forwardOutput.zip(turnController).map(t => t._1 + t._2)
 
-      drive.setController(lowerLevelVelocityControl(speedControl(combinedController)).withCheck { _ =>
-          if (forwardError.get.abs < tolerance && turnError.get.abs < toleranceAngle) {
+      val uncheckedController = lowerLevelVelocityControl(speedControl(combinedController))
+      val zippedError = forwardError.zip(turnError)
+      drive.setController(uncheckedController.withCheckZipped(zippedError) {
+        case (forwardError, turnError) =>
+          if (forwardError.abs < tolerance && turnError.abs < toleranceAngle) {
             finished()
           }
         })
@@ -154,22 +155,62 @@ trait UnicycleCoreTasks {
                               hardware: DrivetrainHardware,
                               props: Signal[DrivetrainProperties]) extends FiniteTask {
     override def onStart(): Unit = {
-      val absoluteDistance = hardware.forwardPosition.get + distance
+      val absoluteDistance = hardware.forwardPosition.currentValue.map(_ + distance)
       val (forwardController, forwardError) = forwardPositionControl(absoluteDistance)
 
       val limitedForward = forwardController.map { u =>
         UnicycleSignal(u.forward max (-maxSpeed) min maxSpeed, u.turn)
       }
 
-      val absoluteAngle = hardware.turnPosition.get
-      val (turnController, turnError) = turnPositionControl(absoluteAngle)
+      val targetAngleAbsolute = hardware.turnPosition.currentValue
+      val (turnController, turnError) = turnPositionControl(targetAngleAbsolute)
 
       val combinedController = limitedForward.zip(turnController).map(t => t._1 + t._2)
 
-      val checkedController = combinedController.withCheck { _ =>
-        if (forwardError.get.abs < toleranceForward && turnError.get.abs < toleranceAngle) {
-          finished()
-        }
+      val zippedError = forwardError.zip(turnError)
+      val checkedController = combinedController.withCheckZipped(zippedError) {
+        case  (forwardError, turnError) =>
+          if (forwardError.abs < toleranceForward && turnError.abs < toleranceAngle) {
+            finished()
+          }
+      }
+
+      drive.setController(
+        lowerLevelVelocityControl(speedControl(checkedController))
+      )
+    }
+
+    override def onEnd(): Unit = {
+      drive.resetToDefault()
+    }
+  }
+
+  class DriveDistanceAtAngle(distance: Length,
+                             toleranceForward: Length,
+                             targetAngle: Angle,
+                             toleranceAngle: Angle,
+                             maxSpeed: Dimensionless)
+                             (implicit drive: Drivetrain,
+                              hardware: DrivetrainHardware,
+                              props: Signal[DrivetrainProperties]) extends FiniteTask {
+    override def onStart(): Unit = {
+      val absoluteDistance = hardware.forwardPosition.currentValue.map(_ + distance)
+      val (forwardController, forwardError) = forwardPositionControl(absoluteDistance)
+
+      val limitedForward = forwardController.map { u =>
+        UnicycleSignal(u.forward max (-maxSpeed) min maxSpeed, u.turn)
+      }
+
+      val (turnController, turnError) = turnPositionControl(targetAngle)
+
+      val combinedController = limitedForward.zip(turnController).map(t => t._1 + t._2)
+
+      val zippedError = forwardError.zip(turnError)
+      val checkedController = combinedController.withCheckZipped(zippedError) {
+        case  (forwardError, turnError) =>
+          if (forwardError.abs < toleranceForward && turnError.abs < toleranceAngle) {
+            finished()
+          }
       }
 
       drive.setController(
@@ -183,42 +224,48 @@ trait UnicycleCoreTasks {
   }
 
   class DriveBeyondStraight(distance: Length,
-                              toleranceForward: Length,
-                              toleranceAngle: Angle,
-                              maxSpeed: Dimensionless)
-                             (implicit drive: Drivetrain,
-                              hardware: DrivetrainHardware,
-                              props: Signal[DrivetrainProperties]) extends FiniteTask {
+                            toleranceForward: Length,
+                            toleranceAngle: Angle,
+                            maxSpeed: Dimensionless)
+                           (implicit drive: Drivetrain,
+                            hardware: DrivetrainHardware,
+                            props: Signal[DrivetrainProperties]) extends FiniteTask {
     override def onStart(): Unit = {
-      val absoluteDistance = hardware.forwardPosition.get + distance
       val (forwardController, forwardError) = (
         if (distance.value > 0) {
-          Signal.constant(maxSpeed).toPeriodic
+          hardware.forwardPosition.mapToConstant(maxSpeed)
         } else {
-          Signal.constant(-maxSpeed).toPeriodic
+          hardware.forwardPosition.mapToConstant(-maxSpeed)
         },
-        hardware.forwardPosition.map(absoluteDistance - _)
+
+        // TODO: requires review
+        hardware.forwardPosition.relativize((initial, current) => {
+          val absoluteTarget = initial + distance
+          absoluteTarget - current
+        })
       )
 
       val limitedForward = forwardController.map { u =>
         UnicycleSignal(u, Percent(0))
       }
 
-      val absoluteAngle = hardware.turnPosition.get
+      val absoluteAngle = hardware.turnPosition.currentValue
       val (turnController, turnError) = turnPositionControl(absoluteAngle)
 
       val combinedController = limitedForward.zip(turnController).map(t => t._1 + t._2)
 
-      val checkedController = combinedController.withCheck { _ =>
-        val beyond = if (distance.value > 0) {
-          forwardError.get.value < 0
-        } else {
-          forwardError.get.value > 0
-        }
+      val zippedError = forwardError.zip(turnError)
+      val checkedController = combinedController.withCheckZipped(zippedError) {
+        case (forwardError, turnError) =>
+          val beyond = if (distance.value > 0) {
+            forwardError.value < 0
+          } else {
+            forwardError.value > 0
+          }
 
-        if (beyond && turnError.get.abs < toleranceAngle) {
-          finished()
-        }
+          if (beyond && turnError.abs < toleranceAngle) {
+            finished()
+          }
       }
 
       drive.setController(
@@ -231,18 +278,22 @@ trait UnicycleCoreTasks {
     }
   }
 
+
+
   class RotateByAngle(relativeAngle: Angle, tolerance: Angle, timeWithinTolerance: Int)
                      (implicit drive: Drivetrain,
                       hardware: DrivetrainHardware,
                       props: Signal[DrivetrainProperties]) extends FiniteTask {
     override def onStart(): Unit = {
-      val absoluteAngle = hardware.turnPosition.get + relativeAngle
+      val absoluteAngle = hardware.turnPosition.currentValue.map(_ + relativeAngle)
+
+//      val absoluteAngle = hardware.turnPosition.get + relativeAngle
       val (controller, error) = turnPositionControl(absoluteAngle)
 
       var ticksWithinTolerance = 0
 
-      val checkedController = controller.withCheck { _ =>
-        if (error.get.abs < tolerance) {
+      val checkedController = controller.withCheckZipped(error) { error =>
+        if (error.abs < tolerance) {
           ticksWithinTolerance += 1
         } else {
           ticksWithinTolerance = 0
@@ -267,8 +318,8 @@ trait UnicycleCoreTasks {
                       props: Signal[DrivetrainProperties]) extends FiniteTask {
     override def onStart(): Unit = {
       val (controller, error) = turnPositionControl(absoluteAngle)
-      val checkedController = controller.withCheck { _ =>
-        if (error.get.abs < tolerance) {
+      val checkedController = controller.withCheckZipped(error) { error =>
+        if (error.abs < tolerance) {
           finished()
         }
       }
@@ -281,14 +332,14 @@ trait UnicycleCoreTasks {
     }
   }
 
-  class CorrectOffsetWithLatency(timestampedOffset: Signal[(Angle, Time)], tolerance: Angle)
+  class CorrectOffsetWithLatency(timestampedOffset: Stream[(Angle, Time)], tolerance: Angle)
     (implicit drive: Drivetrain,
       hardware: DrivetrainHardware,
-      props: Signal[DrivetrainProperties]) extends FiniteTask {
+      props: Signal[DrivetrainProperties],
+      clock: Clock) extends FiniteTask {
 
-    val positionSlide: PeriodicSignal[Queue[(Angle, Time)]] = hardware.turnPosition.toPeriodic.zipWithTime.sliding(
-      20, (hardware.turnPosition.get, Milliseconds(System.currentTimeMillis()))
-    )
+    // TODO: requires review
+    val positionSlide: Stream[Queue[(Angle, Time)]] = hardware.turnPosition.zipWithTime.sliding(20)
 
     override def onStart(): Unit = {
       val targetAbsolute = calculateTargetFromOffsetWithLatency(timestampedOffset, positionSlide)

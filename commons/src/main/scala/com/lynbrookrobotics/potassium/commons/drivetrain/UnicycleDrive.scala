@@ -3,10 +3,8 @@ package com.lynbrookrobotics.potassium.commons.drivetrain
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal, SignalLike}
 import squants.motion.AngularVelocity
+import com.lynbrookrobotics.potassium.streams.Stream
 import squants.{Acceleration, Angle, Dimensionless, Each, Length, Percent, Velocity}
-import com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleMotionProfileControllers
-import squants.space.Feet
-import squants.time.Milliseconds
 
 trait UnicycleProperties {
   val maxForwardVelocity: Velocity
@@ -32,11 +30,11 @@ trait UnicycleProperties {
 }
 
 trait UnicycleHardware {
-  val forwardVelocity: Signal[Velocity]
-  val turnVelocity: Signal[AngularVelocity]
+  val forwardVelocity: Stream[Velocity]
+  val turnVelocity: Stream[AngularVelocity]
 
-  val forwardPosition: Signal[Length]
-  val turnPosition: Signal[Angle]
+  val forwardPosition: Stream[Length]
+  val turnPosition: Stream[Angle]
 }
 
 case class UnicycleSignal(forward: Dimensionless, turn: Dimensionless) {
@@ -76,8 +74,8 @@ trait UnicycleDrive extends Drive { self =>
       * @param unicycle the unicycle signal to drive with
       * @return a signal controlled with open-loop on the parent
       */
-    def parentOpenLoop(unicycle: SignalLike[UnicycleSignal]): PeriodicSignal[DriveSignal] = {
-      unicycle.map(convertUnicycleToDrive).toPeriodic
+    def parentOpenLoop(unicycle: Stream[UnicycleSignal]): Stream[DriveSignal] = {
+      unicycle.map(convertUnicycleToDrive)
     }
 
     /**
@@ -85,8 +83,8 @@ trait UnicycleDrive extends Drive { self =>
       * @param unicycle the unicycle signal to closed-loop drive with
       * @return a signal controlled with closed-loop on the parent
       */
-    def lowerLevelVelocityControl(unicycle: SignalLike[UnicycleSignal])(implicit hardware: DrivetrainHardware,
-                                                                        props: Signal[DrivetrainProperties]): PeriodicSignal[DriveSignal] = {
+    def lowerLevelVelocityControl(unicycle: Stream[UnicycleSignal])(implicit hardware: DrivetrainHardware,
+                                                                        props: Signal[DrivetrainProperties]): Stream[DriveSignal] = {
       driveClosedLoop(unicycle.map(convertUnicycleToDrive))
     }
   }
@@ -102,10 +100,10 @@ trait UnicycleDrive extends Drive { self =>
                             props: Properties): UnicycleControlMode
 
   override protected def defaultController(implicit hardware: Hardware,
-                                           props: Signal[Properties]): PeriodicSignal[DriveSignal] = {
+                                           props: Signal[Properties]): Stream[DriveSignal] = {
     controlMode(hardware, props.get) match {
       case NoOperation =>
-        parentOpenLoop(Signal.constant(UnicycleSignal(Percent(0), Percent(0))))
+        parentOpenLoop(hardware.forwardPosition.mapToConstant(UnicycleSignal(Percent(0), Percent(0))))
 
       case ArcadeControlsOpen(forward, turn) =>
         val combinedSignal = forward.zip(turn).map(t => UnicycleSignal(t._1, t._2))

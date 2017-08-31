@@ -1,7 +1,7 @@
 package com.lynbrookrobotics.potassium.commons.cartesianPosition
 
 import com.lynbrookrobotics.potassium.units.Point
-import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
+import com.lynbrookrobotics.potassium.streams.Stream
 import squants.Angle
 import squants.space._
 
@@ -17,25 +17,19 @@ object XYPosition {
     * @param distanceTraveled the total distance/arclength traveled. Used as the
     *                         magnitude of the vectore used in vector addition
     */
-  def apply(angle: Signal[Angle],
-            distanceTraveled: Signal[Length]): PeriodicSignal[Point] = {
-    val initAngle = angle.get
-    val averageAngle = angle.toPeriodic.sliding(2, initAngle).map(angles =>
+  def apply(angle: Stream[Angle],
+            distanceTraveled: Stream[Length]): Stream[Point] = {
+    val averageAngle = angle.sliding(2).map(angles =>
       (angles.head + angles.last) / 2D)
 
-    val initDistanceTraveled = distanceTraveled.get
-    val deltaDistance = distanceTraveled.toPeriodic.sliding(2, initDistanceTraveled).map { distances =>
+    val deltaDistance = distanceTraveled.sliding(2).map { distances =>
       distances.last - distances.head
     }
 
-    val origin = Point(
-      Feet(0),
-      Feet(0))
-
     // approximate that robot traveled in a straight line at the average
     // angle over the course of 1 tick
-    deltaDistance.zip(averageAngle).scanLeft(origin){
-      case (acc, (distance, avrgAngle), _) =>
+    deltaDistance.zip(averageAngle).scanLeft(Point.origin){
+      case (acc, (distance, avrgAngle)) =>
         acc + Point(
           distance * avrgAngle.cos,
           distance * avrgAngle.sin)
@@ -43,33 +37,30 @@ object XYPosition {
   }
 
   /**
-    * differentiats position, then reintegrates with Simpsons integration
+    * differentiates x and y position, then reintegrates with Simpsons integration
     * @param angle
     * @param distanceTraveled
     * @return
     */
-  def positionWithSimpsons(angle: Signal[Angle],
-                           distanceTraveled: Signal[Length]): PeriodicSignal[Point] = {
-    val initAngle = angle.get
-    val averageAngle = angle.toPeriodic.sliding(2, initAngle).map(angles =>
+  def positionWithSimpsons(angle: Stream[Angle],
+                           distanceTraveled: Stream[Length]): Stream[Point] = {
+    val averageAngle = angle.sliding(2).map(angles =>
       (angles.head + angles.last) / 2D)
 
-    val velocity = distanceTraveled.toPeriodic.derivative
-    val velocityX = velocity.zip(averageAngle).map{v =>
-      val (speed, angle) = v
-      angle.cos * speed
+    val velocity = distanceTraveled.derivative
+    val velocityX = velocity.zip(averageAngle).map{ case(speed, avrgAngle) =>
+      avrgAngle.cos * speed
     }
 
-    val velocityY = velocity.zip(averageAngle).map{v =>
-      val (speed, angle) = v
-      angle.sin * speed
+    val velocityY = velocity.zip(averageAngle).map{ case(speed, avrgAngle)  =>
+      avrgAngle.sin * speed
     }
 
     val xPosition = velocityX.simpsonsIntegral
     val yPosition = velocityY.simpsonsIntegral
 
-    xPosition.zip(yPosition).map { pose =>
-      Point(pose._1, pose._2)
+    xPosition.zip(yPosition).map { case (xPose, yPose) =>
+      Point(xPose, yPose)
     }
   }
 }

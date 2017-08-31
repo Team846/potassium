@@ -1,9 +1,9 @@
 package com.lynbrookrobotics.potassium.streams
 
-class ZippedStream[A, B](aPeriodicity: ExpectedPeriodicity,
-                         bPeriodicity: ExpectedPeriodicity,
-                         parentA: Stream[A], parentB: Stream[B]) extends Stream[(A, B)] {
-  override val expectedPeriodicity: ExpectedPeriodicity = (aPeriodicity, bPeriodicity) match {
+import com.lynbrookrobotics.potassium.clock.Clock
+
+class ZippedStream[A, B](private val parentA: Stream[A], private val parentB: Stream[B]) extends Stream[(A, B)] {
+  override val expectedPeriodicity: ExpectedPeriodicity = (parentA.expectedPeriodicity, parentB.expectedPeriodicity) match {
     case (Periodic(a), Periodic(b)) =>
       if (a eq b) {
         Periodic(a)
@@ -12,6 +12,17 @@ class ZippedStream[A, B](aPeriodicity: ExpectedPeriodicity,
       }
 
     case _ => NonPeriodic
+  }
+
+  override val originTimeStream = (parentA.expectedPeriodicity, parentB.expectedPeriodicity) match {
+    case (Periodic(a), Periodic(b)) =>
+      if (a eq b) {
+        parentA.originTimeStream
+      } else {
+        None // TODO: alternatives?
+      }
+
+    case _ => None
   }
 
   private[this] var aSlot: Option[A] = None

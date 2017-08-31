@@ -7,9 +7,7 @@ import squants.Quantity
 import squants.time.{Time, TimeDerivative, TimeIntegral}
 
 import scala.collection.immutable.Queue
-import scala.collection.mutable
 import scala.ref.WeakReference
-
 import com.lynbrookrobotics.potassium.Platform
 
 abstract class Stream[T] { self =>
@@ -17,12 +15,12 @@ abstract class Stream[T] { self =>
 
   val expectedPeriodicity: ExpectedPeriodicity
 
-  private[this] val listeners = mutable.Queue.empty[T => Unit]
+  val originTimeStream: Option[Stream[Time]]
+
+  private[this] var listeners = Vector.empty[T => Unit]
 
   protected def publishValue(value: T): Unit = {
-    listeners.synchronized {
-      listeners.foreach(_.apply(value))
-    }
+    listeners.foreach(_.apply(value))
     // TODO: more stuff maybe
   }
 
@@ -35,8 +33,9 @@ abstract class Stream[T] { self =>
     */
   def map[O](f: T => O): Stream[O] = {
     val ret = new Stream[O] {
-      val parent = self
+      private val parent = self
       override val expectedPeriodicity = self.expectedPeriodicity
+      override val originTimeStream = self.originTimeStream
     }
 
     val ptr = WeakReference(ret)
@@ -54,6 +53,10 @@ abstract class Stream[T] { self =>
     ret
   }
 
+  def mapToConstant[O](output: O): Stream[O] = {
+    map(_ => output)
+  }
+
   /**
     * Relativizes the stream according to the given function, which takes a base value
     * and the current value and returns the meaningful difference between them
@@ -62,14 +65,24 @@ abstract class Stream[T] { self =>
     * @return a new stream with values relativized against the next value from this stream
     */
   def relativize[O](f: (T, T) => O): Stream[O] = {
-    var lastValue: Option[T] = None
+    var firstValue: Option[T] = None
     map { v =>
-      if (lastValue.isEmpty) {
-        lastValue = Some(v)
+      if (firstValue.isEmpty) {
+        firstValue = Some(v)
       }
 
-      f(lastValue.get, v)
+      f(firstValue.get, v)
     }
+  }
+
+  // TODO: requires review
+  /**
+    *
+    * @return returns a stream of first value this stream will publish
+    *         from the time this method is called
+    */
+  def currentValue: Stream[T] = {
+    relativize((firstValue, _) => firstValue)
   }
 
   /**
@@ -80,7 +93,7 @@ abstract class Stream[T] { self =>
     * @return a stream with the values from both streams brought together
     */
   def zip[O](other: Stream[O]): Stream[(T, O)] = {
-    val ret = new ZippedStream[T, O](expectedPeriodicity, other.expectedPeriodicity, this, other)
+    val ret = new ZippedStream[T, O](this, other)
     val ptr = WeakReference(ret)
 
     var aCancel: Cancel = null
@@ -186,8 +199,8 @@ abstract class Stream[T] { self =>
     *
     * @return a stream with tuples of emitted values and the time of emission
     */
-  def zipWithTime(implicit clock: Clock): Stream[(T, Time)] = {
-    map(v => (v, clock.currentTime))
+  def zipWithTime: Stream[(T, Time)] = {
+    zip(originTimeStream.get)
   }
 
   /**
@@ -199,7 +212,11 @@ abstract class Stream[T] { self =>
     var last = Queue.empty[T]
 
     val ret = new Stream[Queue[T]] {
+      private val parent = self
       override val expectedPeriodicity = self.expectedPeriodicity
+      override val originTimeStream = self.originTimeStream.map { o =>
+        o.sliding(size).map(_.last)
+      }
     }
 
     val ptr = WeakReference(ret)
@@ -246,10 +263,41 @@ abstract class Stream[T] { self =>
     * Zips the stream with the periods between when values were published
     * @return a stream of values and times in tuples
     */
-  def zipWithDt(implicit clock: Clock): Stream[(T, Time)] = {
+  def zipWithDt: Stream[(T, Time)] = {
     zipWithTime.sliding(2).map { q =>
       (q.last._1, q.last._2 - q.head._2)
     }
+  }
+
+  /**
+    * Returns a stream that skips emitting the first n values
+    * @param n the number of values to skip
+    */
+  def drop(n: Int): Stream[T] = {
+    val ret = new Stream[T] {
+      private val parent = self
+      override val expectedPeriodicity = self.expectedPeriodicity
+      override val originTimeStream = self.originTimeStream.map(_.drop(n))
+    }
+
+    val ptr = WeakReference(ret)
+
+    var emittedValues = 0
+
+    var cancel: Cancel = null
+    cancel = this.foreach { v =>
+      ptr.get match {
+        case Some(s) =>
+          emittedValues += 1
+          if (emittedValues > n) {
+            s.publishValue(v)
+          }
+        case None =>
+          cancel.apply()
+      }
+    }
+
+    ret
   }
 
   /**
@@ -257,7 +305,7 @@ abstract class Stream[T] { self =>
     * the derivative of the stream's units
     * @return a stream producing values that are the derivative of the stream
     */
-  def derivative[D <: Quantity[D] with TimeDerivative[_]](implicit intEv: T => TimeIntegral[D], clock: Clock): Stream[D] = {
+  def derivative[D <: Quantity[D] with TimeDerivative[_]](implicit intEv: T => TimeIntegral[D]): Stream[D] = {
     zipWithTime.sliding(2).map { q =>
       val dt = q.last._2 - q.head._2
       (q.last._1 / dt) - (q.head._1 / dt)
@@ -269,7 +317,7 @@ abstract class Stream[T] { self =>
     * the integral of the signal's units
     * @return a signal producing values that are the integral of the signal
     */
-  def integral[I <: Quantity[I] with TimeIntegral[_]](implicit derivEv: T => TimeDerivative[I], clock: Clock): Stream[I] = {
+  def integral[I <: Quantity[I] with TimeIntegral[_]](implicit derivEv: T => TimeDerivative[I]): Stream[I] = {
     // We use null as a cheap way to handle the initial value since there is
     // no way to get a "zero" for I
 
@@ -283,6 +331,36 @@ abstract class Stream[T] { self =>
     }
     // scalastyle:on
   }
+
+  def simpsonsIntegral[I <: Quantity[I] with TimeIntegral[_]](implicit derivEv: T => TimeDerivative[I]): Stream[I] = {
+    val previousValues = sliding(3)
+
+    // scalastyle:off
+    previousValues.zipWithDt.scanLeft(null.asInstanceOf[I]){case (acc, (current3Values, dt)) =>
+      // TODO: review please
+      if (acc != null) {
+        if (current3Values.isEmpty) {
+          println("empty 3 values")
+        }
+        acc + (dt * current3Values.head + 4 * dt * current3Values(1) + dt * current3Values(2)) / 6
+      } else {
+        (current3Values.last: TimeDerivative[I]) * dt
+      }
+    }
+    //scalastyle:on
+  }
+
+  /**
+    * Subtracts toSubtract from this
+    * @param toSubtract how much to subtract
+    * @return stream where every value is the minued minus toSubtract
+    */
+  def minus[Q <: Quantity[Q]](toSubtract: Stream[Q])(implicit intEv: T => Quantity[Q]): Stream[Q] = {
+    zip(toSubtract).map{ case (minuend, subtractand) =>
+      minuend - subtractand
+    }
+  }
+
 
   /**
     * Produces a stream that emits values at the same rate as the given
@@ -308,8 +386,9 @@ abstract class Stream[T] { self =>
   def defer: Stream[T] = {
     if (Platform.isJVM) {
       val ret = new Stream[T] {
-        val parent = self
+        private val parent = self
         override val expectedPeriodicity = self.expectedPeriodicity
+        override val originTimeStream = self.originTimeStream
       }
 
       val ptr = WeakReference(ret)
@@ -378,7 +457,12 @@ abstract class Stream[T] { self =>
       v
     }
   }
-
+  def withCheckZipped[O](checkingStream: Stream[O])(check: O => Unit): Stream[T] = {
+    zip(checkingStream).map{ case (v, checkedValue) =>
+      check(checkedValue)
+      v
+    }
+  }
   /**
     * Filters a stream to only emit values that pass a certain condition
     * @param condition the condition to filter stream values with
@@ -386,8 +470,10 @@ abstract class Stream[T] { self =>
     */
   def filter(condition: T => Boolean): Stream[T] = {
     val ret = new Stream[T] {
-      val parent = self
+      private val parent = self
       override val expectedPeriodicity = NonPeriodic
+      // TODO: optimize
+      override val originTimeStream = self.originTimeStream.map(_.zip(self).filter(t => condition(t._2)).map(_._1))
     }
 
     val ptr = WeakReference(ret)
@@ -417,13 +503,13 @@ abstract class Stream[T] { self =>
     * @return a function to call to remove the listener
     */
   def foreach(thunk: T => Unit): Cancel = {
-    listeners.synchronized {
-      listeners.enqueue(thunk)
+    self.synchronized {
+      listeners = listeners :+ thunk
     }
 
     () => {
-      listeners.synchronized {
-        listeners.dequeueFirst(_ eq thunk)
+      self.synchronized {
+        listeners = listeners.filterNot(_ eq thunk)
       }
     }
   }
@@ -431,8 +517,18 @@ abstract class Stream[T] { self =>
 
 object Stream {
   def periodic[T](period: Time)(value: => T)(implicit clock: Clock): Stream[T] = {
-    new Stream[T] {
-      val expectedPeriodicity = Periodic(period)
+    new Stream[T] { self =>
+      override val expectedPeriodicity = Periodic(period)
+
+      override val originTimeStream = Some(new Stream[Time] {
+        override val expectedPeriodicity = self.expectedPeriodicity
+        override val originTimeStream = None
+      })
+
+      override def publishValue(value: T): Unit = {
+        originTimeStream.get.publishValue(clock.currentTime)
+        super.publishValue(value)
+      }
 
       clock(period) { _ =>
         publishValue(value)
@@ -441,8 +537,40 @@ object Stream {
   }
 
   def manual[T]: (Stream[T], T => Unit) = {
+    manual(NonPeriodic)
+  }
+
+  def manual[T](periodicity: ExpectedPeriodicity): (Stream[T], T => Unit) = {
     val stream = new Stream[T] {
-      override val expectedPeriodicity: ExpectedPeriodicity = NonPeriodic
+      override val expectedPeriodicity: ExpectedPeriodicity = periodicity
+
+      override val originTimeStream = None
+
+      override def publishValue(value: T): Unit = {
+        super.publishValue(value)
+      }
+    }
+
+    (stream, stream.publishValue)
+  }
+
+  def manualWithTime[T](implicit clock: Clock): (Stream[T], T => Unit) = {
+    manualWithTime(NonPeriodic)
+  }
+
+  def manualWithTime[T](periodicity: ExpectedPeriodicity)(implicit clock: Clock): (Stream[T], T => Unit) = {
+    val stream = new Stream[T] {
+      override val expectedPeriodicity: ExpectedPeriodicity = periodicity
+
+      override val originTimeStream = Some(new Stream[Time] {
+        override val expectedPeriodicity: ExpectedPeriodicity = periodicity
+        override val originTimeStream = None
+      })
+
+      override def publishValue(value: T): Unit = {
+        originTimeStream.get.publishValue(clock.currentTime)
+        super.publishValue(value)
+      }
     }
 
     (stream, stream.publishValue)

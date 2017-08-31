@@ -1,5 +1,7 @@
 resolvers += "Funky-Repo" at "http://team846.github.io/repo"
 
+addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-RC10")
+
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.0")
 
 addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.1.0")

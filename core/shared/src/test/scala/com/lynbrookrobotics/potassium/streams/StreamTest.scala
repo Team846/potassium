@@ -1,13 +1,12 @@
 package com.lynbrookrobotics.potassium.streams
 
-import com.lynbrookrobotics.potassium.ClockMocking
 import org.scalatest.FunSuite
 import squants.motion.{FeetPerSecond, Velocity}
 import squants.space.{Feet, Length}
-import squants.time.Milliseconds
+import squants.time.{Milliseconds, Nanoseconds}
 
 import scala.collection.immutable.Queue
-import com.lynbrookrobotics.potassium.Platform
+import com.lynbrookrobotics.potassium.{ClockMocking, Platform}
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Promise}
@@ -86,7 +85,7 @@ class StreamTest extends FunSuite {
   test("Derivative of constant values is always zero") {
     implicit val (clock, update) = ClockMocking.mockedClockTicker
 
-    val (str, pub) = Stream.manual[Length]
+    val (str, pub) = Stream.manualWithTime[Length](Periodic(Milliseconds(1)))
     val derivative = str.derivative
 
     var lastValue: Velocity = null
@@ -107,7 +106,7 @@ class StreamTest extends FunSuite {
     implicit val (clock, update) = ClockMocking.mockedClockTicker
     implicit val tolerance = Feet(0.001) / Milliseconds(1)
 
-    val (str, pub) = Stream.manual[Length]
+    val (str, pub) = Stream.manualWithTime[Length](Periodic(Milliseconds(1)))
     val derivative = str.derivative
 
     var lastValue: Velocity = null
@@ -127,7 +126,7 @@ class StreamTest extends FunSuite {
   test("Integral of zero is always zero") {
     implicit val (clock, update) = ClockMocking.mockedClockTicker
 
-    val (str, pub) = Stream.manual[Velocity]
+    val (str, pub) = Stream.manualWithTime[Velocity](Periodic(Milliseconds(1)))
     val integral = str.integral
 
     var lastValue: Length = null
@@ -148,7 +147,7 @@ class StreamTest extends FunSuite {
     implicit val (clock, update) = ClockMocking.mockedClockTicker
     implicit val tolerance = FeetPerSecond(0.001) * Milliseconds(1)
 
-    val (str, pub) = Stream.manual[Velocity]
+    val (str, pub) = Stream.manualWithTime[Velocity](Periodic(Milliseconds(1)))
     val integral = str.integral
 
     var lastValue: Length = null
@@ -298,5 +297,23 @@ class StreamTest extends FunSuite {
     pub(5)
 
     assert(emitted == 3)
+  }
+
+  test("Stream of 3 ft minus Stream of 2 ft produces stream of 1") {
+    // minuend is what to subtract from
+    val (minuend, pubMinuend) = Stream.manual[Length]
+
+    // subtractand is what to subtract from minuend
+    val (subtractand, pubSubtractand) = Stream.manual[Length]
+
+    val difference = minuend.minus(subtractand)
+
+    var lastDifference = Feet(-10)
+    difference.foreach(lastDifference = _)
+
+    pubMinuend(Feet(3))
+    pubSubtractand(Feet(2))
+
+    assert(lastDifference == Feet(1))
   }
 }

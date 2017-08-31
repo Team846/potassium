@@ -1,9 +1,10 @@
 package com.lynbrookrobotics.potassium.model.simulations
 
 import com.lynbrookrobotics.potassium.clock.Clock
-import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
 import com.lynbrookrobotics.potassium.commons.drivetrain._
+import com.lynbrookrobotics.potassium.commons.drivetrain.TwoSidedDrive
+import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.Point
 import squants.mass.MomentOfInertia
 import squants.{Acceleration, Angle, Dimensionless, Length, Mass, Percent, Velocity}
@@ -15,57 +16,40 @@ import scala.collection.mutable
 
 case class MomentInHistory(time: Time,
                            forwardPosition: Length,
-                            angle: Angle,
-                            forwardVelocity: Velocity,
-                            turnSpeed: AngularVelocity,
-                            position: Point)
+                           angle: Angle,
+                           forwardVelocity: Velocity,
+                           turnSpeed: AngularVelocity,
+                           position: Point)
+
+case class RobotVelocities(left: Velocity,
+                           right: Velocity,
+                           angular: AngularVelocity)
+
+case class TwoSidedDriveForce(left: Force, right: Force)
 
 class SimulatedTwoSidedHardware(constantFriction: Force,
                                 override val track: Length,
                                 mass: Mass,
-                                momentOfInertia: MomentOfInertia)
+                                momentOfInertia: MomentOfInertia,
+                                clock: Clock,
+                                period: Time)
                                 (implicit props: TwoSidedDriveProperties) extends TwoSidedDriveHardware {
-  val history = new mutable.ArrayBuffer[MomentInHistory]
-  private var time = Seconds(0)
-
-  def updateHistory() {
-    history.append(
-      MomentInHistory(
-        time,
-        forwardPosition.get,
-        turnPosition.get,
-        forwardVelocity.get,
-        turnVelocity.get,
-        peekedPosition.get
-      )
-    )
-  }
-
-  def update(dt: Time): Unit = {
-    // force periodic signals to update
-    DrivetrainPositions.currentValue(dt)
-    position.currentValue(dt)
-
-    time += dt
-    updateHistory()
-  }
-
-  val leftMotor = new SimulatedSpeedController
-  val rightMotor = new SimulatedSpeedController
+  val leftMotor = new SimulatedMotor(clock, period)
+  val rightMotor = new SimulatedMotor(clock, period)
 
   private val maxMotorForce = mass * props.maxAcceleration / 2
-  private val leftForceOutput = leftMotor.outputSignal.map(o => o.toEach * maxMotorForce)
-  private val rightForceOutput = rightMotor.outputSignal.map(o => o.toEach * maxMotorForce)
+  private val leftForceOutput = leftMotor.outputStream.map(_.toEach * maxMotorForce)
+  private val rightForceOutput = rightMotor.outputStream.map(_.toEach * maxMotorForce)
 
   def incrementVelocities(leftInputForce: Force,
                           rightInputForce: Force,
                           leftVelocity: Velocity,
                           rightVelocity: Velocity,
                           angularVelocity: AngularVelocity,
-                          dt: Time): (Velocity, Velocity, AngularVelocity) = {
-    val leftFriction = PhysicsUtil.friction(leftVelocity, constantFriction, maxMotorForce)
+                          dt: Time): RobotVelocities = {
+    val leftFriction = PhysicsUtil.frictionAndEMF(leftVelocity, constantFriction, maxMotorForce)
     val netLeftForce = leftInputForce + leftFriction
-    val rightFriction = PhysicsUtil.friction(rightVelocity, constantFriction, maxMotorForce)
+    val rightFriction = PhysicsUtil.frictionAndEMF(rightVelocity, constantFriction, maxMotorForce)
     val netRightForce = rightInputForce + rightFriction
 
     // radius from center, located halfway between wheels
@@ -79,80 +63,73 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
     // Linear acceleration caused by angular acceleration about the center
     val tangentialAcceleration = angularAcceleration onRadius radius
 
+    // TODO: This is completey wrong. Remove +/- tangentialAcceleration
     // Euler's method to integrate velocities
     val newLeftVelocity = leftVelocity + (linearAcceleration - tangentialAcceleration) * dt
     val newRightVelocity = rightVelocity + (linearAcceleration + tangentialAcceleration) * dt
     val newAngularVelocity = angularVelocity + angularAcceleration * dt
 
-    (newLeftVelocity, newRightVelocity, newAngularVelocity)
+    RobotVelocities(newLeftVelocity, newRightVelocity, newAngularVelocity)
   }
 
-  private val InitialSpeeds = (MetersPerSecond(0), MetersPerSecond(0), RadiansPerSecond(0))
-  private val velocities = leftForceOutput.zip(rightForceOutput).scanLeft(InitialSpeeds) {
-    case ((leftVelocity, rightVelocity, turnVelocity), (leftForceOut, rightForceOut), dt) =>
-      incrementVelocities(leftForceOut, rightForceOut, leftVelocity, rightVelocity, turnVelocity, dt)
+  private val InitialSpeeds = RobotVelocities(MetersPerSecond(0), MetersPerSecond(0), RadiansPerSecond(0))
+
+  private val twoSidedOutputs = leftForceOutput.zip(rightForceOutput).map(o =>
+    TwoSidedDriveForce(o._1, o._2))
+
+  private val velocities = twoSidedOutputs.zipWithDt.scanLeft(InitialSpeeds) {
+    case (accVelocities, (outputs, dt)) =>
+      incrementVelocities(
+        outputs.left,
+        outputs.right,
+        accVelocities.left,
+        accVelocities.right,
+        accVelocities.angular,
+        dt)
   }
 
-  private val leftSpeedPeriodic: PeriodicSignal[Velocity] = velocities.map(_._1)
-  private val rightSpeedPeriodic: PeriodicSignal[Velocity] = velocities.map(_._2)
+  override val leftVelocity = velocities.map(_.left)
+  override val rightVelocity = velocities.map(_.right)
 
   // convert triginometric velocity to compass velocity
-  private val turnVelocityPeriodic: PeriodicSignal[AngularVelocity] = velocities.map(-1 * _._3)
+  override lazy val turnVelocity = velocities.map(-1 * _.angular)
 
-  private val leftPositionPeriodic: PeriodicSignal[Length] = leftSpeedPeriodic.integral
-  private val rightPositionPeriodic: PeriodicSignal[Length] = rightSpeedPeriodic.integral
-  private val turnPositionPeriodic: PeriodicSignal[Angle] = turnVelocityPeriodic.integral
+  override val leftPosition = leftVelocity.integral
+  override val rightPosition = rightVelocity.integral
 
-  // zip all position signals together so that when this value is updated,
-  // all positions are updated only once
-  private val DrivetrainPositions = leftPositionPeriodic.zip(rightPositionPeriodic).zip(turnPositionPeriodic)
-
-  private def peekLength(toPeek: PeriodicSignal[Length]): Signal[Length] = {
-    toPeek.peek.map(_.getOrElse(Meters(0)))
-  }
-
-  private def peekVelocity(toPeek: PeriodicSignal[Velocity]) = {
-    toPeek.peek.map(_.getOrElse(MetersPerSecond(0)))
-  }
-
-  private def peekAngularVelocity(toPeek: PeriodicSignal[AngularVelocity]) = {
-    toPeek.peek.map(_.getOrElse(RadiansPerSecond(0)))
-  }
-
-  private def peekAngle(toPeek: PeriodicSignal[Angle]) = {
-    toPeek.peek.map(_.getOrElse(Radians(0)))
-  }
+  override lazy val turnPosition = turnVelocity.integral
 
   val position = XYPosition(turnPosition.map(a => Degrees(90) - a), forwardPosition)
 
-  override val leftVelocity: Signal[Velocity]             = peekVelocity(leftSpeedPeriodic)
-  override val rightVelocity: Signal[Velocity]            = peekVelocity(rightSpeedPeriodic)
-  val trigSpeed = peekAngularVelocity(turnVelocityPeriodic)
-  override lazy val turnVelocity: Signal[AngularVelocity] = peekAngularVelocity(turnVelocityPeriodic)
+  val zippedPositions = forwardPosition.zip(turnPosition).zip(position)
 
-  // I have absolutely no idea why, but marking these as lazy fixes null
-  // pointer exceptions
-  override lazy val leftPosition: Signal[Length]  = peekLength(leftPositionPeriodic)
-  override lazy val rightPosition: Signal[Length] = peekLength(rightPositionPeriodic)
-
-  override lazy val turnPosition: Signal[Angle]   = peekAngle(turnPositionPeriodic)
-  private val peekedPosition: Signal[Point]       = position.peek.map(_.getOrElse(Point.origin))
+  val historyStream = zippedPositions.zip(forwardVelocity).zip(turnVelocity).zipWithTime.map {
+    case (((((fPos, tPos), pos), fVel), tVel), time) =>
+      MomentInHistory(
+        time = time,
+        forwardPosition = fPos,
+        forwardVelocity = fVel,
+        angle = tPos,
+        position = pos,
+        turnSpeed = tVel)
+  }
 }
 
-class TwoSidedDriveContainerSimulator(period: Time)(implicit clock: Clock) extends TwoSidedDrive(period) {
+class TwoSidedDriveContainerSimulator(period: Time)(val clock: Clock) extends TwoSidedDrive(period)(clock) {
   override type Hardware = SimulatedTwoSidedHardware
   override type Properties = TwoSidedDriveProperties
 
   /**
-    * Output the current signal to actuators with the hardware
+    * Output the current signal to actuators with the hardware. In this case
+    * it simply updates the value that simulated motors will publish the next
+    * time that update() in an instance of SimulatedTwoSidedHardware is called
     *
-    * @param hardware the hardware to output with
+    * @param hardware the simulated hardware to output with
     * @param signal   the signal to output
     */
   override protected def output(hardware: Hardware, signal: TwoSidedSignal): Unit = {
     hardware.leftMotor.set(signal.left)
     hardware.rightMotor.set(signal.right)
-    hardware.update(period)
   }
 
   override protected def controlMode(implicit hardware: SimulatedTwoSidedHardware,
@@ -181,8 +158,8 @@ object PhysicsUtil {
     * @param props
     * @return
     */
-  def friction(velocity: Velocity, constantFriction: Force, maxMotorForce: Force)
-              (implicit props: TwoSidedDriveProperties): Force = {
+  def frictionAndEMF(velocity: Velocity, constantFriction: Force, maxMotorForce: Force)
+                    (implicit props: TwoSidedDriveProperties): Force = {
     val direction = -1 * Math.signum(velocity.value)
 
     direction * (emfForce(velocity, maxMotorForce) + constantFriction)

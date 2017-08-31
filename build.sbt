@@ -17,7 +17,8 @@ scalaVersion in ThisBuild := "2.12.1"
 
 resolvers in ThisBuild += "Funky-Repo" at "http://team846.github.io/repo"
 
-parallelExecution in Test in ThisBuild := false
+concurrentRestrictions in Global += Tags.limit(Tags.Test, 1)
+parallelExecution in Global := false
 
 lazy val sharedDependencies = Def.setting(Seq(
   "org.typelevel"  %%% "squants"  % "1.3.0",
@@ -35,7 +36,6 @@ parallelExecution in ThisBuild := false
 lazy val potassium = project.in(file(".")).
   aggregate(
     coreJVM, coreJS, coreNative,
-    testingJVM, testingJS, testingNative,
     model,
     controlJVM, controlJS, controlNative,
     remote,
@@ -70,16 +70,7 @@ lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 lazy val coreNative = core.native
 
-lazy val testing = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core).settings(
-  name := "potassium-testing",
-  libraryDependencies ++= sharedDependencies.value
-).nativeSettings(nativeSettings)
-
-lazy val testingJVM = testing.jvm
-lazy val testingJS = testing.js
-lazy val testingNative = testing.native
-
-lazy val model = project.dependsOn(coreJVM, commonsJVM, testingJVM).settings(
+lazy val model = project.dependsOn(coreJVM, commonsJVM).settings(
   name := "potassium-model",
   libraryDependencies ++= sharedDependencies.value,
   libraryDependencies ++= jvmDependencies
@@ -119,7 +110,7 @@ lazy val config = project.dependsOn(coreJVM).settings(
   libraryDependencies ++= jvmDependencies
 )
 
-lazy val lighting = project.dependsOn(coreJVM, testingJVM % Test).settings(
+lazy val lighting = project.dependsOn(coreJVM).settings(
   name := "potassium-lighting",
   libraryDependencies ++= sharedDependencies.value,
   libraryDependencies ++= jvmDependencies
@@ -133,11 +124,10 @@ lazy val sensors = project.dependsOn(coreJVM).settings(
 
 lazy val commons = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).
   dependsOn(
-    control,
-    (testing: CrossClasspathDependency.Constructor) % Test
+    control
   ).settings(
-    name := "potassium-commons",
-    libraryDependencies ++= sharedDependencies.value
+  name := "potassium-commons",
+  libraryDependencies ++= sharedDependencies.value
 ).nativeSettings(nativeSettings)
 
 
@@ -149,15 +139,15 @@ lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site t
 
 lazy val docs = project
   .enablePlugins(ScalaUnidocPlugin)
-  .dependsOn(coreJVM, testingJVM, model, controlJVM,
-             remote, vision, frc, config, sensors,
-             commonsJVM, lighting)
+  .dependsOn(coreJVM, model, controlJVM,
+    remote, vision, frc, config, sensors,
+    commonsJVM, lighting)
   .settings(
     autoAPIMappings := true,
     docsMappingsAPIDir := "api",
     addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docsMappingsAPIDir),
     unidocProjectFilter in (ScalaUnidoc, unidoc) :=
-      inProjects(coreJVM, testingJVM, model, controlJVM,
+      inProjects(coreJVM, model, controlJVM,
         remote, vision, frc, config, lighting, sensors, commonsJVM)
   )
 

@@ -1,11 +1,35 @@
 package com.lynbrookrobotics.potassium.streams
 
 import com.lynbrookrobotics.potassium.ClockMocking
+import com.lynbrookrobotics.potassium.clock.Clock
 import org.scalatest.FunSuite
+import squants.Time
+import squants.time.Seconds
 
 import scala.ref.WeakReference
 
 class DeallocationTest extends FunSuite {
+  implicit val clock = new Clock {
+    /**
+      * Schedules a periodic execution
+      *
+      * @param period the period between executions
+      * @param thunk  the block of code to execute
+      * @return a function to cancel the execution
+      */
+    override def apply(period: Time)(thunk: (Time) => Unit): Cancel = ???
+
+    /**
+      * Schedules a single execution of a function
+      *
+      * @param delay the initial delay before running the function
+      * @param thunk the function to execute after the delay
+      */
+    override def singleExecution(delay: Time)(thunk: => Unit): Unit = ???
+
+    override def currentTime: Time = Seconds(0)
+  }
+
   private def testDeallocates[T <: AnyRef](value: WeakReference[T]): Unit = {
     var count = 0
 
@@ -69,7 +93,7 @@ class DeallocationTest extends FunSuite {
   test("Zipped with time streams can be deallocated") {
     implicit val (clock, update) = ClockMocking.mockedClockTicker
 
-    val parent = Stream.manual[Int]
+    val parent = Stream.manualWithTime[Int]
     val ptr = WeakReference(parent._1.zipWithTime)
     parent._2(0)
 
@@ -98,6 +122,17 @@ class DeallocationTest extends FunSuite {
     var middle = parent.map(_ + 1)
     val ptr = WeakReference(middle)
     val last = middle.map(_ + 1)
+    middle = null
+
+    testDoesNotDeallocate(ptr)
+  }
+
+  test("Zipped intermediate streams are not deallocated") {
+    val (parent, _) = Stream.manual[Int]
+    val (other, _) = Stream.manual[Int]
+    var middle = parent.zip(other)
+    val ptr = WeakReference(middle)
+    val last = middle.map(identity)
     middle = null
 
     testDoesNotDeallocate(ptr)

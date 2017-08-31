@@ -1,8 +1,7 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
-import java.lang.Math._
+import com.lynbrookrobotics.potassium.streams.Stream
 
-import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
 import squants.motion._
 import squants.space.Feet
 
@@ -15,33 +14,28 @@ trait UnicycleMotionProfileControllers extends UnicycleCoreControllers {
     * velocity controller. This controller is meant to control second order
     * systems such as driving a distance.
     *
-    * @param initVelocity initial velocity of the system
     * @param cruisingVelocity desired magnitude of cruising velocity
     * @param finalVelocity desired final velocity when target is reached
     * @param acceleration desired magnitude of acceleration of the system
-    * @param initPosition initial position of the system
     * @param targetForwardTravel target position
     * @param position current position
     * @return velocity to travel at to achieve a trapezoidal motion profile.
     *         This value must be used a well tuned velocity controller to result
     *         in correct behaviour
     */
-  def trapezoidalDriveControl(initVelocity: Velocity,
-                              cruisingVelocity: Velocity,
+  def trapezoidalDriveControl(cruisingVelocity: Velocity,
                               finalVelocity: Velocity,
                               acceleration: Acceleration,
-                              initPosition: Distance,
                               targetForwardTravel: Distance,
-                              position: Signal[Distance],
-                              tolerance: Distance): (PeriodicSignal[Velocity], Signal[Distance]) = {
-    val targetPosition   = initPosition + targetForwardTravel
-    val error            = position.map(targetPosition - _)
+                              position: Stream[Distance],
+                              velocity: Stream[Velocity]): (Stream[Velocity], Stream[Distance]) = {
+    val targetPosition   = position.currentValue.map(_ + targetForwardTravel)
+    val error            = targetPosition.minus(position)
     val signError        = error.map(error => Math.signum(error.toFeet))
-    val distanceTraveled = position.map(_ - initPosition)
+    val distanceTraveled = position.minus(position.currentValue)
 
     // Travel at 0.1 ft/s for the first 0.25 feet
     val KickstartDistance = Feet(0.25)
-    val Tolerance         = Feet(0.1)
     val KickStartVelocity = FeetPerSecond(1)
 
     /**
@@ -49,7 +43,7 @@ trait UnicycleMotionProfileControllers extends UnicycleCoreControllers {
       * as function of current position using equation V^2 = V0^2 + 2a(x-x_0).
       * Direction of ideal velocity is decided later.
       */
-    val velocityAccel = distanceTraveled.map { traveled =>
+    val velocityAccel = distanceTraveled.zip(velocity.currentValue).map { case (traveled, initVelocity) =>
       // otherwise additional output is zero and nothing happens
       if (traveled.abs <= KickstartDistance) {
         KickStartVelocity
@@ -75,24 +69,20 @@ trait UnicycleMotionProfileControllers extends UnicycleCoreControllers {
       * Direction of ideal velocity is decided later.
       */
     val velocityDeccel = error.map { toTarget =>
-      if (toTarget.abs <= tolerance) {
-        FeetPerSecond(0.0)
-      } else {
-        val finalVelocitySquared = Math.pow(finalVelocity.toFeetPerSecond, 2)
-        val errorValue = toTarget.abs.toFeet
-        val accelerationValue = acceleration.toFeetPerSecondSquared
+      val finalVelocitySquared = Math.pow(finalVelocity.toFeetPerSecond, 2)
+      val errorValue = toTarget.abs.toFeet
+      val accelerationValue = acceleration.toFeetPerSecondSquared
 
-        FeetPerSecond(
-          sqrt(
-            abs(
-              finalVelocitySquared + 2 * accelerationValue * errorValue)))
-      }
+      FeetPerSecond(
+        math.sqrt(
+          math.abs(
+            finalVelocitySquared + 2 * accelerationValue * errorValue)))
     }
 
     // Ensure that motion is in the direction of the error
     val velocityOutput = velocityDeccel.zip(velocityAccel).zip(signError).map {
       case ((velDec, velAcc), sign) => sign * velDec min cruisingVelocity min velAcc
-    }.toPeriodic
+    }
 
     (velocityOutput, error)
   }

@@ -1,26 +1,31 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
+import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.control.{PIDConfig, PIDFConfig}
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
-import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal, SignalLike}
+import com.lynbrookrobotics.potassium.{ClockMocking, PeriodicSignal, Signal, SignalLike}
 import org.scalacheck.{Arbitrary, Gen}
 import squants.motion._
 import squants.space.{Degrees, Meters}
 import squants.time.{Milliseconds, Seconds}
-import squants.{Acceleration, Angle, Each, Length, Percent, Velocity}
+import squants.{Acceleration, Angle, Dimensionless, Each, Length, Percent, Velocity}
 import org.scalacheck.Prop.forAll
 import org.scalatest.FunSuite
 import org.scalatest.prop.Checkers._
 
 class UnicycleDriveControlTest extends FunSuite {
+  val period = Milliseconds(5)
+  implicit val (clock, trigggerClock) = ClockMocking.mockedClockTicker
+
   implicit val hardware: UnicycleHardware = new UnicycleHardware {
 
-    override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
-    override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
 
-    override val forwardPosition: Signal[Length] = null
-    override val turnPosition: Signal[Angle] = null
+    override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))(clock)
+    override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))(clock)
+
+    override val forwardPosition: Stream[Length] = null
+    override val turnPosition: Stream[Angle] = null
   }
 
   private class TestDrivetrain extends UnicycleDrive {
@@ -35,10 +40,10 @@ class UnicycleDriveControlTest extends FunSuite {
     override protected def controlMode(implicit hardware: Hardware,
                                        props: Properties): UnicycleControlMode = NoOperation
 
-    override protected def driveClosedLoop(signal: SignalLike[DriveSignal])
+    override protected def driveClosedLoop(signal: Stream[DriveSignal])
                                           (implicit hardware: Hardware,
-                                           props: Signal[Properties]): PeriodicSignal[DriveSignal] =
-      signal.toPeriodic
+                                           props: Signal[Properties]): Stream[DriveSignal] =
+      signal
 
     override type Drivetrain = Nothing
   }
@@ -55,10 +60,19 @@ class UnicycleDriveControlTest extends FunSuite {
     val drive = new TestDrivetrain
 
     check(forAll { x: Double =>
-      val out = drive.UnicycleControllers.
-        openForwardOpenDrive(Signal.constant(Each(x))).
-        currentValue(Milliseconds(5))
-      out.forward.toEach == x && out.turn.toEach == 0
+      val out = drive.UnicycleControllers.openForwardOpenDrive(
+        hardware.forwardVelocity.mapToConstant(Each(x)))
+
+      var forward = Percent(-10)
+      var turn = Percent(-10)
+      out.foreach(o => {
+        forward = o.forward
+        turn = o.turn
+      })
+
+      trigggerClock.apply(period)
+
+      forward.toEach == x && turn.toEach == 0
     })
   }
 
@@ -66,10 +80,18 @@ class UnicycleDriveControlTest extends FunSuite {
     val drive = new TestDrivetrain
 
     check(forAll { x: Double =>
-      val out = drive.UnicycleControllers.
-        openTurnOpenDrive(Signal.constant(Each(x))).
-        currentValue(Milliseconds(5))
-      out.turn.toEach == x && out.forward.toEach == 0
+      val out = drive.UnicycleControllers.openTurnOpenDrive(hardware.turnVelocity.mapToConstant(Each(x)))
+
+      var forward = Percent(-10)
+      var turn = Percent(-10)
+      out.foreach(o => {
+        forward = o.forward
+        turn = o.turn
+      })
+
+      trigggerClock.apply(period)
+
+      turn.toEach == x && forward.toEach == 0
     })
   }
 
@@ -99,13 +121,21 @@ class UnicycleDriveControlTest extends FunSuite {
     val drive = new TestDrivetrain
 
     check(forAll { (fwd: Velocity, turn: AngularVelocity) =>
-      val in = Signal.constant(UnicycleVelocity(fwd, turn))
-      val out = drive.UnicycleControllers.
-        velocityControl(in).
-        currentValue(Milliseconds(5))
+      val in = hardware.turnVelocity.mapToConstant(UnicycleVelocity(fwd, turn))
+      val out = drive.UnicycleControllers.velocityControl(in)
 
-      (math.abs(out.forward.toEach - (fwd.toMetersPerSecond / 10)) <= 0.01) &&
-        (math.abs(out.turn.toEach - (turn.toDegreesPerSecond / 10)) <= 0.01)
+      var forwardOut = Percent(-10)
+      var turnOut = Percent(-10)
+      out.foreach(o => {
+        forwardOut = o.forward
+        turnOut = o.turn
+      })
+
+      trigggerClock.apply(period)
+      trigggerClock.apply(period)
+
+      (math.abs(forwardOut.toEach - (fwd.toMetersPerSecond / 10)) <= 0.01) &&
+        (math.abs(turnOut.toEach - (turn.toDegreesPerSecond / 10)) <= 0.01)
     })
   }
 
@@ -131,17 +161,27 @@ class UnicycleDriveControlTest extends FunSuite {
     })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
-      override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
-      override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
 
-      override val forwardPosition: Signal[Length] = Signal(Meters(5))
-      override val turnPosition: Signal[Angle] = null
+      override val forwardPosition: Stream[Length] = Stream.periodic(period)(Meters(5))
+      override val turnPosition: Stream[Angle] = null
     }
 
     val out = drive.UnicycleControllers.
-      forwardPositionControl(Meters(5))(hardware, props)._1.currentValue(Milliseconds(5))
+      forwardPositionControl(Meters(5))(hardware, props)._1
 
-    assert(out.forward.toPercent == 0)
+    var forwardOut = Percent(-10)
+    var turnOut = Percent(-10)
+    out.foreach(o => {
+      forwardOut = o.forward
+      turnOut = o.turn
+    })
+
+    trigggerClock.apply(period)
+    trigggerClock.apply(period)
+
+    assert(forwardOut.toPercent == 0)
   }
 
   test("Forward position control returns correct proportional control (forward)") {
@@ -166,17 +206,27 @@ class UnicycleDriveControlTest extends FunSuite {
     })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
-      override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
-      override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
 
-      override val forwardPosition: Signal[Length] = Signal(Meters(0))
-      override val turnPosition: Signal[Angle] = null
+      override val forwardPosition: Stream[Length] = Stream.periodic(period)(Meters(0))
+      override val turnPosition: Stream[Angle] = null
     }
 
     val out = drive.UnicycleControllers.
-      forwardPositionControl(Meters(5))(hardware, props)._1.currentValue(Milliseconds(5))
+      forwardPositionControl(Meters(5))(hardware, props)._1
 
-    assert(out.forward.toPercent == 50)
+    var forwardOut = Percent(-10)
+    var turnOut = Percent(-10)
+    out.foreach(o => {
+      forwardOut = o.forward
+      turnOut = o.turn
+    })
+
+    trigggerClock.apply(period)
+    trigggerClock.apply(period)
+
+    assert(forwardOut.toPercent == 50)
   }
 
   test("Forward position control returns correct proportional control (reverse)") {
@@ -201,17 +251,27 @@ class UnicycleDriveControlTest extends FunSuite {
     })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
-      override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
-      override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
 
-      override val forwardPosition: Signal[Length] = Signal(Meters(0))
-      override val turnPosition: Signal[Angle] = null
+      override val forwardPosition: Stream[Length] = Stream.periodic(period)(Meters(0))
+      override val turnPosition: Stream[Angle] = null
     }
 
     val out = drive.UnicycleControllers.
-      forwardPositionControl(Meters(-5))(hardware, props)._1.currentValue(Milliseconds(5))
+      forwardPositionControl(Meters(-5))(hardware, props)._1
 
-    assert(out.forward.toPercent == -50)
+    var forwardOut = Percent(-10)
+    var turnOut = Percent(-10)
+    out.foreach(o => {
+      forwardOut = o.forward
+      turnOut = o.turn
+    })
+
+    trigggerClock.apply(period)
+    trigggerClock.apply(period)
+
+    assert(forwardOut.toPercent == -50)
   }
 
   test("Turn position control when relative angle is zero returns zero speed") {
@@ -236,17 +296,27 @@ class UnicycleDriveControlTest extends FunSuite {
     })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
-      override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
-      override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
 
-      override val forwardPosition: Signal[Length] = null
-      override val turnPosition: Signal[Angle] = Signal(Degrees(5))
+      override val forwardPosition: Stream[Length] = null
+      override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(5))
     }
 
     val out = drive.UnicycleControllers.
-      turnPositionControl(Degrees(5))(hardware, props)._1.currentValue(Milliseconds(5))
+      turnPositionControl(Degrees(5))(hardware, props)._1
 
-    assert(out.turn.toPercent == 0)
+    var forwardOut = Percent(-10)
+    var turnOut = Percent(-10)
+    out.foreach(o => {
+      forwardOut = o.forward
+      turnOut = o.turn
+    })
+
+    trigggerClock.apply(period)
+    trigggerClock.apply(period)
+
+    assert(turnOut.toPercent == 0)
   }
 
   test("Turn position control returns correct proportional control (clockwise)") {
@@ -271,17 +341,27 @@ class UnicycleDriveControlTest extends FunSuite {
     })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
-      override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
-      override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
 
-      override val forwardPosition: Signal[Length] = null
-      override val turnPosition: Signal[Angle] = Signal(Degrees(0))
+      override val forwardPosition: Stream[Length] = null
+      override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(0))
     }
 
     val out = drive.UnicycleControllers.
-      turnPositionControl(Degrees(5))(hardware, props)._1.currentValue(Milliseconds(5))
+      turnPositionControl(Degrees(5))(hardware, props)._1
 
-    assert(out.turn.toPercent == 50)
+    var forwardOut = Percent(-10)
+    var turnOut = Percent(-10)
+    out.foreach(o => {
+      forwardOut = o.forward
+      turnOut = o.turn
+    })
+
+    trigggerClock.apply(period)
+    trigggerClock.apply(period)
+
+    assert(turnOut.toPercent == 50)
   }
 
   test("Turn position control returns correct proportional control (counterclockwise)") {
@@ -306,16 +386,26 @@ class UnicycleDriveControlTest extends FunSuite {
     })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
-      override val forwardVelocity: Signal[Velocity] = Signal(MetersPerSecond(0))
-      override val turnVelocity: Signal[AngularVelocity] = Signal(DegreesPerSecond(0))
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
 
-      override val forwardPosition: Signal[Length] = null
-      override val turnPosition: Signal[Angle] = Signal(Degrees(0))
+      override val forwardPosition: Stream[Length] = null
+      override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(0))
     }
 
     val out = drive.UnicycleControllers.
-      turnPositionControl(Degrees(-5))(hardware, props)._1.currentValue(Milliseconds(5))
+      turnPositionControl(Degrees(-5))(hardware, props)._1
 
-    assert(out.turn.toPercent == -50)
+    var forwardOut = Percent(-10)
+    var turnOut = Percent(-10)
+    out.foreach(o => {
+      forwardOut = o.forward
+      turnOut = o.turn
+    })
+
+    trigggerClock.apply(period)
+    trigggerClock.apply(period)
+
+    assert(turnOut.toPercent == -50)
   }
 }
