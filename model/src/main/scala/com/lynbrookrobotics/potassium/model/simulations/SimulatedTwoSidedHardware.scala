@@ -25,7 +25,6 @@ case class RobotVelocities(left: Velocity,
                            right: Velocity,
                            angular: AngularVelocity)
 
-// TODO: Already implemented in TwoSidedDrive
 case class TwoSidedDriveForce(left: Force, right: Force)
 
 class SimulatedTwoSidedHardware(constantFriction: Force,
@@ -35,7 +34,6 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
                                 clock: Clock,
                                 period: Time)
                                 (implicit props: TwoSidedDriveProperties) extends TwoSidedDriveHardware {
-  // TODO: breaks without a non null period
   val leftMotor = new SimulatedMotor(clock, period)
   val rightMotor = new SimulatedMotor(clock, period)
 
@@ -65,7 +63,7 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
     // Linear acceleration caused by angular acceleration about the center
     val tangentialAcceleration = angularAcceleration onRadius radius
 
-    // TODO: This is very suspicious and most likely wrong
+    // TODO: This is completey wrong. Remove +/- tangentialAcceleration
     // Euler's method to integrate velocities
     val newLeftVelocity = leftVelocity + (linearAcceleration - tangentialAcceleration) * dt
     val newRightVelocity = rightVelocity + (linearAcceleration + tangentialAcceleration) * dt

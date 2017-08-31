@@ -14,7 +14,6 @@ class ZippedStream[A, B](private val parentA: Stream[A], private val parentB: St
     case _ => NonPeriodic
   }
 
-  // TODO: Review please
   override val originTimeStream = (parentA.expectedPeriodicity, parentB.expectedPeriodicity) match {
     case (Periodic(a), Periodic(b)) =>
       if (a eq b) {

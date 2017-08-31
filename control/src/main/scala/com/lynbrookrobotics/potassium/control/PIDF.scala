@@ -28,20 +28,6 @@ case class PIDFConfig[S <: Quantity[S],
                       U <: Quantity[U]](kp: Ratio[U, S], ki: Ratio[U, I], kd: Ratio[U, D], kf: Ratio[U, S])
 
 object PIDF {
-
-  /**
-    * most control loops have current values updating with greater periodicity
-    * than the target values. This method returns an error that updates in the
-    * manner described in AsyncZipped stream, with the periodicity of current
-    * @param current
-    * @param target
-    * @tparam S
-    * @return
-    */
-  def asyncError[S <: Quantity[S]](current: Stream[S], target: Stream[S]): Stream[S] = {
-    throw new NotImplementedException()
-  }
-
   // TODO: Use zipAsync instead of zip as used in minus
   def proportionalControl[S <: Quantity[S], U <: Quantity[U]](current: Stream[S],
                                                               target: Stream[S], gain: Signal[Ratio[U, S]]): Stream[U] = {

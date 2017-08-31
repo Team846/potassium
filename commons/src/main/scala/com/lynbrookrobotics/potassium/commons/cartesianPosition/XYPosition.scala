@@ -1,6 +1,5 @@
 package com.lynbrookrobotics.potassium.commons.cartesianPosition
 
-import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.units.Point
 import com.lynbrookrobotics.potassium.streams.Stream
 import squants.Angle
@@ -38,7 +37,7 @@ object XYPosition {
   }
 
   /**
-    * differentiats x and y position, then reintegrates with Simpsons integration
+    * differentiates x and y position, then reintegrates with Simpsons integration
     * @param angle
     * @param distanceTraveled
     * @return
