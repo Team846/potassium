@@ -61,8 +61,8 @@ object PIDF {
 
 
 
-  def feedForwardControl[S <: Quantity[S], U <: Quantity[U]](current: Stream[S], gain: Signal[Ratio[U, S]]): Stream[U] = {
-    current.map { v =>
+  def feedForwardControl[S <: Quantity[S], U <: Quantity[U]](target: Stream[S], gain: Signal[Ratio[U, S]]): Stream[U] = {
+    target.map { v =>
       v ** gain.get
     }
   }
@@ -93,7 +93,7 @@ object PIDF {
     proportionalControl(signal, target, config.map(_.kp)).drop(1).
       zip(integralControl(signal.map(exI), target.map(exI), config.map(_.ki))).
       zip(derivativeControl(signal.map(exD), target.map(exD), config.map(_.kd))).
-      zip(feedForwardControl(target, config.map(_.kf)).drop(1)).map { pidf =>
+      zipAsync(feedForwardControl(target, config.map(_.kf)).drop(1)).map { pidf =>
       val (((p, i), d), f) = pidf
       p + i + d + f
     }

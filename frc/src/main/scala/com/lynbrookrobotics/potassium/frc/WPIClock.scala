@@ -10,7 +10,7 @@ object WPIClock extends Clock {
     var lastTime: Option[Time] = None
     var running = false
 
-    val notifier = new Notifier(() => {
+    def onTick() = {
       if (!running) {
         running = true
         val currentTime = Microseconds(Utility.getFPGATime)
@@ -21,7 +21,13 @@ object WPIClock extends Clock {
         lastTime = Some(currentTime)
         running = false
       }
+    }
+
+    val notifier = new Notifier(() => {
+      onTick()
     })
+
+    onTick()
 
     notifier.startPeriodic(period.to(Seconds))
 

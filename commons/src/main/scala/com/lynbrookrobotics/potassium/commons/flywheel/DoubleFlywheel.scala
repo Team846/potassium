@@ -50,8 +50,8 @@ abstract class DoubleFlywheel {
                        (implicit properties: Signal[Properties],
                         hardware: Hardware): (Stream[Frequency], Stream[Frequency],
                                               Stream[DoubleFlywheelSignal]) = {
-      val errorLeft = hardware.leftVelocity.zip(leftTarget).map(t => t._2 - t._1)
-      val errorRight = hardware.rightVelocity.zip(rightTarget).map(t => t._2 - t._1)
+      val errorLeft = hardware.leftVelocity.zipAsync(leftTarget).map(t => t._2 - t._1)
+      val errorRight = hardware.rightVelocity.zipAsync(rightTarget).map(t => t._2 - t._1)
 
       val controlLeft = PIDF.pidf(
         hardware.leftVelocity,
@@ -80,7 +80,7 @@ abstract class DoubleFlywheel {
           velocityControllers.velocityControl(vel, vel)
 
         val zippedError = errorLeft.zip(errorRight)
-        component.setController(control.withCheckZipped(zippedError){ case (eLeft, eRight) =>
+        component.setController(control.withCheckZipped(zippedError) { case (eLeft, eRight) =>
           if (eLeft.abs < tolerance && eRight.abs < tolerance) {
             readyToRunInner()
           }
