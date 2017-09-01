@@ -1,6 +1,7 @@
 package com.lynbrookrobotics.potassium.config
 
 import java.io.File
+import java.nio.file.Files
 
 import squants.motion.{MetersPerSecond, Velocity}
 import SquantsPickling._
@@ -9,7 +10,11 @@ object Test extends App{
   case class RobotConfig(drive: DriveConfig)
   case class DriveConfig(maxForwardSpeed: Velocity)
 
-  val a = TwoWayFileJSON[RobotConfig](new File("test.txt"))
+  val file = new File("test.txt")
+  if(!file.exists()) {
+    Files.createFile(file.toPath)
+  }
+  val a = TwoWayFileJSON[RobotConfig](file)
 
   a.value = RobotConfig(DriveConfig(MetersPerSecond(5.0)))
 
