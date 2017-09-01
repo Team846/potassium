@@ -499,16 +499,6 @@ abstract class Stream[T] { self =>
     ret
   }
 
-  def eventWhen(condition: T => Boolean)(implicit polling: ImpulseEvent): ContinuousEvent = {
-    // stopgap solution for now
-    var conditionTrue = false
-    new ContinuousEvent(conditionTrue) {
-      val cancel = self.foreach { v =>
-        conditionTrue = condition(v)
-      }
-    }
-  }
-
   /**
     * Adds a listener for elements of this stream. Callbacks will be executed
     * whenever a new value is published in order of when the callbacks were added.
