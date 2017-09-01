@@ -28,10 +28,13 @@ case class PIDFConfig[S <: Quantity[S],
                       U <: Quantity[U]](kp: Ratio[U, S], ki: Ratio[U, I], kd: Ratio[U, D], kf: Ratio[U, S])
 
 object PIDF {
-  // TODO: Use zipAsync instead of zip as used in minus
+  private def error[S <: Quantity[S]](current: Stream[S], target: Stream[S]): Stream[S] = {
+    current.zipAsync(target).map(t => t._2 - t._1)
+  }
+
   def proportionalControl[S <: Quantity[S], U <: Quantity[U]](current: Stream[S],
                                                               target: Stream[S], gain: Signal[Ratio[U, S]]): Stream[U] = {
-    target.minus(current).map { v =>
+    error(current, target).map { v =>
       v ** gain.get
     }
   }
@@ -41,7 +44,7 @@ object PIDF {
                         D <: Quantity[D] with TimeDerivative[S]](current: Stream[S],
                                                                  target: Stream[S],
                                                                  gain: Signal[Ratio[U, D]]): Stream[U] = {
-    target.minus(current).derivative.map { d =>
+    error(current, target).derivative.map { d =>
       d ** gain.get
     }
   }
@@ -51,15 +54,15 @@ object PIDF {
                       I <: Quantity[I] with TimeIntegral[S]](current: Stream[S],
                                                              target: Stream[S],
                                                              gain: Signal[Ratio[U, I]]): Stream[U] = {
-    target.minus(current).integral.map(d => {
+    error(current, target).integral.map(d => {
       d ** gain.get
     })
   }
 
 
 
-  def feedForwardControl[S <: Quantity[S], U <: Quantity[U]](current: Stream[S], gain: Signal[Ratio[U, S]]): Stream[U] = {
-    current.map { v =>
+  def feedForwardControl[S <: Quantity[S], U <: Quantity[U]](target: Stream[S], gain: Signal[Ratio[U, S]]): Stream[U] = {
+    target.map { v =>
       v ** gain.get
     }
   }
@@ -90,7 +93,7 @@ object PIDF {
     proportionalControl(signal, target, config.map(_.kp)).drop(1).
       zip(integralControl(signal.map(exI), target.map(exI), config.map(_.ki))).
       zip(derivativeControl(signal.map(exD), target.map(exD), config.map(_.kd))).
-      zip(feedForwardControl(target, config.map(_.kf)).drop(1)).map { pidf =>
+      zipAsync(feedForwardControl(target, config.map(_.kf)).drop(1)).map { pidf =>
       val (((p, i), d), f) = pidf
       p + i + d + f
     }

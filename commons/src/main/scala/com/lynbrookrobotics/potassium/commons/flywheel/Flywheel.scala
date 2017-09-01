@@ -30,7 +30,7 @@ abstract class Flywheel {
     def velocityControl(target: Stream[Frequency])
                        (implicit properties: Signal[Properties],
                         hardware: Hardware): (Stream[Frequency], Stream[Dimensionless]) = {
-      val error = hardware.velocity.zip(target).map(t => t._2 - t._1)
+      val error = hardware.velocity.zipAsync(target).map(t => t._2 - t._1)
       (error, PIDF.pidf(
         hardware.velocity,
         target,
