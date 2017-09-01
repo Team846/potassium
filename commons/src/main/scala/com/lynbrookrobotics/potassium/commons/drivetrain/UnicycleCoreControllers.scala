@@ -50,6 +50,10 @@ trait UnicycleCoreControllers {
       props.map(_.forwardControlGainsFull)
     )
 
+    println(s"forward velocity: ${forwardVelocity.expectedPeriodicity}")
+    println(s"target: ${target.expectedPeriodicity}")
+    println(s"forward control: ${forwardControl.expectedPeriodicity}")
+
     val turnControl = PIDF.pidf(
       turnVelocity,
       target.map(_.turn),

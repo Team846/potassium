@@ -9,6 +9,7 @@ import squants.time.{Time, TimeDerivative, TimeIntegral}
 import scala.collection.immutable.Queue
 import scala.ref.WeakReference
 import com.lynbrookrobotics.potassium.Platform
+import com.lynbrookrobotics.potassium.events.{ContinuousEvent, ImpulseEvent}
 
 abstract class Stream[T] { self =>
   final type Value = T
@@ -130,31 +131,36 @@ abstract class Stream[T] { self =>
     * @return a stream with the values from both streams brought together
     */
   def zipAsync[O](other: Stream[O]): Stream[(T, O)] = {
-    val ret = new AsyncZippedStream[T, O](this, other)
-    val ptr = WeakReference(ret)
+    (this.expectedPeriodicity, other.expectedPeriodicity) match {
+      case (Periodic(a), Periodic(b)) if a eq b =>
+        zip(other)
+      case _ =>
+        val ret = new AsyncZippedStream[T, O](this, other)
+        val ptr = WeakReference(ret)
 
-    var aCancel: Cancel = null
-    aCancel = this.foreach { a =>
-      ptr.get match {
-        case Some(s) =>
-          s.receivePrimary(a)
-        case None =>
-          aCancel.apply()
-      }
+        var aCancel: Cancel = null
+        aCancel = this.foreach { a =>
+          ptr.get match {
+            case Some(s) =>
+              s.receivePrimary(a)
+            case None =>
+              aCancel.apply()
+          }
+        }
+
+        var bCancel: Cancel = null
+
+        bCancel = other.foreach { b =>
+          ptr.get match {
+            case Some(s) =>
+              s.receiveSecondary(b)
+            case None =>
+              bCancel.apply()
+          }
+        }
+
+        ret
     }
-
-    var bCancel: Cancel = null
-
-    bCancel = other.foreach { b =>
-      ptr.get match {
-        case Some(s) =>
-          s.receiveSecondary(b)
-        case None =>
-          bCancel.apply()
-      }
-    }
-
-    ret
   }
 
   /**
@@ -491,6 +497,16 @@ abstract class Stream[T] { self =>
     }
 
     ret
+  }
+
+  def eventWhen(condition: T => Boolean)(implicit polling: ImpulseEvent): ContinuousEvent = {
+    // stopgap solution for now
+    var conditionTrue = false
+    new ContinuousEvent(conditionTrue) {
+      val cancel = self.foreach { v =>
+        conditionTrue = condition(v)
+      }
+    }
   }
 
   /**
