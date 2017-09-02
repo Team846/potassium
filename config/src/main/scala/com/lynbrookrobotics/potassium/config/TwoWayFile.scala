@@ -1,7 +1,7 @@
 package com.lynbrookrobotics.potassium.config
 
 import java.io.{File, FileOutputStream, PrintWriter}
-import java.nio.file.{FileSystem, FileSystems}
+import java.nio.file.{FileSystem, FileSystems, Files}
 
 class TwoWayFile(file: File) extends TwoWaySignal[String] {
   new Thread(new Runnable {
@@ -16,8 +16,14 @@ class TwoWayFile(file: File) extends TwoWaySignal[String] {
   value = scala.io.Source.fromFile(file).getLines.mkString("\n")
 
   override def handlePropogate(newValue: String): Unit = {
-    val writer = new PrintWriter(new FileOutputStream(file))
+    val tempFile = new File(file.getPath + "-new")
+    if(!tempFile.exists()){
+      tempFile.createNewFile()
+    }
+    val fileOutputMain = new FileOutputStream(file)
+    val writer = new PrintWriter(new FileOutputStream(tempFile))
     writer.print(newValue)
     writer.close()
+    Files.copy(tempFile.toPath, fileOutputMain)
   }
 }
