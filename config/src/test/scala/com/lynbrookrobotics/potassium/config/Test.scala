@@ -1,31 +1,37 @@
 package com.lynbrookrobotics.potassium.config
 
-import java.io.File
+import com.lynbrookrobotics.potassium.config.TwoWayFile
+import java.io.{File, PrintWriter}
 import java.nio.file.Files
 
 import squants.motion.{MetersPerSecond, Velocity}
 import SquantsPickling._
+import org.scalatest.FunSuite
+import upickle.default._
 
-object Test extends App{
+
+class Test extends FunSuite {
   case class RobotConfig(drive: DriveConfig)
   case class DriveConfig(maxForwardSpeed: Velocity)
 
-  val file = new File("test.txt")
-  if(!file.exists()) {
-    Files.createFile(file.toPath)
-  }
-  val a = TwoWayFileJSON[RobotConfig](file)
+  test("Test writing and reading randomly generated values to config") {
+    val file = new File("test.txt")
+    file.createNewFile()
 
-  a.value = RobotConfig(DriveConfig(MetersPerSecond(5.0)))
+    // initial value is required in config file
+    val initConfig = write[RobotConfig](null)
+    val writer = new PrintWriter(file)
+    writer.append(initConfig)
+    writer.flush()
 
-  val driveConfig = a.map(_.drive)((robot, newDrive) => robot.copy(drive = newDrive))
+    val configFromFile = new TwoWayFile(file).map(read[RobotConfig])(
+      (_, newValue) => write[RobotConfig](newValue)
+    )
 
-  val maxFwdSpeed = driveConfig.map(_.maxForwardSpeed)((drive, newForward) => drive.copy(maxForwardSpeed = newForward))
-
-  maxFwdSpeed.value = MetersPerSecond(16.0)
-
-  while (true) {
-    println(maxFwdSpeed.value.toMetersPerSecond)
-    Thread.sleep(1000)
+    for (_ <- 1 to 100) {
+      val newConfigValue = RobotConfig(DriveConfig(MetersPerSecond(math.random)))
+      configFromFile.value_=(newConfigValue)
+      assert(configFromFile.value == newConfigValue)
+    }
   }
 }
