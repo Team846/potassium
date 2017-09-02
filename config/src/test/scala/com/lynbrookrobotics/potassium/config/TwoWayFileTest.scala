@@ -5,6 +5,7 @@ import java.nio.file.Files
 
 import squants.motion.{MetersPerSecond, Velocity}
 import org.scalatest.FunSuite
+import SquantsPickling._
 import upickle.default._
 
 
@@ -12,7 +13,7 @@ class TwoWayFileTest extends FunSuite {
   case class RobotConfig(drive: DriveConfig)
   case class DriveConfig(maxForwardSpeed: Velocity)
 
-  test("Test writingu and reading randomly generated values to config") {
+  test("Test writing and reading randomly generated values to config") {
     val file = new File("test.txt")
     if (!file.exists()) {
       Files.createFile(file.toPath)
