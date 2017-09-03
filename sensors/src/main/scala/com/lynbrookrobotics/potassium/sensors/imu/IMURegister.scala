@@ -32,6 +32,9 @@ class IMURegister(register: Byte) {
     readBuffer.getShort(0).toInt
   }
 
+  val valueWriter1 = ByteBuffer.allocateDirect(2)
+  val valueWriter2 = ByteBuffer.allocateDirect(2)
+
   /**
     * Writes a single value to the register.
     *
@@ -39,14 +42,11 @@ class IMURegister(register: Byte) {
     * @param spi   the interface to use for communication
     */
   def write(value: Int, spi: SPITrait): Unit = {
-    val valueWriter1 = ByteBuffer.allocateDirect(2)
-    val valueWriter2 = ByteBuffer.allocateDirect(2)
     valueWriter1.put(0, writeMessage1)
     valueWriter1.put(1, value.toByte)
 
     valueWriter2.put(0, writeMessage2)
     valueWriter2.put(1, (value >> 8).toByte)
-
 
     spi.write(valueWriter1, 2)
     spi.write(valueWriter2, 2)

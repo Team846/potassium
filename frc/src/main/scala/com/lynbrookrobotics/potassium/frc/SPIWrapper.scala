@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.SPI
 
 class SPIWrapper(spi: SPI) extends SPITrait {
   override def read(initiate: Boolean, dataReceived: ByteBuffer, size: Int): Int = {
-      spi.read(initiate, dataReceived, size)
+    spi.read(initiate, dataReceived, size)
   }
   
   override def setClockRate(hz: Int): Unit = {
