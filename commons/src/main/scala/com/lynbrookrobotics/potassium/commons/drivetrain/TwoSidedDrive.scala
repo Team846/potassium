@@ -121,12 +121,4 @@ abstract class TwoSidedDrive(updatePeriod: Time)(implicit clock: Clock)
       velocityControl(signal.map(s => expectedVelocity(s)(props.get)))
     }
   }
-
-  class Drivetrain(implicit hardware: Hardware, props: Signal[Properties]) extends Component[TwoSidedSignal](updatePeriod) {
-    override def defaultController: Stream[TwoSidedSignal] = self.defaultController
-
-    override def applySignal(signal: TwoSidedSignal): Unit = {
-      output(hardware, signal)
-    }
-  }
 }
