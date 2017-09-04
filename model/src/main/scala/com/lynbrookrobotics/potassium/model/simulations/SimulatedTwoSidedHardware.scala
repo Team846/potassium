@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.model.simulations
 
+import com.lynbrookrobotics.potassium.{Component, Signal}
 import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
 import com.lynbrookrobotics.potassium.commons.drivetrain._
@@ -115,7 +116,7 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
   }
 }
 
-class TwoSidedDriveContainerSimulator(period: Time)(val clock: Clock) extends TwoSidedDrive(period)(clock) {
+class TwoSidedDriveContainerSimulator(period: Time)(val clock: Clock) extends TwoSidedDrive(period)(clock) { self =>
   override type Hardware = SimulatedTwoSidedHardware
   override type Properties = TwoSidedDriveProperties
 
@@ -135,6 +136,14 @@ class TwoSidedDriveContainerSimulator(period: Time)(val clock: Clock) extends Tw
   override protected def controlMode(implicit hardware: SimulatedTwoSidedHardware,
                                               props: TwoSidedDriveProperties): UnicycleControlMode = {
     NoOperation
+  }
+
+  class Drivetrain(implicit hardware: Hardware, props: Signal[Properties]) extends Component[TwoSidedSignal](period) {
+    override def defaultController: Stream[TwoSidedSignal] = self.defaultController
+
+    override def applySignal(signal: TwoSidedSignal): Unit = {
+      output(hardware, signal)
+    }
   }
 }
 

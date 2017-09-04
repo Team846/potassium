@@ -8,7 +8,6 @@ import org.scalatest.FunSuite
 import SquantsPickling._
 import upickle.default._
 
-
 class TwoWayFileTest extends FunSuite {
   case class RobotConfig(drive: DriveConfig)
   case class DriveConfig(maxForwardSpeed: Velocity)
@@ -23,9 +22,10 @@ class TwoWayFileTest extends FunSuite {
     val initConfig = write[RobotConfig](null)
     val writer = new PrintWriter(file)
     writer.append(initConfig)
-    writer.flush()
+    writer.close()
 
-    val configFromFile = new TwoWayFile(file).map(read[RobotConfig])(
+    val twoWay = new TwoWayFile(file)
+    val configFromFile = twoWay.map(read[RobotConfig])(
       (_, newValue) => write[RobotConfig](newValue)
     )
 
@@ -34,5 +34,8 @@ class TwoWayFileTest extends FunSuite {
       configFromFile.value_=(newConfigValue)
       assert(configFromFile.value == newConfigValue)
     }
+
+    twoWay.close()
+    file.delete()
   }
 }
