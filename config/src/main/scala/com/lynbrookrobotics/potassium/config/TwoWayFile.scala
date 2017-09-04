@@ -1,17 +1,21 @@
 package com.lynbrookrobotics.potassium.config
 
-import java.io.{File, FileOutputStream, PrintWriter}
-import java.nio.file.{FileSystem, FileSystems, Files}
+import java.io.{File, PrintWriter}
+import java.nio.file.{Files, StandardCopyOption}
 
 class TwoWayFile(file: File) extends TwoWaySignal[String] {
-  new Thread(new Runnable {
-    def run(): Unit = {
+  private val thread = new Thread(() => {
+    try {
       while (!Thread.interrupted()) {
         value = scala.io.Source.fromFile(file).getLines.mkString("\n")
         Thread.sleep(1000)
       }
+    } catch {
+      case _: InterruptedException =>
     }
-  }).start()
+  })
+
+  thread.start()
 
   value = scala.io.Source.fromFile(file).getLines.mkString("\n")
 
@@ -20,10 +24,15 @@ class TwoWayFile(file: File) extends TwoWaySignal[String] {
     if(!tempFile.exists()){
       tempFile.createNewFile()
     }
-    val fileOutputMain = new FileOutputStream(file)
-    val writer = new PrintWriter(new FileOutputStream(tempFile))
+
+    val writer = new PrintWriter(tempFile)
     writer.print(newValue)
     writer.close()
-    Files.copy(tempFile.toPath, fileOutputMain)
+
+    Files.move(tempFile.toPath, file.toPath, StandardCopyOption.REPLACE_EXISTING)
+  }
+
+  def close(): Unit = {
+    thread.interrupt()
   }
 }
