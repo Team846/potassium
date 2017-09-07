@@ -18,7 +18,6 @@ script:
   - echo 'addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-RC5")' > ~/.sbt/0.13/plugins/build.sbt
   - 'sbt "clean" "coverage" "test" "coverageReport"'
   - 'sbt coverageAggregate'
-  - 'if [[ $TRAVIS_PULL_REQUEST != "false" ]]; then bash ./style-checks.sh; fi'
 jdk: oraclejdk8
 after_success:
   - 'bash <(curl -s https://codecov.io/bash)'
