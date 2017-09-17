@@ -22,7 +22,7 @@ object ClockMocking {
 
       override def singleExecution(delay: Time)(thunk: => Unit): Unit = {
         singleThunks = singleThunks.updated(
-          delay,
+          currentTime + delay,
           (() => thunk) :: singleThunks.getOrElse(delay, List.empty)
         )
       }
@@ -32,10 +32,12 @@ object ClockMocking {
 
     (ticker, (period: Time) => {
       _currentTime += period
-      thunks.get(period).foreach(l => l.foreach(_(period)))
+      thunks.get(period).foreach(l => l.foreach(_.apply(period)))
 
-      singleThunks.get(period).foreach(_.foreach(_.apply()))
-      singleThunks = singleThunks.updated(period, List.empty)
+      // If the current time is passed the scheduled execution, apply function now
+      singleThunks.filter(_currentTime >= _._1).foreach{u => u._2.foreach(_.apply())}
+      // remove all single scheduled events whose scheduled time has already passed
+      singleThunks = singleThunks.filterNot(_currentTime >= _._1)
     })
   }
 }

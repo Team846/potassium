@@ -11,8 +11,6 @@ class WaitTask(time: Time)(implicit clock: Clock) extends FiniteTask {
 
     val latestID = currentExecutionID
     clock.singleExecution(time) {
-      // TODO: should be variable timePassed, and check should time against time?
-      // TODO: single execution compares against dt and not total changed time?
       if (currentExecutionID == latestID) {
         finished()
       }

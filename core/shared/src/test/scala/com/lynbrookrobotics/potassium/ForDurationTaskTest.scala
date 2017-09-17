@@ -15,9 +15,12 @@ class ForDurationTaskTest extends FunSuite {
     trigger(Seconds(1))
     val runningBeforeEnd = durationTask.isRunning
 
-    trigger(Seconds(4.5))
+    trigger(Seconds(4))
+    val runningAtEnd = durationTask.isRunning
+
+    trigger(Seconds(1))
     val runningAfterEnd = durationTask.isRunning
 
-    assert(runningAtStart && runningBeforeEnd && !runningAfterEnd)
+    assert(runningAtStart && runningBeforeEnd && !runningAtEnd && !runningAfterEnd)
   }
 }
