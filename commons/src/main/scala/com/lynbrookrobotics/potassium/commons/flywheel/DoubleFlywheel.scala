@@ -73,14 +73,15 @@ abstract class DoubleFlywheel {
 
   object velocityTasks {
     class WhileAtVelocity(vel: Stream[Frequency], tolerance: Frequency)
+                         (doubleFlywheel: Comp)
                          (implicit properties: Signal[Properties],
-                          hardware: Hardware, component: Comp) extends WrapperTask {
+                          hardware: Hardware) extends WrapperTask {
       override def onStart(): Unit = {
         val (errorLeft, errorRight, control) =
           velocityControllers.velocityControl(vel, vel)
 
         val zippedError = errorLeft.zip(errorRight)
-        component.setController(control.withCheckZipped(zippedError) { case (eLeft, eRight) =>
+        doubleFlywheel.setController(control.withCheckZipped(zippedError) { case (eLeft, eRight) =>
           if (eLeft.abs < tolerance && eRight.abs < tolerance) {
             readyToRunInner()
           }
@@ -88,19 +89,18 @@ abstract class DoubleFlywheel {
       }
 
       override def onEnd(): Unit = {
-        component.resetToDefault()
+        doubleFlywheel.resetToDefault()
       }
     }
 
-    class WhileAtDoubleVelocity(leftVel: Stream[Frequency],
-                          rightVel: Stream[Frequency],
-                          tolerance: Frequency)
-                         (implicit properties: Signal[Properties],
-                          hardware: Hardware, component: Comp) extends WrapperTask {
+    class WhileAtDoubleVelocity(leftVel: Stream[Frequency], rightVel: Stream[Frequency], tolerance: Frequency)
+                               (doubleFlywheel: Comp)
+                               (implicit properties: Signal[Properties],
+                                hardware: Hardware) extends WrapperTask {
       override def onStart(): Unit = {
         val (errorLeft, errorRight, control) =
           velocityControllers.velocityControl(leftVel, rightVel)
-        component.setController(control.withCheckZipped(errorLeft.zip(errorRight)){ case (eLeft, eRight) =>
+        doubleFlywheel.setController(control.withCheckZipped(errorLeft.zip(errorRight)){ case (eLeft, eRight) =>
           if (eLeft.abs < tolerance && eRight.abs < tolerance) {
             readyToRunInner()
           }
@@ -108,7 +108,7 @@ abstract class DoubleFlywheel {
       }
 
       override def onEnd(): Unit = {
-        component.resetToDefault()
+        doubleFlywheel.resetToDefault()
       }
     }
   }

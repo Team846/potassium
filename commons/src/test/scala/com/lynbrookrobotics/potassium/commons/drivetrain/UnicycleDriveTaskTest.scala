@@ -100,11 +100,8 @@ class UnicycleDriveTaskTest extends FunSuite {
     }
 
     val task = new drive.unicycleTasks.DriveDistance(
-      Meters(5), Meters(0.1))(
-      drivetrain,
-      hardware,
-      props
-    )
+      Meters(5), Meters(0.1)
+    )(drivetrain)(hardware, props)
 
     task.init()
 
@@ -184,8 +181,8 @@ class UnicycleDriveTaskTest extends FunSuite {
     }
 
     val task = new drive.unicycleTasks.DriveDistanceStraight(
-      Meters(5), Meters(0.1), Degrees(0.1), Percent(100))(
-      drivetrain,
+      Meters(5), Meters(0.1), Degrees(0.1), Percent(100)
+    )(drivetrain)(
       hardware,
       props
     )
@@ -280,8 +277,8 @@ class UnicycleDriveTaskTest extends FunSuite {
     }
 
     val task = new drive.unicycleTasks.DriveDistanceAtAngle(
-      Meters(5), Meters(0.1), Degrees(45), Degrees(0.1), Percent(100))(
-      drivetrain,
+      Meters(5), Meters(0.1), Degrees(45), Degrees(0.1), Percent(100)
+    )(drivetrain)(
       hardware,
       props
     )
@@ -371,8 +368,8 @@ class UnicycleDriveTaskTest extends FunSuite {
     }
 
     val task = new drive.unicycleTasks.RotateByAngle(
-      Degrees(5), Degrees(0.1), 1)(
-      drivetrain,
+      Degrees(5), Degrees(0.1), 1
+    )(drivetrain)(
       hardware,
       props
     )
