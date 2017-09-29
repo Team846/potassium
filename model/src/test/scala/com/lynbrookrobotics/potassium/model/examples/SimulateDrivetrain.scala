@@ -50,7 +50,7 @@ object SimulateDrivetrain extends App {
   implicit val (clock, ticker) = mockedClockTicker
 
   val period = Milliseconds(1)
-  implicit val drivetrainContainer = new TwoSidedDriveContainerSimulator(period)(clock)
+  val drivetrainContainer = new TwoSidedDriveContainerSimulator(period)(clock)
   implicit val hardware = new drivetrainContainer.Hardware(
     Pounds(88) * MetersPerSecondSquared(1) / 2,
     Inches(21.75),
@@ -59,7 +59,7 @@ object SimulateDrivetrain extends App {
     drivetrainContainer.clock,
     period)
 
-  implicit val simulatedComponent = new drivetrainContainer.Drivetrain
+  val simulatedComponent = new drivetrainContainer.Drivetrain
 
   var itr = 0
   val streamPrintingCancel = hardware.historyStream.foreach { e =>
@@ -74,7 +74,7 @@ object SimulateDrivetrain extends App {
     Degrees(90),
     Degrees(0),
     5
-  )/* new drivetrainContainer.unicycleTasks.FollowWayPoints(
+  )(simulatedComponent)/* new drivetrainContainer.unicycleTasks.FollowWayPoints(
     Point.origin :: Point(Meters(0), Meters(1)) :: Point(Meters(1), Meters(2)) :: Nil,
     Inches(5)
   )*/

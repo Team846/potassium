@@ -41,11 +41,12 @@ abstract class Flywheel {
 
   object velocityTasks {
     class WhileAtVelocity(vel: Stream[Frequency], tolerance: Frequency)
+                         (flywheel: Comp)
                          (implicit properties: Signal[Properties],
-                          hardware: Hardware, component: Comp) extends WrapperTask {
+                          hardware: Hardware) extends WrapperTask {
       override def onStart(): Unit = {
         val (error, control) = velocityControllers.velocityControl(vel)
-        component.setController(control.withCheckZipped(error) { error =>
+        flywheel.setController(control.withCheckZipped(error) { error =>
           if (error.abs < tolerance) {
             readyToRunInner()
           }
@@ -53,7 +54,7 @@ abstract class Flywheel {
       }
 
       override def onEnd(): Unit = {
-        component.resetToDefault()
+        flywheel.resetToDefault()
       }
     }
   }

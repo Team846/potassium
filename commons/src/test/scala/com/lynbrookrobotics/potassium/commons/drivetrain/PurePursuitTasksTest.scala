@@ -83,7 +83,7 @@ class PurePursuitTasksTest extends FunSuite {
 
   test("If target is initally within tolerance, stop immediately") {
     var lastAppliedSignal = zeroSignal
-    implicit val drivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
+    val drivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
 
     implicit val hardware = new UnicycleHardware {
       override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
@@ -95,7 +95,8 @@ class PurePursuitTasksTest extends FunSuite {
 
     val target = new Point(Feet(0), Feet(0.5))
     val task = new drive.unicycleTasks.FollowWayPoints(
-      Seq(Point.origin, target), Feet(1))
+      Seq(Point.origin, target), Feet(1)
+    )(drivetrainComp)
 
     task.init()
 
@@ -108,7 +109,7 @@ class PurePursuitTasksTest extends FunSuite {
 
   test("Test that having 1 way point directly ahead results in not turning") {
     var lastAppliedSignal = zeroSignal
-    implicit val testDrivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
+    val testDrivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
 
     val target = new Point(Feet(0), Feet(1))
 
@@ -121,7 +122,7 @@ class PurePursuitTasksTest extends FunSuite {
       override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(0))
     }
 
-    val task = new drive.unicycleTasks.FollowWayPoints(Seq(Point.origin, target), Feet(0.1))
+    val task = new drive.unicycleTasks.FollowWayPoints(Seq(Point.origin, target), Feet(0.1))(testDrivetrainComp)
 
     task.init()
 
@@ -137,8 +138,7 @@ class PurePursuitTasksTest extends FunSuite {
 
   test("Test that going left and back 1 foot does not result in full turn"){
     var lastAppliedSignal = zeroSignal
-    implicit val drivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
-
+    val drivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
 
     implicit val hardware = new UnicycleHardware {
       override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
@@ -161,7 +161,7 @@ class PurePursuitTasksTest extends FunSuite {
     }
 
     val target = new Point(Feet(-1), Feet(-1))
-    val task = new drive.unicycleTasks.FollowWayPoints(Seq(Point.origin, target), Feet(1))
+    val task = new drive.unicycleTasks.FollowWayPoints(Seq(Point.origin, target), Feet(1))(drivetrainComp)
 
     task.init()
     ticker(Milliseconds(5))
@@ -175,7 +175,7 @@ class PurePursuitTasksTest extends FunSuite {
 
   test("test that if near target, do not turn 90 degrees") {
     var lastAppliedSignal = zeroSignal
-    implicit val testDrivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
+    val testDrivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
 
     val target = new Point(Feet(0), Feet(1))
 
@@ -193,7 +193,7 @@ class PurePursuitTasksTest extends FunSuite {
       Feet(0.1),
       hardware.forwardPosition.mapToConstant(Point(Feet(0.001), Feet(0.999999))),
       hardware.turnPosition.mapToConstant(Degrees(0))
-    )
+    )(testDrivetrainComp)
 
     task.init()
 

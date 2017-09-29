@@ -19,8 +19,9 @@ trait UnicycleCoreTasks {
   import controllers._
 
   class DriveOpenLoop(forward: Stream[Dimensionless], turn: Stream[Dimensionless])
-    (implicit drive: Drivetrain, hardware: DrivetrainHardware,
-      props: Signal[DrivetrainProperties]) extends ContinuousTask {
+                     (drive: Drivetrain)
+                     (implicit hardware: DrivetrainHardware,
+                      props: Signal[DrivetrainProperties]) extends ContinuousTask {
     override def onStart(): Unit = {
       val combined = forward.zip(turn).map(t => UnicycleSignal(t._1, t._2))
       drive.setController(lowerLevelOpenLoop(combined))
@@ -33,7 +34,8 @@ trait UnicycleCoreTasks {
 
 
   class ContinuousClosedDrive(forward: Stream[Dimensionless], turn: Stream[Dimensionless])
-                             (implicit drive: Drivetrain, hardware: DrivetrainHardware,
+                             (drive: Drivetrain)
+                             (implicit hardware: DrivetrainHardware,
                               props: Signal[DrivetrainProperties]) extends ContinuousTask {
     override def onStart(): Unit = {
       val combined = forward.zip(turn).map(t => UnicycleSignal(t._1, t._2))
@@ -46,8 +48,8 @@ trait UnicycleCoreTasks {
   }
 
   class ContinuousVelocityDrive(forward: Stream[Velocity], turn: Stream[AngularVelocity])
-                               (implicit drive: Drivetrain,
-                                hardware: DrivetrainHardware,
+                               (drive: Drivetrain)
+                               (implicit hardware: DrivetrainHardware,
                                 props: Signal[DrivetrainProperties]) extends ContinuousTask {
     override def onStart(): Unit = {
       val combined = forward.zip(turn).map(t => UnicycleVelocity(t._1, t._2))
@@ -60,8 +62,8 @@ trait UnicycleCoreTasks {
   }
 
   class DriveDistance(distance: Length, tolerance: Length)
-                     (implicit drive: Drivetrain,
-                      hardware: DrivetrainHardware,
+                     (drive: Drivetrain)
+                     (implicit hardware: DrivetrainHardware,
                       props: Signal[DrivetrainProperties]) extends FiniteTask {
     override def onStart(): Unit = {
       val absoluteDistance = hardware.forwardPosition.currentValue.map(_ + distance)
@@ -88,8 +90,8 @@ trait UnicycleCoreTasks {
                                             position: Stream[Length],
                                             tolerance: Length,
                                             toleranceAngle: Angle)
-                                           (implicit drive: Drivetrain,
-                                            hardware: DrivetrainHardware,
+                                           (drive: Drivetrain)
+                                           (implicit hardware: DrivetrainHardware,
                                             properties: Signal[DrivetrainProperties]) extends FiniteTask {
     if (cruisingVelocity.abs > properties.get.maxForwardVelocity) {
       throw new IllegalArgumentException("Input speed: " +
@@ -136,23 +138,25 @@ trait UnicycleCoreTasks {
     * @param properties
     */
   class DriveDistanceSmooth(targetForwardDistance: Length, finalVelocity: Velocity)
-                           (implicit drive: Drivetrain,
-                            hardware: DrivetrainHardware,
-                            properties: Signal[DrivetrainProperties]) extends DriveDistanceWithTrapazoidalProfile(
-                              0.5 * properties.get.maxForwardVelocity,
-                              finalVelocity,
-                              properties.get.maxAcceleration,
-                              targetForwardDistance,
-                              hardware.forwardPosition,
-                              Feet(.1),
-                              Degrees(5))
+                           (drive: Drivetrain)
+                           (implicit hardware: DrivetrainHardware,
+                            properties: Signal[DrivetrainProperties])
+    extends DriveDistanceWithTrapazoidalProfile(
+      0.5 * properties.get.maxForwardVelocity,
+      finalVelocity,
+      properties.get.maxAcceleration,
+      targetForwardDistance,
+      hardware.forwardPosition,
+      Feet(.1),
+      Degrees(5)
+    )(drive)
 
   class DriveDistanceStraight(distance: Length,
                               toleranceForward: Length,
                               toleranceAngle: Angle,
                               maxSpeed: Dimensionless)
-                             (implicit drive: Drivetrain,
-                              hardware: DrivetrainHardware,
+                             (drive: Drivetrain)
+                             (implicit hardware: DrivetrainHardware,
                               props: Signal[DrivetrainProperties]) extends FiniteTask {
     override def onStart(): Unit = {
       val absoluteDistance = hardware.forwardPosition.currentValue.map(_ + distance)
@@ -190,9 +194,9 @@ trait UnicycleCoreTasks {
                              targetAngle: Angle,
                              toleranceAngle: Angle,
                              maxSpeed: Dimensionless)
-                             (implicit drive: Drivetrain,
-                              hardware: DrivetrainHardware,
-                              props: Signal[DrivetrainProperties]) extends FiniteTask {
+                            (drive: Drivetrain)
+                            (implicit hardware: DrivetrainHardware,
+                             props: Signal[DrivetrainProperties]) extends FiniteTask {
     override def onStart(): Unit = {
       val absoluteDistance = hardware.forwardPosition.currentValue.map(_ + distance)
       val (forwardController, forwardError) = forwardPositionControl(absoluteDistance)
@@ -227,8 +231,8 @@ trait UnicycleCoreTasks {
                             toleranceForward: Length,
                             toleranceAngle: Angle,
                             maxSpeed: Dimensionless)
-                           (implicit drive: Drivetrain,
-                            hardware: DrivetrainHardware,
+                           (drive: Drivetrain)
+                           (implicit hardware: DrivetrainHardware,
                             props: Signal[DrivetrainProperties]) extends FiniteTask {
     override def onStart(): Unit = {
       val (forwardController, forwardError) = (
@@ -281,8 +285,8 @@ trait UnicycleCoreTasks {
 
 
   class RotateByAngle(relativeAngle: Angle, tolerance: Angle, timeWithinTolerance: Int)
-                     (implicit drive: Drivetrain,
-                      hardware: DrivetrainHardware,
+                     (drive: Drivetrain)
+                     (implicit hardware: DrivetrainHardware,
                       props: Signal[DrivetrainProperties]) extends FiniteTask {
     override def onStart(): Unit = {
       val absoluteAngle = hardware.turnPosition.currentValue.map(_ + relativeAngle)
@@ -313,8 +317,8 @@ trait UnicycleCoreTasks {
   }
 
   class RotateToAngle(absoluteAngle: Angle, tolerance: Angle)
-                     (implicit drive: Drivetrain,
-                      hardware: DrivetrainHardware,
+                     (drive: Drivetrain)
+                     (implicit hardware: DrivetrainHardware,
                       props: Signal[DrivetrainProperties]) extends FiniteTask {
     override def onStart(): Unit = {
       val (controller, error) = turnPositionControl(absoluteAngle)
@@ -333,10 +337,10 @@ trait UnicycleCoreTasks {
   }
 
   class CorrectOffsetWithLatency(timestampedOffset: Stream[(Angle, Time)], tolerance: Angle)
-    (implicit drive: Drivetrain,
-      hardware: DrivetrainHardware,
-      props: Signal[DrivetrainProperties],
-      clock: Clock) extends FiniteTask {
+                                (drive: Drivetrain)
+                                (implicit hardware: DrivetrainHardware,
+                                 props: Signal[DrivetrainProperties],
+                                 clock: Clock) extends FiniteTask {
 
     // TODO: requires review
     val positionSlide: Stream[Queue[(Angle, Time)]] = hardware.turnPosition.zipWithTime.sliding(20)

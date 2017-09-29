@@ -26,8 +26,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
   }
 
   class FollowWayPoints(wayPoints: Seq[Point], tolerance: Length)
-                       (implicit drive: Drivetrain,
-                        properties: Signal[DrivetrainProperties],
+                       (drive: Drivetrain)
+                       (implicit properties: Signal[DrivetrainProperties],
                         hardware: DrivetrainHardware) extends FiniteTask {
     override def onStart(): Unit = {
       val turnPosition = hardware.turnPosition.relativize(
@@ -60,8 +60,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                                     tolerance: Length,
                                     position: Stream[Point],
                                     turnPosition: Stream[Angle])
-                                   (implicit drive: Drivetrain,
-                                    properties: Signal[DrivetrainProperties],
+                                   (drive: Drivetrain)
+                                   (implicit properties: Signal[DrivetrainProperties],
                                     hardware: DrivetrainHardware) extends FiniteTask {
     override def onStart(): Unit = {
       val (unicycle, error) = followWayPointsController(
