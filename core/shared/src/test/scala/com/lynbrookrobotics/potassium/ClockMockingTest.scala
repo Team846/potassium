@@ -1,8 +1,7 @@
 package com.lynbrookrobotics.potassium
 
 import squants.Time
-import squants.time.Milliseconds
-
+import squants.time.{Milliseconds, Seconds}
 import org.scalatest.FunSuite
 
 class ClockMockingTest extends FunSuite {
@@ -67,4 +66,21 @@ class ClockMockingTest extends FunSuite {
 
    assert(executed)
  }
+
+  test("Single execution still functions when clock update don't exactly coincide with scheduled time") {
+    val (mockedClock, trigger) = ClockMocking.mockedClockTicker
+
+    var executed = false
+    mockedClock.singleExecution(Seconds(10)) {
+      executed = true
+    }
+
+    trigger(Seconds(5))
+    assert(!executed)
+
+    trigger(Seconds(6))
+
+    // At time 11 seconds, thunk for 10 seconds was executed
+    assert(executed)
+  }
 }

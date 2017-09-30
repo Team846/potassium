@@ -6,25 +6,38 @@ import squants.time.Seconds
 
 object ClockMocking {
   def mockedClockTicker: (Clock, Time => Unit) = {
-    var thunks: Map[Time, List[(Time) => Unit]] = Map.empty
-    var singleThunks: Map[Time, List[() => Unit]] = Map.empty
+    var thunks: List[(Time, () => Unit)] = List.empty
     var _currentTime = Seconds(0)
 
     val ticker = new Clock {
-      override def apply(period: Time)(thunk: (Time) => Unit): Cancel = {
-        thunks = thunks.updated(
-          period,
-          thunk :: thunks.getOrElse(period, List.empty)
-        )
+      // Will break down when clock update is slower than period because
+      // thunk updates will have growing lag behind current time
+      override def apply(period: Time)(thunk: Time => Unit): Cancel = {
+        var lastTimeOfExecution = currentTime
 
-        () => thunks = thunks.updated(period, thunks(period).filterNot(_ == thunk))
+        // lazy is necessary because otherwise compiler doesn't allow this
+        // forward reference
+        lazy val selfSchedulingThunk: () => Unit = () => {
+          // ensure that thunks is scheduled independently of the current time
+          // of the clock
+          lastTimeOfExecution += period
+          thunk(period)
+
+          // self schedule next update
+          scheduleAtTime(lastTimeOfExecution + period)(selfSchedulingThunk)
+        }
+
+        thunks = (period, selfSchedulingThunk) :: thunks
+
+        () => thunks = thunks.filterNot(_._2 == selfSchedulingThunk)
+      }
+
+      private def scheduleAtTime(time: Time)(thunk: () => Unit): Unit = {
+        thunks = (time, thunk) :: thunks
       }
 
       override def singleExecution(delay: Time)(thunk: => Unit): Unit = {
-        singleThunks = singleThunks.updated(
-          currentTime + delay,
-          (() => thunk) :: singleThunks.getOrElse(delay, List.empty)
-        )
+        scheduleAtTime(currentTime + delay)(() => thunk)
       }
 
       override def currentTime: Time = _currentTime
@@ -32,12 +45,16 @@ object ClockMocking {
 
     (ticker, (period: Time) => {
       _currentTime += period
-      thunks.get(period).foreach(l => l.foreach(_.apply(period)))
 
-      // If the current time is passed the scheduled execution, apply function now
-      singleThunks.filter(_currentTime >= _._1).foreach{u => u._2.foreach(_.apply())}
-      // remove all single scheduled events whose scheduled time has already passed
-      singleThunks = singleThunks.filterNot(_currentTime >= _._1)
+      thunks.filter{ case (scheduledTime, _) =>
+        _currentTime >= scheduledTime
+      }.foreach{ case (_, thunk) =>
+        thunk()
+      }
+
+      thunks = thunks.filterNot{ case (scheduledTime, _) =>
+        _currentTime >= scheduledTime
+      }
     })
   }
 }
