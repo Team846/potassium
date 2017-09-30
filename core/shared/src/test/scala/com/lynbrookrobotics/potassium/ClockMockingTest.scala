@@ -67,6 +67,21 @@ class ClockMockingTest extends FunSuite {
    assert(executed)
  }
 
+  test("Periodic update does in fact update periodically") {
+    val (mockedClock, trigger) = ClockMocking.mockedClockTicker
+
+    var executionCounts = 0
+    mockedClock(Seconds(1)) { _ =>
+      executionCounts = executionCounts + 1
+    }
+
+    trigger(Seconds(1))
+    assert(executionCounts == 1)
+
+    trigger(Seconds(1))
+    assert(executionCounts == 2)
+  }
+
   test("Single execution still functions when clock update don't exactly coincide with scheduled time") {
     val (mockedClock, trigger) = ClockMocking.mockedClockTicker
 
@@ -80,7 +95,32 @@ class ClockMockingTest extends FunSuite {
 
     trigger(Seconds(6))
 
-    // At time 11 seconds, thunk for 10 seconds was executed
+    // At time 11 seconds, thunk scheduled for 10 seconds should be executed
+    assert(executed)
+  }
+
+  test("Periodic update still functions when clock update don't exactly coincide with scheduled time") {
+    val (mockedClock, trigger) = ClockMocking.mockedClockTicker
+
+    var executed = false
+    mockedClock(Seconds(1)) { _ =>
+      executed = true
+    }
+
+    trigger(Seconds(0.5))
+    assert(!executed)
+
+    trigger(Seconds(0.6))
+    // At time 1.1 seconds, thunk scheduled for 1 seconds should be executed
+    assert(executed)
+    executed = false
+
+    trigger(Seconds(0.4))
+    // At time 1.5 seconds, thunk scheduled for 2 seconds shouldn't be executed
+    assert(!executed)
+
+    trigger(Seconds(0.6))
+    // At time 2.1 seconds, thunk scheduled for 2 seconds should be executed
     assert(executed)
   }
 }
