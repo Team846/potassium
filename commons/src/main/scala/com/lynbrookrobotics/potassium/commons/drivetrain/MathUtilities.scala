@@ -85,33 +85,45 @@ object MathUtilities {
     }
   }
 
+  /**
+    * This finds the point furthest from the start and if that point's angle formed with the start point is
+    * the same as the angle of the segment, it returns that point.
+    *
+    * If the point furthest of the start doesn't meet the angle condition, it checks if the other point meets it and
+    * returns that point if it matches the angle condition
+    *
+    * If both points don't meet the angle condition or there aren't any intersections, then this method returns None
+    * @param segment the segment that the circle intersects
+    * @param center the center of the circle that intersects the segment
+    * @param radius the radius of the circle that intersects
+    * @return
+    */
   def intersectionLineCircleFurthestFromStart(segment: Segment,
                                               center: Point,
                                               radius: Length): Option[Point] = {
     val solutions = interSectionCircleLine(segment, center, radius)
-    solutions.flatMap { s =>
-      val (positive, negative) = s
+    solutions.flatMap {case(positive, negative) =>
+        val positiveDiffWithStart = segment.start distanceTo positive
+        val negativeDiffWithStart = segment.start distanceTo negative
 
-      implicit val Tolerance = Feet(0.001)
-      val negativeToStart = negative distanceTo segment.start
-      val positiveToStart = positive distanceTo segment.start
-
-      // Handle edge case where both solutions are equidistant from start. Then
-      // return solution closest to the endpoint of the segment
-      if (negativeToStart ~= positiveToStart) {
-        val negativeToEnd = negative distanceTo segment.end
-        val positiveToEnd = positive distanceTo segment.end
-
-        if (positiveToEnd < negativeToEnd) {
-          Some(positive)
+        val furthestFromStart = if ( positiveDiffWithStart > negativeDiffWithStart ) {
+          positive
         } else {
-          Some(negative)
+          negative
         }
-      } else if (negativeToStart > positiveToStart) {
-        Some(negative)
-      } else {
-        Some(positive)
-      }
+        val closerToStart = if ( positiveDiffWithStart <= negativeDiffWithStart ) {
+          positive
+        } else {
+          negative
+        }
+
+        if (segment.angle == Segment(segment.start, furthestFromStart).angle ) {
+          Some(furthestFromStart)
+        } else if ( segment.angle == Segment(segment.start, closerToStart)) {
+          Some(closerToStart)
+        } else {
+          None
+        }
     }
   }
 

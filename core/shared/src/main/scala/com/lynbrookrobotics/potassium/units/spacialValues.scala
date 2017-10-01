@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.units
 
-import squants.space.{Area, Feet, Length}
+import squants.space._
 
 class Point(override val x: Length,
             override val y: Length,
@@ -80,5 +80,9 @@ case class Segment(start: Point, end: Point) {
     */
   def containsInXY(toTest: Point, tolerance: Length): Boolean = {
     withInBoundries(toTest) && onLine(toTest, tolerance)
+  }
+
+  def angle: Angle = {
+    Radians(math.atan2(dy.toFeet, dx.toFeet))
   }
 }

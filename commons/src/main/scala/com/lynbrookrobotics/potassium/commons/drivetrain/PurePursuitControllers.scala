@@ -166,7 +166,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     secondLookAheadPoint.getOrElse(
       firstLookAheadPoint.getOrElse {
         println(s"expanding look ahead distance to ${1.1 * lookAheadDistance}")
-        getNonExtrapolatedLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
+        getExtrapolatedLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
       }
     )
   }
