@@ -66,8 +66,8 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
 
     // TODO: This is completey wrong. Remove +/- tangentialAcceleration
     // Euler's method to integrate velocities
-    val newLeftVelocity = leftVelocity + (linearAcceleration - tangentialAcceleration) * dt
-    val newRightVelocity = rightVelocity + (linearAcceleration + tangentialAcceleration) * dt
+    val newLeftVelocity = leftVelocity + linearAcceleration * dt
+    val newRightVelocity = rightVelocity + linearAcceleration  * dt
     val newAngularVelocity = angularVelocity + angularAcceleration * dt
 
     RobotVelocities(newLeftVelocity, newRightVelocity, newAngularVelocity)
@@ -89,6 +89,16 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
         dt)
   }
 
+  def listenTo[T](stream: Stream[T]): () => Option[T] = {
+    var previous: Option[T] = None
+    val handle = stream.foreach(v => previous = Some(v))
+    () => {
+      // hold reference to handle to prevent garbage colletion
+      handle.hashCode()
+      previous
+    }
+  }
+  
   override val leftVelocity = velocities.map(_.left)
   override val rightVelocity = velocities.map(_.right)
 
