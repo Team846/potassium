@@ -204,13 +204,13 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     }
 
     val (turnOutput, multiplier, lookAheadPoint) = purePursuitControllerTurn(turnPosition, position, selectedPath)
-    val historyUpdatingLookAheadPoint = lookAheadPoint.withCheck{p =>
+    val _ = lookAheadPoint.foreach{p =>
       previousLookAheadPoint = Some(p)
     }
 
     val (forwardOutput, forwardError) = pointDistanceControl(
       position,
-      historyUpdatingLookAheadPoint)
+      selectedPath.map(_._1.end))
     val distanceToLast = position.map(_ distanceTo wayPoints.last)
 
     val errorToLast = distanceToLast.map { d =>
