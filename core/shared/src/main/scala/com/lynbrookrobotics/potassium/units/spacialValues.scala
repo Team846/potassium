@@ -54,7 +54,9 @@ case class Segment(start: Point, end: Point) {
     // Uses point slope form of line to determine if the line constructed from
     // start and end contains the given point
     if (xySlope != Double.NaN && Math.abs(xySlope) != Double.PositiveInfinity) {
-      (toTest.y - start.y) ~= xySlope * (toTest.x - start.x)
+//      println(s"xyslope $xySlope toTest $toTest start: $start")
+//      (toTest.y - start.y) ~= xySlope * (toTest.x - start.x)
+      ((toTest.y - start.y) - xySlope * (toTest.x - start.x)).abs <= tolerance
     } else {
       // If the segment is directly upwards, slope is Nan or Infinity
       toTest.x ~= start.x

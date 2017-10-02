@@ -2,7 +2,7 @@ package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import squants.{Dimensionless, Each, Percent}
-import squants.space.{Feet, Length}
+import squants.space.{Feet, Length, Radians}
 
 
 object MathUtilities {
@@ -116,10 +116,11 @@ object MathUtilities {
         } else {
           negative
         }
+        val tolerance = Radians(0.0001)
 
-        if (segment.angle == Segment(segment.start, furthestFromStart).angle ) {
+        if ((segment.angle - Segment(segment.start, furthestFromStart).angle).abs < tolerance ) {
           Some(furthestFromStart)
-        } else if ( segment.angle == Segment(segment.start, closerToStart)) {
+        } else if ( (segment.angle - Segment(segment.start, closerToStart).angle).abs < tolerance ) {
           Some(closerToStart)
         } else {
           None

@@ -64,20 +64,16 @@ object SimulateDrivetrain extends App {
   var itr = 0
   val streamPrintingCancel = hardware.historyStream.foreach { e =>
     if (itr % 10 == 0) {
-      println(s"${e.time.toSeconds}\t${e.position.x.toFeet}\t${e.position.y.toFeet}")
+      println(s"${e.time.toSeconds}\t${e.position.x.toMeters}\t${e.position.y.toMeters}")
     }
 
     itr += 1
   }
 
-  val task = new drivetrainContainer.unicycleTasks.RotateByAngle(
-    Degrees(90),
-    Degrees(0),
-    5
-  )(simulatedComponent)/* new drivetrainContainer.unicycleTasks.FollowWayPoints(
+  val task = new drivetrainContainer.unicycleTasks.FollowWayPoints(
     Point.origin :: Point(Meters(0), Meters(1)) :: Point(Meters(1), Meters(2)) :: Nil,
     Inches(5)
-  )*/
+  )(simulatedComponent)
 
 
   task.init()

@@ -98,7 +98,7 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
       previous
     }
   }
-  
+
   override val leftVelocity = velocities.map(_.left)
   override val rightVelocity = velocities.map(_.right)
 
