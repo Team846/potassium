@@ -36,6 +36,13 @@ Finite tasks can be run in parallel by using the `and` method, which returns a n
 new DriveForward(5 feet).and(new LiftArm(2 feet)) // only finishes when we have driven forward and lifted the arm
 ```
 
+## Combining with Continuous Tasks
+Sometimes, finite tasks need to be combined with continuous tasks to have a continuous task run in parallel while a finite task is running. For example, you may want to display a different lighting pattern while the robot is driving to a new position. This behavior can be achieved with the `andUntilDone` method, which takes a continuous task to run in parallel while the finite task is running.
+
+```scala
+new DriveForward(5 feet).andUntilDone(new DisplayLightingColor("green"))
+```
+
 ## Timeouts
 Especially when running automated routines in a time-constrained environment (such as the FIRST Robotics Competition autonomous period), it is often necessary to place timeouts to force finite tasks to terminate after a set duration of running. This can be achieved through the `withTimeout` method, which takes a parameter of a duration to terminate the task after. Following the principle of immutability, this **does not** modify the existing task to have a timeout, but returns a new task with the timeout applied.
 
