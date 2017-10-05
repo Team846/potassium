@@ -37,6 +37,10 @@ object Point {
   def apply(x: Length, y: Length): Point = {
     new Point(x, y)
   }
+
+  def apply(v: Value3D[Length]): Point = {
+    new Point(v.x, v.y, v.z)
+  }
 }
 
 case class Segment(start: Point, end: Point) {

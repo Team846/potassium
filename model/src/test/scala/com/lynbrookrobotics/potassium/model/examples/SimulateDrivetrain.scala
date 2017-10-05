@@ -13,17 +13,19 @@ import squants.time.{Milliseconds, Seconds}
 import com.lynbrookrobotics.potassium.ClockMocking._
 import squants.mass.{KilogramsMetersSquared, Pounds}
 
+import scala.reflect.io.File
+
 object SimulateDrivetrain extends App {
   implicit val propsVal: TwoSidedDriveProperties = new TwoSidedDriveProperties {
-    override val maxLeftVelocity: Velocity = FeetPerSecond(15)
-    override val maxRightVelocity: Velocity = FeetPerSecond(15)
+    override val maxLeftVelocity: Velocity = FeetPerSecond(5)
+    override val maxRightVelocity: Velocity = FeetPerSecond(5)
 
     override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(16.5)
     override val defaultLookAheadDistance: Length = Feet(1)
 
     override val turnControlGains = PIDConfig(
-      Percent(10) / DegreesPerSecond(1),
+      Percent(100) / DegreesPerSecond(1),
       Percent(0) / Degrees(1),
       Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)))
 
@@ -33,7 +35,7 @@ object SimulateDrivetrain extends App {
       Percent(0) / MetersPerSecond(1))
 
     override val turnPositionControlGains = PIDConfig(
-      Percent(100) / Degrees(10),
+      Percent(10) / Degrees(10),
       Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
       Percent(0) / DegreesPerSecond(1))
 
@@ -49,7 +51,7 @@ object SimulateDrivetrain extends App {
 
   implicit val (clock, ticker) = mockedClockTicker
 
-  val period = Milliseconds(1)
+  val period = Milliseconds(10)
   val drivetrainContainer = new TwoSidedDriveContainerSimulator(period)(clock)
   implicit val hardware = new drivetrainContainer.Hardware(
     Pounds(88) * MetersPerSecondSquared(1) / 2,
@@ -62,17 +64,23 @@ object SimulateDrivetrain extends App {
   val simulatedComponent = new drivetrainContainer.Drivetrain
 
   var itr = 0
+  val log = new File(new java.io.File("simlog")).printWriter()
   val streamPrintingCancel = hardware.historyStream.foreach { e =>
     if (itr % 10 == 0) {
-      println(s"${e.time.toSeconds}\t${e.position.x.toMeters}\t${e.position.y.toMeters}")
+      //log.println(s"${e.time.toSeconds}\t${e.position.x.toMeters}\t${e.position.y.toMeters}")
+      log.println(s"${e.time.toSeconds}\t${e.turnSpeed.toDegreesPerSecond}\t${e.angle.toDegrees}")
     }
 
     itr += 1
   }
 
-  val task = new drivetrainContainer.unicycleTasks.FollowWayPoints(
-    Point.origin :: Point(Meters(0), Meters(1)) :: Point(Meters(1), Meters(2)) :: Nil,
-    Inches(5)
+//  val task = new drivetrainContainer.unicycleTasks.FollowWayPoints(
+//    Point.origin :: Point(Meters(0), Meters(1)) :: Point(Meters(1), Meters(2)) :: Nil,
+//    Inches(5)
+//  )(simulatedComponent)
+  val task = new drivetrainContainer.unicycleTasks.RotateToAngle(
+    Degrees(1e200),
+    Degrees(0)
   )(simulatedComponent)
 
 
@@ -81,6 +89,8 @@ object SimulateDrivetrain extends App {
   for (i <- 1 to (20D / period.toSeconds).round.toInt) {
 //    val startTime = System.nanoTime()
     ticker(period)
-//    println((System.nanoTime() - startTime) / 10e6)
+    if (i == (1.8D / period.toSeconds).round.toInt) {
+      val atTime = true
+    }
   }
 }

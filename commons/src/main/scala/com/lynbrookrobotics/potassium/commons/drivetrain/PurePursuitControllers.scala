@@ -118,7 +118,11 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       )
     }
 
-    val headingToTarget = position.zip(lookAheadPoint).map(p => headingToPoint(p._1, p._2))
+    val headingToTarget = position.zip(lookAheadPoint).map{p =>
+      val seg = Segment(p._1, p._2)
+      headingToPoint(p._1, p._2)
+    }
+
     val trigHeadingToTarget = headingToTarget.map(h => trigonemtricToCompass(h))
     val compassHeadingToLookAhead = trigHeadingToTarget.map(h => limitToPlusMinus90(h))
 
@@ -220,15 +224,14 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       } else {
         None
       }
-//      (if (!biSegmentPaths.hasNext) {
-//        Some(d)
-//      } else {
-//        None
-//      }).flatten
     }
 
-    (forwardOutput.zip(turnOutput).zip(multiplier).zip(distanceToLast).zip(forwardError).map { o =>
-      val ((((forward, turn), fdMultiplier), _), frdError) = o
+    (forwardOutput.zip(turnOutput).zip(multiplier).zip(lookAheadPoint).zip(forwardError).map { o =>
+      val ((((forward, turn), fdMultiplier), la), frdError) = o
+
+      val hard = hardware
+      println(s"${la.x.toMeters}\t${la.y.toMeters}")
+
       if (frdError > props.get.defaultLookAheadDistance / 2) {
         UnicycleSignal(forward * fdMultiplier, turn)
       } else {
