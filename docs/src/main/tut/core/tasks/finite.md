@@ -5,7 +5,7 @@ section: core
 ---
 
 # Finite Tasks
-Finite Tasks are actions that have a defined starting, running, and ending period. These tasks are primarily used for autonomous routines, where a robot must perform a series of actions one after the other. Through the task API, finite tasks can be easily composed to form complex routines based on elementary pieces.
+Finite tasks are actions that have a defined starting, running, and ending period. These tasks are primarily used for autonomous routines, where a robot must perform a series of actions one after the other. Through the task API, finite tasks can be easily composed to form complex routines based on elementary pieces.
 
 ## Creating a Finite Task
 To create a finite task, simply extend the `FiniteTask` class and implement the `onStart` and `onEnd` methods:
@@ -27,4 +27,18 @@ For example:
 ```scala
 new DriveForward(5 feet).then(new TurnByAngle(10 degrees)) // finite task
 new DriveForward(5 feet).then(new ContinuouslyShootBalls()) // continuous task
+```
+
+## Parallel Finite Tasks
+Finite tasks can be run in parallel by using the `and` method, which returns a new finite task that runs both subtasks at the same time and only terminates when both subtasks have finished.
+
+```scala
+new DriveForward(5 feet).and(new LiftArm(2 feet)) // only finishes when we have driven forward and lifted the arm
+```
+
+## Timeouts
+Especially when running automated routines in a time-constrained environment (such as the FIRST Robotics Competition autonomous period), it is often necessary to place timeouts to force finite tasks to terminate after a set duration of running. This can be achieved through the `withTimeout` method, which takes a parameter of a duration to terminate the task after. Following the principle of immutability, this **does not** modify the existing task to have a timeout, but returns a new task with the timeout applied.
+
+```scala
+new DriveForward(5 feet).withTimeout(10 seconds) // if we get stuck, this will stop after 10 seconds
 ```
