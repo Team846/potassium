@@ -14,7 +14,7 @@ options:
     menu_type: intro
     menu_section: intro
 
-  - title: Core -- Introduction
+  - title: Core Introduction
     url: core/
     menu_type: core
     menu_section: core
