@@ -49,3 +49,10 @@ Especially when running automated routines in a time-constrained environment (su
 ```scala
 new DriveForward(5 feet).withTimeout(10 seconds) // if we get stuck, this will stop after 10 seconds
 ```
+
+## `WaitTask`
+Autonomous routines often contain pauses, which can be introduced into a series of actions by using the `WaitTask` class. `WaitTask` is a finite task that waits for a given duration of time before completing. `WaitTask`s can be used just the same as any other `FiniteTask`, and can be combined with other tasks to produce more complex routines.
+
+```scala
+new DriveForward(5 feet).then(new WaitTask(5 seconds)).then(new DriveForward(5 feet)) // drives, pauses, and then drives again
+```
