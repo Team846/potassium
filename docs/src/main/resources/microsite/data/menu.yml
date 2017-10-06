@@ -26,3 +26,5 @@ options:
     nested_options:
      - title: Finite Tasks
        url: core/tasks/finite.html
+     - title: Continuous Tasks
+       url: core/tasks/continuous.html
