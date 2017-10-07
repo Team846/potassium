@@ -169,7 +169,7 @@ object PhysicsUtil {
   private def emfForce(velocity: Velocity, maxMotorForce: Force)
                       (implicit props: UnicycleProperties): Force = {
     val normalizedVelocity = velocity / props.maxForwardVelocity
-    normalizedVelocity * maxMotorForce
+    -1 * normalizedVelocity * maxMotorForce
   }
 
   /**
@@ -183,6 +183,6 @@ object PhysicsUtil {
                     (implicit props: TwoSidedDriveProperties): Force = {
     val direction = -1 * Math.signum(velocity.value)
 
-    direction * (emfForce(velocity, maxMotorForce) + constantFriction)
+    emfForce(velocity, maxMotorForce) + direction * constantFriction
   }
 }
