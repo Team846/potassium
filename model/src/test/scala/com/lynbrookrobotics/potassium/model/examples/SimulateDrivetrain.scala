@@ -10,6 +10,7 @@ import squants.{Acceleration, Length, Percent, Velocity}
 import squants.motion._
 import squants.space.{Degrees, Feet, Inches, Meters}
 import squants.time.{Milliseconds, Seconds}
+import squants.Time
 import com.lynbrookrobotics.potassium.ClockMocking._
 import squants.mass.{KilogramsMetersSquared, Pounds}
 
@@ -67,29 +68,29 @@ object SimulateDrivetrain extends App {
   val log = new File(new java.io.File("simlog")).printWriter()
   val streamPrintingCancel = hardware.historyStream.foreach { e =>
     if (itr % 10 == 0) {
-      //log.println(s"${e.time.toSeconds}\t${e.position.x.toMeters}\t${e.position.y.toMeters}")
-      log.println(s"${e.time.toSeconds}\t${e.turnSpeed.toDegreesPerSecond}\t${e.angle.toDegrees}")
+      log.println(s"${e.time.toSeconds}\t${e.position.x.toFeet}\t ${e.position.y.toFeet}\t${e.forwardVelocity.toFeetPerSecond}\t${e.angle.toDegrees}")
     }
 
     itr += 1
   }
 
-//  val task = new drivetrainContainer.unicycleTasks.FollowWayPoints(
-//    Point.origin :: Point(Meters(0), Meters(1)) :: Point(Meters(1), Meters(2)) :: Nil,
-//    Inches(5)
-//  )(simulatedComponent)
-  val task = new drivetrainContainer.unicycleTasks.RotateToAngle(
-    Degrees(1e200),
-    Degrees(0)
+  val task = new drivetrainContainer.unicycleTasks.FollowWayPoints(
+    Point.origin :: Point(Feet(0), Feet(5)) :: Point(Feet(5), Feet(10)) :: Nil,
+    Inches(5)
   )(simulatedComponent)
+//  val task = new drivetrainContainer.unicycleTasks.RotateToAngle(
+//    Degrees(1e200),
+//    Degrees(0)
+//  )(simulatedComponent)
 
 
   task.init()
 
+
   for (i <- 1 to (20D / period.toSeconds).round.toInt) {
 //    val startTime = System.nanoTime()
     ticker(period)
-    if (i == (1.8D / period.toSeconds).round.toInt) {
+    if (i == (3.5D / period.toSeconds).round.toInt) {
       val atTime = true
     }
   }

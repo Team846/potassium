@@ -93,7 +93,7 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
     var previous: Option[T] = None
     val handle = stream.foreach(v => previous = Some(v))
     () => {
-      // hold reference to handle to prevent garbage colletion
+      // hold reference to handle to prevent garbage collection
       handle.hashCode()
       previous
     }
@@ -126,6 +126,8 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
   }
 
   val positionListening = listenTo(position)
+  val velocityListening = listenTo(forwardVelocity)
+  val angleListening = listenTo(turnPosition)
 }
 
 class TwoSidedDriveContainerSimulator(period: Time)(val clock: Clock) extends TwoSidedDrive(period)(clock) { self =>

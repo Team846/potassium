@@ -193,13 +193,15 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       )
     }
 
-    var currPath: (Segment, Option[Segment]) = biSegmentPaths.next()
 
-    val selectedPath = position.map{_ =>
-      if (currPath._2.isEmpty) {
-      } else if (previousLookAheadPoint.exists(p => currPath._2.get.containsInXY(p, Feet(0.1)))) {
+    var currPath = biSegmentPaths.next()
+
+    val selectedPath = position.map { _ =>
+      if (previousLookAheadPoint.exists{ p =>
+        currPath._2.exists(_.containsInXY(p, Feet(0.1)))
+      }) {
         if (biSegmentPaths.hasNext) {
-          println("**********advancing path ***********")
+          println("********** advancing path ***********")
           currPath = biSegmentPaths.next()
         }
       }
@@ -208,17 +210,19 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     }
 
     val (turnOutput, multiplier, lookAheadPoint) = purePursuitControllerTurn(turnPosition, position, selectedPath)
-    val _ = lookAheadPoint.foreach{p =>
+    val lookAheadHandle = lookAheadPoint.foreach{ p =>
       previousLookAheadPoint = Some(p)
     }
 
     val (forwardOutput, forwardError) = pointDistanceControl(
       position,
       selectedPath.map(_._1.end))
-    val distanceToLast = position.map(_ distanceTo wayPoints.last)
+    val distanceToLast = position.map{ pose =>
+      pose distanceTo wayPoints.last
+    }
 
     val errorToLast = distanceToLast.map { d =>
-      // error does not exist of we are not on our last segment
+      // error does not exist if we are not on our last segment
       if (!biSegmentPaths.hasNext) {
         Some(d)
       } else {
@@ -230,7 +234,6 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       val ((((forward, turn), fdMultiplier), la), frdError) = o
 
       val hard = hardware
-      println(s"${la.x.toMeters}\t${la.y.toMeters}")
 
       if (frdError > props.get.defaultLookAheadDistance / 2) {
         UnicycleSignal(forward * fdMultiplier, turn)
