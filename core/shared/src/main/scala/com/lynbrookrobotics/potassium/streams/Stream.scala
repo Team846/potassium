@@ -344,10 +344,7 @@ abstract class Stream[T] { self =>
     // scalastyle:off
     previousValues.zipWithDt.scanLeft(null.asInstanceOf[I]){case (acc, (current3Values, dt)) =>
       if (acc != null) {
-        if (current3Values.isEmpty) {
-          println("empty 3 values")
-        }
-        acc + (dt * current3Values.head + 4 * dt * current3Values(1) + dt * current3Values(2)) / 6
+        acc + (dt * current3Values(0) + 4 * dt * current3Values(1) + dt * current3Values(2)) / 6
       } else {
         (current3Values.last: TimeDerivative[I]) * dt
       }

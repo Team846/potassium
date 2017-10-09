@@ -116,7 +116,6 @@ class PurePursuitControllerTests extends FunSuite {
 
     val target = Point(Feet(0), Feet(1))
 
-    // TODO: types not inferred correctly
     val path: Stream[(Segment, Option[Segment])] =
       hardware.turnPosition.mapToConstant((Segment(origin, target), None))
 
@@ -182,8 +181,8 @@ class PurePursuitControllerTests extends FunSuite {
     val target = Point(Feet(0), Feet(1))
     val position = hardware.turnPosition.mapToConstant(Point(Feet(1), Feet(1)))
 
-    // TODO: types not inferred correctly
-    val path: Stream[(Segment, Option[Segment])] = hardware.turnPosition.mapToConstant((Segment(origin, target), None))
+    val path: Stream[(Segment, Option[Segment])] =
+      hardware.turnPosition.mapToConstant((Segment(origin, target), None))
 
     val output = controllers.purePursuitControllerTurn(
       hardware.turnPosition.mapToConstant(Degrees(-85)),
