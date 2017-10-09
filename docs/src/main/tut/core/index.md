@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: Core Introduction
+title: Core
 section: core
 position: 2
 ---
