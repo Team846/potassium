@@ -86,7 +86,10 @@ abstract class TwoSidedDrive(updatePeriod: Time)(implicit clock: Clock)
   }
 
   protected def expectedVelocity(drive: TwoSidedSignal)(implicit props: Properties): TwoSidedVelocity = {
-    TwoSidedVelocity(props.maxLeftVelocity * drive.left, props.maxRightVelocity * drive.right)
+    TwoSidedVelocity(
+      props.maxForwardVelocity * drive.left,
+      props.maxForwardVelocity * drive.right
+    )
   }
 
   protected def driveClosedLoop(signal: Stream[TwoSidedSignal])
