@@ -23,7 +23,7 @@ object SimulateDrivetrain extends App {
 
     override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(16.5)
-    override val defaultLookAheadDistance: Length = Feet(1)
+    override val defaultLookAheadDistance: Length = Feet(3)
 
     override val turnControlGains = PIDConfig(
       Percent(100) / DegreesPerSecond(1),
@@ -36,7 +36,7 @@ object SimulateDrivetrain extends App {
       Percent(0) / MetersPerSecond(1))
 
     override val turnPositionControlGains = PIDConfig(
-      Percent(10) / Degrees(10),
+      Percent(5) / Degrees(1),
       Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
       Percent(0) / DegreesPerSecond(1))
 
@@ -76,8 +76,7 @@ object SimulateDrivetrain extends App {
 
   val task = new drivetrainContainer.unicycleTasks.FollowWayPoints(
     Point.origin :: Point(Feet(0), Feet(5)) :: Point(Feet(5), Feet(10)) :: Nil,
-    Inches(5)
-  )(simulatedComponent)
+    Inches(5))(simulatedComponent, Percent(70))
 //  val task = new drivetrainContainer.unicycleTasks.RotateToAngle(
 //    Degrees(1e200),
 //    Degrees(0)
@@ -90,7 +89,7 @@ object SimulateDrivetrain extends App {
   for (i <- 1 to (20D / period.toSeconds).round.toInt) {
 //    val startTime = System.nanoTime()
     ticker(period)
-    if (i == (3.5D / period.toSeconds).round.toInt) {
+    if (i == (1.64D / period.toSeconds).round.toInt) {
       val atTime = true
     }
   }

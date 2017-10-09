@@ -1,13 +1,13 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.streams.Stream
-import com.lynbrookrobotics.potassium.{ Signal}
+import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
 import com.lynbrookrobotics.potassium.tasks.FiniteTask
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import squants.space.{Angle, Degrees, Feet, Length}
-import squants.{Dimensionless, Each}
+import squants.{Dimensionless, Each, Percent}
 
 trait PurePursuitTasks extends UnicycleCoreTasks {
   import controllers._
@@ -25,8 +25,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
     toClamp min maxMagnitude max -maxMagnitude
   }
 
-  class FollowWayPoints(wayPoints: Seq[Point], tolerance: Length)
-                       (drive: Drivetrain)
+  class FollowWayPoints(wayPoints: Seq[Point], tolerance: Length)(drive: Drivetrain, steadyOutput: Dimensionless)
                        (implicit properties: Signal[DrivetrainProperties],
                         hardware: DrivetrainHardware) extends FiniteTask {
     override def onStart(): Unit = {
@@ -38,14 +37,11 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         hardware.forwardPosition
       )
 
-      val (unicycle, error) = followWayPointsController(
-        wayPoints,
-        position,
-        turnPosition
-      )
+      val (unicycle, error) = followWayPointsController(wayPoints, position, turnPosition, steadyOutput)
 
       drive.setController(lowerLevelOpenLoop(unicycle.withCheckZipped(error) { e =>
         if (e.exists(_ < tolerance)) {
+          println("finished")
           finished()
         }
       }))
@@ -60,14 +56,11 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                                     tolerance: Length,
                                     position: Stream[Point],
                                     turnPosition: Stream[Angle])
-                                   (drive: Drivetrain)
+                                   (drive: Drivetrain, steadyOutput: Dimensionless)
                                    (implicit properties: Signal[DrivetrainProperties],
                                     hardware: DrivetrainHardware) extends FiniteTask {
     override def onStart(): Unit = {
-      val (unicycle, error) = followWayPointsController(
-        wayPoints,
-        position,
-        turnPosition)
+      val (unicycle, error) = followWayPointsController(wayPoints, position, turnPosition, steadyOutput)
 
       drive.setController(lowerLevelOpenLoop(unicycle.withCheckZipped(error) {e =>
         if (e.exists(_ < tolerance)) {

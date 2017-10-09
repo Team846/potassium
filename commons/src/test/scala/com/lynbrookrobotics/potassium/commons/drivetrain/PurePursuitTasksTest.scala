@@ -94,9 +94,7 @@ class PurePursuitTasksTest extends FunSuite {
     }
 
     val target = new Point(Feet(0), Feet(0.5))
-    val task = new drive.unicycleTasks.FollowWayPoints(
-      Seq(Point.origin, target), Feet(1)
-    )(drivetrainComp)
+    val task = new drive.unicycleTasks.FollowWayPoints(Seq(Point.origin, target), Feet(1))(drivetrainComp, Percent(70))
 
     task.init()
 
@@ -122,7 +120,7 @@ class PurePursuitTasksTest extends FunSuite {
       override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(0))
     }
 
-    val task = new drive.unicycleTasks.FollowWayPoints(Seq(Point.origin, target), Feet(0.1))(testDrivetrainComp)
+    val task = new drive.unicycleTasks.FollowWayPoints(Seq(Point.origin, target), Feet(0.1))(testDrivetrainComp, Percent(70))
 
     task.init()
 
@@ -161,7 +159,7 @@ class PurePursuitTasksTest extends FunSuite {
     }
 
     val target = new Point(Feet(-1), Feet(-1))
-    val task = new drive.unicycleTasks.FollowWayPoints(Seq(Point.origin, target), Feet(1))(drivetrainComp)
+    val task = new drive.unicycleTasks.FollowWayPoints(Seq(Point.origin, target), Feet(1))(drivetrainComp, Percent(70))
 
     task.init()
     ticker(Milliseconds(5))
@@ -188,12 +186,7 @@ class PurePursuitTasksTest extends FunSuite {
       override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(0))
     }
 
-    val task = new drive.unicycleTasks.FollowWayPointsWithPosition(
-      Seq(Point.origin, target),
-      Feet(0.1),
-      hardware.forwardPosition.mapToConstant(Point(Feet(0.001), Feet(0.999999))),
-      hardware.turnPosition.mapToConstant(Degrees(0))
-    )(testDrivetrainComp)
+    val task = new drive.unicycleTasks.FollowWayPointsWithPosition(Seq(Point.origin, target), Feet(0.1), hardware.forwardPosition.mapToConstant(Point(Feet(0.001), Feet(0.999999))), hardware.turnPosition.mapToConstant(Degrees(0)))(testDrivetrainComp, Percent(70))
 
     task.init()
 

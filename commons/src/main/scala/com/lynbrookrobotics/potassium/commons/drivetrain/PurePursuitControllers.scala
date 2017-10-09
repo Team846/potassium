@@ -33,42 +33,6 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       distanceToTarget)
   }
 
-  /**
-    * Given a 2 segment path, calculates the look ahead point by finding the
-    * intersection of the circle of radius lookAheadDistance and center
-    * currentPosition with the given path. Returns the intersection with the
-    * second segment if there is an intersection with both segments.
-    * see: https://www.mathworks.com/help/robotics/ug/pure-pursuit-controller.html
-    *
-    * @param biSegmentPath the path to find given intersection on
-    * @param currPosition
-    * @param lookAheadDistance
-    * @return the look ahead point for the given path
-    */
-  @deprecated
-  def getNonExtrapolatedLookAheadPoint(biSegmentPath: (Segment, Option[Segment]),
-                                  currPosition: Point,
-                                  lookAheadDistance: Length): Point = {
-    import MathUtilities._
-    val firstLookAheadPoint = intersectionClosestToEnd(
-      biSegmentPath._1,
-      currPosition,
-      lookAheadDistance)
-
-    val secondLookAheadPoint = biSegmentPath._2.flatMap { s =>
-      intersectionClosestToEnd(s, currPosition, lookAheadDistance)
-    }
-
-    secondLookAheadPoint.getOrElse(
-      firstLookAheadPoint.getOrElse {
-        println(s"expanding look ahead distance to ${1.1 * lookAheadDistance}")
-        println(s"path $biSegmentPath")
-        println(s"current position $currPosition")
-        getNonExtrapolatedLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
-      }
-    )
-  }
-
   def headingToPoint(start: Point, end: Point): Angle = {
       val diff = end - start
       Radians(Math.atan2(
@@ -177,7 +141,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
 
   def followWayPointsController(wayPoints: Seq[Point],
                                 position: Stream[Point],
-                                turnPosition: Stream[Angle])
+                                turnPosition: Stream[Angle],
+                                steadyOutput: Dimensionless)
                                 (implicit hardware: DrivetrainHardware,
                                 props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
     var previousLookAheadPoint: Option[Point] = None
@@ -216,9 +181,17 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
 
     val (forwardOutput, forwardError) = pointDistanceControl(
       position,
-      selectedPath.map(_._1.end))
+      selectedPath.map(_._2.get.end))
     val distanceToLast = position.map{ pose =>
       pose distanceTo wayPoints.last
+    }
+
+    val limitedForward = forwardOutput.map{ s =>
+      if ( !biSegmentPaths.hasNext ) {
+        s min steadyOutput
+      } else {
+        steadyOutput
+      }
     }
 
     val errorToLast = distanceToLast.map { d =>
@@ -230,7 +203,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       }
     }
 
-    (forwardOutput.zip(turnOutput).zip(multiplier).zip(lookAheadPoint).zip(forwardError).map { o =>
+    (limitedForward.zip(turnOutput).zip(multiplier).zip(lookAheadPoint).zip(forwardError).map { o =>
       val ((((forward, turn), fdMultiplier), la), frdError) = o
 
       val hard = hardware
