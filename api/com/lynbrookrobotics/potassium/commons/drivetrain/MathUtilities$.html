@@ -555,24 +555,7 @@
       
       <p class="shortcomment cmt">see http://mathworld.wolfram.com/Circle-LineIntersection.html</p><div class="fullcomment"><div class="comment cmt"><p>see http://mathworld.wolfram.com/Circle-LineIntersection.html</p></div><dl class="paramcmts block"><dt class="param">segment</dt><dd class="cmt"><p>segment defining the infinite line to test for intersection</p></dd><dt class="param">center</dt><dd class="cmt"><p>center of circle to test for intersection</p></dd><dt class="param">radius</dt><dd class="cmt"><p>radius of circle to test for intersection</p></dd><dt>returns</dt><dd class="cmt"><p>on Option of a tuple of points where the
         infinitely long line and circle intersect</p></dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.commons.drivetrain.MathUtilities#intersectionClosestToEnd" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="intersectionClosestToEnd(segment:com.lynbrookrobotics.potassium.units.Segment,center:com.lynbrookrobotics.potassium.units.Point,radius:squants.space.Length):Option[com.lynbrookrobotics.potassium.units.Point]"></a><a id="intersectionClosestToEnd(Segment,Point,Length):Option[Point]"></a>
-      <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/commons/drivetrain/MathUtilities$.html#intersectionClosestToEnd(segment:com.lynbrookrobotics.potassium.units.Segment,center:com.lynbrookrobotics.potassium.units.Point,radius:squants.space.Length):Option[com.lynbrookrobotics.potassium.units.Point]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">intersectionClosestToEnd</span><span class="params">(<span name="segment">segment: <a href="../../units/Segment.html" class="extype" name="com.lynbrookrobotics.potassium.units.Segment">Segment</a></span>, <span name="center">center: <a href="../../units/Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a></span>, <span name="radius">radius: <span class="extype" name="squants.space.Length">Length</span></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="../../units/Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a>]</span>
-      </span>
-      
-      <p class="shortcomment cmt">Finds intersection between segment and circle with given center and radius
-lookAheadDistance that is closest to segment.end</p>
-    </li><li name="com.lynbrookrobotics.potassium.commons.drivetrain.MathUtilities#intersectionLineCircleFurthestFromStart" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.lynbrookrobotics.potassium.commons.drivetrain.MathUtilities#intersectionLineCircleFurthestFromStart" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="intersectionLineCircleFurthestFromStart(segment:com.lynbrookrobotics.potassium.units.Segment,center:com.lynbrookrobotics.potassium.units.Point,radius:squants.space.Length):Option[com.lynbrookrobotics.potassium.units.Point]"></a><a id="intersectionLineCircleFurthestFromStart(Segment,Point,Length):Option[Point]"></a>
       <span class="permalink">
       <a href="../../../../../com/lynbrookrobotics/potassium/commons/drivetrain/MathUtilities$.html#intersectionLineCircleFurthestFromStart(segment:com.lynbrookrobotics.potassium.units.Segment,center:com.lynbrookrobotics.potassium.units.Point,radius:squants.space.Length):Option[com.lynbrookrobotics.potassium.units.Point]" title="Permalink">
@@ -587,7 +570,10 @@ lookAheadDistance that is closest to segment.end</p>
         <span class="name">intersectionLineCircleFurthestFromStart</span><span class="params">(<span name="segment">segment: <a href="../../units/Segment.html" class="extype" name="com.lynbrookrobotics.potassium.units.Segment">Segment</a></span>, <span name="center">center: <a href="../../units/Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a></span>, <span name="radius">radius: <span class="extype" name="squants.space.Length">Length</span></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="../../units/Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a>]</span>
       </span>
       
-      
+      <p class="shortcomment cmt">This finds the point furthest from the start and if that point's angle formed with the start point is
+the same as the angle of the segment, it returns that point.</p><div class="fullcomment"><div class="comment cmt"><p>This finds the point furthest from the start and if that point's angle formed with the start point is
+the same as the angle of the segment, it returns that point.</p><p>If the point furthest of the start doesn't meet the angle condition, it checks if the other point meets it and
+returns that point if it matches the angle condition</p><p>If both points don't meet the angle condition or there aren't any intersections, then this method returns None</p></div><dl class="paramcmts block"><dt class="param">segment</dt><dd class="cmt"><p>the segment that the circle intersects</p></dd><dt class="param">center</dt><dd class="cmt"><p>the center of the circle that intersects the segment</p></dd><dt class="param">radius</dt><dd class="cmt"><p>the radius of the circle that intersects</p></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
