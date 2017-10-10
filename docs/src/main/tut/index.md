@@ -8,4 +8,4 @@ technologies:
  - third: ["Modular", "Potassium is split up into many modules that make it easy to only depend on the features of Potassium that you want to use"]
 ---
 
-TODO
+Potassium is a student-built framework for controlling robots with functional programming concepts in Scala. Combining existing control strategies with novel abstractions for describing the flow of data within robot software, Potassium makes it possible to write elegant software for a variety of applications. Potassium also supports the FIRST Robotics Competition, allowing high school robotics teams to develop software for their robots in Scala.
