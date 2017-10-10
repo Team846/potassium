@@ -2,7 +2,7 @@ package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import squants.{Dimensionless, Each, Percent}
-import squants.space.{Feet, Length}
+import squants.space.{Feet, Length, Radians}
 
 
 object MathUtilities {
@@ -53,65 +53,49 @@ object MathUtilities {
       Some(negativeSolution, positiveSolution)
     }
   }
+
   /**
-    * Finds intersection between segment and circle with given center and radius
-    * lookAheadDistance that is closest to segment.end
-    * @param segment
-    * @param center
-    * @param radius
+    * This finds the point furthest from the start and if that point's angle formed with the start point is
+    * the same as the angle of the segment, it returns that point.
+    *
+    * If the point furthest of the start doesn't meet the angle condition, it checks if the other point meets it and
+    * returns that point if it matches the angle condition
+    *
+    * If both points don't meet the angle condition or there aren't any intersections, then this method returns None
+    * @param segment the segment that the circle intersects
+    * @param center the center of the circle that intersects the segment
+    * @param radius the radius of the circle that intersects
     * @return
     */
-  def intersectionClosestToEnd(segment: Segment,
-                               center: Point,
-                               radius: Length): Option[Point] = {
-    interSectionCircleLine(segment, center, radius).flatMap { case (negativeSolution, positiveSolution) =>
-      val negSolutionLengthToEnd = negativeSolution distanceTo segment.end
-      val posSolutionLengthToEnd = positiveSolution distanceTo segment.end
-
-      val solutionClosestToEnd = if (posSolutionLengthToEnd >= negSolutionLengthToEnd) {
-        negativeSolution
-      } else {
-        positiveSolution
-      }
-
-      // Intersection is found between the LINE formed by the start and end
-      // point of given segment. This means that the given solution might
-      // extend past end point of segment. In this case, just return the end
-      if (segment.containsInXY(solutionClosestToEnd, Feet(0.2))) {
-        Some(solutionClosestToEnd)
-      } else {
-        Some(segment.end)
-      }
-    }
-  }
-
   def intersectionLineCircleFurthestFromStart(segment: Segment,
                                               center: Point,
                                               radius: Length): Option[Point] = {
     val solutions = interSectionCircleLine(segment, center, radius)
-    solutions.flatMap { s =>
-      val (positive, negative) = s
+    solutions.flatMap {case(positive, negative) =>
+        val positiveDiffWithStart = segment.start distanceTo positive
+        val negativeDiffWithStart = segment.start distanceTo negative
 
-      implicit val Tolerance = Feet(0.001)
-      val negativeToStart = negative distanceTo segment.start
-      val positiveToStart = positive distanceTo segment.start
-
-      // Handle edge case where both solutions are equidistant from start. Then
-      // return solution closest to the endpoint of the segment
-      if (negativeToStart ~= positiveToStart) {
-        val negativeToEnd = negative distanceTo segment.end
-        val positiveToEnd = positive distanceTo segment.end
-
-        if (positiveToEnd < negativeToEnd) {
-          Some(positive)
+        val furthestFromStart = if ( positiveDiffWithStart > negativeDiffWithStart ) {
+          positive
         } else {
-          Some(negative)
+          negative
         }
-      } else if (negativeToStart > positiveToStart) {
-        Some(negative)
-      } else {
-        Some(positive)
-      }
+        val closerToStart = if ( positiveDiffWithStart <= negativeDiffWithStart ) {
+          positive
+        } else {
+          negative
+        }
+        val tolerance = Radians(0.0001)
+
+        // Pick point such that look ahead point angle to end point is same as angle
+        // of segment, ensuring that we drive toward the correct direction
+        if ((segment.angle - Segment(segment.start, furthestFromStart).angle).abs < tolerance ) {
+          Some(furthestFromStart)
+        } else if ( (segment.angle - Segment(segment.start, closerToStart).angle).abs < tolerance ) {
+          Some(closerToStart)
+        } else {
+          None
+        }
     }
   }
 

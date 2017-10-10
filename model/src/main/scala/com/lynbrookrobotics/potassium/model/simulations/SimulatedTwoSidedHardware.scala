@@ -53,21 +53,21 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
     val rightFriction = PhysicsUtil.frictionAndEMF(rightVelocity, constantFriction, maxMotorForce)
     val netRightForce = rightInputForce + rightFriction
 
+    // Newton's second law for linear acceleration
+    val leftAccel = netLeftForce / mass
+    val rightAccel = netRightForce / mass
+
+    // Euler's method to integrate
+    val newLeftVelocity = leftVelocity + leftAccel * dt
+    val newRightVelocity = rightVelocity + rightAccel  * dt
+
     // radius from center, located halfway between wheels
     val radius = track / 2
     val netTorque = (netRightForce * radius - netLeftForce * radius).asTorque
 
-    // Newton's second laws
+    // Newton's second law for angular acceleration
     val angularAcceleration = netTorque / momentOfInertia
-    val linearAcceleration  = (netLeftForce + netRightForce) / mass
 
-    // Linear acceleration caused by angular acceleration about the center
-    val tangentialAcceleration = angularAcceleration onRadius radius
-
-    // TODO: This is completey wrong. Remove +/- tangentialAcceleration
-    // Euler's method to integrate velocities
-    val newLeftVelocity = leftVelocity + (linearAcceleration - tangentialAcceleration) * dt
-    val newRightVelocity = rightVelocity + (linearAcceleration + tangentialAcceleration) * dt
     val newAngularVelocity = angularVelocity + angularAcceleration * dt
 
     RobotVelocities(newLeftVelocity, newRightVelocity, newAngularVelocity)
@@ -87,6 +87,16 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
         accVelocities.right,
         accVelocities.angular,
         dt)
+  }
+
+  def listenTo[T](stream: Stream[T]): () => Option[T] = {
+    var previous: Option[T] = None
+    val handle = stream.foreach(v => previous = Some(v))
+    () => {
+      // hold reference to handle to prevent garbage collection
+      handle.hashCode()
+      previous
+    }
   }
 
   override val leftVelocity = velocities.map(_.left)
@@ -114,6 +124,10 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
         position = pos,
         turnSpeed = tVel)
   }
+
+  val positionListening = listenTo(position)
+  val velocityListening = listenTo(forwardVelocity)
+  val angleListening = listenTo(turnPosition)
 }
 
 class TwoSidedDriveContainerSimulator(period: Time)(val clock: Clock) extends TwoSidedDrive(period)(clock) { self =>
@@ -157,7 +171,7 @@ object PhysicsUtil {
   private def emfForce(velocity: Velocity, maxMotorForce: Force)
                       (implicit props: UnicycleProperties): Force = {
     val normalizedVelocity = velocity / props.maxForwardVelocity
-    normalizedVelocity * maxMotorForce
+    -1 * normalizedVelocity * maxMotorForce
   }
 
   /**
@@ -171,6 +185,6 @@ object PhysicsUtil {
                     (implicit props: TwoSidedDriveProperties): Force = {
     val direction = -1 * Math.signum(velocity.value)
 
-    direction * (emfForce(velocity, maxMotorForce) + constantFriction)
+    emfForce(velocity, maxMotorForce) + direction * constantFriction
   }
 }

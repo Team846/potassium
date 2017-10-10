@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.units
 
-import squants.space.{Area, Feet, Length}
+import squants.space._
 
 class Point(override val x: Length,
             override val y: Length,
@@ -37,6 +37,10 @@ object Point {
   def apply(x: Length, y: Length): Point = {
     new Point(x, y)
   }
+
+  def apply(v: Value3D[Length]): Point = {
+    new Point(v.x, v.y, v.z)
+  }
 }
 
 case class Segment(start: Point, end: Point) {
@@ -54,7 +58,7 @@ case class Segment(start: Point, end: Point) {
     // Uses point slope form of line to determine if the line constructed from
     // start and end contains the given point
     if (xySlope != Double.NaN && Math.abs(xySlope) != Double.PositiveInfinity) {
-      (toTest.y - start.y) ~= xySlope * (toTest.x - start.x)
+      ((toTest.y - start.y) - xySlope * (toTest.x - start.x)).abs <= tolerance
     } else {
       // If the segment is directly upwards, slope is Nan or Infinity
       toTest.x ~= start.x
@@ -80,5 +84,9 @@ case class Segment(start: Point, end: Point) {
     */
   def containsInXY(toTest: Point, tolerance: Length): Boolean = {
     withInBoundries(toTest) && onLine(toTest, tolerance)
+  }
+
+  def angle: Angle = {
+    Radians(math.atan2(dy.toFeet, dx.toFeet))
   }
 }
