@@ -242,7 +242,6 @@ trait UnicycleCoreTasks {
           hardware.forwardPosition.mapToConstant(-maxSpeed)
         },
 
-        // TODO: requires review
         hardware.forwardPosition.relativize((initial, current) => {
           val absoluteTarget = initial + distance
           absoluteTarget - current
@@ -267,6 +266,7 @@ trait UnicycleCoreTasks {
             forwardError.value > 0
           }
 
+          // TODO: remove angle condition
           if (beyond && turnError.abs < toleranceAngle) {
             finished()
           }

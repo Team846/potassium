@@ -33,42 +33,6 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       distanceToTarget)
   }
 
-  /**
-    * Given a 2 segment path, calculates the look ahead point by finding the
-    * intersection of the circle of radius lookAheadDistance and center
-    * currentPosition with the given path. Returns the intersection with the
-    * second segment if there is an intersection with both segments.
-    * see: https://www.mathworks.com/help/robotics/ug/pure-pursuit-controller.html
-    *
-    * @param biSegmentPath the path to find given intersection on
-    * @param currPosition
-    * @param lookAheadDistance
-    * @return the look ahead point for the given path
-    */
-  @deprecated
-  def getNonExtrapolatedLookAheadPoint(biSegmentPath: (Segment, Option[Segment]),
-                                  currPosition: Point,
-                                  lookAheadDistance: Length): Point = {
-    import MathUtilities._
-    val firstLookAheadPoint = intersectionClosestToEnd(
-      biSegmentPath._1,
-      currPosition,
-      lookAheadDistance)
-
-    val secondLookAheadPoint = biSegmentPath._2.flatMap { s =>
-      intersectionClosestToEnd(s, currPosition, lookAheadDistance)
-    }
-
-    secondLookAheadPoint.getOrElse(
-      firstLookAheadPoint.getOrElse {
-        println(s"expanding look ahead distance to ${1.1 * lookAheadDistance}")
-        println(s"path $biSegmentPath")
-        println(s"current position $currPosition")
-        getNonExtrapolatedLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
-      }
-    )
-  }
-
   def headingToPoint(start: Point, end: Point): Angle = {
       val diff = end - start
       Radians(Math.atan2(
@@ -118,7 +82,10 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       )
     }
 
-    val headingToTarget = position.zip(lookAheadPoint).map(p => headingToPoint(p._1, p._2))
+    val headingToTarget = position.zip(lookAheadPoint).map{p =>
+      headingToPoint(p._1, p._2)
+    }
+
     val trigHeadingToTarget = headingToTarget.map(h => trigonemtricToCompass(h))
     val compassHeadingToLookAhead = trigHeadingToTarget.map(h => limitToPlusMinus90(h))
 
@@ -164,16 +131,16 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     }
 
     secondLookAheadPoint.getOrElse(
-      firstLookAheadPoint.getOrElse {
-        println(s"expanding look ahead distance to ${1.1 * lookAheadDistance}")
-        getNonExtrapolatedLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
-      }
+      firstLookAheadPoint.getOrElse(
+        getExtrapolatedLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
+      )
     )
   }
 
   def followWayPointsController(wayPoints: Seq[Point],
                                 position: Stream[Point],
-                                turnPosition: Stream[Angle])
+                                turnPosition: Stream[Angle],
+                                steadyOutput: Dimensionless)
                                 (implicit hardware: DrivetrainHardware,
                                 props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
     var previousLookAheadPoint: Option[Point] = None
@@ -189,13 +156,15 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       )
     }
 
-    var currPath: (Segment, Option[Segment]) = biSegmentPaths.next()
 
-    val selectedPath = position.map{_ =>
-      if (currPath._2.isEmpty) {
-      } else if (previousLookAheadPoint.exists(p => currPath._2.get.containsInXY(p, Feet(0.1)))) {
+    var currPath = biSegmentPaths.next()
+
+    val selectedPath = position.map { _ =>
+      if (previousLookAheadPoint.exists{ p =>
+        currPath._2.exists(_.containsInXY(p, Feet(0.1)))
+      }) {
         if (biSegmentPaths.hasNext) {
-          println("**********advancing path ***********")
+          println("********** advancing path ***********")
           currPath = biSegmentPaths.next()
         }
       }
@@ -204,31 +173,36 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     }
 
     val (turnOutput, multiplier, lookAheadPoint) = purePursuitControllerTurn(turnPosition, position, selectedPath)
-    val historyUpdatingLookAheadPoint = lookAheadPoint.withCheck{p =>
+    val lookAheadHandle = lookAheadPoint.foreach{ p =>
       previousLookAheadPoint = Some(p)
     }
 
     val (forwardOutput, forwardError) = pointDistanceControl(
       position,
-      historyUpdatingLookAheadPoint)
-    val distanceToLast = position.map(_ distanceTo wayPoints.last)
+      selectedPath.map(p => p._2.getOrElse(p._1).end))
+    val distanceToLast = position.map{ pose =>
+      pose distanceTo wayPoints.last
+    }
+
+    val limitedForward = forwardOutput.map{ s =>
+      if ( !biSegmentPaths.hasNext ) {
+        s min steadyOutput
+      } else {
+        steadyOutput
+      }
+    }
 
     val errorToLast = distanceToLast.map { d =>
-      // error does not exist of we are not on our last segment
+      // error does not exist if we are not on our last segment
       if (!biSegmentPaths.hasNext) {
         Some(d)
       } else {
         None
       }
-//      (if (!biSegmentPaths.hasNext) {
-//        Some(d)
-//      } else {
-//        None
-//      }).flatten
     }
 
-    (forwardOutput.zip(turnOutput).zip(multiplier).zip(distanceToLast).zip(forwardError).map { o =>
-      val ((((forward, turn), fdMultiplier), _), frdError) = o
+    (limitedForward.zip(turnOutput).zip(multiplier).zip(lookAheadPoint).zip(forwardError).map { o =>
+      val ((((forward, turn), fdMultiplier), la), frdError) = o
       if (frdError > props.get.defaultLookAheadDistance / 2) {
         UnicycleSignal(forward * fdMultiplier, turn)
       } else {
