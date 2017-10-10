@@ -83,7 +83,6 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     }
 
     val headingToTarget = position.zip(lookAheadPoint).map{p =>
-      val seg = Segment(p._1, p._2)
       headingToPoint(p._1, p._2)
     }
 
@@ -181,7 +180,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
 
     val (forwardOutput, forwardError) = pointDistanceControl(
       position,
-      selectedPath.map(_._2.get.end))
+      selectedPath.map(p => p._2.getOrElse(p._1).end))
     val distanceToLast = position.map{ pose =>
       pose distanceTo wayPoints.last
     }
@@ -205,9 +204,6 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
 
     (limitedForward.zip(turnOutput).zip(multiplier).zip(lookAheadPoint).zip(forwardError).map { o =>
       val ((((forward, turn), fdMultiplier), la), frdError) = o
-
-      val hard = hardware
-
       if (frdError > props.get.defaultLookAheadDistance / 2) {
         UnicycleSignal(forward * fdMultiplier, turn)
       } else {

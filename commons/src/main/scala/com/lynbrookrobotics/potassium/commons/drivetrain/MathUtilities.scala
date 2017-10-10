@@ -53,37 +53,6 @@ object MathUtilities {
       Some(negativeSolution, positiveSolution)
     }
   }
-  /**
-    * Finds intersection between segment and circle with given center and radius
-    * lookAheadDistance that is closest to segment.end
-    * @param segment
-    * @param center
-    * @param radius
-    * @return
-    */
-  def intersectionClosestToEnd(segment: Segment,
-                               center: Point,
-                               radius: Length): Option[Point] = {
-    interSectionCircleLine(segment, center, radius).flatMap { case (negativeSolution, positiveSolution) =>
-      val negSolutionLengthToEnd = negativeSolution distanceTo segment.end
-      val posSolutionLengthToEnd = positiveSolution distanceTo segment.end
-
-      val solutionClosestToEnd = if (posSolutionLengthToEnd >= negSolutionLengthToEnd) {
-        negativeSolution
-      } else {
-        positiveSolution
-      }
-
-      // Intersection is found between the LINE formed by the start and end
-      // point of given segment. This means that the given solution might
-      // extend past end point of segment. In this case, just return the end
-      if (segment.containsInXY(solutionClosestToEnd, Feet(0.2))) {
-        Some(solutionClosestToEnd)
-      } else {
-        Some(segment.end)
-      }
-    }
-  }
 
   /**
     * This finds the point furthest from the start and if that point's angle formed with the start point is
@@ -118,6 +87,8 @@ object MathUtilities {
         }
         val tolerance = Radians(0.0001)
 
+        // Pick point such that look ahead point angle to end point is same as angle
+        // of segment, ensuring that we drive toward the correct direction
         if ((segment.angle - Segment(segment.start, furthestFromStart).angle).abs < tolerance ) {
           Some(furthestFromStart)
         } else if ( (segment.angle - Segment(segment.start, closerToStart).angle).abs < tolerance ) {

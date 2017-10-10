@@ -131,7 +131,7 @@ class PurePursuitTasksTest extends FunSuite {
     assert(lastAppliedSignal.turn.toPercent == 0, s"Turn was ${lastAppliedSignal.turn.toPercent} %")
 
     implicit val tolerance = Each(0.01)
-    assert(lastAppliedSignal.forward ~= Percent(100), s"actual forward ${lastAppliedSignal.forward.toPercent}%")
+    assert(lastAppliedSignal.forward ~= Percent(70), s"actual forward ${lastAppliedSignal.forward.toPercent}%")
   }
 
   test("Test that going left and back 1 foot does not result in full turn"){

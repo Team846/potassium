@@ -41,7 +41,6 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
 
       drive.setController(lowerLevelOpenLoop(unicycle.withCheckZipped(error) { e =>
         if (e.exists(_ < tolerance)) {
-          println("finished")
           finished()
         }
       }))
@@ -64,7 +63,6 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
 
       drive.setController(lowerLevelOpenLoop(unicycle.withCheckZipped(error) {e =>
         if (e.exists(_ < tolerance)) {
-          println("finished")
           finished()
         }
       }))
