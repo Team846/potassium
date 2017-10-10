@@ -29,9 +29,9 @@ abstract class Component[T](val period: Time) {
     * @param controller the new controller to use
     */
   def setController(controller: Stream[T]): Unit = {
-    //if (controller.expectedPeriodicity == NonPeriodic) {
-     // throw new IllegalArgumentException("Controller must be periodic")
-    //}
+    if (controller.expectedPeriodicity == NonPeriodic) {
+      throw new IllegalArgumentException("Controller must be periodic")
+    }
 
     currentControllerHandle.foreach(_.apply())
 
