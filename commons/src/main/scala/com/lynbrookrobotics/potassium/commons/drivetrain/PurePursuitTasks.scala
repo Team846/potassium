@@ -25,9 +25,11 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
     toClamp min maxMagnitude max -maxMagnitude
   }
 
-  class FollowWayPoints(wayPoints: Seq[Point], tolerance: Length)(drive: Drivetrain, steadyOutput: Dimensionless)
-                       (implicit properties: Signal[DrivetrainProperties],
-                        hardware: DrivetrainHardware) extends FiniteTask {
+  class FollowWayPoints(wayPoints: Seq[Point],
+                        tolerance: Length,
+                        steadyOutput: Dimensionless)
+                       (drive: Drivetrain)
+                       (properties: Signal[controllers.DrivetrainProperties], hardware: controllers.DrivetrainHardware) extends FiniteTask {
     override def onStart(): Unit = {
       val turnPosition = hardware.turnPosition.relativize(
         (initialTurnPosition, curr) => curr - initialTurnPosition)
@@ -54,8 +56,9 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
   class FollowWayPointsWithPosition(wayPoints: Seq[Point],
                                     tolerance: Length,
                                     position: Stream[Point],
-                                    turnPosition: Stream[Angle])
-                                   (drive: Drivetrain, steadyOutput: Dimensionless)
+                                    turnPosition: Stream[Angle],
+                                    steadyOutput: Dimensionless)
+                                   (drive: Drivetrain)
                                    (implicit properties: Signal[DrivetrainProperties],
                                     hardware: DrivetrainHardware) extends FiniteTask {
     override def onStart(): Unit = {
