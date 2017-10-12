@@ -412,18 +412,6 @@
                           ConstantSignal
                         </a>
                       </li><li class="current-entities indented3">
-                        <a class="object" href="PeriodicSignal$.html" title=""></a>
-                        <a class="class" href="PeriodicSignal.html" title="Represents a signal that requires a fixed update interval"></a>
-                        <a href="PeriodicSignal.html" title="Represents a signal that requires a fixed update interval">
-                          PeriodicSignal
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
-                        <a class="class" href="PeriodicSignalSignalLike.html" title=""></a>
-                        <a href="PeriodicSignalSignalLike.html" title="">
-                          PeriodicSignalSignalLike
-                        </a>
-                      </li><li class="current-entities indented3">
                         <span class="separator"></span>
                         <a class="object" href="Platform$.html" title=""></a>
                         <a href="Platform$.html" title="">
@@ -442,20 +430,6 @@ can be calculated on demand."></a>
                         <a href="Signal.html" title="Represents a continuous stream of values, where the current value
 can be calculated on demand.">
                           Signal
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <a class="object" href="SignalLike$.html" title=""></a>
-                        <a class="trait" href="SignalLike.html" title="Represents a general continuous or periodic signal, for transformations that do not require
-one of the types specifically."></a>
-                        <a href="SignalLike.html" title="Represents a general continuous or periodic signal, for transformations that do not require
-one of the types specifically.">
-                          SignalLike
-                        </a>
-                      </li><li class="current-entities indented3">
-                        <span class="separator"></span>
-                        <a class="class" href="SignalSignalLike.html" title=""></a>
-                        <a href="SignalSignalLike.html" title="">
-                          SignalSignalLike
                         </a>
                       </li>
               </ul>
@@ -560,45 +534,6 @@ is the place to implement safeties, as it is the last layer of signal transforma
       </span>
       
       
-    </li><li name="com.lynbrookrobotics.potassium.PeriodicSignal" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="PeriodicSignal[+T]extendsAnyRef"></a><a id="PeriodicSignal[+T]:PeriodicSignal[T]"></a>
-      <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/index.html#PeriodicSignal[+T]extendsAnyRef" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">abstract </span>
-        <span class="kind">class</span>
-      </span>
-      <span class="symbol">
-        <a title="Represents a signal that requires a fixed update interval" href="PeriodicSignal.html">
-              <span class="name">PeriodicSignal</span>
-            </a><span class="tparams">[<span name="T">+T</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Represents a signal that requires a fixed update interval</p><div class="fullcomment"><div class="comment cmt"><p>Represents a signal that requires a fixed update interval</p><p>This type of signal is used in cases where history must be tracked,
-as it prevents collisions between multiple value requests and includes
-a dt value for use in calculations.
-</p></div><dl class="paramcmts block"><dt class="tparam">T</dt><dd class="cmt"><p>the type of values the signal will produce</p></dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.PeriodicSignalSignalLike" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="PeriodicSignalSignalLike[T]extendsSignalLike[T]"></a><a id="PeriodicSignalSignalLike[T]:PeriodicSignalSignalLike[T]"></a>
-      <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/index.html#PeriodicSignalSignalLike[T]extendsSignalLike[T]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">class</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="PeriodicSignalSignalLike.html">
-              <span class="name">PeriodicSignalSignalLike</span>
-            </a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="SignalLike.html" class="extype" name="com.lynbrookrobotics.potassium.SignalLike">SignalLike</a>[<span class="extype" name="com.lynbrookrobotics.potassium.PeriodicSignalSignalLike.T">T</span>]</span>
-      </span>
-      
-      
     </li><li name="com.lynbrookrobotics.potassium.PureComponent" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
       <a id="PureComponent[T]extendsComponent[T]"></a><a id="PureComponent[T]:PureComponent[T]"></a>
       <span class="permalink">
@@ -639,46 +574,6 @@ can be calculated on demand." href="Signal.html">
 can be calculated on demand.</p><div class="fullcomment"><div class="comment cmt"><p>Represents a continuous stream of values, where the current value
 can be calculated on demand.
 </p></div><dl class="paramcmts block"><dt class="tparam">T</dt><dd class="cmt"><p>the type of value generated by the signal</p></dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.SignalLike" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
-      <a id="SignalLike[T]extendsAnyRef"></a><a id="SignalLike[T]:SignalLike[T]"></a>
-      <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/index.html#SignalLike[T]extendsAnyRef" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">trait</span>
-      </span>
-      <span class="symbol">
-        <a title="Represents a general continuous or periodic signal, for transformations that do not require
-one of the types specifically." href="SignalLike.html">
-              <span class="name">SignalLike</span>
-            </a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
-      </span>
-      
-      <p class="shortcomment cmt">Represents a general continuous or periodic signal, for transformations that do not require
-one of the types specifically.</p><div class="fullcomment"><div class="comment cmt"><p>Represents a general continuous or periodic signal, for transformations that do not require
-one of the types specifically.
-</p></div><dl class="paramcmts block"><dt class="tparam">T</dt><dd class="cmt"><p>the values from the signal</p></dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.SignalSignalLike" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="SignalSignalLike[T]extendsSignalLike[T]"></a><a id="SignalSignalLike[T]:SignalSignalLike[T]"></a>
-      <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/index.html#SignalSignalLike[T]extendsSignalLike[T]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">class</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="SignalSignalLike.html">
-              <span class="name">SignalSignalLike</span>
-            </a><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="SignalLike.html" class="extype" name="com.lynbrookrobotics.potassium.SignalLike">SignalLike</a>[<span class="extype" name="com.lynbrookrobotics.potassium.SignalSignalLike.T">T</span>]</span>
-      </span>
-      
-      
     </li></ol>
             </div>
 
@@ -701,24 +596,6 @@ one of the types specifically.
       <span class="symbol">
         <a title="" href="ClockMocking$.html">
               <span class="name">ClockMocking</span>
-            </a>
-      </span>
-      
-      
-    </li><li name="com.lynbrookrobotics.potassium.PeriodicSignal" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="PeriodicSignal"></a><a id="PeriodicSignal:PeriodicSignal"></a>
-      <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/index.html#PeriodicSignal" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">object</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="PeriodicSignal$.html">
-              <span class="name">PeriodicSignal</span>
             </a>
       </span>
       
@@ -755,24 +632,6 @@ one of the types specifically.
       <span class="symbol">
         <a title="" href="Signal$.html">
               <span class="name">Signal</span>
-            </a>
-      </span>
-      
-      
-    </li><li name="com.lynbrookrobotics.potassium.SignalLike" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="SignalLike"></a><a id="SignalLike:SignalLike"></a>
-      <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/index.html#SignalLike" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">object</span>
-      </span>
-      <span class="symbol">
-        <a title="" href="SignalLike$.html">
-              <span class="name">SignalLike</span>
             </a>
       </span>
       
