@@ -1,6 +1,5 @@
 package com.lynbrookrobotics.potassium.units
 
-import com.lynbrookrobotics.potassium.{PeriodicSignal, SignalLike}
 import squants.{Dimension, Quantity, UnitOfMeasure}
 import squants.time.{Seconds, Time, TimeDerivative, TimeIntegral}
 

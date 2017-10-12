@@ -1,8 +1,12 @@
 package com.lynbrookrobotics.potassium
 
 import org.scalatest.FunSuite
+
 import com.lynbrookrobotics.potassium.units.GenericValue._
-import squants.space.Radians
+import com.lynbrookrobotics.potassium.streams.Stream
+
+import squants.space.{Angle, Radians}
+import squants.motion.AngularVelocity
 import squants.Seconds
 
 class GenericValuesTest extends FunSuite {
@@ -18,19 +22,19 @@ class GenericValuesTest extends FunSuite {
     assert((genericValue / Seconds(2)).toString == "1.0 rad / s")
   }
 
-  test("Can compile integral of unit with no squants integral") {
+  test("Can compile integral of dimension with no squants integral") {
     assertCompiles(
       """
         |import com.lynbrookrobotics.potassium.units.GenericValue.toGenericValue
-        |val signal = Signal(squants.space.Degrees(0)).toPeriodic.integral
+        |val signal = Stream.manual[Angle]._1.integral
       """.stripMargin)
   }
 
-  test("Can compile integral of unit with squants integral") {
+  test("Can compile integral of dimension with squants integral") {
     assertCompiles(
       """
         |import com.lynbrookrobotics.potassium.units.GenericValue.toGenericValue
-        |val signal = Signal(squants.motion.DegreesPerSecond(0)).toPeriodic.integral
+        |val signal = Stream.manual[AngularVelocity]._1.integral
       """.stripMargin)
   }
 }
