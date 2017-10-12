@@ -3,6 +3,7 @@ package com.lynbrookrobotics.potassium.commons.cartesianPosition
 import com.lynbrookrobotics.potassium.units.Point
 import com.lynbrookrobotics.potassium.streams.Stream
 import squants.Angle
+import squants.motion.Velocity
 import squants.space._
 
 object XYPosition {
@@ -39,15 +40,14 @@ object XYPosition {
   /**
     * differentiates x and y position, then reintegrates with Simpsons integration
     * @param angle
-    * @param distanceTraveled
+    * @param velocity
     * @return
     */
   def positionWithSimpsons(angle: Stream[Angle],
-                           distanceTraveled: Stream[Length]): Stream[Point] = {
+                           velocity: Stream[Velocity]): Stream[Point] = {
     val averageAngle = angle.sliding(2).map(angles =>
       (angles.head + angles.last) / 2D)
 
-    val velocity = distanceTraveled.derivative
     val velocityX = velocity.zip(averageAngle).map{ case(speed, avrgAngle) =>
       avrgAngle.cos * speed
     }

@@ -29,7 +29,7 @@ class TestXYPosition extends FunSuite{
     val position = XYPosition(angle, distance)
     val simpsonsPosition = XYPosition.positionWithSimpsons(
       angle,
-      distance)
+      velocity)
 
     var lastPosition = unitializedPose
     var lastSimpsonPosition = unitializedPose
@@ -62,7 +62,7 @@ class TestXYPosition extends FunSuite{
     val position = XYPosition(angle, distance)
     val simpsonsPosition = XYPosition.positionWithSimpsons(
       angle,
-      distance)
+      velocity)
 
     var lastPose = unitializedPose
     var lastSimpsonsPose = unitializedPose
@@ -94,6 +94,8 @@ class TestXYPosition extends FunSuite{
       (angle - initialAngle) onRadius Feet(1)
     }
 
+    val velocity = distance.derivative
+
     val targetPosition = Point(
       Feet(-1),
       Feet(1))
@@ -101,7 +103,7 @@ class TestXYPosition extends FunSuite{
     val position = XYPosition(angle, distance)
     val simpsonsPosition = XYPosition.positionWithSimpsons(
       angle,
-      distance)
+      velocity)
 
     var lastPose = unitializedPose
     var lastSimpPose = unitializedPose
