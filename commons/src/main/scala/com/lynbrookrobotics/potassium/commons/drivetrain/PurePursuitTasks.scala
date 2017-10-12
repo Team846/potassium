@@ -29,7 +29,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                         tolerance: Length,
                         steadyOutput: Dimensionless)
                        (drive: Drivetrain)
-                       (properties: Signal[controllers.DrivetrainProperties], hardware: controllers.DrivetrainHardware) extends FiniteTask {
+                       (implicit properties: Signal[controllers.DrivetrainProperties], hardware: controllers.DrivetrainHardware) extends FiniteTask {
     override def onStart(): Unit = {
       val turnPosition = hardware.turnPosition.relativize(
         (initialTurnPosition, curr) => curr - initialTurnPosition)
