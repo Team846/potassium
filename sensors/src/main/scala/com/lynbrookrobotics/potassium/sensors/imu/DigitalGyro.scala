@@ -2,9 +2,8 @@ package com.lynbrookrobotics.potassium.sensors.imu
 
 import com.lynbrookrobotics.potassium.units.Value3D
 
-import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
 import squants.motion.{AngularVelocity, DegreesPerSecond}
-import squants.{Angle, Time}
+import squants.Time
 
 import scala.collection.mutable
 

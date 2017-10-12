@@ -4,7 +4,7 @@ import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.control.{PIDConfig, PIDFConfig}
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
-import com.lynbrookrobotics.potassium.{ClockMocking, PeriodicSignal, Signal, SignalLike}
+import com.lynbrookrobotics.potassium.{ClockMocking, Signal}
 import org.scalacheck.{Arbitrary, Gen}
 import squants.motion._
 import squants.space.{Degrees, Meters}

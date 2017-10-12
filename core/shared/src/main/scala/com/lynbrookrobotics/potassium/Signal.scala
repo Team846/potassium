@@ -45,17 +45,6 @@ abstract class Signal[+T] { self =>
   def filter(condition: T => Boolean)(implicit polling: ImpulseEvent): ContinuousEvent = {
     new ContinuousEvent(condition(get))
   }
-
-  /**
-    * Converts the signal to a periodic signal
-    * @return a periodic signal
-    */
-  def toPeriodic: PeriodicSignal[T] = new PeriodicSignal[T] {
-    val check = None
-    val parent = None
-
-    def calculateValue(dt: Time, token: Int): T = get
-  }
 }
 
 class ConstantSignal[T](v: T) extends Signal[T] {

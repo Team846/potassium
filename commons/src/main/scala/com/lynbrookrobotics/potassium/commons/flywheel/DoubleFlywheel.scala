@@ -1,9 +1,9 @@
 package com.lynbrookrobotics.potassium.commons.flywheel
 
-import com.lynbrookrobotics.potassium.{Component, PeriodicSignal, Signal}
+import com.lynbrookrobotics.potassium.{Component, Signal}
 import com.lynbrookrobotics.potassium.streams.Stream
-import com.lynbrookrobotics.potassium.control.{PIDConfig, PIDF, PIDFConfig}
-import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask, WrapperTask}
+import com.lynbrookrobotics.potassium.control.{PIDConfig, PIDF}
+import com.lynbrookrobotics.potassium.tasks.WrapperTask
 import com.lynbrookrobotics.potassium.units.{GenericDerivative, GenericValue, Ratio}
 import squants.{Dimensionless, Percent}
 import squants.time.Frequency

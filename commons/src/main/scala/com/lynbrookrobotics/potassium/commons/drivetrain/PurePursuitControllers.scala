@@ -2,7 +2,7 @@ package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
-import com.lynbrookrobotics.potassium.{PeriodicSignal, Signal}
+import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.streams.Stream
 
 import squants.{Angle, Dimensionless, Percent, Time}
