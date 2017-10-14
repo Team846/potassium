@@ -154,10 +154,13 @@ trait UnicycleCoreTasks {
   class DriveDistanceStraight(distance: Length,
                               toleranceForward: Length,
                               toleranceAngle: Angle,
-                              maxSpeed: Dimensionless)
+                              maxSpeed: Dimensionless,
+                              minStableTicks: Int = 10)
                              (drive: Drivetrain)
                              (implicit hardware: DrivetrainHardware,
                               props: Signal[DrivetrainProperties]) extends FiniteTask {
+    var stableTicks = 0
+
     override def onStart(): Unit = {
       val absoluteDistance = hardware.forwardPosition.currentValue.map(_ + distance)
       val (forwardController, forwardError) = forwardPositionControl(absoluteDistance)
@@ -175,7 +178,12 @@ trait UnicycleCoreTasks {
       val checkedController = combinedController.withCheckZipped(zippedError) {
         case  (forwardError, turnError) =>
           if (forwardError.abs < toleranceForward && turnError.abs < toleranceAngle) {
-            finished()
+            stableTicks += 1
+            if (stableTicks >= minStableTicks) {
+              finished()
+            }
+          } else {
+            stableTicks = 0
           }
       }
 
@@ -185,6 +193,7 @@ trait UnicycleCoreTasks {
     }
 
     override def onEnd(): Unit = {
+      stableTicks = 0
       drive.resetToDefault()
     }
   }
