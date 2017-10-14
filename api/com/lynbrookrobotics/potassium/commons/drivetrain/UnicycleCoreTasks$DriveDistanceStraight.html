@@ -338,9 +338,9 @@ TODO: finish adding docs">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleCoreTasks.DriveDistanceStraight#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(distance:squants.Length,toleranceForward:squants.Length,toleranceAngle:squants.Angle,maxSpeed:squants.Dimensionless)(drive:UnicycleCoreTasks.this.Drivetrain)(implicithardware:UnicycleCoreTasks.this.controllers.DrivetrainHardware,implicitprops:com.lynbrookrobotics.potassium.Signal[UnicycleCoreTasks.this.controllers.DrivetrainProperties]):UnicycleCoreTasks.this.DriveDistanceStraight"></a><a id="&lt;init&gt;:DriveDistanceStraight"></a>
+      <a id="&lt;init&gt;(distance:squants.Length,toleranceForward:squants.Length,toleranceAngle:squants.Angle,maxSpeed:squants.Dimensionless,minStableTicks:Int)(drive:UnicycleCoreTasks.this.Drivetrain)(implicithardware:UnicycleCoreTasks.this.controllers.DrivetrainHardware,implicitprops:com.lynbrookrobotics.potassium.Signal[UnicycleCoreTasks.this.controllers.DrivetrainProperties]):UnicycleCoreTasks.this.DriveDistanceStraight"></a><a id="&lt;init&gt;:DriveDistanceStraight"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/commons/drivetrain/UnicycleCoreTasks$DriveDistanceStraight.html#&lt;init&gt;(distance:squants.Length,toleranceForward:squants.Length,toleranceAngle:squants.Angle,maxSpeed:squants.Dimensionless)(drive:UnicycleCoreTasks.this.Drivetrain)(implicithardware:UnicycleCoreTasks.this.controllers.DrivetrainHardware,implicitprops:com.lynbrookrobotics.potassium.Signal[UnicycleCoreTasks.this.controllers.DrivetrainProperties]):UnicycleCoreTasks.this.DriveDistanceStraight" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/commons/drivetrain/UnicycleCoreTasks$DriveDistanceStraight.html#&lt;init&gt;(distance:squants.Length,toleranceForward:squants.Length,toleranceAngle:squants.Angle,maxSpeed:squants.Dimensionless,minStableTicks:Int)(drive:UnicycleCoreTasks.this.Drivetrain)(implicithardware:UnicycleCoreTasks.this.controllers.DrivetrainHardware,implicitprops:com.lynbrookrobotics.potassium.Signal[UnicycleCoreTasks.this.controllers.DrivetrainProperties]):UnicycleCoreTasks.this.DriveDistanceStraight" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -349,7 +349,7 @@ TODO: finish adding docs">
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">DriveDistanceStraight</span><span class="params">(<span name="distance">distance: <span class="extype" name="squants.Length">Length</span></span>, <span name="toleranceForward">toleranceForward: <span class="extype" name="squants.Length">Length</span></span>, <span name="toleranceAngle">toleranceAngle: <span class="extype" name="squants.Angle">Angle</span></span>, <span name="maxSpeed">maxSpeed: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>)</span><span class="params">(<span name="drive">drive: <a href="UnicycleCoreTasks.html#Drivetrain&lt;:com.lynbrookrobotics.potassium.Component[UnicycleCoreTasks.this.controllers.DriveSignal]" class="extmbr" name="com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleCoreTasks.Drivetrain">Drivetrain</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="hardware">hardware: (<a href="UnicycleCoreTasks.html#controllers:com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleCoreControllerswithcom.lynbrookrobotics.potassium.commons.drivetrain.UnicycleMotionProfileControllerswithcom.lynbrookrobotics.potassium.commons.drivetrain.PurePursuitControllers" class="extmbr" name="com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleCoreTasks#controllers">controllers</a>)#<span class="extype" name="com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleCoreControllers.DrivetrainHardware">DrivetrainHardware</span></span>, <span name="props">props: <a href="../../Signal.html" class="extype" name="com.lynbrookrobotics.potassium.Signal">Signal</a>[(<a href="UnicycleCoreTasks.html#controllers:com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleCoreControllerswithcom.lynbrookrobotics.potassium.commons.drivetrain.UnicycleMotionProfileControllerswithcom.lynbrookrobotics.potassium.commons.drivetrain.PurePursuitControllers" class="extmbr" name="com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleCoreTasks#controllers">controllers</a>)#<span class="extype" name="com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleCoreControllers.DrivetrainProperties">DrivetrainProperties</span>]</span>)</span>
+        <span class="name">DriveDistanceStraight</span><span class="params">(<span name="distance">distance: <span class="extype" name="squants.Length">Length</span></span>, <span name="toleranceForward">toleranceForward: <span class="extype" name="squants.Length">Length</span></span>, <span name="toleranceAngle">toleranceAngle: <span class="extype" name="squants.Angle">Angle</span></span>, <span name="maxSpeed">maxSpeed: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>, <span name="minStableTicks">minStableTicks: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">10</span></span>)</span><span class="params">(<span name="drive">drive: <a href="UnicycleCoreTasks.html#Drivetrain&lt;:com.lynbrookrobotics.potassium.Component[UnicycleCoreTasks.this.controllers.DriveSignal]" class="extmbr" name="com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleCoreTasks.Drivetrain">Drivetrain</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="hardware">hardware: (<a href="UnicycleCoreTasks.html#controllers:com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleCoreControllerswithcom.lynbrookrobotics.potassium.commons.drivetrain.UnicycleMotionProfileControllerswithcom.lynbrookrobotics.potassium.commons.drivetrain.PurePursuitControllers" class="extmbr" name="com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleCoreTasks#controllers">controllers</a>)#<span class="extype" name="com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleCoreControllers.DrivetrainHardware">DrivetrainHardware</span></span>, <span name="props">props: <a href="../../Signal.html" class="extype" name="com.lynbrookrobotics.potassium.Signal">Signal</a>[(<a href="UnicycleCoreTasks.html#controllers:com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleCoreControllerswithcom.lynbrookrobotics.potassium.commons.drivetrain.UnicycleMotionProfileControllerswithcom.lynbrookrobotics.potassium.commons.drivetrain.PurePursuitControllers" class="extmbr" name="com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleCoreTasks#controllers">controllers</a>)#<span class="extype" name="com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleCoreControllers.DrivetrainProperties">DrivetrainProperties</span>]</span>)</span>
       </span>
       
       
@@ -745,6 +745,22 @@ of FiniteTask when the task is complete.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleCoreTasks.DriveDistanceStraight">DriveDistanceStraight</a> → <a href="../../tasks/FiniteTask.html" class="extype" name="com.lynbrookrobotics.potassium.tasks.FiniteTask">FiniteTask</a></dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.commons.drivetrain.UnicycleCoreTasks.DriveDistanceStraight#stableTicks" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="stableTicks:Int"></a>
+      <span class="permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/commons/drivetrain/UnicycleCoreTasks$DriveDistanceStraight.html#stableTicks:Int" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">var</span>
+      </span>
+      <span class="symbol">
+        <span class="name">stableTicks</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
