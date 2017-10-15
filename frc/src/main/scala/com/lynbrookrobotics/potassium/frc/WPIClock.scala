@@ -15,7 +15,12 @@ object WPIClock extends Clock {
         running = true
         val currentTime = Microseconds(Utility.getFPGATime)
         lastTime.foreach { l =>
-          thunk(currentTime - l)
+          try {
+            thunk(currentTime - l)
+          } catch {
+            case e: Throwable =>
+              e.printStackTrace()
+          }
         }
 
         lastTime = Some(currentTime)
