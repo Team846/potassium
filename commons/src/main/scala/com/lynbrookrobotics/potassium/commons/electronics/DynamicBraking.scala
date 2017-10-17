@@ -12,7 +12,7 @@ object DynamicBraking {
     ".|||||.|||||",
     ".|||.|||.|||",
     ".||.||.||.||",
-    ".|.|.|.||.||",
+    ".|.|.||.|.||",
     ".|.|.|.|.|.|",
     "..|..|.|.|.|",
     "..|..|..|..|",
@@ -24,15 +24,17 @@ object DynamicBraking {
     .map(_.map(_ == '|'))
   private val ditherLength = brakingPatterns.map(_.length).min
 
-  def orBrake(max: ElectricPotential, free: AngularVelocity)
-             (tick: Int, target: ElectricPotential, current: AngularVelocity)
+  def dynamicBrakingOutput(max: ElectricPotential, free: AngularVelocity)
+                          (tick: Int, target: ElectricPotential, current: AngularVelocity)
   : Option[ElectricPotential] = {
-    val sp = target / max
-    val pv = current / free
-    if ((pv < 0) != (sp < 0)) Some((sp - pv) * max)
-    else if (0 <= sp.abs && sp.abs < pv.abs)
+    // normalized
+    val nTarget = target / max
+    val nSpeed = current / free
+
+    if ((nSpeed < 0) != (nTarget < 0)) Some((nTarget - nSpeed) * max)
+    else if (0 <= nTarget.abs && nTarget.abs < nSpeed.abs)
       if (brakingPatterns
-      (((sp.abs / pv.abs) * brakingPatterns.length).toInt)
+      (((nTarget.abs / nSpeed.abs) * brakingPatterns.length).toInt)
       (tick.abs % ditherLength)
       ) None
       else Some(Volts(0))
