@@ -1,44 +1,41 @@
 package com.lynbrookrobotics.potassium.commons.electronics
 
-import squants.QuantityRange
 import squants.electro.{ElectricPotential, Volts}
 import squants.motion.AngularVelocity
 
 object DynamicBraking {
-  private val ditherPatterns = List(
-    "............", // 0
-    "|...........", // 1
-    "|.....|.....", // 2
-    "|...|...|...", // 3
-    "|..|..|..|..", // 4
-    "|.|.|.|..|..", // 5
-    "|.|.|.|.|.|.", // 6
-    "||.||.|.|.|.", // 7
-    "||.||.||.||.", // 8
-    "|||.|||.|||.", // 9
-    "|||||.|||||.", // 10
-    "|||||||||||.", // 11
-    "||||||||||||" //  12
+  // | -> short
+  // . -> 0 volts
+  private val brakingPatterns = List(
+    "||||||||||||", // strongest braking
+    ".|||||||||||",
+    ".|||||.|||||",
+    ".|||.|||.|||",
+    ".||.||.||.||",
+    ".|.|.|.||.||",
+    ".|.|.|.|.|.|",
+    "..|..|.|.|.|",
+    "..|..|..|..|",
+    "...|...|...|",
+    ".....|.....|",
+    "...........|", // weakest braking
   )
     .map(_.toCharArray)
     .map(_.map(_ == '|'))
-  private val ditherLength = ditherPatterns.map(_.length).min
+  private val ditherLength = brakingPatterns.map(_.length).min
 
   def orBrake(max: ElectricPotential, free: AngularVelocity)
              (tick: Int, target: ElectricPotential, current: AngularVelocity)
   : Option[ElectricPotential] = {
     val sp = target / max
     val pv = current / free
-    if (QuantityRange(0, pv.abs) contains sp)
-      if (ditherPatterns
-      (((pv / sp) * ditherPatterns.length).toInt)
+    if ((pv < 0) != (sp < 0)) Some((sp - pv) * max)
+    else if (0 <= sp.abs && sp.abs < pv.abs)
+      if (brakingPatterns
+      (((sp.abs / pv.abs) * brakingPatterns.length).toInt)
       (tick.abs % ditherLength)
-      ) Some(Volts(0))
-      else None
-    else if (QuantityRange(
-      math.min(sp, pv),
-      math.max(sp, pv)
-    ) contains 0) Some((sp - pv) * max)
+      ) None
+      else Some(Volts(0))
     else Some(target)
   }
 }
