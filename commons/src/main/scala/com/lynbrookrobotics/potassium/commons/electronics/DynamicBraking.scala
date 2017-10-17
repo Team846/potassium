@@ -18,7 +18,7 @@ object DynamicBraking {
     "..|..|..|..|",
     "...|...|...|",
     ".....|.....|",
-    "...........|", // weakest braking
+    "...........|"  // weakest braking
   )
     .map(_.toCharArray)
     .map(_.map(_ == '|'))
