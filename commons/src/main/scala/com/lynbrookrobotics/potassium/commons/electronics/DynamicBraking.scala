@@ -34,7 +34,7 @@ object DynamicBraking {
     val nSpeed = current / free
 
     // checks for a change of direction
-    if ((nSpeed < 0) != (nTarget < 0)) Some((nTarget - nSpeed) * max)
+    if ((nSpeed < 0) != (nTarget < 0)) Some((nTarget + nSpeed) * max)
 
     // checks for deceleration
     else if (0 <= nTarget.abs && nTarget.abs < nSpeed.abs)
