@@ -12,10 +12,9 @@ import com.lynbrookrobotics.potassium.streams.{NonPeriodic, Stream}
   * command and send it to hardware interfaces. In addition, the applySignal method
   * is the place to implement safeties, as it is the last layer of signal transformation.
   *
-  * @param period the update rate of the component
   * @tparam T the type of values produced by signals for the component
   */
-abstract class Component[T](val period: Time) {
+abstract class Component[T] {
   def defaultController: Stream[T]
   private var currentControllerHandle: Option[() => Unit] = None
   setController(defaultController)

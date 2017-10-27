@@ -72,7 +72,7 @@ class PurePursuitTasksTest extends FunSuite {
   implicit val (clock, ticker) = ClockMocking.mockedClockTicker
   val drive = new TestDrivetrain
 
-  class TestDrivetrainComponent(onTick: UnicycleSignal => Unit) extends Component[UnicycleSignal](period) {
+  class TestDrivetrainComponent(onTick: UnicycleSignal => Unit) extends Component[UnicycleSignal]() {
     override def defaultController: Stream[UnicycleSignal] =
       Stream.periodic(period)(UnicycleSignal(Percent(0), Percent(0)))
 
