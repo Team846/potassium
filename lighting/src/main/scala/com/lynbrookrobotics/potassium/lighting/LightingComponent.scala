@@ -5,7 +5,7 @@ import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.Component
 import squants.time.Milliseconds
 
-class LightingComponent(numLEDs: Int, comm: TwoWayComm)(implicit clock: Clock) extends Component[Int](Milliseconds(20)) {
+class LightingComponent(numLEDs: Int, comm: TwoWayComm)(implicit clock: Clock) extends Component[Int]() {
 
   var debug = false
 
