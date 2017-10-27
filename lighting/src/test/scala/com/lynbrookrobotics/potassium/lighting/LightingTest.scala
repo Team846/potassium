@@ -18,7 +18,7 @@ class LightingTest extends FunSuite {
     }
 
     implicit val (mockedClock, trigger) = ClockMocking.mockedClockTicker
-    val dummyComponent = new LightingComponent(1, comm)(mockedClock)
+    val dummyComponent = new LightingComponent(1, comm, period)(mockedClock)
     val twoStream = Stream.periodic[Int](period)(2)
     val task = new DisplayLighting(twoStream, dummyComponent)
 
@@ -45,7 +45,7 @@ class LightingTest extends FunSuite {
       }
     }
     implicit val (mockedClock, trigger) = ClockMocking.mockedClockTicker
-    val dummyComponent = new LightingComponent(1, comm)(mockedClock)
+    val dummyComponent = new LightingComponent(1, comm, period)(mockedClock)
     val twoStream = Stream.periodic(period)(2)
     val task = new DisplayLighting(twoStream, dummyComponent)
 
