@@ -162,7 +162,7 @@ class UnicycleDriveTaskTest extends FunSuite {
 
     val drivetrain = new Component[UnicycleSignal]() {
       override def defaultController: Stream[UnicycleSignal] =
-        Stream.periodic(period)(UnicycleSignal(Percent(0), Percent(0)))
+        Stream.periodic(tickPeriod)(UnicycleSignal(Percent(0), Percent(0)))
 
       override def applySignal(signal: UnicycleSignal): Unit = {
         lastAppliedSignal = signal
@@ -258,7 +258,7 @@ class UnicycleDriveTaskTest extends FunSuite {
 
     val drivetrain = new Component[UnicycleSignal]() {
       override def defaultController: Stream[UnicycleSignal] =
-        Stream.periodic(period)(UnicycleSignal(Percent(0), Percent(0)))
+        Stream.periodic(tickPeriod)(UnicycleSignal(Percent(0), Percent(0)))
 
       override def applySignal(signal: UnicycleSignal): Unit = {
         lastAppliedSignal = signal
@@ -350,7 +350,7 @@ class UnicycleDriveTaskTest extends FunSuite {
 
     val drivetrain = new Component[UnicycleSignal]() {
       override def defaultController: Stream[UnicycleSignal] =
-        Stream.periodic(period)(UnicycleSignal(Percent(0), Percent(0)))
+        Stream.periodic(tickPeriod)(UnicycleSignal(Percent(0), Percent(0)))
 
       override def applySignal(signal: UnicycleSignal): Unit = {
         lastAppliedSignal = signal
