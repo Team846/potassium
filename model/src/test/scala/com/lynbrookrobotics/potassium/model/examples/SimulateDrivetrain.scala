@@ -53,13 +53,13 @@ object SimulateDrivetrain extends App {
   implicit val (clock, ticker) = mockedClockTicker
 
   val period = Milliseconds(10)
-  val drivetrainContainer = new TwoSidedDriveContainerSimulator(period)(clock)
+  val drivetrainContainer = new TwoSidedDriveContainerSimulator
   implicit val hardware = new drivetrainContainer.Hardware(
     Pounds(88) * MetersPerSecondSquared(1) / 2,
     Inches(21.75),
     Pounds(88),
     KilogramsMetersSquared(3.909),
-    drivetrainContainer.clock,
+    clock,
     period)
 
   val simulatedComponent = new drivetrainContainer.Drivetrain

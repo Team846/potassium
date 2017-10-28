@@ -16,7 +16,7 @@ object XYPosition {
     *              plane), where 0 is defined at the x axis. Used as the angle of the
     *              vector in vector addition
     * @param distanceTraveled the total distance/arclength traveled. Used as the
-    *                         magnitude of the vectore used in vector addition
+    *                         magnitude of the vector used in vector addition
     */
   def apply(angle: Stream[Angle],
             distanceTraveled: Stream[Length]): Stream[Point] = {
