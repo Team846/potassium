@@ -60,7 +60,7 @@ trait TwoSidedDriveProperties extends UnicycleProperties {
 /**
   * A drivetrain with two side control (such as a tank drive)
   */
-abstract class TwoSidedDrive(updatePeriod: Time)(implicit clock: Clock)
+abstract class TwoSidedDrive
   extends UnicycleDrive { self =>
   case class TwoSidedSignal(left: Dimensionless, right: Dimensionless)
   case class TwoSidedVelocity(left: Velocity, right: Velocity)
