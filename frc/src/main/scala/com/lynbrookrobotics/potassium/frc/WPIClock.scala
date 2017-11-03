@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.{Notifier, Utility}
 import squants.Time
 import squants.time.{Microseconds, Seconds}
 
-object WPIClock extends Clock {
+private[frc] class WPIClockShared(stopOnException: Boolean) extends Clock {
   override def apply(period: Time)(thunk: (Time) => Unit): Cancel = {
     var lastTime: Option[Time] = None
     var running = false
@@ -15,7 +15,16 @@ object WPIClock extends Clock {
         running = true
         val currentTime = Microseconds(Utility.getFPGATime)
         lastTime.foreach { l =>
-          thunk(currentTime - l)
+          if (stopOnException) {
+            thunk(currentTime - l)
+          } else {
+            try {
+              thunk(currentTime - l)
+            } catch {
+              case e: Throwable =>
+                e.printStackTrace()
+            }
+          }
         }
 
         lastTime = Some(currentTime)
@@ -38,3 +47,7 @@ object WPIClock extends Clock {
 
   override def currentTime: Time = Microseconds(Utility.getFPGATime)
 }
+
+object WPIClock extends WPIClockShared(stopOnException = false)
+
+object WPIClockFailFast extends WPIClockShared(stopOnException = true)
