@@ -130,7 +130,7 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
   val angleListening = listenTo(turnPosition)
 }
 
-class TwoSidedDriveContainerSimulator(period: Time)(val clock: Clock) extends TwoSidedDrive(period)(clock) { self =>
+class TwoSidedDriveContainerSimulator extends TwoSidedDrive { self =>
   override type Hardware = SimulatedTwoSidedHardware
   override type Properties = TwoSidedDriveProperties
 
@@ -152,7 +152,8 @@ class TwoSidedDriveContainerSimulator(period: Time)(val clock: Clock) extends Tw
     NoOperation
   }
 
-  class Drivetrain(implicit hardware: Hardware, props: Signal[Properties]) extends Component[TwoSidedSignal](period) {
+  class Drivetrain(implicit hardware: Hardware,
+                   props: Signal[Properties]) extends Component[TwoSidedSignal] {
     override def defaultController: Stream[TwoSidedSignal] = self.defaultController
 
     override def applySignal(signal: TwoSidedSignal): Unit = {
