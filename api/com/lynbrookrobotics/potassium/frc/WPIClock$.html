@@ -183,6 +183,12 @@ datasheet:https://acroname.com/articles/linearizing-sharp-ranger-data">
                         <a href="" title="">
                           WPIClock
                         </a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
+                        <a class="object" href="WPIClockFailFast$.html" title=""></a>
+                        <a href="WPIClockFailFast$.html" title="">
+                          WPIClockFailFast
+                        </a>
                       </li>
               </ul>
             </div>
@@ -206,7 +212,7 @@ datasheet:https://acroname.com/articles/linearizing-sharp-ranger-data">
         <span class="kind">object</span>
       </span>
       <span class="symbol">
-        <span class="name">WPIClock</span><span class="result"> extends <a href="../clock/Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a></span>
+        <span class="name">WPIClock</span><span class="result"> extends <span class="extype" name="com.lynbrookrobotics.potassium.frc.WPIClockShared">WPIClockShared</span></span>
       </span>
       </h4>
 
@@ -215,7 +221,7 @@ datasheet:https://acroname.com/articles/linearizing-sharp-ranger-data">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><a href="../clock/Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><span class="extype" name="com.lynbrookrobotics.potassium.frc.WPIClockShared">WPIClockShared</span>, <a href="../clock/Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -241,7 +247,7 @@ datasheet:https://acroname.com/articles/linearizing-sharp-ranger-data">
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.lynbrookrobotics.potassium.frc.WPIClock"><span>WPIClock</span></li><li class="in" name="com.lynbrookrobotics.potassium.clock.Clock"><span>Clock</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.lynbrookrobotics.potassium.frc.WPIClock"><span>WPIClock</span></li><li class="in" name="com.lynbrookrobotics.potassium.frc.WPIClockShared"><span>WPIClockShared</span></li><li class="in" name="com.lynbrookrobotics.potassium.clock.Clock"><span>Clock</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -335,10 +341,10 @@ datasheet:https://acroname.com/articles/linearizing-sharp-ranger-data">
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.frc.WPIClock#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="apply(period:squants.Time)(thunk:squants.Time=&gt;Unit):com.lynbrookrobotics.potassium.frc.WPIClock.Cancel"></a><a id="apply(Time)((Time)⇒Unit):Cancel"></a>
+    </li><li name="com.lynbrookrobotics.potassium.frc.WPIClockShared#apply" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="apply(period:squants.Time)(thunk:squants.Time=&gt;Unit):WPIClockShared.this.Cancel"></a><a id="apply(Time)((Time)⇒Unit):Cancel"></a>
       <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/frc/WPIClock$.html#apply(period:squants.Time)(thunk:squants.Time=&gt;Unit):com.lynbrookrobotics.potassium.frc.WPIClock.Cancel" title="Permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/frc/WPIClock$.html#apply(period:squants.Time)(thunk:squants.Time=&gt;Unit):WPIClockShared.this.Cancel" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -350,7 +356,7 @@ datasheet:https://acroname.com/articles/linearizing-sharp-ranger-data">
         <span class="name">apply</span><span class="params">(<span name="period">period: <span class="extype" name="squants.Time">Time</span></span>)</span><span class="params">(<span name="thunk">thunk: (<span class="extype" name="squants.Time">Time</span>) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span><span class="result">: <a href="#Cancel=()=&gt;Unit" class="extmbr" name="com.lynbrookrobotics.potassium.frc.WPIClock.Cancel">Cancel</a></span>
       </span>
       
-      <p class="shortcomment cmt">Schedules a periodic execution</p><div class="fullcomment"><div class="comment cmt"><p>Schedules a periodic execution</p></div><dl class="paramcmts block"><dt class="param">period</dt><dd class="cmt"><p>the period between executions</p></dd><dt class="param">thunk</dt><dd class="cmt"><p>the block of code to execute</p></dd><dt>returns</dt><dd class="cmt"><p>a function to cancel the execution</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.lynbrookrobotics.potassium.frc.WPIClock">WPIClock</a> → <a href="../clock/Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a></dd></dl></div>
+      <p class="shortcomment cmt">Schedules a periodic execution</p><div class="fullcomment"><div class="comment cmt"><p>Schedules a periodic execution</p></div><dl class="paramcmts block"><dt class="param">period</dt><dd class="cmt"><p>the period between executions</p></dd><dt class="param">thunk</dt><dd class="cmt"><p>the block of code to execute</p></dd><dt>returns</dt><dd class="cmt"><p>a function to cancel the execution</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd>WPIClockShared → <a href="../clock/Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
@@ -389,7 +395,7 @@ datasheet:https://acroname.com/articles/linearizing-sharp-ranger-data">
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.frc.WPIClock#currentTime" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.lynbrookrobotics.potassium.frc.WPIClockShared#currentTime" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="currentTime:squants.Time"></a><a id="currentTime:Time"></a>
       <span class="permalink">
       <a href="../../../../com/lynbrookrobotics/potassium/frc/WPIClock$.html#currentTime:squants.Time" title="Permalink">
@@ -404,7 +410,7 @@ datasheet:https://acroname.com/articles/linearizing-sharp-ranger-data">
         <span class="name">currentTime</span><span class="result">: <span class="extype" name="squants.Time">Time</span></span>
       </span>
       
-      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.lynbrookrobotics.potassium.frc.WPIClock">WPIClock</a> → <a href="../clock/Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a></dd></dl></div>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>WPIClockShared → <a href="../clock/Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a></dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -571,7 +577,7 @@ datasheet:https://acroname.com/articles/linearizing-sharp-ranger-data">
       </span>
       
       <p class="shortcomment cmt">Creates an impule event that fires at a fixed rate</p><div class="fullcomment"><div class="comment cmt"><p>Creates an impule event that fires at a fixed rate</p></div><dl class="paramcmts block"><dt class="param">period</dt><dd class="cmt"><p>the period to fire the event at</p></dd><dt>returns</dt><dd class="cmt"><p>an event that fires at the given rate</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../clock/Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a></dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.frc.WPIClock#singleExecution" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+    </li><li name="com.lynbrookrobotics.potassium.frc.WPIClockShared#singleExecution" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="singleExecution(delay:squants.Time)(thunk:=&gt;Unit):Unit"></a><a id="singleExecution(Time)(⇒Unit):Unit"></a>
       <span class="permalink">
       <a href="../../../../com/lynbrookrobotics/potassium/frc/WPIClock$.html#singleExecution(delay:squants.Time)(thunk:=&gt;Unit):Unit" title="Permalink">
@@ -586,7 +592,7 @@ datasheet:https://acroname.com/articles/linearizing-sharp-ranger-data">
         <span class="name">singleExecution</span><span class="params">(<span name="delay">delay: <span class="extype" name="squants.Time">Time</span></span>)</span><span class="params">(<span name="thunk">thunk: ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
-      <p class="shortcomment cmt">Schedules a single execution of a function</p><div class="fullcomment"><div class="comment cmt"><p>Schedules a single execution of a function</p></div><dl class="paramcmts block"><dt class="param">delay</dt><dd class="cmt"><p>the initial delay before running the function</p></dd><dt class="param">thunk</dt><dd class="cmt"><p>the function to execute after the delay</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.lynbrookrobotics.potassium.frc.WPIClock">WPIClock</a> → <a href="../clock/Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a></dd></dl></div>
+      <p class="shortcomment cmt">Schedules a single execution of a function</p><div class="fullcomment"><div class="comment cmt"><p>Schedules a single execution of a function</p></div><dl class="paramcmts block"><dt class="param">delay</dt><dd class="cmt"><p>the initial delay before running the function</p></dd><dt class="param">thunk</dt><dd class="cmt"><p>the function to execute after the delay</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd>WPIClockShared → <a href="../clock/Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
@@ -695,7 +701,9 @@ datasheet:https://acroname.com/articles/linearizing-sharp-ranger-data">
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="com.lynbrookrobotics.potassium.clock.Clock">
+        <div class="parent" name="com.lynbrookrobotics.potassium.frc.WPIClockShared">
+              <h3>Inherited from <span class="extype" name="com.lynbrookrobotics.potassium.frc.WPIClockShared">WPIClockShared</span></h3>
+            </div><div class="parent" name="com.lynbrookrobotics.potassium.clock.Clock">
               <h3>Inherited from <a href="../clock/Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a></h3>
             </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
