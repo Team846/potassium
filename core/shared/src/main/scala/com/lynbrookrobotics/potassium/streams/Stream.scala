@@ -13,8 +13,6 @@ import com.lynbrookrobotics.potassium.Platform
 import scala.annotation.unchecked.uncheckedVariance
 
 abstract class Stream[+T] { self =>
-  final type Value = T
-
   val expectedPeriodicity: ExpectedPeriodicity
 
   val originTimeStream: Option[Stream[Time]]
