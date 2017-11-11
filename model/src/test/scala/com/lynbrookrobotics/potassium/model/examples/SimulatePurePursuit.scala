@@ -26,7 +26,7 @@ class SimulatePurePursuit extends FunSuite {
   val period = Milliseconds(5)
 
   // TODO: Kunal pls arrange a meeting to fix this
-  val nestedBull = new TwoSidedDriveContainerSimulator
+  val container = new TwoSidedDriveContainerSimulator
 
   implicit val propsVal: TwoSidedDriveProperties = new TwoSidedDriveProperties {
     override val maxLeftVelocity: Velocity = FeetPerSecond(15)
@@ -75,9 +75,9 @@ class SimulatePurePursuit extends FunSuite {
       clock,
       period)
 
-    val drivetrain = new nestedBull.Drivetrain
+    val drivetrain = new container.Drivetrain
 
-    val task = new nestedBull.unicycleTasks.FollowWayPoints(
+    val task = new container.unicycleTasks.FollowWayPoints(
       wayPoints,
       Feet(0.5),
       Percent(30)
@@ -140,12 +140,35 @@ class SimulatePurePursuit extends FunSuite {
     )
   }
 
+  test("Reach destination with path from (0,0) to (-5, -5)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(-5), Feet(-5))),
+      Seconds(8)
+    )
+  }
+
+  test("Reach destination with path from (0,0) to (-15, -15)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(-15), Feet(-15))),
+      Seconds(24),
+      distanceTolerance = Feet(1)
+    )
+  }
+
   test("Reach destination with path from (0,0) to (5, 5)") {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(5), Feet(5))),
       Seconds(8)
     )
   }
+
+  test("Reach destination with path from (0,0) to (0, 5)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(0), Feet(5))),
+      Seconds(8)
+    )
+  }
+
 
   test("Reach destination with path from (0,0) to (0, -5)") {
     testPurePursuitReachesDestination(
