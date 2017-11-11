@@ -212,7 +212,7 @@ class PurePursuitControllerTests extends FunSuite {
 
     val target = Point(Feet(1), Feet(1))
     val position = hardware.turnPosition.mapToConstant(Point(Feet(2), Feet(2)))
-    val path: Stream[(Segment, Option[Segment])] = hardware.turnPosition.mapToConstant((Segment(origin, target), None))
+    val path = hardware.turnPosition.mapToConstant((Segment(origin, target), None))
 
     val output = controllers.purePursuitControllerTurn(
       hardware.turnPosition.mapToConstant(Degrees(45)),

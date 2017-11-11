@@ -12,6 +12,12 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Promise}
 
 class StreamTest extends FunSuite {
+  test("Streams can be used as a stream of a parent type of the original element type (covariance)") {
+    val origStream: Stream[None.type] = Stream.manual[None.type]._1
+
+    assertCompiles("origStream: Stream[Option[Int]]")
+  }
+
   test("Manually created stream runs callbacks appropriately") {
     val (str, pub) = Stream.manual[Int]
 
