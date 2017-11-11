@@ -41,10 +41,6 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       ))
   }
 
-  def trigonemtricToCompass(angle: Angle): Angle = {
-    Degrees(90) - angle
-  }
-
   /**
     * returns an angle limited from -180 to 180 equivalent to the input
     * @param degrees
@@ -73,8 +69,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                                (implicit props: Signal[DrivetrainProperties], hardware: DrivetrainHardware): (Stream[Dimensionless],
                                                                                    Stream[Double],
                                                                                    Stream[Point]) = {
-    val lookAheadPoint = position.zip(biSegmentPath).map{p =>
-      val (pose, path) = p
+    val lookAheadPoint = position.zip(biSegmentPath).map{ case (pose, path) =>
       getExtrapolatedLookAheadPoint(
         path,
         pose,
@@ -86,16 +81,16 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       headingToPoint(p._1, p._2)
     }
 
-    val trigHeadingToTarget = headingToTarget.map(h => trigonemtricToCompass(h))
+    val trigHeadingToTarget = headingToTarget.map(MathUtilities.trigonemtricToCompass)
     val compassHeadingToLookAhead = trigHeadingToTarget.map(h => limitToPlusMinus90(h))
 
     val forwardMultiplier = position.zip(lookAheadPoint).zip(biSegmentPath).map{p =>
       val ((pose, lookAhead), path) = p
-      val lastSegemnt = path._2.getOrElse(path._1)
+      val lastSegment = path._2.getOrElse(path._1)
 
-      if (lastSegemnt.onLine(lookAhead, Feet(0.1))) {
-        val angleToEndPoint = headingToPoint(pose, lastSegemnt.end)
-        if (angleToEndPoint.abs > Degrees(90)) {
+      if (lookAhead.onLine(lastSegment, Feet(0.1))) {
+        val angleToEndSegment = headingToPoint(pose, lastSegment.end) - lastSegment.angle
+        if (angleToEndSegment.abs > Degrees(90)) {
           -1D
         } else {
           1D
@@ -172,7 +167,10 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       currPath
     }
 
-    val (turnOutput, multiplier, lookAheadPoint) = purePursuitControllerTurn(turnPosition, position, selectedPath)
+    val (turnOutput, multiplier, lookAheadPoint) = purePursuitControllerTurn(
+      turnPosition,
+      position,
+      selectedPath)
     val lookAheadHandle = lookAheadPoint.foreach{ p =>
       previousLookAheadPoint = Some(p)
     }

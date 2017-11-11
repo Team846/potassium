@@ -1,8 +1,8 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
-import squants.{Dimensionless, Each, Percent}
-import squants.space.{Feet, Length, Radians}
+import squants.{Angle, Dimensionless, Each, Percent}
+import squants.space.{Degrees, Feet, Length, Radians}
 
 
 object MathUtilities {
@@ -99,19 +99,7 @@ object MathUtilities {
     }
   }
 
-  def limitCurrentOutput(input: Dimensionless, normalizedV: Dimensionless,
-                         forwardCurrentLimit: Dimensionless,
-                         backwardsCurrentLimit: Dimensionless): Dimensionless = {
-    if(normalizedV < Each(0)) {
-      -limitCurrentOutput(-input, -normalizedV, forwardCurrentLimit, backwardsCurrentLimit)
-    }
-    if(input > normalizedV){
-      input.min(normalizedV + forwardCurrentLimit)
-    } else if(input < Each(0)){
-      val limitedInput = Each(-backwardsCurrentLimit / (Each(1) + normalizedV))
-      limitedInput.max(input)
-    } else {
-      input
-    }
+  def trigonemtricToCompass(angle: Angle): Angle = {
+    Degrees(90) - angle
   }
 }

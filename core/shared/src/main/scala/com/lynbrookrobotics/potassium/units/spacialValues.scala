@@ -4,9 +4,8 @@ import squants.space._
 
 class Point(override val x: Length,
             override val y: Length,
-            override val z: Length) extends Value3D(x, y, z) {
+            override val z: Length = Feet(0)) extends Value3D(x, y, z) {
   def this(value3D: Value3D[Length]) = this(value3D.x, value3D.y, value3D.z)
-  def this(x: Length, y: Length) = this(x, y, Feet(0))
 
   def distanceTo(other: Point): Length = Segment(this, other).length
 
@@ -16,26 +15,36 @@ class Point(override val x: Length,
 
   def magnitude: Length = (x * x + y * y + z * z).squareRoot
 
-  def - (other: Point) = new Point(super.-(other))
-  def + (other: Point) = new Point(super.+(other))
-  override def * (scalar: Double) = new Point(super.*(scalar))
+  def -(other: Point): Point = new Point(super.-(other))
+  def +(other: Point): Point = new Point(super.+(other))
+  override def *(scalar: Double): Point = new Point(super.*(scalar))
 
   def ~=(other: Point)(implicit tolerance: Length): Boolean = {
     (other.x ~= this.x) &&
       (other.y ~= this.y) &&
       (other.z ~= this.z)
   }
+
+  def onLine(toTest: Segment, tolerance: Length): Boolean = {
+    implicit val implicitTolerance = tolerance
+
+    val xySlope = toTest.xySlope
+    if (xySlope != Double.NaN && math.abs(xySlope) != Double.PositiveInfinity) {
+      // Uses point slope form of line to determine if the line constructed from
+      // start and end contains the given point
+      ((y - toTest.start.y) - xySlope * (x - toTest.start.x)).abs <= tolerance
+    } else {
+      // If the segment is directly upwards, slope is Nan or Infinity
+      x ~= toTest.start.x
+    }
+  }
 }
 
 object Point {
   def origin: Point = new Point(Feet(0), Feet(0))
 
-  def apply(x: Length, y: Length, z: Length): Point = {
+  def apply(x: Length, y: Length, z: Length = Feet(0)): Point = {
     new Point(x, y, z)
-  }
-
-  def apply(x: Length, y: Length): Point = {
-    new Point(x, y)
   }
 
   def apply(v: Value3D[Length]): Point = {
@@ -51,19 +60,6 @@ case class Segment(start: Point, end: Point) {
   val dz = end.z - start.z
   val dy = end.y - start.y
   val dx = end.x - start.x
-
-  def onLine(toTest: Point, tolerance: Length): Boolean = {
-    implicit val implicitTolerance = tolerance
-
-    // Uses point slope form of line to determine if the line constructed from
-    // start and end contains the given point
-    if (xySlope != Double.NaN && Math.abs(xySlope) != Double.PositiveInfinity) {
-      ((toTest.y - start.y) - xySlope * (toTest.x - start.x)).abs <= tolerance
-    } else {
-      // If the segment is directly upwards, slope is Nan or Infinity
-      toTest.x ~= start.x
-    }
-  }
 
   def withInBoundries(toTest: Point): Boolean = {
     val minX = (start.x min end.x) - Feet(0.01)
@@ -83,7 +79,7 @@ case class Segment(start: Point, end: Point) {
     *         plane
     */
   def containsInXY(toTest: Point, tolerance: Length): Boolean = {
-    withInBoundries(toTest) && onLine(toTest, tolerance)
+    withInBoundries(toTest) && toTest.onLine(this, tolerance)
   }
 
   def angle: Angle = {

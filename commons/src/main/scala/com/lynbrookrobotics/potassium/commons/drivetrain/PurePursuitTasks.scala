@@ -9,6 +9,7 @@ import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import squants.space.{Angle, Degrees, Feet, Length}
 import squants.{Dimensionless, Each, Percent}
 
+
 trait PurePursuitTasks extends UnicycleCoreTasks {
   import controllers._
 

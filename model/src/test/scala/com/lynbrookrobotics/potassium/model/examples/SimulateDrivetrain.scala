@@ -23,7 +23,7 @@ object SimulateDrivetrain extends App {
 
     override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(16.5)
-    override val defaultLookAheadDistance: Length = Feet(3)
+    override val defaultLookAheadDistance: Length = Feet(1)
 
     override val turnControlGains = PIDConfig(
       Percent(100) / DegreesPerSecond(1),
@@ -64,9 +64,12 @@ object SimulateDrivetrain extends App {
 
   val simulatedComponent = new drivetrainContainer.Drivetrain
 
-  var itr = 0
+  var itr = 0l
   val log = new File(new java.io.File("simlog")).printWriter()
   val streamPrintingCancel = hardware.historyStream.foreach { e =>
+    if (itr == 0) {
+      log.println(s"Time\tx\ty\tvelocity\tangle")
+    }
     if (itr % 10 == 0) {
       log.println(s"${e.time.toSeconds}\t${e.position.x.toFeet}\t ${e.position.y.toFeet}\t${e.forwardVelocity.toFeetPerSecond}\t${e.angle.toDegrees}")
     }
@@ -74,8 +77,11 @@ object SimulateDrivetrain extends App {
     itr += 1
   }
 
+  val wayPoints = Seq(Point.origin, Point(Feet(-1), Feet(5)), Point(Feet(-5), Feet(10)))
+
   val task = new drivetrainContainer.unicycleTasks.FollowWayPoints(
-    Point.origin :: Point(Feet(0), Feet(5)) :: Point(Feet(5), Feet(10)) :: Nil, Inches(5), 
+    wayPoints,
+    Inches(5),
     Percent(70))(simulatedComponent)
 //  val task = new drivetrainContainer.unicycleTasks.RotateToAngle(
 //    Degrees(1e200),
