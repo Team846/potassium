@@ -99,7 +99,14 @@ object MathUtilities {
     }
   }
 
-  def trigonemtricToCompass(angle: Angle): Angle = {
-    Degrees(90) - angle
+  /**
+    * swapps a trigometric angle, as used in the mathematics
+    * (right is 0 degrees, increasing counter clockwise) to
+    * compass angle, forward is 0, increases clockwise, or vice versa
+    * @param trigonemtricAngle
+    * @return
+    */
+  def swapTrigonemtricAndCompass(trigonemtricAngle: Angle): Angle = {
+    Degrees(90) - trigonemtricAngle
   }
 }

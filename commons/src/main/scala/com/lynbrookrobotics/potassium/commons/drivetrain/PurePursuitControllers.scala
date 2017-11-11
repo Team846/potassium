@@ -81,16 +81,17 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       headingToPoint(p._1, p._2)
     }
 
-    val trigHeadingToTarget = headingToTarget.map(MathUtilities.trigonemtricToCompass)
+    val trigHeadingToTarget = headingToTarget.map(MathUtilities.swapTrigonemtricAndCompass)
     val compassHeadingToLookAhead = trigHeadingToTarget.map(h => limitToPlusMinus90(h))
 
-    val forwardMultiplier = position.zip(lookAheadPoint).zip(biSegmentPath).map{p =>
-      val ((pose, lookAhead), path) = p
+    val forwardMultiplier = position.zip(turnPosition).zip(lookAheadPoint).zip(biSegmentPath).map {p =>
+      val (((pose, currAngle), lookAhead), path) = p
       val lastSegment = path._2.getOrElse(path._1)
 
       if (lookAhead.onLine(lastSegment, Feet(0.1))) {
-        val angleToEndSegment = headingToPoint(pose, lastSegment.end) - lastSegment.angle
-        if (angleToEndSegment.abs > Degrees(90)) {
+        val currTrigAngle = MathUtilities.swapTrigonemtricAndCompass(currAngle)
+        val angleToEndSegment = headingToPoint(pose, lastSegment.end) - currTrigAngle
+        if (angleToEndSegment.abs >= Degrees(90)) {
           -1D
         } else {
           1D
