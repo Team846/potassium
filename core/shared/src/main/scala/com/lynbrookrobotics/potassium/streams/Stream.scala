@@ -9,18 +9,17 @@ import squants.time.{Time, TimeDerivative, TimeIntegral}
 import scala.collection.immutable.Queue
 import scala.ref.WeakReference
 import com.lynbrookrobotics.potassium.Platform
-import com.lynbrookrobotics.potassium.events.{ContinuousEvent, ImpulseEvent}
 
-abstract class Stream[T] { self =>
-  final type Value = T
+import scala.annotation.unchecked.uncheckedVariance
 
+abstract class Stream[+T] { self =>
   val expectedPeriodicity: ExpectedPeriodicity
 
   val originTimeStream: Option[Stream[Time]]
 
   private[this] var listeners = Vector.empty[T => Unit]
 
-  protected def publishValue(value: T): Unit = {
+  protected def publishValue(value: T @uncheckedVariance): Unit = {
     listeners.foreach(_.apply(value))
     // TODO: more stuff maybe
   }
