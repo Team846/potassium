@@ -6,7 +6,7 @@ import com.lynbrookrobotics.potassium.model.simulations.SimulatedTwoSidedHardwar
 import com.lynbrookrobotics.potassium.model.simulations.TwoSidedDriveContainerSimulator
 import com.lynbrookrobotics.potassium.commons.drivetrain.{MathUtilities, PurePursuitTasks, TwoSidedDriveProperties}
 import com.lynbrookrobotics.potassium.control.PIDConfig
-import com.lynbrookrobotics.potassium.model.examples.SimulateDrivetrain.log
+import squants.time.Minutes
 import com.lynbrookrobotics.potassium.units.Point
 import org.scalatest.FunSuite
 import squants.{Acceleration, Length, Percent, Time, Velocity}
@@ -66,7 +66,7 @@ class SimulatePurePursuit extends FunSuite {
                                         log: Boolean = false,
                                         distanceTolerance: Length = Feet(0.5),
                                         angleTolerance: Angle = Degrees(8)): Unit = {
-    implicit val (clock, triggerClocK) = mockedClockTicker
+    implicit val (clock, triggerClock) = mockedClockTicker
     implicit val hardware = new SimulatedTwoSidedHardware(
       Pounds(88) * MetersPerSecondSquared(1) / 2,
       Inches(21.75),
@@ -103,18 +103,11 @@ class SimulatePurePursuit extends FunSuite {
       }
     }
 
-    for (tick <- 1 to (timeOut / period).toInt) {
-      // TODO: This is a real issue we need to fix
-      // TODO: Basically we are ignoring the cases when
-      // TODO: the task finishes early. In reality, if
-      // TODO: we drift to a stop after the task ends
-      // TODO: that is a real problem
-
-      // TODO: Ok, why does this break things?
-      if (/*task.isRunning*/true) {
-        triggerClocK(period)
-      }
+    while (clock.currentTime <= timeOut && task.isRunning) {
+      triggerClock(period)
     }
+
+    println(s"Task finished in ${clock.currentTime}")
 
     implicit val implicitDistanceTolerance = distanceTolerance
     implicit val implicitAngleTolerance = angleTolerance
@@ -150,7 +143,7 @@ class SimulatePurePursuit extends FunSuite {
   test("Reach destination with path from (0,0) to (-15, -15)") {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(-15), Feet(-15))),
-      Seconds(24),
+      Seconds(20),
       distanceTolerance = Feet(1)
     )
   }
@@ -165,7 +158,7 @@ class SimulatePurePursuit extends FunSuite {
   test("Reach destination with path from (0,0) to (0, 5)") {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(0), Feet(5))),
-      Seconds(8)
+      Seconds(5)
     )
   }
 
@@ -173,7 +166,7 @@ class SimulatePurePursuit extends FunSuite {
   test("Reach destination with path from (0,0) to (0, -5)") {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(0), Feet(-5))),
-      Seconds(8)
+      Seconds(5)
     )
   }
 

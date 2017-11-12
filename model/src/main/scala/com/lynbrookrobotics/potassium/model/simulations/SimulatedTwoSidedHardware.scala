@@ -26,6 +26,10 @@ case class RobotVelocities(left: Velocity,
                            right: Velocity,
                            angular: AngularVelocity)
 
+object RobotVelocities {
+  def zero = RobotVelocities(MetersPerSecond(0), MetersPerSecond(0), RadiansPerSecond(0))
+}
+
 case class TwoSidedDriveForce(left: Force, right: Force)
 
 class SimulatedTwoSidedHardware(constantFriction: Force,
@@ -73,12 +77,10 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
     RobotVelocities(newLeftVelocity, newRightVelocity, newAngularVelocity)
   }
 
-  private val InitialSpeeds = RobotVelocities(MetersPerSecond(0), MetersPerSecond(0), RadiansPerSecond(0))
-
   private val twoSidedOutputs = leftForceOutput.zip(rightForceOutput).map(o =>
     TwoSidedDriveForce(o._1, o._2))
 
-  private val velocities = twoSidedOutputs.zipWithDt.scanLeft(InitialSpeeds) {
+  private val velocities = twoSidedOutputs.zipWithDt.scanLeft(RobotVelocities.zero) {
     case (accVelocities, (outputs, dt)) =>
       incrementVelocities(
         outputs.left,

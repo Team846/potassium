@@ -139,8 +139,6 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                                 steadyOutput: Dimensionless)
                                 (implicit hardware: DrivetrainHardware,
                                 props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
-    var previousLookAheadPoint: Option[Point] = None
-
     val biSegmentPaths = wayPoints.sliding(3).map { points =>
       (
         Segment(points(0), points(1)),
@@ -152,8 +150,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       )
     }
 
-
     var currPath = biSegmentPaths.next()
+    var previousLookAheadPoint: Option[Point] = None
 
     val selectedPath = position.map { _ =>
       if (previousLookAheadPoint.exists{ p =>
@@ -176,9 +174,10 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       previousLookAheadPoint = Some(p)
     }
 
-    val (forwardOutput, forwardError) = pointDistanceControl(
+    val forwardOutput = pointDistanceControl(
       position,
-      selectedPath.map(p => p._2.getOrElse(p._1).end))
+      selectedPath.map(p => p._2.getOrElse(p._1).end)
+    )._1
     val distanceToLast = position.map{ pose =>
       pose distanceTo wayPoints.last
     }
@@ -200,14 +199,12 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       }
     }
 
-    (limitedForward.zip(turnOutput).zip(multiplier).zip(lookAheadPoint).zip(forwardError).map { o =>
-      val ((((forward, turn), fdMultiplier), la), frdError) = o
-      if (frdError > props.get.defaultLookAheadDistance / 2) {
+    (
+      limitedForward.zip(turnOutput).zip(multiplier).map { case ((forward, turn), fdMultiplier) =>
         UnicycleSignal(forward * fdMultiplier, turn)
-      } else {
-        UnicycleSignal(forward * fdMultiplier, Percent(0))
-      }
-    }, errorToLast)
+      },
+      errorToLast
+    )
   }
 }
 
