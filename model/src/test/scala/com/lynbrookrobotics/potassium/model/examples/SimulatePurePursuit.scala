@@ -34,7 +34,7 @@ class SimulatePurePursuit extends FunSuite {
 
     override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(16.5)
-    override val defaultLookAheadDistance: Length = Feet(2)
+    override val defaultLookAheadDistance: Length = Feet(5)
 
     override val turnControlGains = PIDConfig(
       Percent(100) / DegreesPerSecond(1),
@@ -47,7 +47,7 @@ class SimulatePurePursuit extends FunSuite {
       Percent(0) / MetersPerSecond(1))
 
     override val turnPositionControlGains = PIDConfig(
-      Percent(5) / Degrees(1),
+      Percent(1) / Degrees(1),
       Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
       Percent(0) / DegreesPerSecond(1))
 
@@ -93,10 +93,10 @@ class SimulatePurePursuit extends FunSuite {
       var i = 0
       val handle = hardware.historyStream.foreach{ e =>
         if(i % 10 == 0) {
-          writer.println(s"${e.time.toSeconds}\t," +
-            s"${e.position.x.toFeet}\t," +
-            s"${e.position.y.toFeet}\t," +
-            s"${e.forwardVelocity.toFeetPerSecond}\t," +
+          writer.println(s"${e.time.toSeconds}\t" +
+            s"${e.position.x.toFeet}\t" +
+            s"${e.position.y.toFeet}\t" +
+            s"${e.forwardVelocity.toFeetPerSecond}\t" +
             s"${e.angle.toDegrees}")
         }
         i = i + 1
@@ -174,8 +174,7 @@ class SimulatePurePursuit extends FunSuite {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(0), Feet(5)), Point(Feet(5), Feet(10))),
       timeOut = Seconds(10),
-      distanceTolerance = Feet(1),
-      log = true
+      distanceTolerance = Feet(1)
     )
   }
 
