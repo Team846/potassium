@@ -1,12 +1,12 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
+import java.io.{File, PrintWriter}
+
 import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.streams.Stream
-
 import squants.{Angle, Dimensionless, Percent, Time}
-
 import squants.space.{Angle, _}
 
 trait PurePursuitControllers extends UnicycleCoreControllers {
@@ -65,7 +65,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     */
   def purePursuitControllerTurn(turnPosition: Stream[Angle],
                                 position: Stream[Point],
-                                biSegmentPath: Stream[(Segment, Option[Segment])])
+                                biSegmentPath: Stream[(Segment, Option[Segment])],
+                                maxTurnOutput: Dimensionless)
                                (implicit props: Signal[DrivetrainProperties], hardware: DrivetrainHardware): (Stream[Dimensionless],
                                                                                    Stream[Double],
                                                                                    Stream[Point]) = {
@@ -77,6 +78,11 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       )
     }
 
+    val logLa = new PrintWriter(new File("look ahead"))
+    logLa.println("x\ty")
+    lookAheadPoint.foreach{la =>
+      logLa.println(s"${la.x.toFeet}\t${la.y.toFeet}")
+    }
     val headingToTarget = position.zip(lookAheadPoint).map{p =>
       headingToPoint(p._1, p._2)
     }
@@ -100,16 +106,13 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
         1D
       }
     }
+    val limitedTurn = PIDF.pid(
+      turnPosition,
+      compassHeadingToLookAhead,
+      props.map(_.turnPositionControlGains)
+    ).map(MathUtilities.clamp(_, maxTurnOutput))
 
-    (
-      PIDF.pid(
-        turnPosition,
-        compassHeadingToLookAhead,
-        props.map(_.turnPositionControlGains)
-      ),
-      forwardMultiplier,
-      lookAheadPoint
-    )
+    (limitedTurn, forwardMultiplier, lookAheadPoint)
   }
 
 
@@ -136,7 +139,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
   def followWayPointsController(wayPoints: Seq[Point],
                                 position: Stream[Point],
                                 turnPosition: Stream[Angle],
-                                steadyOutput: Dimensionless)
+                                steadyOutput: Dimensionless,
+                                maxTurnOutput: Dimensionless)
                                 (implicit hardware: DrivetrainHardware,
                                 props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
     val biSegmentPaths = wayPoints.sliding(3).map { points =>
@@ -169,7 +173,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     val (turnOutput, multiplier, lookAheadPoint) = purePursuitControllerTurn(
       turnPosition,
       position,
-      selectedPath)
+      selectedPath,
+      maxTurnOutput)
     val lookAheadHandle = lookAheadPoint.foreach{ p =>
       previousLookAheadPoint = Some(p)
     }

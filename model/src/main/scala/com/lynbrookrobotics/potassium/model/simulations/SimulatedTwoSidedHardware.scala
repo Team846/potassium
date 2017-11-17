@@ -20,7 +20,9 @@ case class MomentInHistory(time: Time,
                            angle: Angle,
                            forwardVelocity: Velocity,
                            turnSpeed: AngularVelocity,
-                           position: Point)
+                           position: Point,
+                           leftOutput: Dimensionless,
+                           rightOutput: Dimensionless)
 
 case class RobotVelocities(left: Velocity,
                            right: Velocity,
@@ -127,18 +129,26 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
 
   val position = XYPosition(turnPosition.map(a => Degrees(90) - a), forwardPosition)
 
-  val zippedPositions = forwardPosition.zip(turnPosition).zip(position)
-  val zippedVelocities = forwardVelocity.zip(turnVelocity)
+  val zippedStuff: Stream[(((((((Length, Angle), Point), Velocity), AngularVelocity), Dimensionless), Dimensionless), Time)] = forwardPosition.zip(turnPosition)
+    .zip(position)
+    .zip(forwardVelocity)
+    .zip(turnVelocity)
+    .zip(leftMotor.outputStream)
+    .zip(rightMotor.outputStream)
+    .zipWithTime
 
-  val historyStream = zippedPositions.zip(zippedVelocities).zipWithTime.map {
-    case (((((fPos, tPos), pos)), (fVel, tVel)), time) =>
-      MomentInHistory(
-        time = time,
+  val historyStream = zippedStuff.map {
+    case (((((((fPos, tPos), pos), fVel), tVel), lm), rm), tme) => {
+      new MomentInHistory(
+        time = tme,
         forwardPosition = fPos,
         forwardVelocity = fVel,
         angle = tPos,
         position = pos,
-        turnSpeed = tVel)
+        turnSpeed = tVel,
+        leftOutput = lm,
+        rightOutput = lm)
+    }
   }
 
   val positionListening: () => Option[Point] = listenTo(position)

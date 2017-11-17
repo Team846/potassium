@@ -81,6 +81,7 @@ class PurePursuitTasksTest extends FunSuite {
     }
   }
 
+  val unlimitedTurnOutput = Percent(Double.MaxValue)
   test("If target is initally within tolerance, stop immediately") {
     var lastAppliedSignal = zeroSignal
     val drivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
@@ -94,7 +95,12 @@ class PurePursuitTasksTest extends FunSuite {
     }
 
     val target = new Point(Feet(0), Feet(0.5))
-    val task = new drive.unicycleTasks.FollowWayPoints(Seq(Point.origin, target), Feet(1), Percent(70))(drivetrainComp)
+    val task = new drive.unicycleTasks.FollowWayPoints(
+      Seq(Point.origin, target),
+      Feet(1),
+      Percent(70),
+      unlimitedTurnOutput
+    )(drivetrainComp)
 
     task.init()
 
@@ -120,7 +126,12 @@ class PurePursuitTasksTest extends FunSuite {
       override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(0))
     }
 
-    val task = new drive.unicycleTasks.FollowWayPoints(Seq(Point.origin, target), Feet(0.1), Percent(70))(testDrivetrainComp)
+    val task = new drive.unicycleTasks.FollowWayPoints(
+      Seq(Point.origin, target),
+      Feet(0.1),
+      Percent(70),
+      unlimitedTurnOutput
+    )(testDrivetrainComp)
 
     task.init()
 
@@ -159,7 +170,12 @@ class PurePursuitTasksTest extends FunSuite {
     }
 
     val target = new Point(Feet(-1), Feet(-1))
-    val task = new drive.unicycleTasks.FollowWayPoints(Seq(Point.origin, target), Feet(1), Percent(70))(drivetrainComp)
+    val task = new drive.unicycleTasks.FollowWayPoints(
+      Seq(Point.origin, target),
+      Feet(1),
+      Percent(70),
+      unlimitedTurnOutput
+    )(drivetrainComp)
 
     task.init()
     ticker(Milliseconds(5))
@@ -186,7 +202,13 @@ class PurePursuitTasksTest extends FunSuite {
       override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(0))
     }
 
-    val task = new drive.unicycleTasks.FollowWayPointsWithPosition(Seq(Point.origin, target), Feet(0.1), hardware.forwardPosition.mapToConstant(Point(Feet(0.001), Feet(0.999999))), hardware.turnPosition.mapToConstant(Degrees(0)), Percent(70))(testDrivetrainComp)
+    val task = new drive.unicycleTasks.FollowWayPointsWithPosition(
+      Seq(Point.origin, target),
+      Feet(0.1),
+      hardware.forwardPosition.mapToConstant(Point(Feet(0.001), Feet(0.999999))),
+      hardware.turnPosition.mapToConstant(Degrees(0)), Percent(70),
+      unlimitedTurnOutput
+    )(testDrivetrainComp)
 
     task.init()
 

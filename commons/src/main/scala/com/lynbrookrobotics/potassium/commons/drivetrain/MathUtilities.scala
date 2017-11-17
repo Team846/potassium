@@ -1,7 +1,7 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
-import squants.{Angle, Dimensionless, Each, Percent}
+import squants.{Angle, Dimensionless, Each, Percent, Quantity}
 import squants.space.{Degrees, Feet, Length, Radians}
 
 
@@ -40,12 +40,12 @@ object MathUtilities {
       val sqrtDiscrim = sqrt(discriminant)
       val signDy = if (dy < 0) -1D else 1D
 
-      val positiveSolution = new Point(
+      val positiveSolution = Point(
         Feet((det * dy + signDy * sqrtDiscrim * dx) / dr_squared + posX),
         Feet((-det * dx + abs(dy) * sqrtDiscrim) / dr_squared + posY)
       )
 
-      val negativeSolution = new Point(
+      val negativeSolution = Point(
         Feet((det * dy - signDy * sqrtDiscrim * dx) / dr_squared + posX),
         Feet((-det * dx - abs(dy) * sqrtDiscrim) / dr_squared + posY)
       )
@@ -71,7 +71,7 @@ object MathUtilities {
                                               center: Point,
                                               radius: Length): Option[Point] = {
     val solutions = interSectionCircleLine(segment, center, radius)
-    solutions.flatMap {case(positive, negative) =>
+    solutions.flatMap {case (positive, negative) =>
         val positiveDiffWithStart = segment.start distanceTo positive
         val negativeDiffWithStart = segment.start distanceTo negative
 
@@ -108,5 +108,13 @@ object MathUtilities {
     */
   def swapTrigonemtricAndCompass(trigonemtricAngle: Angle): Angle = {
     Degrees(90) - trigonemtricAngle
+  }
+
+  def clamp[T](toClamp: Dimensionless, max: Dimensionless): Dimensionless = {
+    if (toClamp > max) {
+      max
+    } else {
+      toClamp
+    }
   }
 }

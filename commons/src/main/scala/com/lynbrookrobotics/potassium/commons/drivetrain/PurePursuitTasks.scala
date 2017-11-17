@@ -28,7 +28,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
 
   class FollowWayPoints(wayPoints: Seq[Point],
                         tolerance: Length,
-                        steadyOutput: Dimensionless)
+                        steadyOutput: Dimensionless,
+                        maxTurnOutput: Dimensionless)
                        (drive: Drivetrain)
                        (implicit properties: Signal[controllers.DrivetrainProperties], hardware: controllers.DrivetrainHardware) extends FiniteTask {
     override def onStart(): Unit = {
@@ -40,7 +41,12 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         hardware.forwardPosition
       )
 
-      val (unicycle, error) = followWayPointsController(wayPoints, position, turnPosition, steadyOutput)
+      val (unicycle, error) = followWayPointsController(
+        wayPoints,
+        position,
+        turnPosition,
+        steadyOutput,
+        maxTurnOutput)
 
       drive.setController(lowerLevelOpenLoop(unicycle.withCheckZipped(error) { e =>
         if (e.exists(_ < tolerance)) {
@@ -58,12 +64,18 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                                     tolerance: Length,
                                     position: Stream[Point],
                                     turnPosition: Stream[Angle],
-                                    steadyOutput: Dimensionless)
+                                    steadyOutput: Dimensionless,
+                                    maxTurnOutput: Dimensionless)
                                    (drive: Drivetrain)
                                    (implicit properties: Signal[DrivetrainProperties],
                                     hardware: DrivetrainHardware) extends FiniteTask {
     override def onStart(): Unit = {
-      val (unicycle, error) = followWayPointsController(wayPoints, position, turnPosition, steadyOutput)
+      val (unicycle, error) = followWayPointsController(
+        wayPoints,
+        position,
+        turnPosition,
+        steadyOutput,
+        maxTurnOutput)
 
       drive.setController(lowerLevelOpenLoop(unicycle.withCheckZipped(error) {e =>
         if (e.exists(_ < tolerance)) {
