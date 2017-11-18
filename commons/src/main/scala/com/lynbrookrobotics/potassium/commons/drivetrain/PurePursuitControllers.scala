@@ -78,11 +78,6 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       )
     }
 
-    val logLa = new PrintWriter(new File("look ahead"))
-    logLa.println("x\ty")
-    lookAheadPoint.foreach{la =>
-      logLa.println(s"${la.x.toFeet}\t${la.y.toFeet}")
-    }
     val headingToTarget = position.zip(lookAheadPoint).map{p =>
       headingToPoint(p._1, p._2)
     }
@@ -96,8 +91,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
 
       if (lookAhead.onLine(lastSegment, Feet(0.1))) {
         val currTrigAngle = MathUtilities.swapTrigonemtricAndCompass(currAngle)
-        val angleToEndSegment = headingToPoint(pose, lastSegment.end) - currTrigAngle
-        if (angleToEndSegment.abs >= Degrees(90)) {
+        val angleErrorToLastWayPoint = headingToPoint(pose, lastSegment.end) - currTrigAngle
+        if (angleErrorToLastWayPoint.abs >= Degrees(90)) {
           -1D
         } else {
           1D

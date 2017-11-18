@@ -33,7 +33,7 @@ class SimulatePurePursuit extends FunSuite {
 
     override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(16.5)
-    override val defaultLookAheadDistance: Length = Feet(8)
+    override val defaultLookAheadDistance: Length = Feet(1)
 
     override val turnControlGains = PIDConfig(
       Percent(100) / DegreesPerSecond(1),
@@ -46,9 +46,9 @@ class SimulatePurePursuit extends FunSuite {
       Percent(0) / MetersPerSecond(1))
 
     override val turnPositionControlGains = PIDConfig(
-      Percent(1) / Degrees(1),
-      Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
-      Percent(0) / DegreesPerSecond(1))
+      kp = Percent(5) / Degrees(1),
+      ki = Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
+      kd = Percent(0.5) / DegreesPerSecond(1))
 
     override val leftControlGains = PIDConfig(
       Percent(100) / FeetPerSecond(1),
@@ -80,7 +80,7 @@ class SimulatePurePursuit extends FunSuite {
       wayPoints,
       Feet(0.5),
       Percent(30),
-      Percent(5)
+      Percent(30)
     )(drivetrain)
 
     task.init()
@@ -99,7 +99,8 @@ class SimulatePurePursuit extends FunSuite {
             s"${e.position.y.toFeet}\t" +
             s"${e.forwardVelocity.toFeetPerSecond}\t" +
             s"${e.angle.toDegrees}\t",
-            s"${e.turnSpeed.toDegreesPerSecond}")
+            s"${e.turnSpeed.toDegreesPerSecond}"
+          )
         }
         i = i + 1
       }
@@ -128,27 +129,27 @@ class SimulatePurePursuit extends FunSuite {
       s"\nLast angle was ${lastAngle.toDegrees}")
   }
 
-//  test("Reach destination with path from (0,0) to (-5, 5)") {
-//    testPurePursuitReachesDestination(
-//      Seq(Point.origin, Point(Feet(-5), Feet(5))),
-//      Seconds(8)
-//    )
-//  }
-//
-//  test("Reach destination with path from (0,0) to (-5, -5)") {
-//    testPurePursuitReachesDestination(
-//      Seq(Point.origin, Point(Feet(-5), Feet(-5))),
-//      Seconds(8)
-//    )
-//  }
-//
-//  test("Reach destination with path from (0,0) to (-15, -15)") {
-//    testPurePursuitReachesDestination(
-//      Seq(Point.origin, Point(Feet(-15), Feet(-15))),
-//      Seconds(20),
-//      distanceTolerance = Feet(1)
-//    )
-//  }
+  test("Reach destination with path from (0,0) to (-5, 5)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(-5), Feet(5))),
+      Seconds(8)
+    )
+  }
+
+  test("Reach destination with path from (0,0) to (-5, -5)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(-5), Feet(-5))),
+      Seconds(8)
+    )
+  }
+
+  test("Reach destination with path from (0,0) to (-15, -15)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(-15), Feet(-15))),
+      Seconds(20),
+      distanceTolerance = Feet(1)
+    )
+  }
 
   test("Reach destination with path from (0,0) to (5, 5)") {
     testPurePursuitReachesDestination(
@@ -158,34 +159,34 @@ class SimulatePurePursuit extends FunSuite {
     )
   }
 
-//  test("Reach destination with path from (0,0) to (0, 5)") {
-//    testPurePursuitReachesDestination(
-//      Seq(Point.origin, Point(Feet(0), Feet(5))),
-//      Seconds(5)
-//    )
-//  }
-//
-//
-//  test("Reach destination with path from (0,0) to (0, -5)") {
-//    testPurePursuitReachesDestination(
-//      Seq(Point.origin, Point(Feet(0), Feet(-5))),
-//      Seconds(5)
-//    )
-//  }
-//
-//  test("Reach destination with path from (0,0) to (0, 5) to (5, 10)") {
-//    testPurePursuitReachesDestination(
-//      Seq(Point.origin, Point(Feet(0), Feet(5)), Point(Feet(5), Feet(10))),
-//      timeOut = Seconds(10),
-//      distanceTolerance = Feet(1)
-//    )
-//  }
-//
-//  test("Reach destination with path from (0,0) to (0, 5) to (-5, 10)") {
-//    testPurePursuitReachesDestination(
-//      Seq(Point.origin, Point(Feet(0), Feet(5)), Point(Feet(-5), Feet(10))),
-//      Seconds(10),
-//      distanceTolerance = Feet(1)
-//    )
-//  }
+  test("Reach destination with path from (0,0) to (0, 5)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(0), Feet(5))),
+      Seconds(5)
+    )
+  }
+
+
+  test("Reach destination with path from (0,0) to (0, -5)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(0), Feet(-5))),
+      Seconds(5)
+    )
+  }
+
+  test("Reach destination with path from (0,0) to (0, 5) to (5, 10)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(0), Feet(5)), Point(Feet(5), Feet(10))),
+      timeOut = Seconds(10),
+      distanceTolerance = Feet(1)
+    )
+  }
+
+  test("Reach destination with path from (0,0) to (0, 5) to (-5, 10)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(0), Feet(5)), Point(Feet(-5), Feet(10))),
+      Seconds(10),
+      distanceTolerance = Feet(1)
+    )
+  }
 }
