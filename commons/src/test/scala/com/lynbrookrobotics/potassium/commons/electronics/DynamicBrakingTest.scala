@@ -128,4 +128,26 @@ class DynamicBrakingTest extends FunSuite with Checkers {
       DynamicBraking.dynamicBrakingOutput(targetStream, speedStream).map(_.isEmpty) // true when option is None (braking)
     } == patternToList("|.|.|.|."))
   }
+
+  test("End-to-end dynamic braking when accelerating from 50% to 100%") {
+    assert(evaluateStreamForList(
+      List.fill(8)((Percent(100), Percent(50)))
+    ) { stream =>
+      val targetStream = stream.map(_._1)
+      val speedStream = stream.map(_._2)
+
+      DynamicBraking.dynamicBrakingOutput(targetStream, speedStream)
+    } == List.fill(8)(Some(Percent(100))))
+  }
+
+  test("End-to-end dynamic braking when reversing direction from 50% to -25%") {
+    assert(evaluateStreamForList(
+      List.fill(8)((Percent(-25), Percent(50)))
+    ) { stream =>
+      val targetStream = stream.map(_._1)
+      val speedStream = stream.map(_._2)
+
+      DynamicBraking.dynamicBrakingOutput(targetStream, speedStream)
+    } == List.fill(8)(Some(Percent(-50))))
+  }
 }

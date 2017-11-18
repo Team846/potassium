@@ -3,24 +3,46 @@ package com.lynbrookrobotics.potassium.commons.electronics
 import com.lynbrookrobotics.potassium.streams.Stream
 import squants.{Dimensionless, Each, Percent}
 
-sealed trait DitherStatus
-case class NotBraking(outputPower: Dimensionless) extends DitherStatus
-case class ApplyBrakingPattern(brakingPower: Dimensionless) extends DitherStatus
+sealed trait DitherStatus {
+  def negate: DitherStatus
+}
+
+case class NotBraking(outputPower: Dimensionless) extends DitherStatus {
+  override def negate: DitherStatus = NotBraking(-outputPower)
+}
+
+case class ApplyBrakingPattern(brakingPower: Dimensionless) extends DitherStatus {
+  override def negate: DitherStatus = this
+}
 
 object DynamicBraking {
+  private def calculateBrakeAndDutyCycle(desired: Dimensionless, currentSpeed: Dimensionless): DitherStatus = {
+    if (currentSpeed < Percent(0)) {
+      calculateBrakeAndDutyCycle(-desired, -currentSpeed).negate
+    } else {
+      // speed >= 0 at this point
+      if (desired >= currentSpeed) { // going faster
+        NotBraking(desired)
+      } else { // slowing down
+        val error = desired - currentSpeed // error always <= 0
+
+        if (desired >= Percent(0)) { // braking is based on speed alone; reverse power unnecessary
+          if (currentSpeed > -error + Percent(5)) {
+            ApplyBrakingPattern(Each(-error / currentSpeed)) // speed always > 0
+          } else {
+            ApplyBrakingPattern(Percent(100))
+          }
+        } else { // input < 0, braking with reverse power
+          NotBraking(Each(error / (currentSpeed + Percent(100))))
+        }
+      }
+    }
+  }
+
   def dynamicBrakingOutput(targetPower: Stream[Dimensionless],
                            currentSpeed: Stream[Dimensionless]): Stream[Option[Dimensionless]] = {
     val ditherStatus: Stream[DitherStatus] = targetPower.zip(currentSpeed).map { case (target, speed) =>
-      if ((speed.toPercent < 0) != (target.toPercent < 0)) {
-        // change in direction
-        NotBraking(target + speed)
-      } else if (target.abs < speed.abs) {
-        // we are decelerating
-        ApplyBrakingPattern(Each(target.abs / speed.abs))
-      } else {
-        // we are accelerating
-        NotBraking(target)
-      }
+      calculateBrakeAndDutyCycle(target, speed)
     }
 
     val brakingPowers = ditherStatus.map {
