@@ -38,10 +38,10 @@ class DynamicBrakingTest extends FunSuite with Checkers {
 
   test("Dither pattern - 20%") {
     assert(evaluateStreamForList(
-      List.fill(8)(Percent(20))
+      List.fill(10)(Percent(20))
     ) { inputStream =>
       DynamicBraking.ditherPattern(inputStream)
-    } == patternToList("....|..."))
+    } == patternToList("|...|....|"))
   }
 
   test("Dither pattern - 25%") {
@@ -49,7 +49,7 @@ class DynamicBrakingTest extends FunSuite with Checkers {
       List.fill(8)(Percent(25))
     ) { inputStream =>
       DynamicBraking.ditherPattern(inputStream)
-    } == patternToList("...|...|"))
+    } == patternToList("|...|..."))
   }
 
   test("Dither pattern - 50%") {

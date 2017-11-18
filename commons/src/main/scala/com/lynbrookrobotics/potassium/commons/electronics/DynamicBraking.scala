@@ -61,33 +61,23 @@ object DynamicBraking {
     brakingPowers.scanLeft((false, 0D, 0D)) { case ((_, total, accum), requestedPower) =>
       // results in a tuple (output, newTotal, newAccum)
 
-      if (requestedPower >= Percent(100)) {
+      if (requestedPower >= Percent(99.9)) {
         // we want full brake, so just directly output instead of building up a large total
         (true, 0D, 0D)
-      } else if (requestedPower <= Percent(0)) {
+      } else if (requestedPower <= Percent(0.1)) {
         // we want full coast, so just directly output instead of building up a large total
         (false, 0D, 0D)
       } else {
         // combine the accumulated error (requested power vs actual brake percentage
         // with the braking percentage that would result from not braking next
-        val windowPattern = accum / (total + 1) + (total / (1 + total))
+        val windowPattern = (accum + total) / (1 + total)
 
-        // pattern for x% is the opposite of the pattern for (100 - x)%, so we only handle x >= 50% and
-        // invert the outputs and requested power otherwise
-        val (outputForCoast, requestedPowerAfterInvert) = if (requestedPower.toPercent >= 50) {
-          // when we overshoot that means we braked too much so we coast
-          (false, requestedPower)
-        } else {
-          // when we overshoot that means we did not brake often enough (since everything is inverted), so we brake
-          (true, Percent(100) - requestedPower) // now it's greater than 50
-        }
-
-        if (windowPattern >= requestedPowerAfterInvert.toEach) {
+        if (windowPattern >= requestedPower.toEach) {
           // reset if overshoot -- the braking percentage even with the next value being coast was too high
-          (outputForCoast, 0, (windowPattern - requestedPowerAfterInvert.toEach) * (total + 1))
+          (false, 0, (windowPattern - requestedPower.toEach) * (total + 1))
         } else {
           // if we did not overshoot yet, we continue to brake
-          (!outputForCoast, total + 1, accum)
+          (true, total + 1, accum)
         }
       }
     }.map(_._1)
