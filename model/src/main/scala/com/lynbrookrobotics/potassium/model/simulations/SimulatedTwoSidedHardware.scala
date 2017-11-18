@@ -1,28 +1,25 @@
 package com.lynbrookrobotics.potassium.model.simulations
 
-import com.lynbrookrobotics.potassium.{Component, Signal}
 import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
-import com.lynbrookrobotics.potassium.commons.drivetrain._
-import com.lynbrookrobotics.potassium.commons.drivetrain.TwoSidedDrive
+import com.lynbrookrobotics.potassium.commons.drivetrain.{TwoSidedDrive, _}
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.Point
+import com.lynbrookrobotics.potassium.{Component, Signal}
 import squants.mass.MomentOfInertia
-import squants.{Acceleration, Angle, Dimensionless, Length, Mass, Percent, Velocity}
 import squants.motion.{AngularVelocity, Force, _}
-import squants.space.{Degrees, Meters, Radians}
-import squants.time.{Seconds, Time}
+import squants.space.Degrees
+import squants.time.Time
+import squants.{Angle, Dimensionless, Length, Mass, Velocity}
 
-import scala.collection.mutable
-
-case class MomentInHistory(time: Time,
-                           forwardPosition: Length,
-                           angle: Angle,
-                           forwardVelocity: Velocity,
-                           turnSpeed: AngularVelocity,
-                           position: Point,
-                           leftOutput: Dimensionless,
-                           rightOutput: Dimensionless)
+case class RobotState(time: Time,
+                      forwardPosition: Length,
+                      angle: Angle,
+                      forwardVelocity: Velocity,
+                      turnSpeed: AngularVelocity,
+                      position: Point,
+                      leftOutput: Dimensionless,
+                      rightOutput: Dimensionless)
 
 case class RobotVelocities(left: Velocity,
                            right: Velocity,
@@ -129,7 +126,7 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
 
   val position = XYPosition(turnPosition.map(a => Degrees(90) - a), forwardPosition)
 
-  val zippedStuff = forwardPosition.zip(turnPosition)
+  val zippedStates = forwardPosition.zip(turnPosition)
     .zip(position)
     .zip(forwardVelocity)
     .zip(turnVelocity)
@@ -137,9 +134,9 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
     .zip(rightMotor.outputStream)
     .zipWithTime
 
-  val historyStream = zippedStuff.map {
-    case (((((((fPos, tPos), pos), fVel), tVel), lm), rm), tme) => {
-      new MomentInHistory(
+  val robotStateStream = zippedStates.map {
+    case (((((((fPos, tPos), pos), fVel), tVel), lm), rm), tme) =>
+      RobotState(
         time = tme,
         forwardPosition = fPos,
         forwardVelocity = fVel,
@@ -147,8 +144,7 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
         position = pos,
         turnSpeed = tVel,
         leftOutput = lm,
-        rightOutput = lm)
-    }
+        rightOutput = rm)
   }
 
   val positionListening: () => Option[Point] = listenTo(position)

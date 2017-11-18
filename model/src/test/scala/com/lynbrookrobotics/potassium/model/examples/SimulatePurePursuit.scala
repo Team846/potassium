@@ -91,7 +91,7 @@ class SimulatePurePursuit extends FunSuite {
       writer.println(s"Time\tx\ty\tvelocity\tangle\tturnSpeed")
 
       var i = 0
-      val handle = hardware.historyStream.foreach{ e =>
+      val handle = hardware.robotStateStream.foreach{ e =>
         if(i % 10 == 0) {
           writer.println(
             s"${e.time.toSeconds}\t" +

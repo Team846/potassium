@@ -66,7 +66,7 @@ object SimulateDrivetrain extends App {
 
   var itr = 0l
   val log = new File(new java.io.File("simlog")).printWriter()
-  val streamPrintingCancel = hardware.historyStream.foreach { e =>
+  val streamPrintingCancel = hardware.robotStateStream.foreach { e =>
     if (itr == 0) {
       log.println(s"Time\tx\ty\tvelocity\tangle")
     }
