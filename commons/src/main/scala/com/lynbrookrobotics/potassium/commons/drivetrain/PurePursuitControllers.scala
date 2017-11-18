@@ -1,7 +1,5 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
-import java.io.{File, PrintWriter}
-
 import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import com.lynbrookrobotics.potassium.Signal

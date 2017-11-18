@@ -129,7 +129,7 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
 
   val position = XYPosition(turnPosition.map(a => Degrees(90) - a), forwardPosition)
 
-  val zippedStuff: Stream[(((((((Length, Angle), Point), Velocity), AngularVelocity), Dimensionless), Dimensionless), Time)] = forwardPosition.zip(turnPosition)
+  val zippedStuff = forwardPosition.zip(turnPosition)
     .zip(position)
     .zip(forwardVelocity)
     .zip(turnVelocity)
