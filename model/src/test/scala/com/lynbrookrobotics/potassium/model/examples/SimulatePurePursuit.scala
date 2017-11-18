@@ -132,37 +132,35 @@ class SimulatePurePursuit extends FunSuite {
   test("Reach destination with path from (0,0) to (-5, 5)") {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(-5), Feet(5))),
-      Seconds(8)
+      timeOut = Seconds(8)
     )
   }
 
   test("Reach destination with path from (0,0) to (-5, -5)") {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(-5), Feet(-5))),
-      Seconds(8)
+      timeOut = Seconds(8)
     )
   }
 
   test("Reach destination with path from (0,0) to (-15, -15)") {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(-15), Feet(-15))),
-      Seconds(20),
-      distanceTolerance = Feet(1)
+      timeOut = Seconds(20)
     )
   }
 
   test("Reach destination with path from (0,0) to (5, 5)") {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(5), Feet(5))),
-      Seconds(8),
-      log = true
+      timeOut = Seconds(8)
     )
   }
 
   test("Reach destination with path from (0,0) to (0, 5)") {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(0), Feet(5))),
-      Seconds(5)
+      timeOut = Seconds(5)
     )
   }
 
@@ -170,23 +168,21 @@ class SimulatePurePursuit extends FunSuite {
   test("Reach destination with path from (0,0) to (0, -5)") {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(0), Feet(-5))),
-      Seconds(5)
+      timeOut = Seconds(5)
     )
   }
 
   test("Reach destination with path from (0,0) to (0, 5) to (5, 10)") {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(0), Feet(5)), Point(Feet(5), Feet(10))),
-      timeOut = Seconds(10),
-      distanceTolerance = Feet(1)
+      timeOut = Seconds(10)
     )
   }
 
   test("Reach destination with path from (0,0) to (0, 5) to (-5, 10)") {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(0), Feet(5)), Point(Feet(-5), Feet(10))),
-      Seconds(10),
-      distanceTolerance = Feet(1)
+      timeOut = Seconds(10)
     )
   }
 }
