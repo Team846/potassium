@@ -111,8 +111,8 @@ object MathUtilities {
   }
 
   def clamp[T](toClamp: Dimensionless, max: Dimensionless): Dimensionless = {
-    if (toClamp > max) {
-      max
+    if (toClamp.abs > max) {
+      toClamp.value.signum * max
     } else {
       toClamp
     }
