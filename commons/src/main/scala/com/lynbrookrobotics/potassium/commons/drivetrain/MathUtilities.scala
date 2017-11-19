@@ -1,8 +1,8 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
-import squants.{Dimensionless, Each, Percent}
-import squants.space.{Feet, Length, Radians}
+import squants.{Angle, Dimensionless, Each, Percent, Quantity}
+import squants.space.{Degrees, Feet, Length, Radians}
 
 
 object MathUtilities {
@@ -40,12 +40,12 @@ object MathUtilities {
       val sqrtDiscrim = sqrt(discriminant)
       val signDy = if (dy < 0) -1D else 1D
 
-      val positiveSolution = new Point(
+      val positiveSolution = Point(
         Feet((det * dy + signDy * sqrtDiscrim * dx) / dr_squared + posX),
         Feet((-det * dx + abs(dy) * sqrtDiscrim) / dr_squared + posY)
       )
 
-      val negativeSolution = new Point(
+      val negativeSolution = Point(
         Feet((det * dy - signDy * sqrtDiscrim * dx) / dr_squared + posX),
         Feet((-det * dx - abs(dy) * sqrtDiscrim) / dr_squared + posY)
       )
@@ -71,7 +71,7 @@ object MathUtilities {
                                               center: Point,
                                               radius: Length): Option[Point] = {
     val solutions = interSectionCircleLine(segment, center, radius)
-    solutions.flatMap {case(positive, negative) =>
+    solutions.flatMap {case (positive, negative) =>
         val positiveDiffWithStart = segment.start distanceTo positive
         val negativeDiffWithStart = segment.start distanceTo negative
 
@@ -99,19 +99,22 @@ object MathUtilities {
     }
   }
 
-  def limitCurrentOutput(input: Dimensionless, normalizedV: Dimensionless,
-                         forwardCurrentLimit: Dimensionless,
-                         backwardsCurrentLimit: Dimensionless): Dimensionless = {
-    if(normalizedV < Each(0)) {
-      -limitCurrentOutput(-input, -normalizedV, forwardCurrentLimit, backwardsCurrentLimit)
-    }
-    if(input > normalizedV){
-      input.min(normalizedV + forwardCurrentLimit)
-    } else if(input < Each(0)){
-      val limitedInput = Each(-backwardsCurrentLimit / (Each(1) + normalizedV))
-      limitedInput.max(input)
+  /**
+    * swapps a trigometric angle, as used in the mathematics
+    * (right is 0 degrees, increasing counter clockwise) to
+    * compass angle, forward is 0, increases clockwise, or vice versa
+    * @param trigonemtricAngle
+    * @return
+    */
+  def swapTrigonemtricAndCompass(trigonemtricAngle: Angle): Angle = {
+    Degrees(90) - trigonemtricAngle
+  }
+
+  def clamp[T](toClamp: Dimensionless, max: Dimensionless): Dimensionless = {
+    if (toClamp.abs > max) {
+      toClamp.value.signum * max
     } else {
-      input
+      toClamp
     }
   }
 }
