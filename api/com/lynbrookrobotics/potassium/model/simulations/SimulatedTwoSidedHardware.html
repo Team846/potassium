@@ -163,18 +163,18 @@
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.lynbrookrobotics.potassium.model">model</a></dd></dl></div>
     </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="MomentInHistory.html" title=""></a>
-                        <a href="MomentInHistory.html" title="">
-                          MomentInHistory
-                        </a>
-                      </li><li class="current-entities indented5">
-                        <span class="separator"></span>
                         <a class="object" href="PhysicsUtil$.html" title=""></a>
                         <a href="PhysicsUtil$.html" title="">
                           PhysicsUtil
                         </a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
+                        <a class="class" href="RobotState.html" title=""></a>
+                        <a href="RobotState.html" title="">
+                          RobotState
+                        </a>
+                      </li><li class="current-entities indented5">
+                        <a class="object" href="RobotVelocities$.html" title=""></a>
                         <a class="class" href="RobotVelocities.html" title=""></a>
                         <a href="RobotVelocities.html" title="">
                           RobotVelocities
@@ -527,26 +527,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.model.simulations.SimulatedTwoSidedHardware#historyStream" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="historyStream:com.lynbrookrobotics.potassium.streams.Stream[com.lynbrookrobotics.potassium.model.simulations.MomentInHistory]"></a><a id="historyStream:Stream[MomentInHistory]"></a>
-      <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/SimulatedTwoSidedHardware.html#historyStream:com.lynbrookrobotics.potassium.streams.Stream[com.lynbrookrobotics.potassium.model.simulations.MomentInHistory]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">historyStream</span><span class="result">: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<a href="MomentInHistory.html" class="extype" name="com.lynbrookrobotics.potassium.model.simulations.MomentInHistory">MomentInHistory</a>]</span>
-      </span>
-      
-      
     </li><li name="com.lynbrookrobotics.potassium.model.simulations.SimulatedTwoSidedHardware#incrementVelocities" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="incrementVelocities(leftInputForce:squants.motion.Force,rightInputForce:squants.motion.Force,leftVelocity:squants.Velocity,rightVelocity:squants.Velocity,angularVelocity:squants.motion.AngularVelocity,dt:squants.time.Time):com.lynbrookrobotics.potassium.model.simulations.RobotVelocities"></a><a id="incrementVelocities(Force,Force,Velocity,Velocity,AngularVelocity,Time):RobotVelocities"></a>
+      <a id="incrementVelocities(leftInputForce:squants.motion.Force,rightInputForce:squants.motion.Force,leftVelocity:squants.Velocity,rightVelocity:squants.Velocity,forwardVelocity:squants.Velocity,angularVelocity:squants.motion.AngularVelocity,dt:squants.time.Time):com.lynbrookrobotics.potassium.model.simulations.RobotVelocities"></a><a id="incrementVelocities(Force,Force,Velocity,Velocity,Velocity,AngularVelocity,Time):RobotVelocities"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/SimulatedTwoSidedHardware.html#incrementVelocities(leftInputForce:squants.motion.Force,rightInputForce:squants.motion.Force,leftVelocity:squants.Velocity,rightVelocity:squants.Velocity,angularVelocity:squants.motion.AngularVelocity,dt:squants.time.Time):com.lynbrookrobotics.potassium.model.simulations.RobotVelocities" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/SimulatedTwoSidedHardware.html#incrementVelocities(leftInputForce:squants.motion.Force,rightInputForce:squants.motion.Force,leftVelocity:squants.Velocity,rightVelocity:squants.Velocity,forwardVelocity:squants.Velocity,angularVelocity:squants.motion.AngularVelocity,dt:squants.time.Time):com.lynbrookrobotics.potassium.model.simulations.RobotVelocities" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -555,7 +539,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">incrementVelocities</span><span class="params">(<span name="leftInputForce">leftInputForce: <span class="extype" name="squants.motion.Force">Force</span></span>, <span name="rightInputForce">rightInputForce: <span class="extype" name="squants.motion.Force">Force</span></span>, <span name="leftVelocity">leftVelocity: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="rightVelocity">rightVelocity: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="angularVelocity">angularVelocity: <span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span></span>, <span name="dt">dt: <span class="extype" name="squants.time.Time">Time</span></span>)</span><span class="result">: <a href="RobotVelocities.html" class="extype" name="com.lynbrookrobotics.potassium.model.simulations.RobotVelocities">RobotVelocities</a></span>
+        <span class="name">incrementVelocities</span><span class="params">(<span name="leftInputForce">leftInputForce: <span class="extype" name="squants.motion.Force">Force</span></span>, <span name="rightInputForce">rightInputForce: <span class="extype" name="squants.motion.Force">Force</span></span>, <span name="leftVelocity">leftVelocity: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="rightVelocity">rightVelocity: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="forwardVelocity">forwardVelocity: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="angularVelocity">angularVelocity: <span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span></span>, <span name="dt">dt: <span class="extype" name="squants.time.Time">Time</span></span>)</span><span class="result">: <a href="RobotVelocities.html" class="extype" name="com.lynbrookrobotics.potassium.model.simulations.RobotVelocities">RobotVelocities</a></span>
       </span>
       
       
@@ -767,6 +751,22 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.lynbrookrobotics.potassium.model.simulations.SimulatedTwoSidedHardware">SimulatedTwoSidedHardware</a> → <a href="../../commons/drivetrain/TwoSidedDriveHardware.html" class="extype" name="com.lynbrookrobotics.potassium.commons.drivetrain.TwoSidedDriveHardware">TwoSidedDriveHardware</a></dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.model.simulations.SimulatedTwoSidedHardware#robotStateStream" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="robotStateStream:com.lynbrookrobotics.potassium.streams.Stream[com.lynbrookrobotics.potassium.model.simulations.RobotState]"></a><a id="robotStateStream:Stream[RobotState]"></a>
+      <span class="permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/SimulatedTwoSidedHardware.html#robotStateStream:com.lynbrookrobotics.potassium.streams.Stream[com.lynbrookrobotics.potassium.model.simulations.RobotState]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">robotStateStream</span><span class="result">: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<a href="RobotState.html" class="extype" name="com.lynbrookrobotics.potassium.model.simulations.RobotState">RobotState</a>]</span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
@@ -929,10 +929,10 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.model.simulations.SimulatedTwoSidedHardware#zippedPositions" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="zippedPositions:com.lynbrookrobotics.potassium.streams.Stream[((squants.Length,squants.Angle),com.lynbrookrobotics.potassium.units.Point)]"></a><a id="zippedPositions:Stream[((Length,Angle),Point)]"></a>
+    </li><li name="com.lynbrookrobotics.potassium.model.simulations.SimulatedTwoSidedHardware#zippedStates" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="zippedStates:com.lynbrookrobotics.potassium.streams.Stream[(((((((squants.Length,squants.Angle),com.lynbrookrobotics.potassium.units.Point),squants.Velocity),squants.motion.AngularVelocity),squants.Dimensionless),squants.Dimensionless),squants.time.Time)]"></a><a id="zippedStates:Stream[(((((((Length,Angle),Point),Velocity),AngularVelocity),Dimensionless),Dimensionless),Time)]"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/SimulatedTwoSidedHardware.html#zippedPositions:com.lynbrookrobotics.potassium.streams.Stream[((squants.Length,squants.Angle),com.lynbrookrobotics.potassium.units.Point)]" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/SimulatedTwoSidedHardware.html#zippedStates:com.lynbrookrobotics.potassium.streams.Stream[(((((((squants.Length,squants.Angle),com.lynbrookrobotics.potassium.units.Point),squants.Velocity),squants.motion.AngularVelocity),squants.Dimensionless),squants.Dimensionless),squants.time.Time)]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -941,7 +941,7 @@
         <span class="kind">val</span>
       </span>
       <span class="symbol">
-        <span class="name">zippedPositions</span><span class="result">: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[((<span class="extype" name="squants.Length">Length</span>, <span class="extype" name="squants.Angle">Angle</span>), <a href="../../units/Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a>)]</span>
+        <span class="name">zippedStates</span><span class="result">: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[(((((((<span class="extype" name="squants.Length">Length</span>, <span class="extype" name="squants.Angle">Angle</span>), <a href="../../units/Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a>), <span class="extype" name="squants.Velocity">Velocity</span>), <span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span>), <span class="extype" name="squants.Dimensionless">Dimensionless</span>), <span class="extype" name="squants.Dimensionless">Dimensionless</span>), <span class="extype" name="squants.time.Time">Time</span>)]</span>
       </span>
       
       

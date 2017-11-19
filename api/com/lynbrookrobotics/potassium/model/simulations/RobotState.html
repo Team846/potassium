@@ -163,18 +163,18 @@
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.lynbrookrobotics.potassium.model">model</a></dd></dl></div>
     </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="" title=""></a>
-                        <a href="" title="">
-                          MomentInHistory
-                        </a>
-                      </li><li class="current-entities indented5">
-                        <span class="separator"></span>
                         <a class="object" href="PhysicsUtil$.html" title=""></a>
                         <a href="PhysicsUtil$.html" title="">
                           PhysicsUtil
                         </a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
+                        <a class="class" href="" title=""></a>
+                        <a href="" title="">
+                          RobotState
+                        </a>
+                      </li><li class="current-entities indented5">
+                        <a class="object" href="RobotVelocities$.html" title=""></a>
                         <a class="class" href="RobotVelocities.html" title=""></a>
                         <a href="RobotVelocities.html" title="">
                           RobotVelocities
@@ -212,8 +212,8 @@
       <div id="definition">
         <div class="big-circle class">c</div>
         <p id="owner"><a href="../../../../index.html" class="extype" name="com">com</a>.<a href="../../../index.html" class="extype" name="com.lynbrookrobotics">lynbrookrobotics</a>.<a href="../../index.html" class="extype" name="com.lynbrookrobotics.potassium">potassium</a>.<a href="../index.html" class="extype" name="com.lynbrookrobotics.potassium.model">model</a>.<a href="index.html" class="extype" name="com.lynbrookrobotics.potassium.model.simulations">simulations</a></p>
-        <h1>MomentInHistory<span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html" title="Permalink">
+        <h1>RobotState<span class="permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -226,7 +226,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">MomentInHistory</span><span class="params">(<span name="time">time: <span class="extype" name="squants.time.Time">Time</span></span>, <span name="forwardPosition">forwardPosition: <span class="extype" name="squants.Length">Length</span></span>, <span name="angle">angle: <span class="extype" name="squants.Angle">Angle</span></span>, <span name="forwardVelocity">forwardVelocity: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="turnSpeed">turnSpeed: <span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span></span>, <span name="position">position: <a href="../../units/Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">RobotState</span><span class="params">(<span name="time">time: <span class="extype" name="squants.time.Time">Time</span></span>, <span name="forwardPosition">forwardPosition: <span class="extype" name="squants.Length">Length</span></span>, <span name="angle">angle: <span class="extype" name="squants.Angle">Angle</span></span>, <span name="forwardVelocity">forwardVelocity: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="turnSpeed">turnSpeed: <span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span></span>, <span name="position">position: <a href="../../units/Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a></span>, <span name="leftOutput">leftOutput: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>, <span name="rightOutput">rightOutput: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -261,7 +261,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.lynbrookrobotics.potassium.model.simulations.MomentInHistory"><span>MomentInHistory</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.lynbrookrobotics.potassium.model.simulations.RobotState"><span>RobotState</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -281,10 +281,10 @@
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="com.lynbrookrobotics.potassium.model.simulations.MomentInHistory#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(time:squants.time.Time,forwardPosition:squants.Length,angle:squants.Angle,forwardVelocity:squants.Velocity,turnSpeed:squants.motion.AngularVelocity,position:com.lynbrookrobotics.potassium.units.Point):com.lynbrookrobotics.potassium.model.simulations.MomentInHistory"></a><a id="&lt;init&gt;:MomentInHistory"></a>
+              <ol><li name="com.lynbrookrobotics.potassium.model.simulations.RobotState#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(time:squants.time.Time,forwardPosition:squants.Length,angle:squants.Angle,forwardVelocity:squants.Velocity,turnSpeed:squants.motion.AngularVelocity,position:com.lynbrookrobotics.potassium.units.Point,leftOutput:squants.Dimensionless,rightOutput:squants.Dimensionless):com.lynbrookrobotics.potassium.model.simulations.RobotState"></a><a id="&lt;init&gt;:RobotState"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#&lt;init&gt;(time:squants.time.Time,forwardPosition:squants.Length,angle:squants.Angle,forwardVelocity:squants.Velocity,turnSpeed:squants.motion.AngularVelocity,position:com.lynbrookrobotics.potassium.units.Point):com.lynbrookrobotics.potassium.model.simulations.MomentInHistory" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#&lt;init&gt;(time:squants.time.Time,forwardPosition:squants.Length,angle:squants.Angle,forwardVelocity:squants.Velocity,turnSpeed:squants.motion.AngularVelocity,position:com.lynbrookrobotics.potassium.units.Point,leftOutput:squants.Dimensionless,rightOutput:squants.Dimensionless):com.lynbrookrobotics.potassium.model.simulations.RobotState" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -293,7 +293,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">MomentInHistory</span><span class="params">(<span name="time">time: <span class="extype" name="squants.time.Time">Time</span></span>, <span name="forwardPosition">forwardPosition: <span class="extype" name="squants.Length">Length</span></span>, <span name="angle">angle: <span class="extype" name="squants.Angle">Angle</span></span>, <span name="forwardVelocity">forwardVelocity: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="turnSpeed">turnSpeed: <span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span></span>, <span name="position">position: <a href="../../units/Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a></span>)</span>
+        <span class="name">RobotState</span><span class="params">(<span name="time">time: <span class="extype" name="squants.time.Time">Time</span></span>, <span name="forwardPosition">forwardPosition: <span class="extype" name="squants.Length">Length</span></span>, <span name="angle">angle: <span class="extype" name="squants.Angle">Angle</span></span>, <span name="forwardVelocity">forwardVelocity: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="turnSpeed">turnSpeed: <span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span></span>, <span name="position">position: <a href="../../units/Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a></span>, <span name="leftOutput">leftOutput: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>, <span name="rightOutput">rightOutput: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>)</span>
       </span>
       
       
@@ -310,7 +310,7 @@
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -326,7 +326,7 @@
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html###():Int" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -342,7 +342,7 @@
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -355,10 +355,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.model.simulations.MomentInHistory#angle" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.lynbrookrobotics.potassium.model.simulations.RobotState#angle" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="angle:squants.Angle"></a><a id="angle:Angle"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#angle:squants.Angle" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#angle:squants.Angle" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -374,7 +374,7 @@
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -390,7 +390,7 @@
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#clone():Object" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -412,7 +412,7 @@
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -428,7 +428,7 @@
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#finalize():Unit" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -447,10 +447,10 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.model.simulations.MomentInHistory#forwardPosition" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.lynbrookrobotics.potassium.model.simulations.RobotState#forwardPosition" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="forwardPosition:squants.Length"></a><a id="forwardPosition:Length"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#forwardPosition:squants.Length" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#forwardPosition:squants.Length" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -463,10 +463,10 @@
       </span>
       
       
-    </li><li name="com.lynbrookrobotics.potassium.model.simulations.MomentInHistory#forwardVelocity" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.lynbrookrobotics.potassium.model.simulations.RobotState#forwardVelocity" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="forwardVelocity:squants.Velocity"></a><a id="forwardVelocity:Velocity"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#forwardVelocity:squants.Velocity" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#forwardVelocity:squants.Velocity" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -482,7 +482,7 @@
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -498,7 +498,7 @@
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -511,10 +511,26 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.model.simulations.RobotState#leftOutput" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="leftOutput:squants.Dimensionless"></a><a id="leftOutput:Dimensionless"></a>
+      <span class="permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#leftOutput:squants.Dimensionless" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">leftOutput</span><span class="result">: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -530,7 +546,7 @@
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#notify():Unit" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -546,7 +562,7 @@
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -559,10 +575,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.model.simulations.MomentInHistory#position" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.lynbrookrobotics.potassium.model.simulations.RobotState#position" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="position:com.lynbrookrobotics.potassium.units.Point"></a><a id="position:Point"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#position:com.lynbrookrobotics.potassium.units.Point" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#position:com.lynbrookrobotics.potassium.units.Point" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -575,10 +591,26 @@
       </span>
       
       
+    </li><li name="com.lynbrookrobotics.potassium.model.simulations.RobotState#rightOutput" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="rightOutput:squants.Dimensionless"></a><a id="rightOutput:Dimensionless"></a>
+      <span class="permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#rightOutput:squants.Dimensionless" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">rightOutput</span><span class="result">: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -591,10 +623,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.model.simulations.MomentInHistory#time" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.lynbrookrobotics.potassium.model.simulations.RobotState#time" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="time:squants.time.Time"></a><a id="time:Time"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#time:squants.time.Time" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#time:squants.time.Time" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -607,10 +639,10 @@
       </span>
       
       
-    </li><li name="com.lynbrookrobotics.potassium.model.simulations.MomentInHistory#turnSpeed" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.lynbrookrobotics.potassium.model.simulations.RobotState#turnSpeed" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="turnSpeed:squants.motion.AngularVelocity"></a><a id="turnSpeed:AngularVelocity"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#turnSpeed:squants.motion.AngularVelocity" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#turnSpeed:squants.motion.AngularVelocity" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -626,7 +658,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#wait():Unit" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -648,7 +680,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -670,7 +702,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/MomentInHistory.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotState.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>

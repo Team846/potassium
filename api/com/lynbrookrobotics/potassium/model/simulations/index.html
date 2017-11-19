@@ -161,18 +161,18 @@
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.lynbrookrobotics.potassium.model">model</a></dd></dl></div>
     </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="MomentInHistory.html" title=""></a>
-                        <a href="MomentInHistory.html" title="">
-                          MomentInHistory
-                        </a>
-                      </li><li class="current-entities indented5">
-                        <span class="separator"></span>
                         <a class="object" href="PhysicsUtil$.html" title=""></a>
                         <a href="PhysicsUtil$.html" title="">
                           PhysicsUtil
                         </a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
+                        <a class="class" href="RobotState.html" title=""></a>
+                        <a href="RobotState.html" title="">
+                          RobotState
+                        </a>
+                      </li><li class="current-entities indented5">
+                        <a class="object" href="RobotVelocities$.html" title=""></a>
                         <a class="class" href="RobotVelocities.html" title=""></a>
                         <a href="RobotVelocities.html" title="">
                           RobotVelocities
@@ -264,10 +264,10 @@
 
         <div id="types" class="types members">
               <h3>Type Members</h3>
-              <ol><li name="com.lynbrookrobotics.potassium.model.simulations.MomentInHistory" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="MomentInHistoryextendsProductwithSerializable"></a><a id="MomentInHistory:MomentInHistory"></a>
+              <ol><li name="com.lynbrookrobotics.potassium.model.simulations.RobotState" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RobotStateextendsProductwithSerializable"></a><a id="RobotState:RobotState"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/index.html#MomentInHistoryextendsProductwithSerializable" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/index.html#RobotStateextendsProductwithSerializable" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -276,9 +276,9 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <a title="" href="MomentInHistory.html">
-              <span class="name">MomentInHistory</span>
-            </a><span class="params">(<span name="time">time: <span class="extype" name="squants.time.Time">Time</span></span>, <span name="forwardPosition">forwardPosition: <span class="extype" name="squants.Length">Length</span></span>, <span name="angle">angle: <span class="extype" name="squants.Angle">Angle</span></span>, <span name="forwardVelocity">forwardVelocity: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="turnSpeed">turnSpeed: <span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span></span>, <span name="position">position: <a href="../../units/Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <a title="" href="RobotState.html">
+              <span class="name">RobotState</span>
+            </a><span class="params">(<span name="time">time: <span class="extype" name="squants.time.Time">Time</span></span>, <span name="forwardPosition">forwardPosition: <span class="extype" name="squants.Length">Length</span></span>, <span name="angle">angle: <span class="extype" name="squants.Angle">Angle</span></span>, <span name="forwardVelocity">forwardVelocity: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="turnSpeed">turnSpeed: <span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span></span>, <span name="position">position: <a href="../../units/Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a></span>, <span name="leftOutput">leftOutput: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>, <span name="rightOutput">rightOutput: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       
@@ -296,7 +296,7 @@
       <span class="symbol">
         <a title="" href="RobotVelocities.html">
               <span class="name">RobotVelocities</span>
-            </a><span class="params">(<span name="left">left: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="right">right: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="angular">angular: <span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+            </a><span class="params">(<span name="left">left: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="right">right: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="forward">forward: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="angular">angular: <span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       
@@ -395,6 +395,24 @@
         <a title="" href="PhysicsUtil$.html">
               <span class="name">PhysicsUtil</span>
             </a>
+      </span>
+      
+      
+    </li><li name="com.lynbrookrobotics.potassium.model.simulations.RobotVelocities" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RobotVelocities"></a><a id="RobotVelocities:RobotVelocities"></a>
+      <span class="permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/index.html#RobotVelocities" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="RobotVelocities$.html">
+              <span class="name">RobotVelocities</span>
+            </a><span class="result"> extends <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       
       

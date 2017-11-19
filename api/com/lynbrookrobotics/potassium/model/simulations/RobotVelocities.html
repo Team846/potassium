@@ -163,18 +163,18 @@
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.lynbrookrobotics.potassium.model">model</a></dd></dl></div>
     </li><li class="current-entities indented5">
                         <span class="separator"></span>
-                        <a class="class" href="MomentInHistory.html" title=""></a>
-                        <a href="MomentInHistory.html" title="">
-                          MomentInHistory
-                        </a>
-                      </li><li class="current-entities indented5">
-                        <span class="separator"></span>
                         <a class="object" href="PhysicsUtil$.html" title=""></a>
                         <a href="PhysicsUtil$.html" title="">
                           PhysicsUtil
                         </a>
                       </li><li class="current-entities indented5">
                         <span class="separator"></span>
+                        <a class="class" href="RobotState.html" title=""></a>
+                        <a href="RobotState.html" title="">
+                          RobotState
+                        </a>
+                      </li><li class="current-entities indented5">
+                        <a class="object" href="RobotVelocities$.html" title=""></a>
                         <a class="class" href="" title=""></a>
                         <a href="" title="">
                           RobotVelocities
@@ -210,14 +210,16 @@
           <div id="content">
             <body class="class type">
       <div id="definition">
-        <div class="big-circle class">c</div>
+        <a href="RobotVelocities$.html" title="See companion object"><div class="big-circle class-companion-object">c</div></a>
         <p id="owner"><a href="../../../../index.html" class="extype" name="com">com</a>.<a href="../../../index.html" class="extype" name="com.lynbrookrobotics">lynbrookrobotics</a>.<a href="../../index.html" class="extype" name="com.lynbrookrobotics.potassium">potassium</a>.<a href="../index.html" class="extype" name="com.lynbrookrobotics.potassium.model">model</a>.<a href="index.html" class="extype" name="com.lynbrookrobotics.potassium.model.simulations">simulations</a></p>
-        <h1>RobotVelocities<span class="permalink">
+        <h1><a href="RobotVelocities$.html" title="See companion object">RobotVelocities</a><span class="permalink">
       <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotVelocities.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
-        <h3><span class="morelinks"></span></h3>
+        <h3><span class="morelinks"><div>
+            Companion <a href="RobotVelocities$.html" title="See companion object">object RobotVelocities</a>
+          </div></span></h3>
       </div>
 
       <h4 id="signature" class="signature">
@@ -226,7 +228,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">RobotVelocities</span><span class="params">(<span name="left">left: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="right">right: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="angular">angular: <span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">RobotVelocities</span><span class="params">(<span name="left">left: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="right">right: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="forward">forward: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="angular">angular: <span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -282,9 +284,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.lynbrookrobotics.potassium.model.simulations.RobotVelocities#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(left:squants.Velocity,right:squants.Velocity,angular:squants.motion.AngularVelocity):com.lynbrookrobotics.potassium.model.simulations.RobotVelocities"></a><a id="&lt;init&gt;:RobotVelocities"></a>
+      <a id="&lt;init&gt;(left:squants.Velocity,right:squants.Velocity,forward:squants.Velocity,angular:squants.motion.AngularVelocity):com.lynbrookrobotics.potassium.model.simulations.RobotVelocities"></a><a id="&lt;init&gt;:RobotVelocities"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotVelocities.html#&lt;init&gt;(left:squants.Velocity,right:squants.Velocity,angular:squants.motion.AngularVelocity):com.lynbrookrobotics.potassium.model.simulations.RobotVelocities" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotVelocities.html#&lt;init&gt;(left:squants.Velocity,right:squants.Velocity,forward:squants.Velocity,angular:squants.motion.AngularVelocity):com.lynbrookrobotics.potassium.model.simulations.RobotVelocities" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -293,7 +295,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">RobotVelocities</span><span class="params">(<span name="left">left: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="right">right: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="angular">angular: <span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span></span>)</span>
+        <span class="name">RobotVelocities</span><span class="params">(<span name="left">left: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="right">right: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="forward">forward: <span class="extype" name="squants.Velocity">Velocity</span></span>, <span name="angular">angular: <span class="extype" name="squants.motion.AngularVelocity">AngularVelocity</span></span>)</span>
       </span>
       
       
@@ -447,6 +449,22 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.model.simulations.RobotVelocities#forward" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="forward:squants.Velocity"></a><a id="forward:Velocity"></a>
+      <span class="permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/model/simulations/RobotVelocities.html#forward:squants.Velocity" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">forward</span><span class="result">: <span class="extype" name="squants.Velocity">Velocity</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
