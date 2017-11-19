@@ -68,6 +68,7 @@ class PurePursuitControllerTests extends FunSuite {
   val period = Milliseconds(5)
   implicit val (clock, triggerClock) = ClockMocking.mockedClockTicker
 
+  val unlimitedTurnOutput = Percent(Double.MaxValue)
   test("Test if facing target while at start results in driving straight") {
     implicit val testDrivetrain = new TestDrivetrain
     implicit val hardware = new UnicycleHardware {
@@ -91,7 +92,8 @@ class PurePursuitControllerTests extends FunSuite {
     val output = controllers.purePursuitControllerTurn(
       hardware.turnPosition.mapToConstant(Degrees(0)),
       position,
-      path)._1
+      path,
+      unlimitedTurnOutput)._1
 
     var lastOutput = Percent(-10)
     output.foreach(lastOutput = _)
@@ -124,7 +126,8 @@ class PurePursuitControllerTests extends FunSuite {
     val output = controllers.purePursuitControllerTurn(
       hardware.turnPosition.mapToConstant(Degrees(0)),
       position,
-      path
+      path,
+      unlimitedTurnOutput
     )._1
 
     var out = Percent(-10)
@@ -187,7 +190,8 @@ class PurePursuitControllerTests extends FunSuite {
     val output = controllers.purePursuitControllerTurn(
       hardware.turnPosition.mapToConstant(Degrees(-85)),
       position,
-      path
+      path,
+      unlimitedTurnOutput
     )._1
 
     var out = Percent(-10)
@@ -217,7 +221,8 @@ class PurePursuitControllerTests extends FunSuite {
     val output = controllers.purePursuitControllerTurn(
       hardware.turnPosition.mapToConstant(Degrees(45)),
       position,
-      path
+      path,
+      unlimitedTurnOutput
     )._1
 
     var out = Percent(-10)

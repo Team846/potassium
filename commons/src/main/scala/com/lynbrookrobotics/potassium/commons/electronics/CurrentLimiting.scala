@@ -1,9 +1,8 @@
 package com.lynbrookrobotics.potassium.commons.electronics
 
 import com.lynbrookrobotics.potassium.streams.Stream
-import squants.{Dimensionless, Percent}
+import squants.{Dimensionless, Each, Percent, Time}
 import squants.time.{Milliseconds, TimeDerivative}
-import squants.Time
 
 object CurrentLimiting {
   def slewRate(input: Stream[Dimensionless],
@@ -22,6 +21,23 @@ object CurrentLimiting {
       } else {
         limit(acc, target, dt)
       }
+    }
+  }
+
+  def limitCurrentOutput(input: Dimensionless,
+                         normalizedV: Dimensionless,
+                         forwardCurrentLimit: Dimensionless,
+                         backwardsCurrentLimit: Dimensionless): Dimensionless = {
+    if(normalizedV < Each(0)) {
+      -limitCurrentOutput(-input, -normalizedV, forwardCurrentLimit, backwardsCurrentLimit)
+    }
+    if(input > normalizedV){
+      input.min(normalizedV + forwardCurrentLimit)
+    } else if(input < Each(0)){
+      val limitedInput = Each(-backwardsCurrentLimit / (Each(1) + normalizedV))
+      limitedInput.max(input)
+    } else {
+      input
     }
   }
 }

@@ -1,30 +1,38 @@
 package com.lynbrookrobotics.potassium.model.simulations
 
-import com.lynbrookrobotics.potassium.{Component, Signal}
 import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
-import com.lynbrookrobotics.potassium.commons.drivetrain._
-import com.lynbrookrobotics.potassium.commons.drivetrain.TwoSidedDrive
+import com.lynbrookrobotics.potassium.commons.drivetrain.{TwoSidedDrive, _}
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.Point
+import com.lynbrookrobotics.potassium.{Component, Signal}
 import squants.mass.MomentOfInertia
-import squants.{Acceleration, Angle, Dimensionless, Length, Mass, Percent, Velocity}
 import squants.motion.{AngularVelocity, Force, _}
-import squants.space.{Degrees, Meters, Radians}
-import squants.time.{Seconds, Time}
+import squants.space.Degrees
+import squants.time.Time
+import squants.{Angle, Dimensionless, Length, Mass, Velocity}
 
-import scala.collection.mutable
-
-case class MomentInHistory(time: Time,
-                           forwardPosition: Length,
-                           angle: Angle,
-                           forwardVelocity: Velocity,
-                           turnSpeed: AngularVelocity,
-                           position: Point)
+case class RobotState(time: Time,
+                      forwardPosition: Length,
+                      angle: Angle,
+                      forwardVelocity: Velocity,
+                      turnSpeed: AngularVelocity,
+                      position: Point,
+                      leftOutput: Dimensionless,
+                      rightOutput: Dimensionless)
 
 case class RobotVelocities(left: Velocity,
                            right: Velocity,
+                           forward: Velocity,
                            angular: AngularVelocity)
+
+object RobotVelocities {
+  def zero: RobotVelocities = RobotVelocities(
+    MetersPerSecond(0),
+    MetersPerSecond(0),
+    MetersPerSecond(0),
+    RadiansPerSecond(0))
+}
 
 case class TwoSidedDriveForce(left: Force, right: Force)
 
@@ -46,6 +54,7 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
                           rightInputForce: Force,
                           leftVelocity: Velocity,
                           rightVelocity: Velocity,
+                          forwardVelocity: Velocity,
                           angularVelocity: AngularVelocity,
                           dt: Time): RobotVelocities = {
     val leftFriction = PhysicsUtil.frictionAndEMF(leftVelocity, constantFriction, maxMotorForce)
@@ -54,12 +63,11 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
     val netRightForce = rightInputForce + rightFriction
 
     // Newton's second law for linear acceleration
-    val leftAccel = netLeftForce / mass
-    val rightAccel = netRightForce / mass
+    val netForce = netLeftForce + netRightForce
+    val acceleration = netForce / mass
 
-    // Euler's method to integrate
-    val newLeftVelocity = leftVelocity + leftAccel * dt
-    val newRightVelocity = rightVelocity + rightAccel  * dt
+    // Euler's method
+    val newForwardVelocity = forwardVelocity + acceleration * dt
 
     // radius from center, located halfway between wheels
     val radius = track / 2
@@ -70,21 +78,27 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
 
     val newAngularVelocity = angularVelocity + angularAcceleration * dt
 
-    RobotVelocities(newLeftVelocity, newRightVelocity, newAngularVelocity)
-  }
+    val newLeftVelocity = newForwardVelocity - (newAngularVelocity onRadius radius)
+    val newRightVelocity = newForwardVelocity + (newAngularVelocity onRadius radius)
 
-  private val InitialSpeeds = RobotVelocities(MetersPerSecond(0), MetersPerSecond(0), RadiansPerSecond(0))
+    RobotVelocities(
+      newLeftVelocity,
+      newRightVelocity,
+      newForwardVelocity,
+      newAngularVelocity)
+  }
 
   private val twoSidedOutputs = leftForceOutput.zip(rightForceOutput).map(o =>
     TwoSidedDriveForce(o._1, o._2))
 
-  private val velocities = twoSidedOutputs.zipWithDt.scanLeft(InitialSpeeds) {
+  private val velocities = twoSidedOutputs.zipWithDt.scanLeft(RobotVelocities.zero) {
     case (accVelocities, (outputs, dt)) =>
       incrementVelocities(
         outputs.left,
         outputs.right,
         accVelocities.left,
         accVelocities.right,
+        accVelocities.forward,
         accVelocities.angular,
         dt)
   }
@@ -102,7 +116,7 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
   override val leftVelocity = velocities.map(_.left)
   override val rightVelocity = velocities.map(_.right)
 
-  // convert triginometric velocity to compass velocity
+  // convert trigonometric velocity to compass velocity
   override lazy val turnVelocity = velocities.map(-1 * _.angular)
 
   override val leftPosition = leftVelocity.integral
@@ -112,22 +126,30 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
 
   val position = XYPosition(turnPosition.map(a => Degrees(90) - a), forwardPosition)
 
-  val zippedPositions = forwardPosition.zip(turnPosition).zip(position)
+  val zippedStates = forwardPosition.zip(turnPosition)
+    .zip(position)
+    .zip(forwardVelocity)
+    .zip(turnVelocity)
+    .zip(leftMotor.outputStream)
+    .zip(rightMotor.outputStream)
+    .zipWithTime
 
-  val historyStream = zippedPositions.zip(forwardVelocity).zip(turnVelocity).zipWithTime.map {
-    case (((((fPos, tPos), pos), fVel), tVel), time) =>
-      MomentInHistory(
-        time = time,
+  val robotStateStream = zippedStates.map {
+    case (((((((fPos, tPos), pos), fVel), tVel), lm), rm), tme) =>
+      RobotState(
+        time = tme,
         forwardPosition = fPos,
         forwardVelocity = fVel,
         angle = tPos,
         position = pos,
-        turnSpeed = tVel)
+        turnSpeed = tVel,
+        leftOutput = lm,
+        rightOutput = rm)
   }
 
-  val positionListening = listenTo(position)
-  val velocityListening = listenTo(forwardVelocity)
-  val angleListening = listenTo(turnPosition)
+  val positionListening: () => Option[Point] = listenTo(position)
+  val velocityListening: () => Option[Velocity] = listenTo(forwardVelocity)
+  val angleListening: () => Option[Angle] = listenTo(turnPosition)
 }
 
 class TwoSidedDriveContainerSimulator extends TwoSidedDrive { self =>
@@ -165,9 +187,6 @@ class TwoSidedDriveContainerSimulator extends TwoSidedDrive { self =>
 object PhysicsUtil {
   /**
     * motor back emf is proportional to speed
-    * @param velocity
-    * @param props
-    * @return
     */
   private def emfForce(velocity: Velocity, maxMotorForce: Force)
                       (implicit props: UnicycleProperties): Force = {
@@ -177,10 +196,6 @@ object PhysicsUtil {
 
   /**
     * friction accounting constant friction and motor back emf
-    * @param velocity
-    * @param constantFriction
-    * @param props
-    * @return
     */
   def frictionAndEMF(velocity: Velocity, constantFriction: Force, maxMotorForce: Force)
                     (implicit props: TwoSidedDriveProperties): Force = {
