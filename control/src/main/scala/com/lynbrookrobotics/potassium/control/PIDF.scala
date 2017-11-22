@@ -5,7 +5,6 @@ import com.lynbrookrobotics.potassium.streams._
 import com.lynbrookrobotics.potassium.units._
 import squants.Quantity
 import squants.time.{TimeDerivative, TimeIntegral}
-import sun.reflect.generics.reflectiveObjects.NotImplementedException
 
 case class PIDConfig[S <: Quantity[S],
                      SWithD <: Quantity[SWithD] with TimeIntegral[D],

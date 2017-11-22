@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
-import com.lynbrookrobotics.potassium.control.PIDConfig
+import com.lynbrookrobotics.potassium.control.{PIDConfig, TrapezoidalProfileConfig}
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.streams.{Periodic, Stream}
@@ -17,6 +17,8 @@ class PurePursuitControllerTests extends FunSuite {
     override val maxTurnVelocity: AngularVelocity = RadiansPerSecond(10)
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(15)
     override val defaultLookAheadDistance: Length = Feet(1)
+
+    override val trapezoidalProfileConfig: TrapezoidalProfileConfig[Velocity, Acceleration, Length] = null
 
     override val forwardControlGains = PIDConfig(
       Percent(0) / MetersPerSecond(1),
@@ -155,6 +157,8 @@ class PurePursuitControllerTests extends FunSuite {
       override val maxTurnVelocity: AngularVelocity = RadiansPerSecond(10)
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(15)
       override val defaultLookAheadDistance: Length = Feet(1)
+
+      override val trapezoidalProfileConfig: TrapezoidalProfileConfig[Velocity, Acceleration, Length] = null
 
       override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),

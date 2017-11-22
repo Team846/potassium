@@ -2,7 +2,8 @@ package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.Signal
-import squants.motion.AngularVelocity
+import com.lynbrookrobotics.potassium.control.TrapezoidalProfileConfig
+import squants.motion.{Acceleration, AngularVelocity, Distance, Velocity}
 import com.lynbrookrobotics.potassium.streams.Stream
 import squants.{Acceleration, Angle, Dimensionless, Each, Length, Percent, Velocity}
 
@@ -27,6 +28,8 @@ trait UnicycleProperties {
   val forwardPositionControlGains: ForwardPositionGains
 
   val turnPositionControlGains: TurnPositionGains
+
+  val trapezoidalProfileConfig: TrapezoidalProfileConfig[Velocity, Acceleration, Length]
 }
 
 trait UnicycleHardware {

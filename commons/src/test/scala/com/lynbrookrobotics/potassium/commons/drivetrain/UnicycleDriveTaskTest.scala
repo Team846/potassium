@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
-import com.lynbrookrobotics.potassium.control.PIDConfig
+import com.lynbrookrobotics.potassium.control.{PIDConfig, TrapezoidalProfileConfig}
 import com.lynbrookrobotics.potassium.ClockMocking
 import com.lynbrookrobotics.potassium.streams.{Periodic, Stream}
 import com.lynbrookrobotics.potassium.units.GenericValue._
@@ -56,6 +56,7 @@ class UnicycleDriveTaskTest extends FunSuite {
       override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(15)
       override val defaultLookAheadDistance: Length = null
+			override val trapezoidalProfileConfig: TrapezoidalProfileConfig[Velocity, Acceleration, Length] = null
 
       override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
@@ -132,6 +133,7 @@ class UnicycleDriveTaskTest extends FunSuite {
       override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
       override val defaultLookAheadDistance: Length = null
+			override val trapezoidalProfileConfig: TrapezoidalProfileConfig[Velocity, Acceleration, Length] = null
 
       override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
@@ -228,6 +230,7 @@ class UnicycleDriveTaskTest extends FunSuite {
       override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
       override val defaultLookAheadDistance: Length = null
+			override val trapezoidalProfileConfig: TrapezoidalProfileConfig[Velocity, Acceleration, Length] = null
 
       override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
@@ -324,6 +327,7 @@ class UnicycleDriveTaskTest extends FunSuite {
       override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
       override val defaultLookAheadDistance: Length = null
+			override val trapezoidalProfileConfig: TrapezoidalProfileConfig[Velocity, Acceleration, Length] = null
 
       override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),

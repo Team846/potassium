@@ -3,7 +3,7 @@ package com.lynbrookrobotics.potassium.commons.drivetrain
 import squants.space.Feet
 import squants.{Acceleration, Angle, Each, Length, Percent, Velocity}
 import com.lynbrookrobotics.potassium.streams.Stream
-import com.lynbrookrobotics.potassium.control.PIDConfig
+import com.lynbrookrobotics.potassium.control.{PIDConfig, TrapezoidalProfileConfig}
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium._
@@ -42,6 +42,8 @@ class PurePursuitTasksTest extends FunSuite {
     override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
     override val defaultLookAheadDistance: Length = Feet(0.5)
+
+    override val trapezoidalProfileConfig: TrapezoidalProfileConfig[Velocity, Acceleration, Length] = null
 
     override val forwardControlGains = PIDConfig(
       Percent(0) / MetersPerSecond(1),

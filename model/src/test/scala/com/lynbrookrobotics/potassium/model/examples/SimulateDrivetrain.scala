@@ -24,6 +24,7 @@ object SimulateDrivetrain extends App {
     override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(16.5)
     override val defaultLookAheadDistance: Length = Feet(1)
+    override val trapezoidalProfileConfig = null
 
     override val turnControlGains = PIDConfig(
       Percent(100) / DegreesPerSecond(1),

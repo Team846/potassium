@@ -1,7 +1,7 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.streams.Stream
-import com.lynbrookrobotics.potassium.control.{PIDConfig, PIDFConfig}
+import com.lynbrookrobotics.potassium.control.{PIDConfig, PIDFConfig, TrapezoidalProfileConfig}
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.{ClockMocking, Signal}
@@ -102,6 +102,8 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
       override val defaultLookAheadDistance: Length = null
 
+      override val trapezoidalProfileConfig: TrapezoidalProfileConfig[Velocity, Acceleration, Length] = null
+
       override val forwardControlGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
         Percent(0) / Meters(1),
@@ -147,6 +149,8 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxTurnVelocity: AngularVelocity = null
       override val maxAcceleration: Acceleration = null
       override val defaultLookAheadDistance: Length = null
+
+      override val trapezoidalProfileConfig: TrapezoidalProfileConfig[Velocity, Acceleration, Length] = null
 
       override val forwardControlGains = null
       override val turnControlGains = null
@@ -196,6 +200,8 @@ class UnicycleDriveControlTest extends FunSuite {
       override val forwardControlGains = null
       override val turnControlGains = null
 
+      override val trapezoidalProfileConfig: TrapezoidalProfileConfig[Velocity, Acceleration, Length] = null
+
       override val forwardPositionControlGains = PIDConfig(
         Percent(100) / Meters(10),
         Percent(0) / (Meters(1).toGeneric * Seconds(1)),
@@ -237,6 +243,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxTurnVelocity: AngularVelocity = null
       override val maxAcceleration: Acceleration = null
       override val defaultLookAheadDistance: Length = null
+			override val trapezoidalProfileConfig: TrapezoidalProfileConfig[Velocity, Acceleration, Length] = null
 
       override val forwardControlGains = null
       override val turnControlGains = null
@@ -282,6 +289,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxTurnVelocity: AngularVelocity = null
       override val maxAcceleration: Acceleration = null
       override val defaultLookAheadDistance: Length = null
+			override val trapezoidalProfileConfig: TrapezoidalProfileConfig[Velocity, Acceleration, Length] = null
 
       override val forwardControlGains = null
       override val turnControlGains = null
@@ -327,6 +335,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxTurnVelocity: AngularVelocity = null
       override val maxAcceleration: Acceleration = null
       override val defaultLookAheadDistance: Length = null
+			override val trapezoidalProfileConfig: TrapezoidalProfileConfig[Velocity, Acceleration, Length] = null
 
       override val forwardControlGains = null
       override val turnControlGains = null
@@ -372,6 +381,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxTurnVelocity: AngularVelocity = null
       override val maxAcceleration: Acceleration = null
       override val defaultLookAheadDistance: Length = null
+			override val trapezoidalProfileConfig: TrapezoidalProfileConfig[Velocity, Acceleration, Length] = null
 
       override val forwardControlGains = null
       override val turnControlGains = null

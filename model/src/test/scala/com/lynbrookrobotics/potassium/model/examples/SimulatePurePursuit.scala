@@ -5,7 +5,7 @@ import com.lynbrookrobotics.potassium.{Signal, commons}
 import com.lynbrookrobotics.potassium.model.simulations.SimulatedTwoSidedHardware
 import com.lynbrookrobotics.potassium.model.simulations.TwoSidedDriveContainerSimulator
 import com.lynbrookrobotics.potassium.commons.drivetrain.{MathUtilities, PurePursuitTasks, TwoSidedDriveProperties}
-import com.lynbrookrobotics.potassium.control.PIDConfig
+import com.lynbrookrobotics.potassium.control.{PIDConfig, TrapezoidalProfileConfig}
 import squants.time.Minutes
 import com.lynbrookrobotics.potassium.units.Point
 import org.scalatest.FunSuite
@@ -34,7 +34,7 @@ class SimulatePurePursuit extends FunSuite {
     override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(16.5)
     override val defaultLookAheadDistance: Length = Feet(1)
-
+    override val trapezoidalProfileConfig: TrapezoidalProfileConfig[Velocity, Acceleration, Length] = null
     override val turnControlGains = PIDConfig(
       Percent(100) / DegreesPerSecond(1),
       Percent(0) / Degrees(1),

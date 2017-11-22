@@ -1,6 +1,7 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.clock.Clock
+import com.lynbrookrobotics.potassium.control.TrapezoidalProfileConfig
 import com.lynbrookrobotics.potassium.{Component, Signal}
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask}
@@ -83,6 +84,8 @@ trait UnicycleCoreTasks {
     }
   }
 
+  type profileConfig = TrapezoidalProfileConfig[Velocity, Acceleration, Length]
+
   class DriveDistanceWithTrapazoidalProfile(cruisingVelocity: Velocity,
                                             finalVelocity: Velocity,
                                             acceleration: Acceleration,
@@ -100,17 +103,17 @@ trait UnicycleCoreTasks {
     }
 
     override final def onStart(): Unit = {
-      val (idealVelocity, forwardError) = trapezoidalDriveControl(
-          cruisingVelocity = cruisingVelocity,
-          finalVelocity = finalVelocity,
-          acceleration = acceleration,
-          targetForwardTravel = targetDistance,
-          position = position,
-          velocity = hardware.forwardVelocity)
+      val (forwardOutput, forwardError) = trapezoidalDriveControl(
+          /*cruisingVelocity = */cruisingVelocity,
+          /*finalVelocity = */finalVelocity,
+          /*acceleration =*/ acceleration,
+          /*targetForwardTravel = */targetDistance,
+          /*position = */position,
+          /*velocity = */hardware.forwardVelocity,
+          /*config = */properties.map(_.trapezoidalProfileConfig))
 
       val absoluteAngleTarget = hardware.turnPosition.currentValue
       val (turnController, turnError) = turnPositionControl(absoluteAngleTarget)
-      val forwardOutput = idealVelocity.map(UnicycleVelocity(_, DegreesPerSecond(0)).toUnicycleSignal)
       val combinedController = forwardOutput.zip(turnController).map(t => t._1 + t._2)
 
       val uncheckedController = lowerLevelVelocityControl(speedControl(combinedController))
@@ -129,8 +132,7 @@ trait UnicycleCoreTasks {
   }
 
   /**
-    * drives the target distance with default values for acceleration and cruising velocity
-    * TODO: finish adding docs
+    * drives the target distance with default values for acceleration and cruising velocit
     * @param targetForwardDistance
     * @param finalVelocity
     * @param drive
