@@ -16,7 +16,6 @@ import squants.mass.{KilogramsMetersSquared, Pounds}
 import squants.motion._
 import squants.space._
 
-import scala.collection.immutable.{NumericRange, Range}
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.units.GenericValue._
 

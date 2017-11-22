@@ -149,6 +149,7 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
 
   val positionListening: () => Option[Point] = listenTo(position)
   val velocityListening: () => Option[Velocity] = listenTo(forwardVelocity)
+  val accelerationListening: () => Option[Acceleration] = listenTo(forwardVelocity.derivative)
   val angleListening: () => Option[Angle] = listenTo(turnPosition)
 }
 
