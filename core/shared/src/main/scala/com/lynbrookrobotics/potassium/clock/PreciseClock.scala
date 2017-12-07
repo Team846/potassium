@@ -8,7 +8,7 @@ object PreciseClock {
     }
   }
 
-  def getRealTimeClock(originClock: Clock, noise: Time, tolerance: Time): Clock = {
+  def getPreciseClock(originClock: Clock, noise: Time, tolerance: Time): Clock = {
     new Clock {
       def scheduleAtTime(time: Time, thunk: => Unit) = {
         singleExecution(time - currentTime)(thunk)
