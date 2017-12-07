@@ -135,6 +135,10 @@ lazy val commonsJVM = commons.jvm
 lazy val commonsJS = commons.js
 lazy val commonsNative = commons.native
 
+lazy val benchmarks = project.dependsOn(
+  coreJVM, model, controlJVM, commonsJVM
+)
+
 lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site target directory for api docs")
 
 lazy val docs = project
