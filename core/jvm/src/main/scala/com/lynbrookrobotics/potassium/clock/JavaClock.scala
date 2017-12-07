@@ -3,7 +3,7 @@ package com.lynbrookrobotics.potassium.clock
 import java.util.concurrent.{Executors, TimeUnit}
 
 import squants.Time
-import squants.time.Milliseconds
+import squants.time.{Nanoseconds}
 
 /**
   * An implementation of a clock for the JVM that uses a scheduled thread pool
@@ -16,14 +16,14 @@ object JavaClock extends Clock {
 
     val scheduledFuture = scheduler.scheduleAtFixedRate(new Runnable {
       override def run(): Unit = {
-        val currentTime = Milliseconds(System.currentTimeMillis())
+        val currentTime = Nanoseconds(System.nanoTime())
         lastTime.foreach { l =>
           thunk(currentTime - l)
         }
 
         lastTime = Some(currentTime)
       }
-    }, 0, period.toMilliseconds.toLong, TimeUnit.MILLISECONDS)
+    }, 0, period.toNanoseconds.toLong, TimeUnit.NANOSECONDS)
 
     () => {
       scheduledFuture.cancel(true)
@@ -35,8 +35,8 @@ object JavaClock extends Clock {
       override def run(): Unit = {
         thunk
       }
-    }, delay.to(Milliseconds).toLong, TimeUnit.MILLISECONDS)
+    }, delay.toNanoseconds.toLong, TimeUnit.NANOSECONDS)
   }
 
-  override def currentTime: Time = Milliseconds(System.currentTimeMillis())
+  override def currentTime: Time = Nanoseconds(System.nanoTime())
 }

@@ -57,7 +57,7 @@ object PreciseClock {
 
           if (continueUpdating) {
             scheduleAtTime(
-              target - noise,
+              newTarget,
               selfSchedulingThunk.apply(period, newTarget))
           }
         }
@@ -77,3 +77,4 @@ object PreciseClock {
     }
   }
 }
+
