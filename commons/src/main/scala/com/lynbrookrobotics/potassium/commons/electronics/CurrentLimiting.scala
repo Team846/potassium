@@ -5,7 +5,8 @@ import squants.{Dimensionless, Each, Percent, Time}
 import squants.time.{Milliseconds, TimeDerivative}
 
 object CurrentLimiting {
-  def slewRate(input: Stream[Dimensionless],
+  def slewRate(lastMotorCommand: Dimensionless,
+               input: Stream[Dimensionless],
                slewRate: TimeDerivative[Dimensionless]): Stream[Dimensionless] = {
     def limit(previousOutput: Dimensionless, target: Dimensionless, dt: Time) = {
       if (previousOutput < target) {
@@ -15,7 +16,7 @@ object CurrentLimiting {
       }
     }
 
-    input.zipWithDt.scanLeft(Percent(0)) { case (acc, (target, dt)) =>
+    input.zipWithDt.scanLeft(lastMotorCommand) { case (acc, (target, dt)) =>
       if (target < Percent(0)) {
         -limit(-acc, -target, dt)
       } else {
@@ -24,20 +25,19 @@ object CurrentLimiting {
     }
   }
 
-  def limitCurrentOutput(input: Dimensionless,
-                         normalizedV: Dimensionless,
+  def limitCurrentOutput(targetPower: Dimensionless,
+                         normalizedVelocity: Dimensionless,
                          forwardCurrentLimit: Dimensionless,
                          backwardsCurrentLimit: Dimensionless): Dimensionless = {
-    if(normalizedV < Each(0)) {
-      -limitCurrentOutput(-input, -normalizedV, forwardCurrentLimit, backwardsCurrentLimit)
-    }
-    if(input > normalizedV){
-      input.min(normalizedV + forwardCurrentLimit)
-    } else if(input < Each(0)){
-      val limitedInput = Each(-backwardsCurrentLimit / (Each(1) + normalizedV))
-      limitedInput.max(input)
+    if (normalizedVelocity < Each(0)) {
+      -limitCurrentOutput(-targetPower, -normalizedVelocity, forwardCurrentLimit, backwardsCurrentLimit)
+    } else if (targetPower > normalizedVelocity) {
+      targetPower min (normalizedVelocity + forwardCurrentLimit)
+    } else if (targetPower < Each(0)){
+      val limitedInput = Each(-backwardsCurrentLimit / (Each(1) + normalizedVelocity))
+      limitedInput max targetPower
     } else {
-      input
+      targetPower
     }
   }
 }
