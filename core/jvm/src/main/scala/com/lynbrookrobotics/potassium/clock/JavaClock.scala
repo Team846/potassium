@@ -3,7 +3,7 @@ package com.lynbrookrobotics.potassium.clock
 import java.util.concurrent.{Executors, TimeUnit}
 
 import squants.Time
-import squants.time.{Nanoseconds}
+import squants.time.Nanoseconds
 
 /**
   * An implementation of a clock for the JVM that uses a scheduled thread pool

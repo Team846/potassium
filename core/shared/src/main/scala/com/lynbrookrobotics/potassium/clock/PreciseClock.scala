@@ -13,58 +13,54 @@ object PreciseClock {
       def scheduleAtTime(time: Time, thunk: => Unit) = {
         singleExecution(time - currentTime)(thunk)
       }
-
-      override def apply(period: Time)
-                        (thunk: Time => Unit): Cancel = {
-        var continueUpdating = true
-
-        var previousUpdateTime: Option[Time] = None
-
-
-        // schedule oneself for noise amount before the next periodic update
-        // then idle in a loop until the actual time is within a tolerance
-        lazy val selfSchedulingThunk: (Time, Time) => Unit = (period, target) => {
-          var newTarget: Time = target
-
-          // In case that we reach this sub optimal circumstance,
-          // recover by setting a new target that is guaranteed to
-          // be 1 period from now. This significantly reduces frequency
-          // of low period outliers, since we do not try to compensate
-          // for a previous high period
-          // TODO: doesn't seem to do anything any more?
-          val missedTarget = currentTime > target
-          if (missedTarget) {
-            newTarget = currentTime + period
-          }
-
-          def withinTolerance = {
-            (currentTime - target).abs <= tolerance
-          }
-
-          loopUntilTrue(
-            () => withinTolerance || currentTime >= target
-          )
-
-          val currTime = currentTime
-          previousUpdateTime.foreach { lastTime =>
-            thunk(currTime - lastTime)
-          }
-          previousUpdateTime = Some(currTime)
-
-          if (!missedTarget) {
-            newTarget = target + period
-          }
-
-          if (continueUpdating) {
-            scheduleAtTime(
-              newTarget,
-              selfSchedulingThunk.apply(period, newTarget))
-          }
-        }
-
-        selfSchedulingThunk(period, currentTime + period)
-        () => continueUpdating = false
-      }
+asdf asdf as pls no compile
+//      override def apply(period: Time)
+//                        (thunk: Time => Unit): Cancel = {
+//        var continueUpdating = true
+//
+//        var previousUpdateTime: Option[Time] = None
+//        // schedule oneself for noise amount before the next periodic update
+//        // then idle in a loop until the actual time is within a tolerance
+//        lazy val selfSchedulingThunk: (Time, Time) => Unit = (period, target) => {
+//          println("some update")
+//          val targetGarunteedInFuture = if (currentTime > target) {
+//            // oh shoot, we've already past the target time.
+//            // recover by setting a new target that is guaranteed to
+//            // be 1 period from now. This significantly reduces frequency
+//            // of low period outliers, since we do not try to compensate
+//            // for a previous very long period
+//            println("missed target")
+//            currentTime + period
+//          } else {
+//            println("didn't miss")
+//            target
+//          }
+//
+//          def withinTolerance = {
+//            (currentTime - targetGarunteedInFuture).abs <= tolerance
+//          }
+//
+//          loopUntilTrue(
+//            () => withinTolerance || currentTime >= targetGarunteedInFuture
+//          )
+//
+//          val currTime = currentTime
+//          previousUpdateTime.foreach { lastTime =>
+//            thunk(currTime - lastTime)
+//          }
+//          previousUpdateTime = Some(currTime)
+//
+//          if (continueUpdating) {
+//            val newTarget = targetGarunteedInFuture + period
+//            scheduleAtTime(
+//              newTarget,
+//              selfSchedulingThunk.apply(period, newTarget))
+//          }
+//        }
+//
+//        selfSchedulingThunk(period, currentTime + period)
+//        () => continueUpdating = false
+//      }
 
       override def currentTime: Time = {
         originClock.currentTime
