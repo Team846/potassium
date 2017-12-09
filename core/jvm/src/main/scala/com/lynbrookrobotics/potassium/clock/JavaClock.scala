@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.clock
 
-import java.util.concurrent.{Executors, TimeUnit}
+import java.util.concurrent.{Executors, ThreadFactory, TimeUnit}
 
 import squants.Time
 import squants.time.Nanoseconds
@@ -32,9 +32,9 @@ object JavaClock extends Clock {
 
   override def singleExecution(delay: Time)(thunk: => Unit): Unit = {
     scheduler.schedule(new Runnable {
-      override def run(): Unit = {
-        thunk
-      }
+        override def run(): Unit = {
+          thunk
+        }
     }, delay.toNanoseconds.toLong, TimeUnit.NANOSECONDS)
   }
 
