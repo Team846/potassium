@@ -9,6 +9,7 @@ import squants.time.{Time, TimeDerivative, TimeIntegral}
 import scala.collection.immutable.Queue
 import scala.ref.WeakReference
 import com.lynbrookrobotics.potassium.Platform
+import com.lynbrookrobotics.potassium.events.{ContinuousEvent, ImpulseEvent, ImpulseEventSource}
 
 import scala.annotation.unchecked.uncheckedVariance
 
@@ -19,7 +20,10 @@ abstract class Stream[+T] { self =>
 
   private[this] var listeners = Vector.empty[T => Unit]
 
+  private var lastValue: Option[T @uncheckedVariance] = None
+
   protected def publishValue(value: T @uncheckedVariance): Unit = {
+    lastValue = Some(value)
     listeners.foreach(_.apply(value))
     // TODO: more stuff maybe
   }
@@ -458,12 +462,14 @@ abstract class Stream[+T] { self =>
       v
     }
   }
+
   def withCheckZipped[O](checkingStream: Stream[O])(check: O => Unit): Stream[T] = {
     zipAsync(checkingStream).map{ case (v, checkedValue) =>
       check(checkedValue)
       v
     }
   }
+
   /**
     * Filters a stream to only emit values that pass a certain condition
     * @param condition the condition to filter stream values with
@@ -492,6 +498,20 @@ abstract class Stream[+T] { self =>
     }
 
     ret
+  }
+
+  /**
+    * Returns a continuous even that is true when condition is true
+    * The pollingSource ImpulseEvent is used to check when condition is true
+    * @param condition condition of the event
+    * @param pollingSource source of when to update the check for condition
+    * @return
+    */
+  def evenWithCondition(condition: T => Boolean)
+                       (implicit pollingSource: ImpulseEvent): ContinuousEvent = {
+    new ContinuousEvent(
+      lastValue.exists(condition)
+    )
   }
 
   /**

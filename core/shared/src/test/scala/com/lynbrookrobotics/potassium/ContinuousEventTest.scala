@@ -3,14 +3,18 @@ package com.lynbrookrobotics.potassium
 import org.scalatest.FunSuite
 import com.lynbrookrobotics.potassium.events.ImpulseEventSource
 import com.lynbrookrobotics.potassium.tasks.ContinuousTask
+import com.lynbrookrobotics.potassium.streams._
+import com.lynbrookrobotics.potassium.streams
 
 class ContinuousEventTest extends FunSuite {
   val eventUpdateSource = new ImpulseEventSource
   implicit val eventUpdateEvent = eventUpdateSource.event
 
   test("Start and end impulse events are fired correctly") {
-    var condition = false
-    val event = Signal(condition).filter(identity)
+    val (streamOfCondition, publishCondition) = Stream.manual[Boolean]
+    publishCondition(false)
+
+    val event = streamOfCondition.evenWithCondition(identity)
 
     var onStart = false
     var onEnd = false
@@ -21,20 +25,22 @@ class ContinuousEventTest extends FunSuite {
     eventUpdateSource.fire()
     assert(!onStart && !onEnd)
 
-    condition = true
+    publishCondition(true)
 
     eventUpdateSource.fire()
     assert(onStart && !onEnd)
 
-    condition = false
+    publishCondition(false)
 
     eventUpdateSource.fire()
     assert(onStart && onEnd)
   }
 
   test("On ticking callback fired correctly") {
-    var condition = false
-    val event = Signal(condition).filter(identity)
+    val (streamOfCondition, publishCondition) = Stream.manual[Boolean]
+    publishCondition(false)
+
+    val event = streamOfCondition.evenWithCondition(identity)
 
     var callbackRun = false
     event.foreach(() => callbackRun = true)
@@ -42,15 +48,17 @@ class ContinuousEventTest extends FunSuite {
     eventUpdateSource.fire()
     assert(!callbackRun)
 
-    condition = true
+    publishCondition(true)
 
     eventUpdateSource.fire()
     assert(callbackRun)
   }
 
   test("Mapped continuous task launched correctly") {
-    var condition = false
-    val event = Signal(condition).filter(identity)
+    val (streamOfCondition, publishCondition) = Stream.manual[Boolean]
+    publishCondition(false)
+
+    val event = streamOfCondition.evenWithCondition(identity)
 
     var taskStarted = false
     var taskEnded = false
@@ -68,20 +76,22 @@ class ContinuousEventTest extends FunSuite {
     eventUpdateSource.fire()
     assert(!taskStarted && !taskEnded)
 
-    condition = true
+    publishCondition(true)
 
     eventUpdateSource.fire()
     assert(taskStarted && !taskEnded)
 
-    condition = false
+    publishCondition(false)
 
     eventUpdateSource.fire()
     assert(taskStarted && taskEnded)
   }
 
   test("Mapped continuous task signal launched correctly") {
-    var condition = false
-    val event = Signal(condition).filter(identity)
+    val (streamOfCondition, publishCondition) = Stream.manual[Boolean]
+    publishCondition(false)
+
+    val event = streamOfCondition.evenWithCondition(identity)
 
     var taskStarted = false
     var taskEnded = false
@@ -99,25 +109,28 @@ class ContinuousEventTest extends FunSuite {
     eventUpdateSource.fire()
     assert(!taskStarted && !taskEnded)
 
-    condition = true
+    publishCondition(true)
 
     eventUpdateSource.fire()
     assert(taskStarted && !taskEnded)
 
-    condition = false
+    publishCondition(false)
 
     eventUpdateSource.fire()
     assert(taskStarted && taskEnded)
   }
 
   test("Combined events fired correctly") {
-    var conditionA = false
-    var conditionB = false
+    val (conditionAStream, publishConditionA) = Stream.manual[Boolean]
+    publishConditionA(false)
+
+    val (conditionBStream, publishConditionB) = Stream.manual[Boolean]
+    publishConditionB(false)
 
     var callbackRun = false
 
-    val eventA = Signal(conditionA).filter(identity)
-    val eventB = Signal(conditionB).filter(identity)
+    val eventA = conditionAStream.evenWithCondition(identity)
+    val eventB = conditionBStream.evenWithCondition(identity)
 
     (eventA && eventB).foreach(() => {
       callbackRun = true
@@ -126,27 +139,28 @@ class ContinuousEventTest extends FunSuite {
     eventUpdateSource.fire()
     assert(!callbackRun)
 
-    conditionA = true
+    publishConditionA(true)
     eventUpdateSource.fire()
     assert(!callbackRun)
 
-    conditionA = false
-    conditionB = true
+    publishConditionA(false)
+    publishConditionB(true)
     eventUpdateSource.fire()
     assert(!callbackRun)
 
-    conditionA = true
-    conditionB = true
+    publishConditionA(true)
+    publishConditionB(true)
     eventUpdateSource.fire()
     assert(callbackRun)
   }
 
   test("Opposite event fired correctly") {
-    var condition = true
+    val (streamOfCondition, publishCondition) = Stream.manual[Boolean]
+    publishCondition(true)
 
     var callbackRun = false
 
-    val event = Signal(condition).filter(identity)
+    val event = streamOfCondition.evenWithCondition(identity)
 
     (!event).foreach(() => {
       callbackRun = true
@@ -155,7 +169,7 @@ class ContinuousEventTest extends FunSuite {
     eventUpdateSource.fire()
     assert(!callbackRun)
 
-    condition = false
+    publishCondition(false)
     eventUpdateSource.fire()
     assert(callbackRun)
   }
