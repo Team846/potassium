@@ -1,6 +1,7 @@
 package com.lynbrookrobotics.potassium.clock
 
 import squants.Time
+import squants.time.Milliseconds
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -29,13 +30,16 @@ class PreciseClock(originClock: Clock, noise: Time, tolerance: Time, name: Strin
     singleExecution(time - currentTime)(thunk)
   }
 
-  private def loopUntilTrue(condition: () => Boolean) = {
-    println(s"start $name busy wait")
+  private def loopUntilTrue(condition: () => Boolean): Unit = {
+    //if (!condition()) {
+    //  singleExecution(Milliseconds(0.1))(loopUntilTrue(condition))
+    //}
     while (!condition()) {
       // waste time until condition() is true
     }
-    println(s"end $name busy wait")
+//    println(s"end $name busy wait")
   }
+
 
   override def apply(period: Time)(thunk: Time => Unit): Cancel = {
     var continueUpdating = true
@@ -56,9 +60,9 @@ class PreciseClock(originClock: Clock, noise: Time, tolerance: Time, name: Strin
         // future by 1 period from now. This significantly reduces frequency
         // of low period outliers, since we do not try to compensate
         // for previous very long period outliers.
-        println(s"past the target at $name")
-        println(s"current time: ${tempCurrTime.toSeconds} newTarget: ${(tempCurrTime + period).toSeconds}")
-        println()
+        // println(s"past the target at $name")
+        // println(s"current time: ${tempCurrTime.toSeconds} newTarget: ${(tempCurrTime + period).toSeconds}")
+        // println()
         tempCurrTime + period
       } else {
         target
