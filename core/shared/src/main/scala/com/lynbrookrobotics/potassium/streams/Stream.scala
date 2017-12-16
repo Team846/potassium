@@ -366,7 +366,6 @@ abstract class Stream[+T] { self =>
     }
   }
 
-
   /**
     * Produces a stream that emits values at the same rate as the given
     * stream through polling
