@@ -96,7 +96,7 @@ class PollingContinuousEvent(condition: => Boolean)(implicit polling: ImpulseEve
 }
 
 
-class ContinuousEvent(val condition: () => Boolean) {
+class ContinuousEvent {
   private val onStartSource = new ImpulseEventSource
   private val onEndSource = new ImpulseEventSource
 
@@ -114,11 +114,13 @@ class ContinuousEvent(val condition: () => Boolean) {
   private var onEventTrueCallbacks: List[() => Unit] = List.empty
   // used to check negation events
   private var onEventFalseCallbacks: List[() => Unit] = List.empty
+  private var onUpdateCallbacks: List[Boolean => Unit] = List.empty
 
   private[events] var isRunning = false
 
-  def checkCondition(): Unit = {
-    if (condition.apply()) {
+  private[events] def checkCondition(condition: Boolean): Unit = {
+    onUpdateCallbacks.foreach(_.apply(condition))
+    if (condition) {
       onEventTrueCallbacks.foreach(_.apply())
 
       if (!isRunning) {
@@ -142,13 +144,21 @@ class ContinuousEvent(val condition: () => Boolean) {
   }
 
   /**
-    * To be used exclusively for unary_!
+    * To be used exclusively in unary_! method
     * Same as foreach, except runs this function whenever the even is NOT happening
     * (aka, condition returns false)
     * @param onFalse a function to be called continuously when the event is NOT happening
     */
-  def foreachNotTrue(onFalse: () => Unit): Unit = {
+  private def foreachNotTrue(onFalse: () => Unit): Unit = {
     onEventFalseCallbacks = onFalse :: onEventFalseCallbacks
+  }
+
+  /**
+    * For each update of the event, regardless if the event is true or not
+    * @param onUpdate
+    */
+  private[events] def foreachUpdate(onUpdate: Boolean => Unit) = {
+    onUpdateCallbacks = onUpdate :: onUpdateCallbacks
   }
 
   /**
@@ -184,32 +194,37 @@ class ContinuousEvent(val condition: () => Boolean) {
 
   /**
     * Returns a continuous event that is an intersection of both events
-    * @param event the event to intersect with the original
+    * @param other the event to intersect with the original
     */
-  def &&(event: ContinuousEvent): ContinuousEvent = {
-    val isIntersection = () => this.condition.apply() && event.condition.apply()
-    val (intersectionEvent, checkIntersectionEvent) = ContinuousEvent.newEvent(isIntersection)
+  def &&(other: ContinuousEvent): ContinuousEvent = {
+    val (intersectionEvent, updateAndEvent) = ContinuousEvent.newEvent
 
-    this.foreach(checkIntersectionEvent)
-    event.foreach(checkIntersectionEvent)
+    var parentATrue = false
+    var parentBTrue = false
+
+    this.foreachUpdate { isTrue =>
+      parentATrue = isTrue
+      updateAndEvent.apply(parentATrue && parentBTrue)
+    }
+
+    other.foreachUpdate { isTrue =>
+      parentBTrue = isTrue
+      updateAndEvent.apply(parentATrue && parentBTrue)
+    }
 
     intersectionEvent
   }
 
   def unary_!(): ContinuousEvent = {
-    val isNegated = () => {
-      !condition.apply()
-    }
-    val (negatedEvent, checkEventNegated) = ContinuousEvent.newEvent(isNegated)
-    this.foreachNotTrue(checkEventNegated)
-
+    val (negatedEvent, updateNotEvent) = ContinuousEvent.newEvent
+    this.foreachUpdate(parentTrue => updateNotEvent(!parentTrue))
     negatedEvent
   }
 }
 
 object ContinuousEvent {
-  def newEvent(condition: () => Boolean): (ContinuousEvent, () => Unit) = {
-    val ret = new ContinuousEvent(condition)
-    (ret, () => ret.checkCondition())
+  def newEvent: (ContinuousEvent, Boolean => Unit) = {
+    val ret = new ContinuousEvent
+    (ret, condition => ret.checkCondition(condition))
   }
 }

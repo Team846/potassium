@@ -509,10 +509,8 @@ abstract class Stream[+T] { self =>
     */
   def eventWithCondition(condition: T => Boolean)
                         (implicit pollingSource: ImpulseEvent): ContinuousEvent = {
-    val (event, updateEvent) = ContinuousEvent.newEvent(
-      () => lastValue.exists(condition)
-    )
-    this.foreach(_ => updateEvent.apply())
+    val (event, updateEvent) = ContinuousEvent.newEvent
+    this.foreach(_ => updateEvent.apply(lastValue.exists(condition)))
     event
   }
 
