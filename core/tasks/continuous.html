@@ -4,26 +4,23 @@
 <h2 id="creating-a-continuous-task">Creating a Continuous Task</h2>
 <p>To create a continuous task, extend the <code class="highlighter-rouge">ContinuousTask</code> abstract class and implement the <code class="highlighter-rouge">onStart</code> and <code class="highlighter-rouge">onEnd</code> methods.</p>
 
-<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">DriveAtVelocity</span><span class="o">(</span><span class="n">velocity</span><span class="k">:</span> <span class="kt">Double</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">ContinuousTask</span> <span class="o">{</span>
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">DriveAtVelocity</span><span class="o">(</span><span class="n">velocity</span><span class="k">:</span> <span class="kt">Double</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">ContinuousTask</span> <span class="o">{</span>
   <span class="k">def</span> <span class="n">onStart</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span> <span class="o">...</span> <span class="o">}</span>
   <span class="k">def</span> <span class="n">onEnd</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span> <span class="o">...</span> <span class="o">}</span>
 <span class="o">}</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h2 id="parallel-continuous-tasks">Parallel Continuous Tasks</h2>
 <p>As continuous tasks have no defined end, there is no way to chain continuyous tasks to run one after the other. Instead, the only continuous task combination method is <code class="highlighter-rouge">and</code>, which allows two continuous tasks to be run in parallel.</p>
 
-<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">val</span> <span class="n">collectAndShoot</span><span class="k">:</span> <span class="kt">ContinuousTask</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">CollectItems</span><span class="o">().</span><span class="n">and</span><span class="o">(</span><span class="k">new</span> <span class="nc">ShootIntoGoal</span><span class="o">())</span>
-</code></pre>
-</div>
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">val</span> <span class="n">collectAndShoot</span><span class="k">:</span> <span class="kt">ContinuousTask</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">CollectItems</span><span class="o">().</span><span class="n">and</span><span class="o">(</span><span class="k">new</span> <span class="nc">ShootIntoGoal</span><span class="o">())</span>
+</code></pre></div></div>
 
 <h2 id="conversion-to-finite-tasks">Conversion to Finite Tasks</h2>
 <p>Sometimes, a continuous task needs to be integrated into a finite task sequence by having the continuous task only run for a specified duration. To convert a continuous task to a finite task that runs the action for the specified duration, <code class="highlighter-rouge">ContinuousTask</code> has a method <code class="highlighter-rouge">forDuration(time)</code> that produces a new finite task that wraps the continuous task.</p>
 
-<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">val</span> <span class="n">fiveSecondShoot</span><span class="k">:</span> <span class="kt">FiniteTask</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ShootIntoGoal</span><span class="o">().</span><span class="n">forDuration</span><span class="o">(</span><span class="nc">Seconds</span><span class="o">(</span><span class="mi">5</span><span class="o">))</span>
-</code></pre>
-</div>
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">val</span> <span class="n">fiveSecondShoot</span><span class="k">:</span> <span class="kt">FiniteTask</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ShootIntoGoal</span><span class="o">().</span><span class="n">forDuration</span><span class="o">(</span><span class="nc">Seconds</span><span class="o">(</span><span class="mi">5</span><span class="o">))</span>
+</code></pre></div></div>
 </section></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/potassium/highlight/highlight.pack.js"></script><script>hljs.configure({
 languages:['scala','java','bash']
 });

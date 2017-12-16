@@ -3,12 +3,11 @@
 
 <h2 id="creating-a-finite-task">Creating a Finite Task</h2>
 <p>To create a finite task, simply extend the <code class="highlighter-rouge">FiniteTask</code> class and implement the <code class="highlighter-rouge">onStart</code> and <code class="highlighter-rouge">onEnd</code> methods:</p>
-<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">DriveForward</span><span class="o">(</span><span class="n">distance</span><span class="k">:</span> <span class="kt">Double</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">FiniteTask</span> <span class="o">{</span>
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">DriveForward</span><span class="o">(</span><span class="n">distance</span><span class="k">:</span> <span class="kt">Double</span><span class="o">)</span> <span class="k">extends</span> <span class="nc">FiniteTask</span> <span class="o">{</span>
   <span class="k">def</span> <span class="n">onStart</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span> <span class="o">...</span> <span class="o">}</span>
   <span class="k">def</span> <span class="n">onEnd</span><span class="o">()</span><span class="k">:</span> <span class="kt">Unit</span> <span class="o">=</span> <span class="o">{</span> <span class="o">...</span> <span class="o">}</span>
 <span class="o">}</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>One important thing to remember is that <strong>finite tasks must decide when they are done</strong>. To do this, call the <code class="highlighter-rouge">finished()</code> method from inside the finite task class when the task is complete. The logic for checking if a task is done will usually come from a <code class="highlighter-rouge">withCheck</code> on a stream, where information such as distances to targets can be inspected to see if the task is done.</p>
 
@@ -18,38 +17,33 @@
 <p>To run one finite task after another, use the <code class="highlighter-rouge">then</code> method on finite tasks, which takes a task to be run after the task that <code class="highlighter-rouge">then</code> was called on. With <code class="highlighter-rouge">then</code>, both continuous and finite tasks can be passed to run after the task. If a finite task is passed, the <code class="highlighter-rouge">then</code> method will return a new finite task that runs both tasks in order and then terminates. If a continuous task is passed, the <code class="highlighter-rouge">then</code> method will return a continuous task that runs the finite task first and then starts the continuous task with no specified end.</p>
 
 <p>For example:</p>
-<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">new</span> <span class="nc">DriveForward</span><span class="o">(</span><span class="mi">5</span> <span class="n">feet</span><span class="o">).</span><span class="n">then</span><span class="o">(</span><span class="k">new</span> <span class="nc">TurnByAngle</span><span class="o">(</span><span class="mi">10</span> <span class="n">degrees</span><span class="o">))</span> <span class="c1">// finite task
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">new</span> <span class="nc">DriveForward</span><span class="o">(</span><span class="mi">5</span> <span class="n">feet</span><span class="o">).</span><span class="n">then</span><span class="o">(</span><span class="k">new</span> <span class="nc">TurnByAngle</span><span class="o">(</span><span class="mi">10</span> <span class="n">degrees</span><span class="o">))</span> <span class="c1">// finite task
 </span><span class="k">new</span> <span class="nc">DriveForward</span><span class="o">(</span><span class="mi">5</span> <span class="n">feet</span><span class="o">).</span><span class="n">then</span><span class="o">(</span><span class="k">new</span> <span class="nc">ContinuouslyShootBalls</span><span class="o">())</span> <span class="c1">// continuous task
-</span></code></pre>
-</div>
+</span></code></pre></div></div>
 
 <h2 id="parallel-finite-tasks">Parallel Finite Tasks</h2>
 <p>Finite tasks can be run in parallel by using the <code class="highlighter-rouge">and</code> method, which returns a new finite task that runs both subtasks at the same time and only terminates when both subtasks have finished.</p>
 
-<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">new</span> <span class="nc">DriveForward</span><span class="o">(</span><span class="mi">5</span> <span class="n">feet</span><span class="o">).</span><span class="n">and</span><span class="o">(</span><span class="k">new</span> <span class="nc">LiftArm</span><span class="o">(</span><span class="mi">2</span> <span class="n">feet</span><span class="o">))</span> <span class="c1">// only finishes when we have driven forward and lifted the arm
-</span></code></pre>
-</div>
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">new</span> <span class="nc">DriveForward</span><span class="o">(</span><span class="mi">5</span> <span class="n">feet</span><span class="o">).</span><span class="n">and</span><span class="o">(</span><span class="k">new</span> <span class="nc">LiftArm</span><span class="o">(</span><span class="mi">2</span> <span class="n">feet</span><span class="o">))</span> <span class="c1">// only finishes when we have driven forward and lifted the arm
+</span></code></pre></div></div>
 
 <h2 id="combining-with-continuous-tasks">Combining with Continuous Tasks</h2>
 <p>Sometimes, finite tasks need to be combined with continuous tasks to have a continuous task run in parallel while a finite task is running. For example, you may want to display a different lighting pattern while the robot is driving to a new position. This behavior can be achieved with the <code class="highlighter-rouge">andUntilDone</code> method, which takes a continuous task to run in parallel while the finite task is running.</p>
 
-<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">new</span> <span class="nc">DriveForward</span><span class="o">(</span><span class="mi">5</span> <span class="n">feet</span><span class="o">).</span><span class="n">andUntilDone</span><span class="o">(</span><span class="k">new</span> <span class="nc">DisplayLightingColor</span><span class="o">(</span><span class="s">"green"</span><span class="o">))</span>
-</code></pre>
-</div>
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">new</span> <span class="nc">DriveForward</span><span class="o">(</span><span class="mi">5</span> <span class="n">feet</span><span class="o">).</span><span class="n">andUntilDone</span><span class="o">(</span><span class="k">new</span> <span class="nc">DisplayLightingColor</span><span class="o">(</span><span class="s">"green"</span><span class="o">))</span>
+</code></pre></div></div>
 
 <h2 id="timeouts">Timeouts</h2>
 <p>Especially when running automated routines in a time-constrained environment (such as the FIRST Robotics Competition autonomous period), it is often necessary to place timeouts to force finite tasks to terminate after a set duration of running. This can be achieved through the <code class="highlighter-rouge">withTimeout</code> method, which takes a parameter of a duration to terminate the task after. Following the principle of immutability, this <strong>does not</strong> modify the existing task to have a timeout, but returns a new task with the timeout applied.</p>
 
-<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">new</span> <span class="nc">DriveForward</span><span class="o">(</span><span class="mi">5</span> <span class="n">feet</span><span class="o">).</span><span class="n">withTimeout</span><span class="o">(</span><span class="mi">10</span> <span class="n">seconds</span><span class="o">)</span> <span class="c1">// if we get stuck, this will stop after 10 seconds
-</span></code></pre>
-</div>
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">new</span> <span class="nc">DriveForward</span><span class="o">(</span><span class="mi">5</span> <span class="n">feet</span><span class="o">).</span><span class="n">withTimeout</span><span class="o">(</span><span class="mi">10</span> <span class="n">seconds</span><span class="o">)</span> <span class="c1">// if we get stuck, this will stop after 10 seconds
+</span></code></pre></div></div>
 
 <h2 id="waittask"><code class="highlighter-rouge">WaitTask</code></h2>
 <p>Autonomous routines often contain pauses, which can be introduced into a series of actions by using the <code class="highlighter-rouge">WaitTask</code> class. <code class="highlighter-rouge">WaitTask</code> is a finite task that waits for a given duration of time before completing. <code class="highlighter-rouge">WaitTask</code>s can be used just the same as any other <code class="highlighter-rouge">FiniteTask</code>, and can be combined with other tasks to produce more complex routines.</p>
 
-<div class="language-scala highlighter-rouge"><pre class="highlight"><code><span class="k">new</span> <span class="nc">DriveForward</span><span class="o">(</span><span class="mi">5</span> <span class="n">feet</span><span class="o">).</span><span class="n">then</span><span class="o">(</span><span class="k">new</span> <span class="nc">WaitTask</span><span class="o">(</span><span class="mi">5</span> <span class="n">seconds</span><span class="o">)).</span><span class="n">then</span><span class="o">(</span><span class="k">new</span> <span class="nc">DriveForward</span><span class="o">(</span><span class="mi">5</span> <span class="n">feet</span><span class="o">))</span> <span class="c1">// drives, pauses, and then drives again
-</span></code></pre>
-</div>
+<div class="language-scala highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">new</span> <span class="nc">DriveForward</span><span class="o">(</span><span class="mi">5</span> <span class="n">feet</span><span class="o">).</span><span class="n">then</span><span class="o">(</span><span class="k">new</span> <span class="nc">WaitTask</span><span class="o">(</span><span class="mi">5</span> <span class="n">seconds</span><span class="o">)).</span><span class="n">then</span><span class="o">(</span><span class="k">new</span> <span class="nc">DriveForward</span><span class="o">(</span><span class="mi">5</span> <span class="n">feet</span><span class="o">))</span> <span class="c1">// drives, pauses, and then drives again
+</span></code></pre></div></div>
 </section></div></div></div></div><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script><script src="/potassium/highlight/highlight.pack.js"></script><script>hljs.configure({
 languages:['scala','java','bash']
 });
