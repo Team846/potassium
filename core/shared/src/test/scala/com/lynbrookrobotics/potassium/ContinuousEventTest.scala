@@ -12,9 +12,9 @@ class ContinuousEventTest extends FunSuite {
 
   test("Start and end impulse Stream events are fired correctly") {
     val (streamOfCondition, publishCondition) = Stream.manual[Boolean]
-    publishCondition(false)
 
-    val event = streamOfCondition.evenWithCondition(identity)
+    val event = streamOfCondition.eventWithCondition(identity)
+    publishCondition(false)
 
     var onStart = false
     var onEnd = false
@@ -35,9 +35,9 @@ class ContinuousEventTest extends FunSuite {
 
   test("On ticking callback from Stream event fired correctly") {
     val (streamOfCondition, publishCondition) = Stream.manual[Boolean]
-    publishCondition(false)
 
-    val event = streamOfCondition.evenWithCondition(identity)
+    val event = streamOfCondition.eventWithCondition(identity)
+    publishCondition(false)
 
     var callbackRun = false
     event.foreach(() => callbackRun = true)
@@ -51,9 +51,9 @@ class ContinuousEventTest extends FunSuite {
 
   test("Mapped continuous task from Stream event launched correctly") {
     val (streamOfCondition, publishCondition) = Stream.manual[Boolean]
-    publishCondition(false)
 
-    val event = streamOfCondition.evenWithCondition(identity)
+    val event = streamOfCondition.eventWithCondition(identity)
+    publishCondition(false)
 
     var taskStarted = false
     var taskEnded = false
@@ -82,11 +82,10 @@ class ContinuousEventTest extends FunSuite {
   test("Combined events from Stream fired correctly") {
     val (conditionAStream, publishConditionA) = Stream.manual[Boolean]
 
-
     val (conditionBStream, publishConditionB) = Stream.manual[Boolean]
 
-    val eventA = conditionAStream.evenWithCondition(identity)
-    val eventB = conditionBStream.evenWithCondition(identity)
+    val eventA = conditionAStream.eventWithCondition(identity)
+    val eventB = conditionBStream.eventWithCondition(identity)
 
     var callbackRun = false
     (eventA && eventB).foreach(() => {
@@ -116,7 +115,7 @@ class ContinuousEventTest extends FunSuite {
 
     var callbackRun = false
 
-    val event = streamOfCondition.evenWithCondition(identity)
+    val event = streamOfCondition.eventWithCondition(identity)
 
     publishCondition(true)
 

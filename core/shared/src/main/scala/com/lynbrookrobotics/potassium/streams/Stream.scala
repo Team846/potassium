@@ -507,8 +507,8 @@ abstract class Stream[+T] { self =>
     * @param pollingSource source of when to update the check for condition
     * @return
     */
-  def evenWithCondition(condition: T => Boolean)
-                       (implicit pollingSource: ImpulseEvent): ContinuousEvent = {
+  def eventWithCondition(condition: T => Boolean)
+                        (implicit pollingSource: ImpulseEvent): ContinuousEvent = {
     val (event, updateEvent) = ContinuousEvent.newEvent(
       () => lastValue.exists(condition)
     )
