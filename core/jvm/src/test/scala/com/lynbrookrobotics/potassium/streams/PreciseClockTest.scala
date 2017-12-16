@@ -1,14 +1,11 @@
-package com.lynbrookrobotics.potassium.benchmarks
+package com.lynbrookrobotics.potassium.streams
 
 import java.io.PrintWriter
-import java.lang.management.{GarbageCollectorMXBean, ManagementFactory}
 
 import com.lynbrookrobotics.potassium.clock.{JavaClock, PreciseClock}
 import squants.time._
 
-import scala.collection.mutable.ArrayBuffer
-
-object PreciseClockBenchmark {
+object PreciseClockTest {
   def main(args: Array[String]): Unit = {
     def startAndLogClock(period: Time,
                          noise: Time,
@@ -37,12 +34,6 @@ object PreciseClockBenchmark {
       val startTime = clock.currentTime
       clock.apply(period){ dt =>
         println(s"$name: ${dt.toMilliseconds}")
-        logDump.println(dt.toMilliseconds)
-        logDump.flush()
-      }
-
-      clock.apply(period){ dt =>
-        println(s"$name 2: ${dt.toMilliseconds}")
         logDump.println(dt.toMilliseconds)
         logDump.flush()
       }
