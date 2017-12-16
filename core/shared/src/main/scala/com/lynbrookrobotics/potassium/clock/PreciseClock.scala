@@ -5,27 +5,10 @@ import squants.time.Milliseconds
 
 import scala.collection.mutable.ArrayBuffer
 
-object PreciseClock {
-  private var loopers = Map.empty[() => Boolean, () => Unit]
-
-  def add(condition: () => Boolean, after: () => Unit): Unit = {
-    loopers = loopers.updated(condition, after)
-    startLoop()
-  }
-
-  private def startLoop(): Unit = {
-    while (loopers.nonEmpty) {
-      loopers.foreach { case (condition, after) =>
-        if (condition()) {
-          loopers = loopers.filterNot{ case (key, _) => key == condition }
-          after()
-        }
-      }
-    }
-  }
-}
-
-class PreciseClock(originClock: Clock, noise: Time, tolerance: Time, name: String) extends Clock {
+class PreciseClock(originClock: Clock,
+                   noise: Time,
+                   tolerance: Time,
+                   name: String) extends Clock {
   private def scheduleAtTime(time: Time, thunk: => Unit) = {
     singleExecution(time - currentTime)(thunk)
   }
