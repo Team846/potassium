@@ -22,17 +22,14 @@ class ContinuousEventTest extends FunSuite {
     event.onStart.foreach(() => onStart = true)
     event.onEnd.foreach(() => onEnd = true)
 
-    eventUpdateSource.fire()
     assert(!onStart && !onEnd)
 
     publishCondition(true)
 
-    eventUpdateSource.fire()
     assert(onStart && !onEnd)
 
     publishCondition(false)
 
-    eventUpdateSource.fire()
     assert(onStart && onEnd)
   }
 
@@ -45,12 +42,10 @@ class ContinuousEventTest extends FunSuite {
     var callbackRun = false
     event.foreach(() => callbackRun = true)
 
-    eventUpdateSource.fire()
     assert(!callbackRun)
 
     publishCondition(true)
 
-    eventUpdateSource.fire()
     assert(callbackRun)
   }
 
@@ -73,71 +68,65 @@ class ContinuousEventTest extends FunSuite {
       }
     })
 
-    eventUpdateSource.fire()
     assert(!taskStarted && !taskEnded)
 
     publishCondition(true)
 
-    eventUpdateSource.fire()
     assert(taskStarted && !taskEnded)
 
     publishCondition(false)
 
-    eventUpdateSource.fire()
     assert(taskStarted && taskEnded)
   }
 
   test("Combined events from Stream fired correctly") {
     val (conditionAStream, publishConditionA) = Stream.manual[Boolean]
-    publishConditionA(false)
+
 
     val (conditionBStream, publishConditionB) = Stream.manual[Boolean]
-    publishConditionB(false)
-
-    var callbackRun = false
 
     val eventA = conditionAStream.evenWithCondition(identity)
     val eventB = conditionBStream.evenWithCondition(identity)
 
+    var callbackRun = false
     (eventA && eventB).foreach(() => {
       callbackRun = true
     })
 
-    eventUpdateSource.fire()
+    publishConditionA(false)
+    publishConditionB(false)
+
     assert(!callbackRun)
 
     publishConditionA(true)
-    eventUpdateSource.fire()
     assert(!callbackRun)
 
     publishConditionA(false)
     publishConditionB(true)
-    eventUpdateSource.fire()
     assert(!callbackRun)
 
     publishConditionA(true)
     publishConditionB(true)
-    eventUpdateSource.fire()
     assert(callbackRun)
   }
 
   test("Opposite event from Stream fired correctly") {
     val (streamOfCondition, publishCondition) = Stream.manual[Boolean]
-    publishCondition(true)
+
 
     var callbackRun = false
 
     val event = streamOfCondition.evenWithCondition(identity)
 
+    publishCondition(true)
+
     (!event).foreach(() => {
       callbackRun = true
     })
 
-    eventUpdateSource.fire()
     assert(!callbackRun)
 
     publishCondition(false)
-    eventUpdateSource.fire()
     assert(callbackRun)
   }
 

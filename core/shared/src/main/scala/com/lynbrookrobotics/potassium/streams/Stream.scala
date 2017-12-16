@@ -9,7 +9,7 @@ import squants.time.{Time, TimeDerivative, TimeIntegral}
 import scala.collection.immutable.Queue
 import scala.ref.WeakReference
 import com.lynbrookrobotics.potassium.Platform
-import com.lynbrookrobotics.potassium.events.{ContinuousEvent, ImpulseEvent, ImpulseEventSource}
+import com.lynbrookrobotics.potassium.events.{ContinuousEvent, ImpulseEvent, ImpulseEventSource, PollingContinuousEvent}
 
 import scala.annotation.unchecked.uncheckedVariance
 
@@ -509,9 +509,11 @@ abstract class Stream[+T] { self =>
     */
   def evenWithCondition(condition: T => Boolean)
                        (implicit pollingSource: ImpulseEvent): ContinuousEvent = {
-    new ContinuousEvent(
-      lastValue.exists(condition)
+    val (event, updateEvent) = ContinuousEvent.newEvent(
+      () => lastValue.exists(condition)
     )
+    this.foreach(_ => updateEvent.apply())
+    event
   }
 
   /**
