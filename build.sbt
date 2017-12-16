@@ -28,8 +28,7 @@ lazy val sharedDependencies = Def.setting(Seq(
 
 lazy val jvmDependencies = Seq(
   "org.mockito" % "mockito-core" % "2.3.11" % Test,
-  "com.storm-enroute" %% "scalameter-core" % "0.8.2" % Test,
-  "com.coreoz" % "wisp" % "1.0.0",
+  "com.storm-enroute" %% "scalameter-core" % "0.8.2" % Test
 )
 
 parallelExecution in ThisBuild := false

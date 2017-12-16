@@ -27,7 +27,7 @@ object PreciseClockBenchmark {
       }
 
       val logFileName = if (usePreciseClock) {
-        s"precise time noise: ${noise.toMilliseconds}"
+        s"$name noise: ${noise.toMilliseconds}"
       } else {
         "regular time"
       }
@@ -36,19 +36,42 @@ object PreciseClockBenchmark {
 
       val startTime = clock.currentTime
       clock.apply(period){ dt =>
-        println(s"$name: ${dt.toMilliseconds} ${(clock.currentTime - startTime).toSeconds}")
+        println(s"$name: ${dt.toMilliseconds}")
         logDump.println(dt.toMilliseconds)
         logDump.flush()
-        //Thread.sleep(1)
+      }
+
+      clock.apply(period){ dt =>
+        println(s"$name 2: ${dt.toMilliseconds}")
+        logDump.println(dt.toMilliseconds)
+        logDump.flush()
       }
     }
 
 
-    startAndLogClock(Milliseconds(5), Milliseconds(2), usePreciseClock = true, name = "precise")
-    //startAndLogClock(Milliseconds(5), Milliseconds(2), usePreciseClock = false, name = "clock 2")
-    //startAndLogClock(Milliseconds(5), Milliseconds(3), usePreciseClock = true)
+    startAndLogClock(
+      period = Milliseconds(5),
+      noise = Milliseconds(2),
+      usePreciseClock = true,
+      name = "precise clock 1")
+
+    startAndLogClock(
+      period = Milliseconds(5),
+      noise = Milliseconds(2),
+      usePreciseClock = true,
+      name = "precise clock 2")
+
+    startAndLogClock(
+      period = Milliseconds(5),
+      noise = Milliseconds(2),
+      usePreciseClock = true,
+      name = "precise clock 3")
 
 
-    startAndLogClock(Milliseconds(5), null, usePreciseClock = false, name = "regular")
+    startAndLogClock(
+      period = Milliseconds(5),
+      noise = null,
+      usePreciseClock = false,
+      name = "regular")
   }
 }

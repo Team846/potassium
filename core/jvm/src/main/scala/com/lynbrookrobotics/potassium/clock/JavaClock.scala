@@ -9,7 +9,9 @@ import squants.time.Nanoseconds
   * An implementation of a clock for the JVM that uses a scheduled thread pool
   */
 object JavaClock extends Clock {
-  private val scheduler = Executors.newScheduledThreadPool(1)
+  private val scheduler = Executors.newScheduledThreadPool(
+    Runtime.getRuntime.availableProcessors()
+  )
 
   override def apply(period: Time)(thunk: Time => Unit): Cancel = {
     var lastTime: Option[Time] = None
