@@ -503,11 +503,9 @@ abstract class Stream[+T] { self =>
     * Returns a continuous even that is true when condition is true
     * The pollingSource ImpulseEvent is used to check when condition is true
     * @param condition condition of the event
-    * @param pollingSource source of when to update the check for condition
     * @return
     */
-  def eventWithCondition(condition: T => Boolean)
-                        (implicit pollingSource: ImpulseEvent): ContinuousEvent = {
+  def eventWithCondition(condition: T => Boolean): ContinuousEvent = {
     val (event, updateEvent) = ContinuousEvent.newEvent
     this.foreach(_ => updateEvent.apply(lastValue.exists(condition)))
     event
