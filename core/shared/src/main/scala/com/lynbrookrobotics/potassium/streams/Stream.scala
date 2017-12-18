@@ -79,7 +79,6 @@ abstract class Stream[+T] { self =>
     }
   }
 
-  // TODO: requires review
   /**
     *
     * @return returns a stream of first value this stream will publish
@@ -479,7 +478,9 @@ abstract class Stream[+T] { self =>
       private val parent = self
       override val expectedPeriodicity = NonPeriodic
       // TODO: optimize
-      override val originTimeStream = self.originTimeStream.map(_.zip(self).filter(t => condition(t._2)).map(_._1))
+      override val originTimeStream = self.originTimeStream.map(
+        _.zip(self).filter(t => condition(t._2)).map(_._1)
+      )
     }
 
     val ptr = WeakReference(ret)
@@ -500,14 +501,16 @@ abstract class Stream[+T] { self =>
   }
 
   /**
-    * Returns a continuous even that is true when condition is true
-    * The pollingSource ImpulseEvent is used to check when condition is true
-    * @param condition condition of the event
+    * Returns a continuous even that is true when condition about the value of
+    * the stream is true
+    * @param condition condition
     * @return
     */
-  def eventWithCondition(condition: T => Boolean): ContinuousEvent = {
+  def eventWhen(condition: T => Boolean): ContinuousEvent = {
     val (event, updateEvent) = ContinuousEvent.newEvent
-    this.foreach(_ => updateEvent.apply(lastValue.exists(condition)))
+
+    // hold onto cancel function to prevent garbage collection
+    val cancelFunction = this.foreach(v => updateEvent.apply(condition(v)))
     event
   }
 
