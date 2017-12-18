@@ -441,9 +441,9 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.commons.electronics.CurrentLimiting#limitCurrentOutput" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="limitCurrentOutput(input:squants.Dimensionless,normalizedV:squants.Dimensionless,forwardCurrentLimit:squants.Dimensionless,backwardsCurrentLimit:squants.Dimensionless):squants.Dimensionless"></a><a id="limitCurrentOutput(Dimensionless,Dimensionless,Dimensionless,Dimensionless):Dimensionless"></a>
+      <a id="limitCurrentOutput(targetPower:squants.Dimensionless,normalizedVelocity:squants.Dimensionless,forwardCurrentLimit:squants.Dimensionless,backwardsCurrentLimit:squants.Dimensionless):squants.Dimensionless"></a><a id="limitCurrentOutput(Dimensionless,Dimensionless,Dimensionless,Dimensionless):Dimensionless"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/commons/electronics/CurrentLimiting$.html#limitCurrentOutput(input:squants.Dimensionless,normalizedV:squants.Dimensionless,forwardCurrentLimit:squants.Dimensionless,backwardsCurrentLimit:squants.Dimensionless):squants.Dimensionless" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/commons/electronics/CurrentLimiting$.html#limitCurrentOutput(targetPower:squants.Dimensionless,normalizedVelocity:squants.Dimensionless,forwardCurrentLimit:squants.Dimensionless,backwardsCurrentLimit:squants.Dimensionless):squants.Dimensionless" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -452,7 +452,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">limitCurrentOutput</span><span class="params">(<span name="input">input: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>, <span name="normalizedV">normalizedV: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>, <span name="forwardCurrentLimit">forwardCurrentLimit: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>, <span name="backwardsCurrentLimit">backwardsCurrentLimit: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>)</span><span class="result">: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>
+        <span class="name">limitCurrentOutput</span><span class="params">(<span name="targetPower">targetPower: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>, <span name="normalizedVelocity">normalizedVelocity: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>, <span name="forwardCurrentLimit">forwardCurrentLimit: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>, <span name="backwardsCurrentLimit">backwardsCurrentLimit: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>)</span><span class="result">: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>
       </span>
       
       
@@ -505,9 +505,9 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.commons.electronics.CurrentLimiting#slewRate" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="slewRate(input:com.lynbrookrobotics.potassium.streams.Stream[squants.Dimensionless],slewRate:squants.time.TimeDerivative[squants.Dimensionless]):com.lynbrookrobotics.potassium.streams.Stream[squants.Dimensionless]"></a><a id="slewRate(Stream[Dimensionless],TimeDerivative[Dimensionless]):Stream[Dimensionless]"></a>
+      <a id="slewRate(lastMotorCommand:squants.Dimensionless,input:com.lynbrookrobotics.potassium.streams.Stream[squants.Dimensionless],slewRate:squants.time.TimeDerivative[squants.Dimensionless]):com.lynbrookrobotics.potassium.streams.Stream[squants.Dimensionless]"></a><a id="slewRate(Dimensionless,Stream[Dimensionless],TimeDerivative[Dimensionless]):Stream[Dimensionless]"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/commons/electronics/CurrentLimiting$.html#slewRate(input:com.lynbrookrobotics.potassium.streams.Stream[squants.Dimensionless],slewRate:squants.time.TimeDerivative[squants.Dimensionless]):com.lynbrookrobotics.potassium.streams.Stream[squants.Dimensionless]" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/commons/electronics/CurrentLimiting$.html#slewRate(lastMotorCommand:squants.Dimensionless,input:com.lynbrookrobotics.potassium.streams.Stream[squants.Dimensionless],slewRate:squants.time.TimeDerivative[squants.Dimensionless]):com.lynbrookrobotics.potassium.streams.Stream[squants.Dimensionless]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -516,7 +516,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">slewRate</span><span class="params">(<span name="input">input: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.Dimensionless">Dimensionless</span>]</span>, <span name="slewRate">slewRate: <span class="extype" name="squants.time.TimeDerivative">TimeDerivative</span>[<span class="extype" name="squants.Dimensionless">Dimensionless</span>]</span>)</span><span class="result">: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.Dimensionless">Dimensionless</span>]</span>
+        <span class="name">slewRate</span><span class="params">(<span name="lastMotorCommand">lastMotorCommand: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>, <span name="input">input: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.Dimensionless">Dimensionless</span>]</span>, <span name="slewRate">slewRate: <span class="extype" name="squants.time.TimeDerivative">TimeDerivative</span>[<span class="extype" name="squants.Dimensionless">Dimensionless</span>]</span>)</span><span class="result">: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.Dimensionless">Dimensionless</span>]</span>
       </span>
       
       
