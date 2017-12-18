@@ -13,7 +13,7 @@ class ContinuousEventTest extends FunSuite {
   test("Start and end impulse Stream events are fired correctly") {
     val (streamOfCondition, publishCondition) = Stream.manual[Boolean]
 
-    val event = streamOfCondition.eventWithCondition(identity)
+    val event = streamOfCondition.eventWhen(identity)
     publishCondition(false)
 
     var onStart = false
@@ -36,7 +36,7 @@ class ContinuousEventTest extends FunSuite {
   test("On ticking callback from Stream event fired correctly") {
     val (streamOfCondition, publishCondition) = Stream.manual[Boolean]
 
-    val event = streamOfCondition.eventWithCondition(identity)
+    val event = streamOfCondition.eventWhen(identity)
     publishCondition(false)
 
     var callbackRun = false
@@ -52,7 +52,7 @@ class ContinuousEventTest extends FunSuite {
   test("Mapped continuous task from Stream event launched correctly") {
     val (streamOfCondition, publishCondition) = Stream.manual[Boolean]
 
-    val event = streamOfCondition.eventWithCondition(identity)
+    val event = streamOfCondition.eventWhen(identity)
     publishCondition(false)
 
     var taskStarted = false
@@ -84,8 +84,8 @@ class ContinuousEventTest extends FunSuite {
 
     val (conditionBStream, publishConditionB) = Stream.manual[Boolean]
 
-    val eventA = conditionAStream.eventWithCondition(identity)
-    val eventB = conditionBStream.eventWithCondition(identity)
+    val eventA = conditionAStream.eventWhen(identity)
+    val eventB = conditionBStream.eventWhen(identity)
 
     var callbackRun = false
     (eventA && eventB).foreach(() => {
@@ -115,7 +115,7 @@ class ContinuousEventTest extends FunSuite {
 
     var callbackRun = false
 
-    val event = streamOfCondition.eventWithCondition(identity)
+    val event = streamOfCondition.eventWhen(identity)
 
     publishCondition(true)
 

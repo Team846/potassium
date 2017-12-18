@@ -37,7 +37,7 @@ object Implicits {
                           (implicit clock: Clock): ContinuousEvent = {
       Stream.periodic(period){
         joystick.getRawButton(buttonId)
-      }.eventWithCondition(down => down)
+      }.eventWhen(down => down)
     }
   }
 
