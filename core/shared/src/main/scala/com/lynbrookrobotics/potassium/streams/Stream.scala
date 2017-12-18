@@ -464,6 +464,31 @@ abstract class Stream[+T] { self =>
       v
     }
   }
+
+  def withFallBack(fallBack: Stream[T @uncheckedVariance],
+                   printOnFallback: Boolean = false): Stream[T] = {
+    var defaultValueIsFresh = true
+
+    val cancel1 = fallBack.foreach(_ => defaultValueIsFresh = false)
+    val cancel2 = this.foreach(_ => defaultValueIsFresh = true)
+
+    // we zip with fallBack first because fallback is meant to do no time
+    // consuming operations, so the returned stream updates efficiently
+    fallBack.zipAsync(this).map { case (fallback, default) =>
+      if (defaultValueIsFresh) {
+        default
+      } else {
+        if (printOnFallback) {
+          println("******************************")
+          println("Falling back to default value!")
+          println("******************************")
+        }
+        fallback
+      }
+    }
+  }
+
+
   /**
     * Filters a stream to only emit values that pass a certain condition
     * @param condition the condition to filter stream values with
