@@ -10,10 +10,9 @@ mode, holding down of a button, or when a vision target is in sight
 
 ## Creating Continuous Events
 The main way to create a Continuous Event is to use the `eventWhen` method in 
-a `Stream`. Every new value of the `Stream` instance triggeres an update of the 
+a `Stream`. Every new value of the `Stream` instance triggers an update of the 
 event, which checks if `condition` function of the state of the stream returns true, and marks 
 the `ContinuousEvent` as running appropriately.
-
 ```scala
 val buttonPressedStream: Stream[Boolean] = ...
 val buttonPressedEvent: ContinuousEvent = buttonPressedStream.eventWhen(identity)
@@ -21,7 +20,6 @@ val buttonPressedEvent: ContinuousEvent = buttonPressedStream.eventWhen(identity
 val robotSpeedStream: Stream[Velocity] =  ...
 val robotTooFast: ContinuousEvent = robotSpeedStream.eventWhen(v > FeetPerSecond(20))
 ``` 
-
 
 ## Using Continuous Events
 You can use Continuous Events in 3 different ways.
@@ -46,9 +44,7 @@ class BlinkAlarmLEDs extends ContinuousTask {
 }
 
 robotTooFast.foreach(BlinkAlarmLEDs)
-
 ```
 
 3. Run a Signal of `ContinuousTask`. 
-For use when the `ContinuousTask` is variable. When the `ContinuousEvent` starts, it aborts the current Task
-,retrieves the current `ContinuousTask` from the Signal, and runs the retrieved Task.  
+For use when the `ContinuousTask` is variable. When the `ContinuousEvent` starts, it aborts the current Task, retrieves the current `ContinuousTask` from the Signal, and runs the retrieved Task.  
