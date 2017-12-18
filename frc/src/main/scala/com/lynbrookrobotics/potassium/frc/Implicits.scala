@@ -1,7 +1,9 @@
 package com.lynbrookrobotics.potassium.frc
 
-import com.lynbrookrobotics.potassium.Signal
-import com.lynbrookrobotics.potassium.events.{ContinuousEvent, ImpulseEvent, ImpulseEventSource}
+import com.lynbrookrobotics.potassium.streams
+import com.lynbrookrobotics.potassium.streams._
+import com.lynbrookrobotics.potassium.clock.Clock
+import com.lynbrookrobotics.potassium.events.{ContinuousEvent, ImpulseEvent, ImpulseEventSource, PollingContinuousEvent}
 import edu.wpi.first.wpilibj._
 import squants.{Dimensionless, Each, Time}
 import squants.electro.{ElectricPotential, Volts}
@@ -22,8 +24,20 @@ object Implicits {
     def y: Dimensionless = Each(joystick.getY())
     def z: Dimensionless = Each(joystick.getZ())
 
-    def buttonPressed(button: Int)(implicit polling: ImpulseEvent): ContinuousEvent = {
-      Signal(joystick.getRawButton(button)).filter(down => down)
+    /**
+      *
+      * @param buttonId the id of the button to check
+      * @param period how frequently to check if the button is pressed
+      * @param clock used to update checking of the button status
+      * @return a ContinuousEvent true whenenver a button is pressed at the
+      *         buttonId of this joystick
+      */
+    def buttonPressedEvent(buttonId: Int,
+                           period: Time)
+                          (implicit clock: Clock): ContinuousEvent = {
+      Stream.periodic(period){
+        joystick.getRawButton(buttonId)
+      }.eventWhen(down => down)
     }
   }
 

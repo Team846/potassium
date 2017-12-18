@@ -9,6 +9,7 @@ import squants.time.{Time, TimeDerivative, TimeIntegral}
 import scala.collection.immutable.Queue
 import scala.ref.WeakReference
 import com.lynbrookrobotics.potassium.Platform
+import com.lynbrookrobotics.potassium.events.{ContinuousEvent, ImpulseEvent, ImpulseEventSource, PollingContinuousEvent}
 
 import scala.annotation.unchecked.uncheckedVariance
 
@@ -75,7 +76,6 @@ abstract class Stream[+T] { self =>
     }
   }
 
-  // TODO: requires review
   /**
     *
     * @return returns a stream of first value this stream will publish
@@ -362,7 +362,6 @@ abstract class Stream[+T] { self =>
     }
   }
 
-
   /**
     * Produces a stream that emits values at the same rate as the given
     * stream through polling
@@ -458,12 +457,14 @@ abstract class Stream[+T] { self =>
       v
     }
   }
+
   def withCheckZipped[O](checkingStream: Stream[O])(check: O => Unit): Stream[T] = {
     zipAsync(checkingStream).map{ case (v, checkedValue) =>
       check(checkedValue)
       v
     }
   }
+
   /**
     * Filters a stream to only emit values that pass a certain condition
     * @param condition the condition to filter stream values with
@@ -474,7 +475,9 @@ abstract class Stream[+T] { self =>
       private val parent = self
       override val expectedPeriodicity = NonPeriodic
       // TODO: optimize
-      override val originTimeStream = self.originTimeStream.map(_.zip(self).filter(t => condition(t._2)).map(_._1))
+      override val originTimeStream = self.originTimeStream.map(
+        _.zip(self).filter(t => condition(t._2)).map(_._1)
+      )
     }
 
     val ptr = WeakReference(ret)
@@ -492,6 +495,20 @@ abstract class Stream[+T] { self =>
     }
 
     ret
+  }
+
+  /**
+    * Returns a continuous even that is true when condition about the value of
+    * the stream is true
+    * @param condition condition
+    * @return
+    */
+  def eventWhen(condition: T => Boolean): ContinuousEvent = {
+    val (event, updateEvent) = ContinuousEvent.newEvent
+
+    // hold onto cancel function to prevent garbage collection
+    val cancelFunction = this.foreach(v => updateEvent.apply(condition(v)))
+    event
   }
 
   /**
