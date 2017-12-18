@@ -20,10 +20,7 @@ abstract class Stream[+T] { self =>
 
   private[this] var listeners = Vector.empty[T => Unit]
 
-  private var lastValue: Option[T @uncheckedVariance] = None
-
   protected def publishValue(value: T @uncheckedVariance): Unit = {
-    lastValue = Some(value)
     listeners.foreach(_.apply(value))
     // TODO: more stuff maybe
   }
