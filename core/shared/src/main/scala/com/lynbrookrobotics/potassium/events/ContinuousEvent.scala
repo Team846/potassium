@@ -25,7 +25,7 @@ class ContinuousEvent {
 
   private[events] var isRunning = false
 
-  private[events] def updateEventState(eventTrue: Boolean): Unit = {
+  protected def updateEventState(eventTrue: Boolean): Unit = {
     onUpdateCallbacks.foreach(_.apply(eventTrue))
 
     if (eventTrue) {
