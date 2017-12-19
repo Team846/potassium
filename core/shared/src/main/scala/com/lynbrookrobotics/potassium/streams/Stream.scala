@@ -504,11 +504,9 @@ abstract class Stream[+T] { self =>
     * @return
     */
   def eventWhen(condition: T => Boolean): ContinuousEvent = {
-    val (event, updateEvent) = ContinuousEvent.newEvent
-
-    // hold onto cancel function to prevent garbage collection
-    val cancelFunction = this.foreach(v => updateEvent.apply(condition(v)))
-    event
+    new ContinuousEvent {
+      val cancel = self.foreach(v => updateEventState(condition.apply(v)))
+    }
   }
 
   /**
