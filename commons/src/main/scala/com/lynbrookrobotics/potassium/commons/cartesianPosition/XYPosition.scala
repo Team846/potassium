@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.commons.cartesianPosition
 
+
 import com.lynbrookrobotics.potassium.units.Point
 import com.lynbrookrobotics.potassium.streams.Stream
 import squants.Angle
@@ -62,5 +63,13 @@ object XYPosition {
     xPosition.zip(yPosition).map { case (xPose, yPose) =>
       Point(xPose, yPose)
     }
+  }
+
+  def circularTracking(angle: Stream[Angle], position: Stream[Length]): Stream[Point] = {
+    val centralAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue(1) - angleQueue(2))
+    val arcLength: Stream[Length] = position.sliding(2).map(arcQueue => arcQueue(1) - arcQueue(2))
+    val radius: Stream[Length] = centralAngle.zip(arcLength).map(data => data._2 / data._1.toRadians)
+
+    ???
   }
 }

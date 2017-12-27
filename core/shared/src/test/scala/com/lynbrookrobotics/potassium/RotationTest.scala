@@ -27,7 +27,7 @@ class RotationTest extends FunSuite{
 
   test("Rotation of point at origin by any angle results in no displacement")
   {
-    val originalPoint: Point = Point(Feet(0), Feet(0), Feet(0))
+    val originalPoint: Point = Point.origin
     val angleToRotate: Angle = Degrees(47)
     val newPoint: Point = originalPoint.rotateBy(angleToRotate)
     val testPoint: Point = Point(Feet(0), Feet(0), Feet(0))
@@ -36,7 +36,7 @@ class RotationTest extends FunSuite{
 
   test("Rotation about another point by 90 degrees results in correct point")
   {
-    val originalPoint: Point = Point(Feet(0), Feet(0), Feet(0))
+    val originalPoint: Point = Point.origin
     val center: Point = Point(Feet(1), Feet(0), Feet(0))
     val angleToRotate: Angle = Degrees(90)
     val newPoint: Point = originalPoint.rotateAround(center, angleToRotate)
@@ -47,7 +47,7 @@ class RotationTest extends FunSuite{
 
   test("Rotation about another point by -90 degrees results in correct point")
   {
-    val originalPoint: Point = Point(Feet(0), Feet(0), Feet(0))
+    val originalPoint: Point = Point.origin
     val center: Point = Point(Feet(1), Feet(0), Feet(0))
     val angleToRotate: Angle = Degrees(-90)
     val newPoint: Point = originalPoint.rotateAround(center, angleToRotate)
@@ -59,7 +59,7 @@ class RotationTest extends FunSuite{
   test("Rotation about origin by 90 degrees results in correct point")
   {
     val originalPoint: Point = Point(Feet(1), Feet(1), Feet(0))
-    val center: Point = Point(Feet(0), Feet(0), Feet(0))
+    val center: Point = Point.origin
     val angleToRotate: Angle = Degrees(90)
     val newPoint: Point = originalPoint.rotateAround(center, angleToRotate)
     val testPoint: Point = Point(Feet(-1), Feet(1), Feet(0))
