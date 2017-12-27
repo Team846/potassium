@@ -50,4 +50,16 @@ case class Value3D[Q <: Quantity[Q]](x: Q, y: Q, z: Q) {
   }
 
   def * (scaler: Double): Value3D[Q] = this.times(scaler)
+
+  def * (matrix: (
+    (Double, Double, Double),
+      (Double, Double, Double),
+      (Double, Double, Double),
+    )): Value3D[Q] = {
+    Value3D(
+      matrix._1._1 * x + matrix._1._2 * y + matrix._1._3 * z,
+      matrix._2._1 * x + matrix._2._2 * y + matrix._2._3 * z,
+      matrix._3._1 * x + matrix._3._2 * y + matrix._3._3 * z
+    )
+  }
 }
