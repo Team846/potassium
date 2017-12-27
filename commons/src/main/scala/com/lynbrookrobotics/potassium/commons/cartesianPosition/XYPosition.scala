@@ -81,7 +81,8 @@ object XYPosition {
     val previousAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue(1))
 
     centralAngle.zip(previousAngle).zip(radius).zip(arcLength).zip(angle).scanLeft(Point.origin) {
-      case(prevPos: Point,(((((centralAngle: Angle), previousAngle: Angle), radius: Length), arcLength: Length),angle: Angle)) =>
+      case(prevPos: Point,(((((centralAngle: Angle), previousAngle: Angle), radius: Length), arcLength: Length),angle:
+        Angle)) =>
         if (centralAngle.value == 0.0) {
           Point(prevPos.x + angle.cos * arcLength, prevPos.y + arcLength * angle.sin)
         } else {
