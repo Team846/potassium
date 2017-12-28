@@ -69,7 +69,8 @@ object XYPosition {
     val centralAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue(1) - angleQueue(2))
     val arcLength: Stream[Length] = position.sliding(2).map(arcQueue => arcQueue(1) - arcQueue(2))
     val radius: Stream[Length] = centralAngle.zip(arcLength).map(data => data._2 / data._1.toRadians)
-
+    val previousAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue(2))
+    val dat = centralAngle.zip(previousAngle).zip(radius).sliding((Point.origin))
     ???
   }
 }
