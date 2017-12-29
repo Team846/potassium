@@ -40,9 +40,9 @@ object XYPosition {
 
   /**
     * differentiates x and y position, then reintegrates with Simpsons integration
-    * @param angle
-    * @param velocity
-    * @return
+    * @param angle a stream of the angle of the robot
+    * @param velocity a stream of the robot's velocity
+    * @return a stream of points of the robot's path
     */
   def positionWithSimpsons(angle: Stream[Angle],
                            velocity: Stream[Velocity]): Stream[Point] = {
@@ -65,12 +65,24 @@ object XYPosition {
     }
   }
 
+  /**
+    * tracks the position of the robot by assuming a circular path in order to account for angular velocity
+    * @param angle a stream of the angle of the robot
+    * @param position a stream of the distance traveled by the robot
+    * @return stream of points of the robot's path
+    */
   def circularTracking(angle: Stream[Angle], position: Stream[Length]): Stream[Point] = {
-    val centralAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue(1) - angleQueue(2))
-    val arcLength: Stream[Length] = position.sliding(2).map(arcQueue => arcQueue(1) - arcQueue(2))
+    val centralAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue.head - angleQueue(1))
+    val arcLength: Stream[Length] = position.sliding(2).map(arcQueue => arcQueue.head - arcQueue(1))
     val radius: Stream[Length] = centralAngle.zip(arcLength).map(data => data._2 / data._1.toRadians)
-    val previousAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue(2))
-    val dat = centralAngle.zip(previousAngle).zip(radius).sliding((Point.origin))
-    ???
+    val previousAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue(1))
+
+    centralAngle.zip(previousAngle).zip(radius).scanLeft(Point.origin)
+    {
+            case(prevPos: Point,((centralAngle: Angle, previousAngle: Angle), radius: Length)) =>
+              val center: Point = Point(Feet(prevPos.x + radius * previousAngle.cos),
+                  Feet(prevPos.y + radius * previousAngle.sin))
+              prevPos.rotateAround(center, centralAngle)
+    }
   }
 }
