@@ -72,9 +72,10 @@ object XYPosition {
     * @return stream of points of the robot's path
     */
   def circularTracking(angle: Stream[Angle], distanceTraveled: Stream[Length]): Stream[Point] = {
-    val centralAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue.head - angleQueue(1))
-    val arcLength: Stream[Length] = distanceTraveled.sliding(2).map(arcQueue => arcQueue.head - arcQueue(1))
+    val centralAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue(0) - angleQueue(1))
+    val arcLength: Stream[Length] = distanceTraveled.sliding(2).map(arcQueue => arcQueue(0) - arcQueue(1))
     val radius: Stream[Length] = centralAngle.zip(arcLength).map(data => data._2 / data._1.toRadians)
+
     val previousAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue(1))
 
     centralAngle.zip(previousAngle).zip(radius).scanLeft(Point.origin)
