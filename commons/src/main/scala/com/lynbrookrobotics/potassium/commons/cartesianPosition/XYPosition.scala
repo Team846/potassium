@@ -81,8 +81,9 @@ object XYPosition {
     centralAngle.zip(previousAngle).zip(radius).scanLeft(Point.origin)
     {
             case(prevPos: Point,((centralAngle: Angle, previousAngle: Angle), radius: Length)) =>
-              val center: Point = Point(Feet(prevPos.x + radius * previousAngle.cos),
-                  Feet(prevPos.y + radius * previousAngle.sin))
+              val center: Point = Point(
+                prevPos.x + radius * previousAngle.cos,
+                prevPos.y + radius * previousAngle.sin)
               prevPos.rotateAround(center, centralAngle)
     }
   }
