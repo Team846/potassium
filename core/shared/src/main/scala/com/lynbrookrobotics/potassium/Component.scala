@@ -20,7 +20,7 @@ import scala.collection.immutable.Queue
   *
   * @tparam T the type of values produced by signals for the component
   */
-abstract class Component[T] (printsOnOverflow: Boolean) {
+abstract class Component[T] (printsOnOverflow: Boolean = false) {
   def defaultController: Stream[T]
   private var currentControllerHandle: Option[Cancel] = None
 
