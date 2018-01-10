@@ -2,7 +2,13 @@ package com.lynbrookrobotics.potassium
 
 import com.lynbrookrobotics.potassium.clock.Clock
 import squants.Time
+<<<<<<< HEAD
 import com.lynbrookrobotics.potassium.streams.{Cancel, NonPeriodic, Stream}
+=======
+import com.lynbrookrobotics.potassium.streams.{NonPeriodic, Periodic, Stream}
+
+import scala.collection.immutable.Queue
+>>>>>>> detected overrun stuff
 
 /**
   * Represents a single robotic component, which translates signal data into action
@@ -14,7 +20,7 @@ import com.lynbrookrobotics.potassium.streams.{Cancel, NonPeriodic, Stream}
   *
   * @tparam T the type of values produced by signals for the component
   */
-abstract class Component[T] {
+abstract class Component[T] (printsOnOverflow: Boolean) {
   def defaultController: Stream[T]
   private var currentControllerHandle: Option[Cancel] = None
 
@@ -29,6 +35,13 @@ abstract class Component[T] {
   def setController(controller: Stream[T]): Unit = {
     if (controller.expectedPeriodicity == NonPeriodic) {
       throw new IllegalArgumentException("Controller must be periodic")
+    }
+    controller.originTimeStream.get.zipWithDt.foreach{ case (_, dt: Time) =>
+      if (controller.expectedPeriodicity.asInstanceOf[Periodic].period > 2 * dt ) {
+        println("Loop took twice as long as expected, $dt")
+        println("bad bad bad")
+        println("overrun bad bad bad")
+      }
     }
 
     currentControllerHandle.foreach(_.cancel())
