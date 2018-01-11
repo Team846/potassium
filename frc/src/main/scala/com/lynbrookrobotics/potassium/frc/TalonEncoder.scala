@@ -8,9 +8,7 @@ import squants.motion.AngularVelocity
 import squants.time.Seconds
 
 class TalonEncoder(talon: TalonSRX,
-                   conversionFactor: Ratio[Angle, Dimensionless]) {
-
-  talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10)
+                   val conversionFactor: Ratio[Angle, Dimensionless]) {
 
   def getAngle: Angle = {
     conversionFactor * Each(talon.getSelectedSensorPosition(0))

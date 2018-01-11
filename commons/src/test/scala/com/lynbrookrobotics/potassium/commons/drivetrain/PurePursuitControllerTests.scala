@@ -1,15 +1,16 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleDrive, UnicycleHardware, UnicycleProperties, UnicycleSignal}
 import com.lynbrookrobotics.potassium.control.PIDConfig
+import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
-import com.lynbrookrobotics.potassium.streams.{Periodic, Stream}
 import com.lynbrookrobotics.potassium.{ClockMocking, Signal}
+import org.scalatest.FunSuite
 import squants.motion._
 import squants.space.{Degrees, Feet, Meters}
 import squants.time.{Milliseconds, Seconds}
-import squants.{Acceleration, Angle, Dimensionless, Length, Percent, Velocity}
-import org.scalatest.FunSuite
+import squants.{Acceleration, Angle, Length, Percent, Velocity}
 
 class PurePursuitControllerTests extends FunSuite {
   implicit val props = Signal.constant(new UnicycleProperties {
@@ -18,7 +19,7 @@ class PurePursuitControllerTests extends FunSuite {
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(15)
     override val defaultLookAheadDistance: Length = Feet(1)
 
-    override val forwardControlGains = PIDConfig(
+    override val forwardVelocityGains = PIDConfig(
       Percent(0) / MetersPerSecond(1),
       Percent(0) / Meters(1),
       Percent(0) / MetersPerSecondSquared(1)
@@ -30,37 +31,38 @@ class PurePursuitControllerTests extends FunSuite {
       Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1))
     )
 
-    override val forwardPositionControlGains = PIDConfig(
+    override val forwardPositionGains = PIDConfig(
       Percent(100) / Meters(10),
       Percent(0) / (Meters(1).toGeneric * Seconds(1)),
       Percent(0) / MetersPerSecond(1)
     )
 
-    override val turnPositionControlGains = PIDConfig(
+    override val turnPositionGains = PIDConfig(
       Percent(100) / Degrees(10),
       Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
       Percent(0) / DegreesPerSecond(1)
     )
   })
 
-  private class TestDrivetrain extends UnicycleDrive with Drive{
+  private class TestDrivetrain extends UnicycleDrive with Drive {
     override type DriveSignal = UnicycleSignal
-    override type DriveVelocity = UnicycleSignal
+    override type OpenLoopInput = UnicycleSignal
 
     override type Hardware = UnicycleHardware
     override type Properties = UnicycleProperties
 
-    override protected def convertUnicycleToDrive(uni: UnicycleSignal): DriveSignal = uni
+    override protected def convertUnicycleToOpenLoopInput(uni: UnicycleSignal): DriveSignal = uni
 
-    override protected def controlMode(implicit hardware: Hardware,
-                                       props: Properties): UnicycleControlMode = NoOperation
+    override protected def getControlMode(implicit hardware: Hardware,
+                                          props: Properties): UnicycleControlMode = NoOperation
 
-    override protected def driveClosedLoop(signal: Stream[DriveSignal])
-                                          (implicit hardware: Hardware,
-                                           props: Signal[Properties]): Stream[DriveSignal] =
-      signal
+    override protected def driveClosedLoop(signal: Stream[OpenLoopInput])
+                                          (implicit hardware: UnicycleHardware,
+                                           props: Signal[UnicycleProperties]): Stream[UnicycleSignal] = signal
 
     override type Drivetrain = Nothing
+
+    override protected def openLoopToDriveSignal(openLoopInput: UnicycleSignal): UnicycleSignal = openLoopInput
   }
 
 
@@ -156,7 +158,7 @@ class PurePursuitControllerTests extends FunSuite {
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(15)
       override val defaultLookAheadDistance: Length = Feet(1)
 
-      override val forwardControlGains = PIDConfig(
+      override val forwardVelocityGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
         Percent(0) / Meters(1),
         Percent(0) / MetersPerSecondSquared(1)
@@ -168,13 +170,13 @@ class PurePursuitControllerTests extends FunSuite {
         Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1))
       )
 
-      override val forwardPositionControlGains = PIDConfig(
+      override val forwardPositionGains = PIDConfig(
         Percent(100) / Meters(10),
         Percent(0) / (Meters(1).toGeneric * Seconds(1)),
         Percent(0) / MetersPerSecond(1)
       )
 
-      override val turnPositionControlGains = PIDConfig(
+      override val turnPositionGains = PIDConfig(
         Percent(100) / Degrees(10),
         Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
         Percent(0) / DegreesPerSecond(1)
@@ -203,7 +205,7 @@ class PurePursuitControllerTests extends FunSuite {
     assert(out ~= Percent(-50), s"result is ${out.toPercent}")
   }
 
-  test("Test if overshooting target results not making full turn"){
+  test("Test if overshooting target results not making full turn") {
     val testDrivetrain = new TestDrivetrain
     implicit val hardware = new UnicycleHardware {
       override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))

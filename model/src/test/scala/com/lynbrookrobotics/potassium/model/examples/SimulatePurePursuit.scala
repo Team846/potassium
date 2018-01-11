@@ -1,10 +1,11 @@
 package com.lynbrookrobotics.potassium.model.examples
 
 import com.lynbrookrobotics.potassium.ClockMocking.mockedClockTicker
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.MathUtilities
+import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.TwoSidedDriveProperties
 import com.lynbrookrobotics.potassium.{Signal, commons}
 import com.lynbrookrobotics.potassium.model.simulations.SimulatedTwoSidedHardware
 import com.lynbrookrobotics.potassium.model.simulations.TwoSidedDriveContainerSimulator
-import com.lynbrookrobotics.potassium.commons.drivetrain.{MathUtilities, PurePursuitTasks, TwoSidedDriveProperties}
 import com.lynbrookrobotics.potassium.control.PIDConfig
 import squants.time.Minutes
 import com.lynbrookrobotics.potassium.units.Point
@@ -40,22 +41,22 @@ class SimulatePurePursuit extends FunSuite {
       Percent(0) / Degrees(1),
       Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)))
 
-    override val forwardPositionControlGains = PIDConfig(
+    override val forwardPositionGains = PIDConfig(
       Percent(100) / Feet(4),
       Percent(0) / (Meters(1).toGeneric * Seconds(1)),
       Percent(0) / MetersPerSecond(1))
 
-    override val turnPositionControlGains = PIDConfig(
+    override val turnPositionGains = PIDConfig(
       kp = Percent(5) / Degrees(1),
       ki = Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
       kd = Percent(0.5) / DegreesPerSecond(1))
 
-    override val leftControlGains = PIDConfig(
+    override val leftVelocityGains = PIDConfig(
       Percent(100) / FeetPerSecond(1),
       Percent(0) / Meters(1),
       Percent(0) / MetersPerSecondSquared(1))
 
-    override val rightControlGains = leftControlGains
+    override val rightVelocityGains = leftVelocityGains
   }
 
   implicit val props = Signal.constant(propsVal)

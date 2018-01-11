@@ -1,18 +1,19 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle._
+import com.lynbrookrobotics.potassium.control.PIDConfig
 import com.lynbrookrobotics.potassium.streams.Stream
-import com.lynbrookrobotics.potassium.control.{PIDConfig, PIDFConfig}
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.{ClockMocking, Signal}
+import org.scalacheck.Prop.forAll
 import org.scalacheck.{Arbitrary, Gen}
+import org.scalatest.FunSuite
+import org.scalatest.prop.Checkers._
 import squants.motion._
 import squants.space.{Degrees, Meters}
 import squants.time.{Milliseconds, Seconds}
-import squants.{Acceleration, Angle, Dimensionless, Each, Length, Percent, Velocity}
-import org.scalacheck.Prop.forAll
-import org.scalatest.FunSuite
-import org.scalatest.prop.Checkers._
+import squants.{Acceleration, Angle, Each, Length, Percent, Velocity}
 
 class UnicycleDriveControlTest extends FunSuite {
   val period = Milliseconds(5)
@@ -30,22 +31,23 @@ class UnicycleDriveControlTest extends FunSuite {
 
   private class TestDrivetrain extends UnicycleDrive {
     override type DriveSignal = UnicycleSignal
-    override type DriveVelocity = UnicycleSignal
+    override type OpenLoopInput = UnicycleSignal
 
     override type Hardware = UnicycleHardware
     override type Properties = UnicycleProperties
 
-    override protected def convertUnicycleToDrive(uni: UnicycleSignal): DriveSignal = uni
+    override protected def convertUnicycleToOpenLoopInput(uni: UnicycleSignal): DriveSignal = uni
 
-    override protected def controlMode(implicit hardware: Hardware,
-                                       props: Properties): UnicycleControlMode = NoOperation
-
-    override protected def driveClosedLoop(signal: Stream[DriveSignal])
-                                          (implicit hardware: Hardware,
-                                           props: Signal[Properties]): Stream[DriveSignal] =
-      signal
+    override protected def getControlMode(implicit hardware: Hardware,
+                                          props: Properties): UnicycleControlMode = NoOperation
 
     override type Drivetrain = Nothing
+
+    override protected def driveClosedLoop(signal: Stream[OpenLoopInput])
+                                          (implicit hardware: UnicycleHardware,
+                                           props: Signal[UnicycleProperties]): Stream[UnicycleSignal] = signal
+
+    override protected def openLoopToDriveSignal(openLoopInput: OpenLoopInput): UnicycleSignal = openLoopInput
   }
 
   implicit val arbitraryVelocity: Arbitrary[Velocity] = Arbitrary(
@@ -56,45 +58,6 @@ class UnicycleDriveControlTest extends FunSuite {
     Gen.chooseNum[Double](-100D, 100D).map(d => DegreesPerSecond(d))
   )
 
-  test("Open forward loop produces same forward speed as input and zero turn speed") {
-    val drive = new TestDrivetrain
-
-    check(forAll { x: Double =>
-      val out = drive.UnicycleControllers.openForwardOpenDrive(
-        hardware.forwardVelocity.mapToConstant(Each(x)))
-
-      var forward = Percent(-10)
-      var turn = Percent(-10)
-      out.foreach(o => {
-        forward = o.forward
-        turn = o.turn
-      })
-
-      trigggerClock.apply(period)
-
-      forward.toEach == x && turn.toEach == 0
-    })
-  }
-
-  test("Open turn loop produces same turn speed as input and zero forward speed") {
-    val drive = new TestDrivetrain
-
-    check(forAll { x: Double =>
-      val out = drive.UnicycleControllers.openTurnOpenDrive(hardware.turnVelocity.mapToConstant(Each(x)))
-
-      var forward = Percent(-10)
-      var turn = Percent(-10)
-      out.foreach(o => {
-        forward = o.forward
-        turn = o.turn
-      })
-
-      trigggerClock.apply(period)
-
-      turn.toEach == x && forward.toEach == 0
-    })
-  }
-
   test("Closed loop with only feed-forward is essentially open loop") {
     implicit val props = Signal.constant(new UnicycleProperties {
       override val maxForwardVelocity: Velocity = MetersPerSecond(10)
@@ -102,7 +65,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
       override val defaultLookAheadDistance: Length = null
 
-      override val forwardControlGains = PIDConfig(
+      override val forwardVelocityGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
         Percent(0) / Meters(1),
         Percent(0) / MetersPerSecondSquared(1)
@@ -114,8 +77,8 @@ class UnicycleDriveControlTest extends FunSuite {
         Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1))
       )
 
-      override val forwardPositionControlGains = null
-      override val turnPositionControlGains = null
+      override val forwardPositionGains = null
+      override val turnPositionGains = null
     })
 
     val drive = new TestDrivetrain
@@ -148,16 +111,16 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxAcceleration: Acceleration = null
       override val defaultLookAheadDistance: Length = null
 
-      override val forwardControlGains = null
+      override val forwardVelocityGains = null
       override val turnControlGains = null
 
-      override val forwardPositionControlGains = PIDConfig(
+      override val forwardPositionGains = PIDConfig(
         Percent(100) / Meters(1),
         Percent(0) / (Meters(1).toGeneric * Seconds(1)),
         Percent(0) / MetersPerSecond(1)
       )
 
-      override val turnPositionControlGains = null
+      override val turnPositionGains = null
     })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
@@ -193,16 +156,16 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxAcceleration: Acceleration = null
       override val defaultLookAheadDistance: Length = null
 
-      override val forwardControlGains = null
+      override val forwardVelocityGains = null
       override val turnControlGains = null
 
-      override val forwardPositionControlGains = PIDConfig(
+      override val forwardPositionGains = PIDConfig(
         Percent(100) / Meters(10),
         Percent(0) / (Meters(1).toGeneric * Seconds(1)),
         Percent(0) / MetersPerSecond(1)
       )
 
-      override val turnPositionControlGains = null
+      override val turnPositionGains = null
     })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
@@ -238,16 +201,16 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxAcceleration: Acceleration = null
       override val defaultLookAheadDistance: Length = null
 
-      override val forwardControlGains = null
+      override val forwardVelocityGains = null
       override val turnControlGains = null
 
-      override val forwardPositionControlGains = PIDConfig(
+      override val forwardPositionGains = PIDConfig(
         Percent(100) / Meters(10),
         Percent(0) / (Meters(1).toGeneric * Seconds(1)),
         Percent(0) / MetersPerSecond(1)
       )
 
-      override val turnPositionControlGains = null
+      override val turnPositionGains = null
     })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
@@ -283,12 +246,12 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxAcceleration: Acceleration = null
       override val defaultLookAheadDistance: Length = null
 
-      override val forwardControlGains = null
+      override val forwardVelocityGains = null
       override val turnControlGains = null
 
-      override val forwardPositionControlGains = null
+      override val forwardPositionGains = null
 
-      override val turnPositionControlGains = PIDConfig(
+      override val turnPositionGains = PIDConfig(
         Percent(100) / Degrees(1),
         Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
         Percent(0) / DegreesPerSecond(1)
@@ -328,12 +291,12 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxAcceleration: Acceleration = null
       override val defaultLookAheadDistance: Length = null
 
-      override val forwardControlGains = null
+      override val forwardVelocityGains = null
       override val turnControlGains = null
 
-      override val forwardPositionControlGains = null
+      override val forwardPositionGains = null
 
-      override val turnPositionControlGains = PIDConfig(
+      override val turnPositionGains = PIDConfig(
         Percent(100) / Degrees(10),
         Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
         Percent(0) / DegreesPerSecond(1)
@@ -373,12 +336,12 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxAcceleration: Acceleration = null
       override val defaultLookAheadDistance: Length = null
 
-      override val forwardControlGains = null
+      override val forwardVelocityGains = null
       override val turnControlGains = null
 
-      override val forwardPositionControlGains = null
+      override val forwardPositionGains = null
 
-      override val turnPositionControlGains = PIDConfig(
+      override val turnPositionGains = PIDConfig(
         Percent(100) / Degrees(10),
         Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
         Percent(0) / DegreesPerSecond(1)

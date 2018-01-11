@@ -2,7 +2,6 @@ package com.lynbrookrobotics.potassium.model.examples
 
 import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.model.simulations.TwoSidedDriveContainerSimulator
-import com.lynbrookrobotics.potassium.commons.drivetrain.TwoSidedDriveProperties
 import com.lynbrookrobotics.potassium.control.PIDConfig
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
@@ -12,6 +11,7 @@ import squants.space.{Degrees, Feet, Inches, Meters}
 import squants.time.{Milliseconds, Seconds}
 import squants.Time
 import com.lynbrookrobotics.potassium.ClockMocking._
+import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.TwoSidedDriveProperties
 import squants.mass.{KilogramsMetersSquared, Pounds}
 
 import scala.reflect.io.File
@@ -30,22 +30,22 @@ object SimulateDrivetrain extends App {
       Percent(0) / Degrees(1),
       Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)))
 
-    override val forwardPositionControlGains = PIDConfig(
+    override val forwardPositionGains = PIDConfig(
       Percent(100) / Feet(4),
       Percent(0) / (Meters(1).toGeneric * Seconds(1)),
       Percent(0) / MetersPerSecond(1))
 
-    override val turnPositionControlGains = PIDConfig(
+    override val turnPositionGains = PIDConfig(
       Percent(5) / Degrees(1),
       Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
       Percent(0) / DegreesPerSecond(1))
 
-    override val leftControlGains = PIDConfig(
+    override val leftVelocityGains = PIDConfig(
       Percent(100) / FeetPerSecond(1),
       Percent(0) / Meters(1),
       Percent(0) / MetersPerSecondSquared(1))
 
-    override val rightControlGains = leftControlGains
+    override val rightVelocityGains = leftVelocityGains
   }
 
   implicit val props = Signal.constant(propsVal)
