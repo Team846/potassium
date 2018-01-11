@@ -30,7 +30,6 @@ class UnicycleDriveControlTest extends FunSuite {
 
   private class TestDrivetrain extends UnicycleDrive {
     override type DriveSignal = UnicycleSignal
-    override type DriveVelocity = UnicycleSignal
 
     override type Hardware = UnicycleHardware
     override type Properties = UnicycleProperties

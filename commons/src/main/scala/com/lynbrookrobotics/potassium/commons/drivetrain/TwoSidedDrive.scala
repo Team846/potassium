@@ -66,7 +66,6 @@ abstract class TwoSidedDrive
   case class TwoSidedVelocity(left: Velocity, right: Velocity)
 
   type DriveSignal = TwoSidedSignal
-  type DriveVelocity = TwoSidedVelocity
 
   type Hardware <: TwoSidedDriveHardware
   type Properties <: TwoSidedDriveProperties

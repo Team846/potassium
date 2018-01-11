@@ -45,7 +45,6 @@ class PurePursuitControllerTests extends FunSuite {
 
   private class TestDrivetrain extends UnicycleDrive with Drive{
     override type DriveSignal = UnicycleSignal
-    override type DriveVelocity = UnicycleSignal
 
     override type Hardware = UnicycleHardware
     override type Properties = UnicycleProperties
