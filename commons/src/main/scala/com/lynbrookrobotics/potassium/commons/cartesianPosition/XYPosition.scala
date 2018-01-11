@@ -74,17 +74,23 @@ object XYPosition {
   def circularTracking(angle: Stream[Angle], distanceTraveled: Stream[Length]): Stream[Point] = {
     val centralAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue(0) - angleQueue(1))
     val arcLength: Stream[Length] = distanceTraveled.sliding(2).map(arcQueue => arcQueue(0) - arcQueue(1))
-    val radius: Stream[Length] = centralAngle.zip(arcLength).map(data => data._2 / data._1.toRadians)
+    val radius: Stream[Length] = centralAngle.zip(arcLength).map {
+      case(centralAngle, arcLength) => arcLength / centralAngle.toRadians
+    }
 
-    val previousAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue(1))
+    val previousAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue(1) - Degrees(90))
 
-    centralAngle.zip(previousAngle).zip(radius).scanLeft(Point.origin)
-    {
-      case(prevPos: Point,((centralAngle: Angle, previousAngle: Angle), radius: Length)) =>
-        val center: Point = Point(
-          prevPos.x + radius * previousAngle.cos,
-          prevPos.y + radius * previousAngle.sin)
-        prevPos.rotateAround(center, centralAngle - Degrees(90))
+    centralAngle.zip(previousAngle).zip(radius).zip(arcLength).scanLeft(Point.origin) {
+      case(prevPos: Point,((((centralAngle: Angle), previousAngle: Angle), radius: Length), arcLength: Length)) =>
+        if (radius.value == Double.PositiveInfinity || radius.value == Double.NegativeInfinity) {
+          Point(previousAngle.cos * arcLength, arcLength * previousAngle.sin)
+        }
+        else {
+          val center: Point = Point(
+            prevPos.x + radius * previousAngle.cos,
+            prevPos.y + radius * previousAngle.sin)
+          prevPos.rotateAround(center, centralAngle - Degrees(90))
+        }
     }
   }
 }
