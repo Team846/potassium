@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle._
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.control.{PIDConfig, PIDFConfig}
 import com.lynbrookrobotics.potassium.units.GenericValue._

@@ -8,9 +8,7 @@ import squants.{Angle, Dimensionless, Ratio}
 sealed class OffloadedSignal
 
 object OffloadedSignal {
-  type VelocityGains = PIDConfig[AngularVelocity,
-    GenericValue[AngularVelocity],
-    AngularVelocity,
+  type VelocityGains = PIDFProperUnitsConfig[AngularVelocity,
     AngularAcceleration,
     Angle,
     Dimensionless]
@@ -23,11 +21,11 @@ object OffloadedSignal {
     Dimensionless]
 }
 
-case class VelocityControl(encoderTickConversionFactor: Ratio[Angle, Int])
+case class VelocityControl(encoderTickConversionFactor: Ratio[Angle, Dimensionless])
                           (gains: VelocityGains)
                           (signal: AngularVelocity) extends OffloadedSignal
 
-case class PositionControl(encoderTickConversionFactor: Ratio[Angle, Int])
+case class PositionControl(encoderTickConversionFactor: Ratio[Angle, Dimensionless])
                           (gains: PositionGains)
                           (signal: Angle) extends OffloadedSignal
 

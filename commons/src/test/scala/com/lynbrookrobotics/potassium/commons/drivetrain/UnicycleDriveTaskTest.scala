@@ -7,6 +7,7 @@ import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium._
 import com.lynbrookrobotics.potassium.clock.Clock
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleDrive, UnicycleHardware, UnicycleProperties, UnicycleSignal}
 import squants.motion.{AngularVelocity, DegreesPerSecond, MetersPerSecond, MetersPerSecondSquared}
 import squants.motion._
 import squants.space.{Degrees, Meters}

@@ -1,54 +1,10 @@
-package com.lynbrookrobotics.potassium.commons.drivetrain
+package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle
 
-import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium.Signal
-import squants.motion.AngularVelocity
+import com.lynbrookrobotics.potassium.commons.drivetrain._
+import com.lynbrookrobotics.potassium.commons.drivetrain.purePursuit.{PurePursuitControllers, PurePursuitTasks}
 import com.lynbrookrobotics.potassium.streams.Stream
-import squants.{Acceleration, Angle, Dimensionless, Each, Length, Percent, Velocity}
-
-trait UnicycleProperties {
-  val maxForwardVelocity: Velocity
-  val maxTurnVelocity: AngularVelocity
-  val maxAcceleration: Acceleration
-  val defaultLookAheadDistance: Length
-
-  val forwardControlGains: ForwardVelocityGains
-
-  lazy val forwardControlGainsFull: ForwardVelocityGains#Full = {
-    forwardControlGains.withF(Percent(100) / maxForwardVelocity)
-  }
-
-  val turnControlGains: TurnVelocityGains
-
-  lazy val turnControlGainsFull: TurnVelocityGains#Full = {
-    turnControlGains.withF(Percent(100) / maxTurnVelocity)
-  }
-
-  val forwardPositionControlGains: ForwardPositionGains
-
-  val turnPositionControlGains: TurnPositionGains
-}
-
-trait UnicycleHardware {
-  val forwardVelocity: Stream[Velocity]
-  val turnVelocity: Stream[AngularVelocity]
-
-  val forwardPosition: Stream[Length]
-  val turnPosition: Stream[Angle]
-}
-
-case class UnicycleSignal(forward: Dimensionless, turn: Dimensionless) {
-  def +(that: UnicycleSignal): UnicycleSignal =
-    UnicycleSignal(this.forward + that.forward, this.turn + that.turn)
-}
-
-case class UnicycleVelocity(forward: Velocity, turn: AngularVelocity) {
-  def toUnicycleSignal(implicit unicycleProperties: Signal[UnicycleProperties]) = {
-    UnicycleSignal(
-      Each(forward / unicycleProperties.get.maxForwardVelocity),
-      Each(turn / unicycleProperties.get.maxTurnVelocity))
-  }
-}
+import squants.Percent
 
 /**
   * A drivetrain that has forward-backward and turning control in the unicycle model

@@ -1,10 +1,11 @@
-package com.lynbrookrobotics.potassium.commons.drivetrain
+package com.lynbrookrobotics.potassium.commons.drivetrain.purePursuit
 
-import com.lynbrookrobotics.potassium.control.PIDF
-import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import com.lynbrookrobotics.potassium.Signal
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleCoreControllers, UnicycleHardware, UnicycleProperties, UnicycleSignal}
+import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.streams.Stream
-import squants.{Angle, Dimensionless, Percent, Time}
+import com.lynbrookrobotics.potassium.units.{Point, Segment}
+import squants.Dimensionless
 import squants.space.{Angle, _}
 
 trait PurePursuitControllers extends UnicycleCoreControllers {

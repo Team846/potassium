@@ -1,11 +1,10 @@
-package com.lynbrookrobotics.potassium.commons.drivetrain
+package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle
 
 import com.lynbrookrobotics.potassium.Signal
-import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.control.PIDF
-import squants.{Angle, Dimensionless, Length, Percent, Quantity, Time, Velocity}
+import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units._
-import squants.time.{TimeDerivative, TimeIntegral}
+import squants.{Angle, Dimensionless, Length, Percent, Quantity, Time}
 
 import scala.collection.immutable.Queue
 
