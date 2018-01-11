@@ -1,19 +1,23 @@
 package com.lynbrookrobotics.potassium.frc
 
-import com.ctre.CANTalon
-
+import com.ctre.phoenix.motorcontrol.FeedbackDevice
+import com.ctre.phoenix.motorcontrol.can.TalonSRX
 import com.lynbrookrobotics.potassium.units.Ratio
 import squants.{Angle, Dimensionless, Each}
 import squants.motion.AngularVelocity
 import squants.time.Seconds
 
-class TalonEncoder(talon: CANTalon,
+class TalonEncoder(talon: TalonSRX,
                    conversionFactor: Ratio[Angle, Dimensionless]) {
+
+  talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10)
+
   def getAngle: Angle = {
-    conversionFactor * Each(talon.getPosition)
+    conversionFactor * Each(talon.getSelectedSensorPosition(0))
   }
 
   def getAngularVelocity: AngularVelocity = {
-    (conversionFactor * Each(talon.getSpeed) * 10) / Seconds(1)
+    // we multiply by 10 because we read in units of ticks/100ms
+    (conversionFactor * Each(talon.getSelectedSensorVelocity(0)) * 10) / Seconds(1)
   }
 }
