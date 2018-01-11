@@ -1,13 +1,13 @@
-package com.lynbrookrobotics.potassium.commons.drivetrain
+package com.lynbrookrobotics.potassium.commons.drivetrain.purePursuit
 
-import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
-import com.lynbrookrobotics.potassium.tasks.FiniteTask
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.UnicycleCoreTasks
 import com.lynbrookrobotics.potassium.streams.Stream
-import com.lynbrookrobotics.potassium.units.{Point, Segment}
+import com.lynbrookrobotics.potassium.tasks.FiniteTask
+import com.lynbrookrobotics.potassium.units.Point
+import squants.Dimensionless
 import squants.space.{Angle, Degrees, Feet, Length}
-import squants.{Dimensionless, Each, Percent}
 
 
 trait PurePursuitTasks extends UnicycleCoreTasks {

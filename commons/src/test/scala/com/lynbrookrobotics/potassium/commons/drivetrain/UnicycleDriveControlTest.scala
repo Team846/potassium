@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle._
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.control.{PIDConfig, PIDFConfig}
 import com.lynbrookrobotics.potassium.units.GenericValue._
@@ -30,7 +31,6 @@ class UnicycleDriveControlTest extends FunSuite {
 
   private class TestDrivetrain extends UnicycleDrive {
     override type DriveSignal = UnicycleSignal
-    override type DriveVelocity = UnicycleSignal
 
     override type Hardware = UnicycleHardware
     override type Properties = UnicycleProperties

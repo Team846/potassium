@@ -2,7 +2,9 @@ package com.lynbrookrobotics.potassium.model.simulations
 
 import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
-import com.lynbrookrobotics.potassium.commons.drivetrain.{TwoSidedDrive, _}
+import com.lynbrookrobotics.potassium.commons.drivetrain._
+import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.{TwoSidedDrive, TwoSidedDriveHardware, TwoSidedDriveProperties, TwoSidedSignal}
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.UnicycleProperties
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.Point
 import com.lynbrookrobotics.potassium.{Component, Signal}

@@ -7,6 +7,7 @@ import com.lynbrookrobotics.potassium.control.PIDConfig
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium._
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleDrive, UnicycleHardware, UnicycleProperties, UnicycleSignal}
 import squants.motion.{AngularVelocity, DegreesPerSecond, MetersPerSecond, MetersPerSecondSquared}
 import squants.motion._
 import squants.space.{Degrees, Meters}
@@ -16,7 +17,6 @@ import org.scalatest.FunSuite
 class PurePursuitTasksTest extends FunSuite {
   class TestDrivetrain extends UnicycleDrive {
     override type DriveSignal = UnicycleSignal
-    override type DriveVelocity = UnicycleSignal
 
     override type Hardware = UnicycleHardware
     override type Properties = UnicycleProperties

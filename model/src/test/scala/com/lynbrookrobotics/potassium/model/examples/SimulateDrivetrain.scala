@@ -2,7 +2,6 @@ package com.lynbrookrobotics.potassium.model.examples
 
 import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.model.simulations.TwoSidedDriveContainerSimulator
-import com.lynbrookrobotics.potassium.commons.drivetrain.TwoSidedDriveProperties
 import com.lynbrookrobotics.potassium.control.PIDConfig
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
@@ -12,6 +11,7 @@ import squants.space.{Degrees, Feet, Inches, Meters}
 import squants.time.{Milliseconds, Seconds}
 import squants.Time
 import com.lynbrookrobotics.potassium.ClockMocking._
+import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.TwoSidedDriveProperties
 import squants.mass.{KilogramsMetersSquared, Pounds}
 
 import scala.reflect.io.File

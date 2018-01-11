@@ -1,7 +1,6 @@
-package com.lynbrookrobotics.potassium.commons.drivetrain
+package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle
 
 import com.lynbrookrobotics.potassium.streams.Stream
-
 import squants.motion._
 import squants.space.Feet
 
