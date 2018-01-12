@@ -1,6 +1,19 @@
 package com.lynbrookrobotics.potassium.streams
 
-class EagerZippedStream[A, B](private val parentA: Stream[A], private val parentB: Stream[B]) extends Stream[(A, B)] {
+class EagerZippedStream[A, B](parentA: Stream[A], parentB: Stream[B]) extends Stream[(A, B)] {
+  var parentAUnsubscribe: Cancel = null
+  var parentBUnsubscribe: Cancel = null
+
+  override def subscribeToParents(): Unit = {
+    parentAUnsubscribe = parentA.foreach(this.receiveA)
+    parentBUnsubscribe = parentB.foreach(this.receiveB)
+  }
+
+  override def unsubscribeFromParents(): Unit = {
+    parentAUnsubscribe.cancel(); parentAUnsubscribe = null
+    parentBUnsubscribe.cancel(); parentBUnsubscribe = null
+  }
+
   override val expectedPeriodicity: ExpectedPeriodicity = NonPeriodic
 
   override val originTimeStream = null
