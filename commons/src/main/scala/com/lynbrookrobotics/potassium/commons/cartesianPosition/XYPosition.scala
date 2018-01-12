@@ -72,20 +72,19 @@ object XYPosition {
     * @return stream of points of the robot's path
     */
   def circularTracking(angle: Stream[Angle], distanceTraveled: Stream[Length]): Stream[Point] = {
-    val centralAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue(0) - angleQueue(1))
-    val arcLength: Stream[Length] = distanceTraveled.sliding(2).map(arcQueue => arcQueue(0) - arcQueue(1))
+    val centralAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue(1) - angleQueue(0))
+    val arcLength: Stream[Length] = distanceTraveled.sliding(2).map(arcQueue => arcQueue(1) - arcQueue(0))
     val radius: Stream[Length] = centralAngle.zip(arcLength).map {
       case(centralAngle, arcLength) => arcLength / centralAngle.toRadians
     }
 
     val previousAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue(1) - Degrees(90))
 
-    centralAngle.zip(previousAngle).zip(radius).zip(arcLength).scanLeft(Point.origin) {
-      case(prevPos: Point,((((centralAngle: Angle), previousAngle: Angle), radius: Length), arcLength: Length)) =>
-        if (radius.value == Double.PositiveInfinity || radius.value == Double.NegativeInfinity) {
-          Point(previousAngle.cos * arcLength, arcLength * previousAngle.sin)
-        }
-        else {
+    centralAngle.zip(previousAngle).zip(radius).zip(arcLength).zip(angle).scanLeft(Point.origin) {
+      case(prevPos: Point,(((((centralAngle: Angle), previousAngle: Angle), radius: Length), arcLength: Length),angle: Angle)) =>
+        if (centralAngle.value == 0.0) {
+          Point(prevPos.x + angle.cos * arcLength, prevPos.y + arcLength * angle.sin)
+        } else {
           val center: Point = Point(
             prevPos.x + radius * previousAngle.cos,
             prevPos.y + radius * previousAngle.sin)

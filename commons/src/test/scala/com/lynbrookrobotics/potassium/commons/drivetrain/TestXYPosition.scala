@@ -100,9 +100,6 @@ class TestXYPosition extends FunSuite{
     val (angularSpeed, pubTurnSpeed) = Stream.manualWithTime[AngularVelocity](Periodic(period))
     val angle = angularSpeed.integral.map(_ + initialAngle)
 
-    val (straightVelocity, pubStraightVelocity) = Stream.manualWithTime[Velocity](Periodic(period))
-    val straightDistance = straightVelocity.integral
-
     val distance = angle.map{ angle =>
       (angle - initialAngle) onRadius Feet(1)
     }
@@ -117,7 +114,7 @@ class TestXYPosition extends FunSuite{
     val simpsonsPosition = XYPosition.positionWithSimpsons(
       angle,
       velocity)
-    val circularPosition = XYPosition.circularTracking(angle, straightDistance)
+    val circularPosition = XYPosition.circularTracking(angle, distance)
 
     var lastPose = unitializedPose
     var lastSimpPose = unitializedPose
