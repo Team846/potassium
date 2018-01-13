@@ -168,8 +168,6 @@ class TwoSidedDriveContainerSimulator extends TwoSidedDrive { self =>
     * @param signal   the signal to output
     */
   override protected def output(hardware: Hardware, signal: TwoSidedSignal): Unit = {
-    hardware.leftMotor.set(signal.left)
-    hardware.rightMotor.set(signal.right)
   }
 
   override protected def controlMode(implicit hardware: SimulatedTwoSidedHardware,
@@ -182,7 +180,8 @@ class TwoSidedDriveContainerSimulator extends TwoSidedDrive { self =>
     override def defaultController: Stream[TwoSidedSignal] = self.defaultController
 
     override def applySignal(signal: TwoSidedSignal): Unit = {
-      output(hardware, signal)
+      hardware.leftMotor.set(signal.left)
+      hardware.rightMotor.set(signal.right)
     }
   }
 }
