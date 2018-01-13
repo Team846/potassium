@@ -1,7 +1,6 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain.twoSided
 
 import com.lynbrookrobotics.potassium.Signal
-import com.lynbrookrobotics.potassium.commons.drivetrain._
 import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleDrive, UnicycleSignal}
 import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.streams.Stream
@@ -12,8 +11,7 @@ import com.lynbrookrobotics.potassium.units._
   * A drivetrain with two side control (such as a tank drive)
   */
 abstract class TwoSidedDrive
-  extends UnicycleDrive {
-  self =>
+  extends UnicycleDrive { self =>
 
   type DriveSignal = TwoSidedSignal
 

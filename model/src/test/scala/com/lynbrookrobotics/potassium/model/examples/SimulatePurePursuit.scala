@@ -52,6 +52,8 @@ class SimulatePurePursuit extends FunSuite {
       Percent(0) / MetersPerSecondSquared(1))
 
     override val rightControlGains: ForwardVelocityGains = leftControlGains
+    override val track: Distance = Inches(21.75)
+    override val blendExponent: Double = Double.NaN
   }
 
   implicit val props = Signal.constant(propsVal)
@@ -64,7 +66,6 @@ class SimulatePurePursuit extends FunSuite {
     implicit val (clock, triggerClock) = mockedClockTicker
     implicit val hardware = new SimulatedTwoSidedHardware(
       Pounds(88) * MetersPerSecondSquared(1) / 2,
-      Inches(21.75),
       Pounds(88),
       KilogramsMetersSquared(3.909),
       clock,
