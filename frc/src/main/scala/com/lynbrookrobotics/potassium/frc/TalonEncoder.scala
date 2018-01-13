@@ -7,17 +7,15 @@ import squants.{Angle, Dimensionless, Each}
 import squants.motion.AngularVelocity
 import squants.time.Seconds
 
-class TalonEncoder(talon: TalonSRX,
+class TalonEncoder(talon: TalonController,
                    conversionFactor: Ratio[Angle, Dimensionless]) {
 
-  talon.configSelectedFeedbackSensor(FeedbackDevice.QuadEncoder, 0, 10)
-
   def getAngle: Angle = {
-    conversionFactor * Each(talon.getSelectedSensorPosition(0))
+    conversionFactor * Each(talon.rawPosition)
   }
 
   def getAngularVelocity: AngularVelocity = {
     // we multiply by 10 because we read in units of ticks/100ms
-    (conversionFactor * Each(talon.getSelectedSensorVelocity(0)) * 10) / Seconds(1)
+    (conversionFactor * Each(talon.rawPosition) * 10) / Seconds(1)
   }
 }
