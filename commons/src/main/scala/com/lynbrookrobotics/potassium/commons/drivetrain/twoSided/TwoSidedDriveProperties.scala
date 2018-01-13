@@ -5,7 +5,7 @@ import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.UnicycleProper
 import com.lynbrookrobotics.potassium.control.PIDConfig
 import com.lynbrookrobotics.potassium.units._
 import squants.motion.{MetersPerSecond, MetersPerSecondSquared}
-import squants.space.Meters
+import squants.space.{Length, Meters}
 import squants.{Each, Percent, Velocity}
 
 trait TwoSidedDriveProperties extends UnicycleProperties {
@@ -27,4 +27,8 @@ trait TwoSidedDriveProperties extends UnicycleProperties {
     Each(0) / Meters(1),
     Each(0) / MetersPerSecondSquared(1)
   )
+
+  val track: Length
+
+  val blendExponent: Double
 }

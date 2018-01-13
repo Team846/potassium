@@ -1,25 +1,19 @@
 package com.lynbrookrobotics.potassium.model.examples
 
 import com.lynbrookrobotics.potassium.ClockMocking.mockedClockTicker
+import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.commons.drivetrain.purePursuit.MathUtilities
 import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.TwoSidedDriveProperties
-import com.lynbrookrobotics.potassium.{Signal, commons}
-import com.lynbrookrobotics.potassium.model.simulations.SimulatedTwoSidedHardware
-import com.lynbrookrobotics.potassium.model.simulations.TwoSidedDriveContainerSimulator
 import com.lynbrookrobotics.potassium.control.PIDConfig
-import squants.time.Minutes
-import com.lynbrookrobotics.potassium.units.Point
+import com.lynbrookrobotics.potassium.model.simulations.{SimulatedTwoSidedHardware, TwoSidedDriveContainerSimulator}
+import com.lynbrookrobotics.potassium.units.GenericValue._
+import com.lynbrookrobotics.potassium.units.{Point, _}
 import org.scalatest.FunSuite
-import squants.{Acceleration, Length, Percent, Time, Velocity}
-import squants.time.Milliseconds
-import squants.time.Seconds
 import squants.mass.{KilogramsMetersSquared, Pounds}
 import squants.motion._
 import squants.space._
-
-import scala.collection.immutable.{NumericRange, Range}
-import com.lynbrookrobotics.potassium.units._
-import com.lynbrookrobotics.potassium.units.GenericValue._
+import squants.time.{Milliseconds, Seconds}
+import squants.{Acceleration, Length, Percent, Time, Velocity}
 
 import scala.reflect.io.File
 
@@ -57,6 +51,8 @@ class SimulatePurePursuit extends FunSuite {
       Percent(0) / MetersPerSecondSquared(1))
 
     override val rightControlGains = leftControlGains
+    override val track: Distance = Inches(21.75)
+    override val blendExponent: Double = Double.NaN
   }
 
   implicit val props = Signal.constant(propsVal)
@@ -69,7 +65,6 @@ class SimulatePurePursuit extends FunSuite {
     implicit val (clock, triggerClock) = mockedClockTicker
     implicit val hardware = new SimulatedTwoSidedHardware(
       Pounds(88) * MetersPerSecondSquared(1) / 2,
-      Inches(21.75),
       Pounds(88),
       KilogramsMetersSquared(3.909),
       clock,
