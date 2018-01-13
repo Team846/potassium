@@ -24,7 +24,7 @@ object BlendedDriving {
                                 (implicit properties: Signal[TwoSidedDriveProperties]): Stream[TwoSidedVelocity] = {
     circularMotion(
       targetForwardVelocity,
-      curvature.map(ratio => ratio.num.toEach * ratio.den))
+      curvature.map(curvature => curvature.num.toEach * curvature.den))
   }
 
   /**
@@ -58,6 +58,4 @@ object BlendedDriving {
         blend(carSpeed.left, tankSpeed.left, targetForward))
     }
   }
-
-
 }
