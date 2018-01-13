@@ -132,6 +132,6 @@ class TestXYPosition extends FunSuite{
     implicit val tolerance = Feet(0.1)
     assert(lastPose ~= targetPosition)
     assert(lastSimpPose ~= targetPosition)
-    assert(lastCircularPose ~= targetPosition)
+    assert(lastCircularPose ~= targetPosition, "last circular pose = " + lastCircularPose)
   }
 }

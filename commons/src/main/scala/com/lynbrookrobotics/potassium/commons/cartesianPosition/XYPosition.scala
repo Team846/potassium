@@ -78,7 +78,7 @@ object XYPosition {
       case(centralAngle, arcLength) => arcLength / centralAngle.toRadians
     }
 
-    val previousAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue(1) - Degrees(90))
+    val previousAngle: Stream[Angle] = angle.sliding(2).map(angleQueue => angleQueue(1))
 
     centralAngle.zip(previousAngle).zip(radius).zip(arcLength).zip(angle).scanLeft(Point.origin) {
       case(prevPos: Point,(((((centralAngle: Angle), previousAngle: Angle), radius: Length), arcLength: Length),angle: Angle)) =>
@@ -86,9 +86,9 @@ object XYPosition {
           Point(prevPos.x + angle.cos * arcLength, prevPos.y + arcLength * angle.sin)
         } else {
           val center: Point = Point(
-            prevPos.x + radius * previousAngle.cos,
-            prevPos.y + radius * previousAngle.sin)
-          prevPos.rotateAround(center, centralAngle - Degrees(90))
+            prevPos.x + radius * (previousAngle + Degrees(90)).cos,
+            prevPos.y + radius * (previousAngle + Degrees(90)).sin)
+          prevPos.rotateAround(center, centralAngle)
         }
     }
   }
