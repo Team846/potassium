@@ -11,6 +11,7 @@ object BlendedDriving {
                      radius: Stream[Length])
                     (implicit props: Signal[TwoSidedDriveProperties]): Stream[TwoSidedVelocity] = {
     targetForward.zip(radius).map { case (velocity, radius) =>
+
       val angularVelocity = RadiansPerSecond(velocity.toFeetPerSecond / radius.toFeet)
 
       val left = angularVelocity onRadius (radius - props.get.track / 2)
@@ -24,7 +25,7 @@ object BlendedDriving {
                                 (implicit properties: Signal[TwoSidedDriveProperties]): Stream[TwoSidedVelocity] = {
     circularMotion(
       targetForwardVelocity,
-      curvature.map(curvature => curvature.num.toEach * curvature.den))
+      radius = curvature.map(curvature => curvature.den / curvature.num.toEach))
   }
 
   /**
