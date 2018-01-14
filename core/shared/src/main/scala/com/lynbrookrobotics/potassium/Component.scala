@@ -1,14 +1,9 @@
 package com.lynbrookrobotics.potassium
 
-import com.lynbrookrobotics.potassium.clock.Clock
-import squants.Time
-<<<<<<< HEAD
-import com.lynbrookrobotics.potassium.streams.{Cancel, NonPeriodic, Stream}
-=======
-import com.lynbrookrobotics.potassium.streams.{NonPeriodic, Periodic, Stream}
+import com.lynbrookrobotics.potassium.streams.{Cancel, NonPeriodic, Periodic, Stream}
+import com.lynbrookrobotics.potassium.units.Histogram
+import squants.time.Time
 
-import scala.collection.immutable.Queue
->>>>>>> detected overrun stuff
 
 /**
   * Represents a single robotic component, which translates signal data into action
@@ -24,9 +19,12 @@ abstract class Component[T] (printsOnOverflow: Boolean = false) {
   def defaultController: Stream[T]
   private var currentControllerHandle: Option[Cancel] = None
 
+  private var currentTimingHandle: Option[Cancel] = None
+
   private var lastControlSignal: Option[T] = None
 
   def shouldComponentUpdate(previousSignal: T, newSignal: T): Boolean = true
+  val histogram = new Histogram(4, 5, 10)
 
   /**
     * Sets the controller to be used by the component during updates.
@@ -36,15 +34,18 @@ abstract class Component[T] (printsOnOverflow: Boolean = false) {
     if (controller.expectedPeriodicity == NonPeriodic) {
       throw new IllegalArgumentException("Controller must be periodic")
     }
-    controller.originTimeStream.get.zipWithDt.foreach{ case (_, dt: Time) =>
-      if (controller.expectedPeriodicity.asInstanceOf[Periodic].period > 2 * dt ) {
-        println("Loop took twice as long as expected, $dt")
-        println("bad bad bad")
-        println("overrun bad bad bad")
-      }
-    }
+    currentTimingHandle = Some(
+      controller.zipWithDt.foreach{ case (_, dt: Time) =>
+        histogram.accept(dt.toMilliseconds)
+        if (controller.expectedPeriodicity.asInstanceOf[Periodic].period > 2 * dt ) {
+          histogram.toString
+        }
+     }
+    )
+
 
     currentControllerHandle.foreach(_.cancel())
+    currentTimingHandle.foreach(_.cancel())
 
     currentControllerHandle = Some(controller.foreach { value =>
       val shouldUpdate = lastControlSignal.isEmpty ||
