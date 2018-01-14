@@ -50,16 +50,18 @@ case class Value3D[Q <: Quantity[Q]](x: Q, y: Q, z: Q) {
   }
 
   def * (scaler: Double): Value3D[Q] = this.times(scaler)
+}
 
-  def * (matrix: (
-    (Double, Double, Double),
-      (Double, Double, Double),
-      (Double, Double, Double)
-    )): Value3D[Q] = {
+case class Matrix3by3(elems: Seq[Double]*) {
+  if (elems.length != 3 || elems.forall(_.length != 3)) {
+    throw new IllegalArgumentException("matrix must be 3 by 3")
+  }
+
+  def *[T <: Quantity[T]](other: Value3D[T]): Value3D[T] = {
     Value3D(
-      matrix._1._1 * x + matrix._1._2 * y + matrix._1._3 * z,
-      matrix._2._1 * x + matrix._2._2 * y + matrix._2._3 * z,
-      matrix._3._1 * x + matrix._3._2 * y + matrix._3._3 * z
+      elems(1)(1) * other.x + elems(1)(2) * other.y + elems(1)(3) * other.z,
+      elems(2)(1) * other.x + elems(2)(2) * other.y + elems(2)(3) * other.z,
+      elems(3)(1) * other.x + elems(3)(2) * other.y + elems(3)(3) * other.z
     )
   }
 }
