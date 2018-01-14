@@ -1,6 +1,5 @@
 package com.lynbrookrobotics.potassium.streams
 
-import com.lynbrookrobotics.potassium.clock.Clock
 import squants.time.Time
 
 class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B], skipTimestampCheck: Boolean) extends Stream[(A, B)] {
@@ -8,7 +7,7 @@ class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B], skipTimestampCh
   var parentBUnsubscribe: Cancel = null
 
   override def subscribeToParents(): Unit = {
-    if (skipTimestampCheck) {
+    if (skipTimestampCheck || expectedPeriodicity == NonPeriodic) {
       parentAUnsubscribe = parentA.foreach(t => this.receiveA(t, null))
       parentBUnsubscribe = parentB.foreach(t => this.receiveB(t, null))
     } else {
