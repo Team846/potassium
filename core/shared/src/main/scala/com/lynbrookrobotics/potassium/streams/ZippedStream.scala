@@ -7,7 +7,8 @@ class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B], skipTimestampCh
   var parentBUnsubscribe: Cancel = null
 
   override def subscribeToParents(): Unit = {
-    if (skipTimestampCheck || expectedPeriodicity == NonPeriodic) {
+    if (skipTimestampCheck || expectedPeriodicity == NonPeriodic
+      || parentA.originTimeStream.isEmpty || parentB.originTimeStream.isEmpty) {
       parentAUnsubscribe = parentA.foreach(t => this.receiveA(t, null))
       parentBUnsubscribe = parentB.foreach(t => this.receiveB(t, null))
     } else {
