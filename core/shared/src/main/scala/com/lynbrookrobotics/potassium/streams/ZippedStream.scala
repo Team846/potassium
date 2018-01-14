@@ -1,14 +1,20 @@
 package com.lynbrookrobotics.potassium.streams
 
 import com.lynbrookrobotics.potassium.clock.Clock
+import squants.time.Time
 
-class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B]) extends Stream[(A, B)] {
+class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B], skipTimestampCheck: Boolean) extends Stream[(A, B)] {
   var parentAUnsubscribe: Cancel = null
   var parentBUnsubscribe: Cancel = null
 
   override def subscribeToParents(): Unit = {
-    parentAUnsubscribe = parentA.foreach(this.receiveA)
-    parentBUnsubscribe = parentB.foreach(this.receiveB)
+    if (skipTimestampCheck) {
+      parentAUnsubscribe = parentA.foreach(t => this.receiveA(t, null))
+      parentBUnsubscribe = parentB.foreach(t => this.receiveB(t, null))
+    } else {
+      parentAUnsubscribe = parentA.zipWithTime.foreach(t => this.receiveA(t._1, t._2))
+      parentBUnsubscribe = parentB.zipWithTime.foreach(t => this.receiveB(t._1, t._2))
+    }
   }
 
   override def unsubscribeFromParents(): Unit = {
@@ -38,24 +44,26 @@ class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B]) extends Stream[
     case _ => None
   }
 
-  private[this] var aSlot: Option[A] = None
-  private[this] var bSlot: Option[B] = None
+  private[this] var aSlot: Option[(A, Time)] = None
+  private[this] var bSlot: Option[(B, Time)] = None
 
   def attemptPublish(): Unit = {
-    if (aSlot.isDefined && bSlot.isDefined) {
-      publishValue((aSlot.get, bSlot.get))
+    if (aSlot.isDefined && bSlot.isDefined &&
+      // if the streams are synced, make sure the timestamps match
+      (aSlot.get._2 == bSlot.get._2 || expectedPeriodicity == NonPeriodic)) {
+      publishValue((aSlot.get._1, bSlot.get._1))
       aSlot = None
       bSlot = None
     }
   }
 
-  def receiveA(aValue: A): Unit = {
-    aSlot = Some(aValue)
+  def receiveA(aValue: A, timestamp: Time): Unit = {
+    aSlot = Some((aValue, timestamp))
     attemptPublish()
   }
 
-  def receiveB(bValue: B): Unit = {
-    bSlot = Some(bValue)
+  def receiveB(bValue: B, timestamp: Time): Unit = {
+    bSlot = Some((bValue, timestamp))
     attemptPublish()
   }
 }

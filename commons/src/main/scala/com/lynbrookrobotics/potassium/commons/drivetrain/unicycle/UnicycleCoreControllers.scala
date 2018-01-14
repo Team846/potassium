@@ -84,7 +84,7 @@ trait UnicycleCoreControllers {
   def forwardPositionControl(targetAbsolute: Length)
                             (implicit hardware: DrivetrainHardware,
                              props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Length]) = {
-    val error = hardware.forwardPosition.map(targetAbsolute - _).drop(1)
+    val error = hardware.forwardPosition.map(targetAbsolute - _)
 
     val control = PIDF.pid(
       hardware.forwardPosition,
@@ -98,8 +98,7 @@ trait UnicycleCoreControllers {
   def forwardPositionControl(targetAbsolute: Stream[Length])
                             (implicit hardware: DrivetrainHardware,
                              props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Length]) = {
-    // drop one to get in sync with pid
-    val error: Stream[Length] = targetAbsolute.minus(hardware.forwardPosition).drop(1)
+    val error: Stream[Length] = targetAbsolute.minus(hardware.forwardPosition)
 
     val control = PIDF.pid(
       hardware.forwardPosition,
@@ -116,7 +115,7 @@ trait UnicycleCoreControllers {
     val error = targetAbsolute.zip(hardware.turnPosition).map{ t =>
       val (target: Angle, pos: Angle) = t
       target - pos
-    }.drop(1)
+    }
 
     val control = PIDF.pid(
       hardware.turnPosition,
@@ -130,7 +129,7 @@ trait UnicycleCoreControllers {
   def turnPositionControl(targetAbsolute: Angle)
     (implicit hardware: DrivetrainHardware,
       props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Angle]) = {
-    val error = hardware.turnPosition.map(targetAbsolute - _).drop(1)
+    val error = hardware.turnPosition.map(targetAbsolute - _)
 
     val control = PIDF.pid(
       hardware.turnPosition,
@@ -144,7 +143,7 @@ trait UnicycleCoreControllers {
   def turnPositionControl(targetAbsolute: Stream[Angle])
     (implicit hardware: DrivetrainHardware,
       props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Angle]) = {
-    val error = hardware.turnPosition.zip(targetAbsolute).map(a => a._1 - a._2).drop(1)
+    val error = hardware.turnPosition.zip(targetAbsolute).map(a => a._1 - a._2)
 
     val control = PIDF.pid(
       hardware.turnPosition,

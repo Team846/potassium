@@ -131,7 +131,7 @@ abstract class Stream[+T] { self =>
     * @return a stream with the values from both streams brought together
     */
   def zip[O](other: Stream[O]): Stream[(T, O)] = {
-    new ZippedStream[T, O](this, other)
+    new ZippedStream[T, O](this, other, false)
   }
 
   /**
@@ -171,7 +171,7 @@ abstract class Stream[+T] { self =>
     * @return a stream with tuples of emitted values and the time of emission
     */
   def zipWithTime: Stream[(T, Time)] = {
-    zip(originTimeStream.get)
+    new ZippedStream[T, Time](this, originTimeStream.get, skipTimestampCheck = true)
   }
 
   /**
@@ -237,37 +237,6 @@ abstract class Stream[+T] { self =>
   def zipWithDt: Stream[(T, Time)] = {
     zipWithTime.sliding(2).map { q =>
       (q.last._1, q.last._2 - q.head._2)
-    }
-  }
-
-  /**
-    * Returns a stream that skips emitting the first n values
-    * @param n the number of values to skip
-    */
-  def drop(n: Int): Stream[T] = {
-    new Stream[T] {
-      var unsubscribe: Cancel = null
-      var emittedValues = 0
-
-      override def subscribeToParents(): Unit = {
-        unsubscribe = self.foreach { v =>
-          emittedValues += 1
-          if (emittedValues > n) {
-            this.publishValue(v)
-          }
-        }
-      }
-
-      override def unsubscribeFromParents(): Unit = {
-        unsubscribe.cancel(); unsubscribe = null
-      }
-
-      override def checkRelaunch(): Unit = {
-        throw new IllegalStateException("Dropped streams cannot be relaunched")
-      }
-
-      override val expectedPeriodicity = self.expectedPeriodicity
-      override val originTimeStream = self.originTimeStream.map(_.drop(n))
     }
   }
 
