@@ -1,25 +1,19 @@
 package com.lynbrookrobotics.potassium.model.examples
 
 import com.lynbrookrobotics.potassium.ClockMocking.mockedClockTicker
+import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.commons.drivetrain.purePursuit.MathUtilities
 import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.TwoSidedDriveProperties
-import com.lynbrookrobotics.potassium.{Signal, commons}
-import com.lynbrookrobotics.potassium.model.simulations.SimulatedTwoSidedHardware
-import com.lynbrookrobotics.potassium.model.simulations.TwoSidedDriveContainerSimulator
 import com.lynbrookrobotics.potassium.control.PIDConfig
-import squants.time.Minutes
-import com.lynbrookrobotics.potassium.units.Point
+import com.lynbrookrobotics.potassium.model.simulations.{SimulatedTwoSidedHardware, TwoSidedDriveContainerSimulator}
+import com.lynbrookrobotics.potassium.units.GenericValue._
+import com.lynbrookrobotics.potassium.units.{Point, _}
 import org.scalatest.FunSuite
-import squants.{Acceleration, Length, Percent, Time, Velocity}
-import squants.time.Milliseconds
-import squants.time.Seconds
 import squants.mass.{KilogramsMetersSquared, Pounds}
 import squants.motion._
 import squants.space._
-
-import scala.collection.immutable.{NumericRange, Range}
-import com.lynbrookrobotics.potassium.units._
-import com.lynbrookrobotics.potassium.units.GenericValue._
+import squants.time.{Milliseconds, Seconds}
+import squants.{Acceleration, Length, Percent, Time, Velocity}
 
 import scala.reflect.io.File
 
@@ -140,6 +134,20 @@ class SimulatePurePursuit extends FunSuite {
   test("Reach destination with path from (0,0) to (-5, -5)") {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(-5), Feet(-5))),
+      timeOut = Seconds(8)
+    )
+  }
+
+  test("Reach destination with path from (0.5,0) to (-5, -5)") {
+    testPurePursuitReachesDestination(
+      Seq(Point(Feet(0.5), Feet(0)), Point(Feet(-5), Feet(-5))),
+      timeOut = Seconds(8)
+    )
+  }
+
+  test("Reach destination with path from (-0.5,0) to (-5, -5)") {
+    testPurePursuitReachesDestination(
+      Seq(Point(Feet(-0.5), Feet(0)), Point(Feet(-5), Feet(-5))),
       timeOut = Seconds(8)
     )
   }
