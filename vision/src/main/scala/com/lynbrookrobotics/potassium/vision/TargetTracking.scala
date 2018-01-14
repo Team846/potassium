@@ -2,26 +2,19 @@ package com.lynbrookrobotics.potassium.vision
 
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.Point
-import squants.{Dimensionless, Length}
-import squants.space.{Angle, Degrees, Feet, Inches}
-import squants.time.Milliseconds
-import com.lynbrookrobotics.potassium.vision.limelight.LimelightNetwork._
+import com.lynbrookrobotics.potassium.vision.limelight.{CameraProperties, LimelightNetwork}
+import squants.Length
+import squants.space.{Angle, Degrees, Feet}
 
-class TargetTracking {
 
-  val cameraHorizontalOffset: Angle = Degrees(0)
-  val cameraVerticalOffset: Angle = Degrees(0)
-  val cameraHeight: Length = Feet(0)
-  val targetHeight: Length = Inches(11)
+class TargetTracking(implicit limelightNetwork: LimelightNetwork, props: CameraProperties) {
+  val target: Stream[Point] = {
+    limelightNetwork.xOffsetAngle.zip(limelightNetwork.yOffsetAngle).map { case (xOffsetAngle: Angle, yOffsetAngle: Angle) => {
+        val d: Length = Feet(props.targetHeight.value - props.cameraHeight.value) / math.tan(props.cameraVerticalOffset.value + yOffsetAngle.value)
+        val ang: Angle = Degrees(xOffsetAngle.value - props.cameraHorizontalOffset.value)
 
-  val target: Stream[Point] = Stream.periodic(Milliseconds(5)){
-    xOffsetAngle.zip(yOffsetAngle).zip(targetArea).zip(targetSkew).map { case (((xOffsetAngle: Angle, yOffsetAngle: Angle),
-    targetArea: Dimensionless), targetSkew: Dimensionless) => {
-      val d: Length = Feet((Feet(targetHeight).value - cameraHeight.value) / math.tan(cameraVerticalOffset.value + yOffsetAngle.value))
-      val ang: Angle = Degrees(xOffsetAngle.value - cameraHorizontalOffset.value)
-
-      Point(x = d * math.cos(ang.value),y = d * math.cos(ang.value))
-    }
+        Point(x = d * math.cos(ang.value),y = d * math.cos(ang.value))
+      }
     }
   }
 }
