@@ -17,4 +17,4 @@ object LimelightNetwork{
   def apply(implicit clock: Clock): LimelightNetwork = {
     new LimelightNetwork(NetworkTableInstance.getDefault.getTable("/limelight"))
   }
-}
+
