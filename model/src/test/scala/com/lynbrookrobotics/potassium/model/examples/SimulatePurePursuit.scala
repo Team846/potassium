@@ -138,16 +138,17 @@ class SimulatePurePursuit extends FunSuite {
     )
   }
 
-  test("Reach destination with path from (0.5,0) to (-5, -5)") {
+  test("Reach destination with path from (0.1,0) to (-5, -5)") {
     testPurePursuitReachesDestination(
-      Seq(Point(Feet(0.5), Feet(0)), Point(Feet(-5), Feet(-5))),
+      Seq(Point(Feet(0.1), Feet(0)), Point(Feet(-5), Feet(-5))),
       timeOut = Seconds(8)
     )
   }
 
-  test("Reach destination with path from (-0.5,0) to (-5, -5)") {
+  // Test case that initial position is not exactly at (0, 0)
+  test("Reach destination with path from (-0.1,0) to (-5, -5)") {
     testPurePursuitReachesDestination(
-      Seq(Point(Feet(-0.5), Feet(0)), Point(Feet(-5), Feet(-5))),
+      Seq(Point(Feet(-0.1), Feet(0)), Point(Feet(-5), Feet(-5))),
       timeOut = Seconds(8)
     )
   }
@@ -188,9 +189,45 @@ class SimulatePurePursuit extends FunSuite {
     )
   }
 
+  // Test case that initial position is not exactly at (0, 0). In this case, that means
+  // robot is not perfectly aligned with initial segment
+  test("Reach destination with path from (0.1,0) to (0, 5) to (5, 10)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(0.1), Feet(5)), Point(Feet(5), Feet(10))),
+      timeOut = Seconds(10)
+    )
+  }
+
+  // Test case that initial position is not exactly at (0, 0). In this case, that means
+  // robot is not perfectly aligned with initial segment
+  test("Reach destination with path from (-0.1,0) to (0, 5) to (5, 10)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(-0.1), Feet(5)), Point(Feet(5), Feet(10))),
+      timeOut = Seconds(10)
+    )
+  }
+
   test("Reach destination with path from (0,0) to (0, 5) to (-5, 10)") {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(0), Feet(5)), Point(Feet(-5), Feet(10))),
+      timeOut = Seconds(10)
+    )
+  }
+
+  // Test case that initial position is not exactly at (0, 0). In this case, that means
+  // robot is not perfectly aligned with initial segment
+  test("Reach destination with path from (0.5,0) to (0, 5) to (-5, 10)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(0.5), Feet(5)), Point(Feet(-5), Feet(10))),
+      timeOut = Seconds(10)
+    )
+  }
+
+  // Test case that initial position is not exactly at (0, 0). In this case, that means
+  // robot is not perfectly aligned with initial segment
+  test("Reach destination with path from (-0.1,0) to (0, 5) to (-5, 10)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(-0.1), Feet(5)), Point(Feet(-5), Feet(10))),
       timeOut = Seconds(10)
     )
   }
