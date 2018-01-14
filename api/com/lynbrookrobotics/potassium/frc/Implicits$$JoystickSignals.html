@@ -360,9 +360,9 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.frc.Implicits.JoystickSignals#buttonPressedEvent" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="buttonPressedEvent(buttonId:Int,period:squants.Time)(implicitclock:com.lynbrookrobotics.potassium.clock.Clock):com.lynbrookrobotics.potassium.events.ContinuousEvent"></a><a id="buttonPressedEvent(Int,Time)(Clock):ContinuousEvent"></a>
+      <a id="buttonPressedEvent(buttonId:Int,updateSource:com.lynbrookrobotics.potassium.streams.Stream[Unit]):com.lynbrookrobotics.potassium.events.ContinuousEvent"></a><a id="buttonPressedEvent(Int,Stream[Unit]):ContinuousEvent"></a>
       <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/frc/Implicits$$JoystickSignals.html#buttonPressedEvent(buttonId:Int,period:squants.Time)(implicitclock:com.lynbrookrobotics.potassium.clock.Clock):com.lynbrookrobotics.potassium.events.ContinuousEvent" title="Permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/frc/Implicits$$JoystickSignals.html#buttonPressedEvent(buttonId:Int,updateSource:com.lynbrookrobotics.potassium.streams.Stream[Unit]):com.lynbrookrobotics.potassium.events.ContinuousEvent" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -371,10 +371,11 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">buttonPressedEvent</span><span class="params">(<span name="buttonId">buttonId: <span class="extype" name="scala.Int">Int</span></span>, <span name="period">period: <span class="extype" name="squants.Time">Time</span></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="clock">clock: <a href="../clock/Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a></span>)</span><span class="result">: <a href="../events/ContinuousEvent.html" class="extype" name="com.lynbrookrobotics.potassium.events.ContinuousEvent">ContinuousEvent</a></span>
+        <span class="name">buttonPressedEvent</span><span class="params">(<span name="buttonId">buttonId: <span class="extype" name="scala.Int">Int</span></span>, <span name="updateSource">updateSource: <a href="../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="scala.Unit">Unit</span>]</span>)</span><span class="result">: <a href="../events/ContinuousEvent.html" class="extype" name="com.lynbrookrobotics.potassium.events.ContinuousEvent">ContinuousEvent</a></span>
       </span>
       
-      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">buttonId</dt><dd class="cmt"><p>the id of the button to check</p></dd><dt class="param">period</dt><dd class="cmt"><p>how frequently to check if the button is pressed</p></dd><dt class="param">clock</dt><dd class="cmt"><p>used to update checking of the button status</p></dd><dt>returns</dt><dd class="cmt"><p>a ContinuousEvent true whenenver a button is pressed at the
+      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">buttonId</dt><dd class="cmt"><p>the id of the button to check</p></dd><dt class="param">updateSource</dt><dd class="cmt"><p>update the status of the button event with each update
+                    of the updateSource stream</p></dd><dt>returns</dt><dd class="cmt"><p>a ContinuousEvent true whenever a button is pressed at the
         buttonId of this joystick</p></dd></dl></div>
     </li><li name="scala.AnyVal#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_&lt;:AnyVal]"></a>
