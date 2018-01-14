@@ -5,3 +5,5 @@ resolvers += "opencv-maven" at "https://github.com/WPIRoboticsProjects/opencv-ma
 
 libraryDependencies += "edu.wpi.first" % "cscore" % "2018.1.1"
 libraryDependencies += "org.opencv" % "opencv-java" % "3.1.0"
+
+libraryDependencies += "edu.wpi.first" % "ntcore" % "2018.1.1"
