@@ -3,7 +3,6 @@ package com.lynbrookrobotics.potassium.vision
 import com.lynbrookrobotics.potassium.ClockMocking
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.Point
-import com.lynbrookrobotics.potassium.vision.limelight.CameraProperties
 import org.scalatest.FunSuite
 import squants.space.{Angle, Degrees, Feet, Length}
 import squants.time.Milliseconds
