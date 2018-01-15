@@ -22,6 +22,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                            hardware: UnicycleHardware): (Stream[Dimensionless],
                                                    Stream[Length]) = {
     val distanceToTarget = position.zip(target).map { p =>
+//      println(s"position: ${p._1} target: ${p._2}")
       p._1 distanceTo p._2
     }
 
