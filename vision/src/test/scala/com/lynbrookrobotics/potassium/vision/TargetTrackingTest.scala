@@ -36,6 +36,7 @@ class TargetTrackingTest extends FunSuite {
       pubXAngle.apply(Degrees(0))
       pubYAngle.apply(Degrees(-45))
     }
+    println(lastCubePosition)
 
     implicit val tolerance: Length = Feet(0.1)
     assert(target ~= lastCubePosition)
@@ -66,6 +67,7 @@ class TargetTrackingTest extends FunSuite {
       pubYAngle.apply(Degrees(-42))
     }
 
+    println(lastCubePosition)
     implicit val tolerance: Length = Feet(0.1)
     assert(target ~= lastCubePosition)
   }
