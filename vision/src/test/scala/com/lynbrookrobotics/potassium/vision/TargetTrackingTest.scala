@@ -3,6 +3,10 @@ package com.lynbrookrobotics.potassium.vision
 import com.lynbrookrobotics.potassium.ClockMocking
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.Point
+<<<<<<< HEAD
+=======
+import com.lynbrookrobotics.potassium.vision.limelight.CameraProperties
+>>>>>>> added unit tests
 import org.scalatest.FunSuite
 import squants.space.{Angle, Degrees, Feet, Length}
 import squants.time.Milliseconds
@@ -29,13 +33,21 @@ class TargetTrackingTest extends FunSuite {
 
     cubePosition.foreach(lastCubePosition = _)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> added unit tests
     for(_ <- 1 to periodsPerSecond){
       clockTrigger.apply(period)
       pubXAngle.apply(Degrees(0))
       pubYAngle.apply(Degrees(-45))
     }
 
+<<<<<<< HEAD
+=======
+    println(lastCubePosition)
+
+>>>>>>> added unit tests
     implicit val tolerance: Length = Feet(0.1)
     assert(target ~= lastCubePosition)
   }
@@ -65,6 +77,11 @@ class TargetTrackingTest extends FunSuite {
       pubYAngle.apply(Degrees(-42))
     }
 
+<<<<<<< HEAD
+=======
+    println(lastCubePosition)
+
+>>>>>>> added unit tests
     implicit val tolerance: Length = Feet(0.1)
     assert(target ~= lastCubePosition)
   }
