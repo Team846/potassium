@@ -71,9 +71,18 @@ object MathUtilities {
                                               center: Point,
                                               radius: Length): Option[Point] = {
     val solutions = interSectionCircleLine(segment, center, radius)
-    solutions.flatMap {case (positive, negative) =>
+    solutions.flatMap { case (positive, negative) =>
         val positiveDiffWithStart = segment.start distanceTo positive
         val negativeDiffWithStart = segment.start distanceTo negative
+
+        val positiveDiffWithEnd = segment.end distanceTo positive
+        val negativeDiffWithEnd = segment.end distanceTo negative
+
+       val closestToEnd = if (positiveDiffWithEnd <= negativeDiffWithEnd) {
+         positive
+       } else {
+         negative
+       }
 
         val furthestFromStart = if ( positiveDiffWithStart > negativeDiffWithStart ) {
           positive
@@ -89,13 +98,19 @@ object MathUtilities {
 
         // Pick point such that look ahead point angle to end point is same as angle
         // of segment, ensuring that we drive toward the correct direction
-        if ((segment.angle - Segment(segment.start, furthestFromStart).angle).abs < tolerance ) {
-          Some(furthestFromStart)
-        } else if ( (segment.angle - Segment(segment.start, closerToStart).angle).abs < tolerance ) {
-          Some(closerToStart)
-        } else {
-          None
-        }
+//        if ((segment.angle - Segment(segment.start, furthestFromStart).angle).abs < tolerance ) {
+//          Some(furthestFromStart)
+//        } else if ( (segment.angle - Segment(segment.start, closerToStart).angle).abs < tolerance ) {
+//          Some(closerToStart)
+//        } else {
+//          None
+//        }
+       if ((closestToEnd distanceTo segment.end) <= radius / 2) {
+         Some(furthestFromStart)
+       } else {
+         Some(closestToEnd)
+       }
+
     }
   }
 

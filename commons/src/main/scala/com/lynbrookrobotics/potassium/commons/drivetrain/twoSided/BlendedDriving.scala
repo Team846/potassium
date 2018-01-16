@@ -39,8 +39,7 @@ object BlendedDriving {
            (implicit props: Signal[TwoSidedDriveProperties]): Velocity = {
     val normalizedTargetForwardSpeed = targetForward / props.get.maxForwardVelocity
 
-    val constantRadiusWeight = Each(
-      math.pow(normalizedTargetForwardSpeed, props.get.blendExponent))
+    val constantRadiusWeight = Each(math.pow(normalizedTargetForwardSpeed, props.get.blendExponent))
     val tankWeight = Percent(100) - constantRadiusWeight
 
     tankWeight.toEach * tankSpeed + constantRadiusWeight.toEach * constantRadiusSpeed

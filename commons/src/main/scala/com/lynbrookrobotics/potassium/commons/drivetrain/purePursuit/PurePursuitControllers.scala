@@ -1,5 +1,7 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain.purePursuit
 
+import java.io.{File, PrintWriter}
+
 import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleCoreControllers, UnicycleHardware, UnicycleProperties, UnicycleSignal}
 import com.lynbrookrobotics.potassium.control.PIDF
@@ -22,7 +24,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                            hardware: UnicycleHardware): (Stream[Dimensionless],
                                                    Stream[Length]) = {
     val distanceToTarget = position.zip(target).map { p =>
-//      println(s"position: ${p._1} target: ${p._2}")
+      //println(s"position: ${p._1} target: ${p._2}")
       p._1 distanceTo p._2
     }
 
@@ -70,12 +72,16 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                                (implicit props: Signal[DrivetrainProperties], hardware: DrivetrainHardware): (Stream[Dimensionless],
                                                                                    Stream[Double],
                                                                                    Stream[Point]) = {
-    val lookAheadPoint = position.zip(biSegmentPath).map{ case (pose, path) =>
-      getExtrapolatedLookAheadPoint(
+//    val lookAheadWriter = new PrintWriter(new File("/home/lvuser/look head"))
+    val lookAheadPoint = position.zip(biSegmentPath).map { case (pose, path) =>
+      val ret = getExtrapolatedLookAheadPoint(
         path,
         pose,
         props.get.defaultLookAheadDistance
       )
+      println(s"look ahead ${ret}")
+      //  lookAheadWriter.println(s"${ret}")
+      ret
     }
 
     val headingToTarget = position.zip(lookAheadPoint).map{p =>
@@ -83,16 +89,20 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     }
 
     val trigHeadingToTarget = headingToTarget.map(MathUtilities.swapTrigonemtricAndCompass)
-    val compassHeadingToLookAhead = trigHeadingToTarget.map(h => limitToPlusMinus90(h))
+    val compassHeadingToLookAhead = trigHeadingToTarget//.map(h => limitToPlusMinus90(h))
 
-    val forwardMultiplier = position.zip(turnPosition).zip(lookAheadPoint).zip(biSegmentPath).map {p =>
+    val forwardMultiplier = position.zip(turnPosition).zip(lookAheadPoint).zip(biSegmentPath).map { p =>
       val (((pose, currAngle), lookAhead), path) = p
       val lastSegment = path._2.getOrElse(path._1)
+
+      var turnAround = false
 
       if (lookAhead.onLine(lastSegment, Feet(0.1))) {
         val currTrigAngle = MathUtilities.swapTrigonemtricAndCompass(currAngle)
         val angleErrorToLastWayPoint = headingToPoint(pose, lastSegment.end) - currTrigAngle
-        if (angleErrorToLastWayPoint.abs >= Degrees(90)) {
+        if (angleErrorToLastWayPoint.abs >= Degrees(90) && pose.distanceTo(lastSegment.end) < props.get.defaultLookAheadDistance) {
+          println("reversing")
+          turnAround = true
           -1D
         } else {
           1D
@@ -107,7 +117,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       props.map(_.turnPositionControlGains)
     ).map(MathUtilities.clamp(_, maxTurnOutput))
 
-    (limitedTurn, forwardMultiplier, lookAheadPoint)
+    (limitedTurn, forwardMultiplier.mapToConstant(1.0), lookAheadPoint)
   }
 
 
@@ -124,6 +134,10 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       intersectionLineCircleFurthestFromStart(s, currPosition, lookAheadDistance)
     }
 
+    println(s"first $firstLookAheadPoint  second $secondLookAheadPoint  currPose $currPosition path $biSegmentPath")
+
+
+
     secondLookAheadPoint.getOrElse(
       firstLookAheadPoint.getOrElse(
         getExtrapolatedLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
@@ -138,16 +152,15 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                                 maxTurnOutput: Dimensionless)
                                 (implicit hardware: DrivetrainHardware,
                                 props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
-    val biSegmentPaths = wayPoints.sliding(3).map { points =>
+    val biSegmentPaths = (wayPoints.sliding(3).toSeq.filter(_.size == 3).map { points =>
       (
         Segment(points(0), points(1)),
-        if (points.size == 3) {
-          Some(Segment(points(1), points(2)))
-        } else {
-          None
-        }
+        Some(Segment(points(1), points(2)))
       )
-    }
+    } :+ (
+      Segment(wayPoints(wayPoints.size - 2), wayPoints(wayPoints.size - 1)),
+      None
+    )).toIterator
 
     var currPath = biSegmentPaths.next()
     var previousLookAheadPoint: Option[Point] = None
