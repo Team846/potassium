@@ -16,9 +16,8 @@ class TimeoutFiniteTask private[tasks](task: FiniteTask, timeout: Time, clock: C
     finished()
   }
 
-  task.addFinishedListener(this)
-
   override def onStart(): Unit = {
+    task.setFinishedListener(this)
     task.init()
     currentExecutionID += 1
 
