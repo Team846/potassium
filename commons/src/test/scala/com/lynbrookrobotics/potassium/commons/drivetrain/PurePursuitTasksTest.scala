@@ -98,6 +98,7 @@ class PurePursuitTasksTest extends FunSuite {
     val task = new drive.unicycleTasks.FollowWayPoints(
       Seq(Point.origin, target),
       Feet(1),
+      1,
       Percent(70),
       unlimitedTurnOutput
     )(drivetrainComp)
@@ -129,6 +130,7 @@ class PurePursuitTasksTest extends FunSuite {
     val task = new drive.unicycleTasks.FollowWayPoints(
       Seq(Point.origin, target),
       Feet(0.1),
+      1,
       Percent(70),
       unlimitedTurnOutput
     )(testDrivetrainComp)
@@ -173,6 +175,7 @@ class PurePursuitTasksTest extends FunSuite {
     val task = new drive.unicycleTasks.FollowWayPoints(
       Seq(Point.origin, target),
       Feet(1),
+      1,
       Percent(70),
       unlimitedTurnOutput
     )(drivetrainComp)

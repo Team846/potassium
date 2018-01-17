@@ -75,11 +75,12 @@ class SimulatePurePursuit extends FunSuite {
     val task = new container.unicycleTasks.FollowWayPoints(
       wayPoints,
       Inches(3),
+      1,
       Percent(30),
       Percent(30)
     )(drivetrain)
 
-    println("cahnge id: 2")
+    println("change id: 3")
     task.init()
 
     if (log) {

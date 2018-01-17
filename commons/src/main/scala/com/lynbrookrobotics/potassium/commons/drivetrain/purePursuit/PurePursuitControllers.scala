@@ -138,9 +138,6 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       intersectionRayCircleFurthestFromStart(s, currPosition, lookAheadDistance)
     }
 
-    //println(s"first $firstLookAheadPoint  second $secondLookAheadPoint  currPose $currPosition path $biSegmentPath")
-
-
 
     secondLookAheadPoint.getOrElse(
       firstLookAheadPoint.getOrElse(
@@ -156,6 +153,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                                 maxTurnOutput: Dimensionless)
                                 (implicit hardware: DrivetrainHardware,
                                 props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
+    // append that there is always a None segment to ensure that once we reach
+    // the last stage of the path, we "forget" about the previous segment
     val biSegmentPaths = (wayPoints.sliding(3).toSeq.filter(_.size == 3).map { points =>
       (
         Segment(points(0), points(1)),

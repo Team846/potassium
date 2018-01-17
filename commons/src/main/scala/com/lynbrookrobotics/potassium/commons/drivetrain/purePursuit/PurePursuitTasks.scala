@@ -28,6 +28,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
 
   class FollowWayPoints(wayPoints: Seq[Point],
                         tolerance: Length,
+                        targetTicksWithingTolerance: Int = 1,
                         steadyOutput: Dimensionless,
                         maxTurnOutput: Dimensionless)
                        (drive: Drivetrain)
@@ -48,10 +49,18 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         steadyOutput,
         maxTurnOutput)
 
+      var ticksWithingTolerance = 0
+
       drive.setController(lowerLevelVelocityControl(unicycle.withCheckZipped(error) { e =>
         if (e.exists(_ < tolerance)) {
-          println("finished")
-          finished()
+          println("Within tolerance")
+          ticksWithingTolerance = ticksWithingTolerance + 1
+        } else {
+          ticksWithingTolerance = 0
+        }
+
+        if (ticksWithingTolerance >= targetTicksWithingTolerance) {
+          println("finished.")
         }
       }))
     }
