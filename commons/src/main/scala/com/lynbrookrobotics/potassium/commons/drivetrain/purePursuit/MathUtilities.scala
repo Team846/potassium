@@ -21,12 +21,12 @@ object MathUtilities {
     val diffEnd   = segment.end - center
     val diffStart = segment.start - center
 
-    val dr_squared = (segment.length * segment.length).toSquareFeet
+    val drSquared = (segment.length * segment.length).toSquareFeet
 
     val det = (diffStart.x * diffEnd.y - diffEnd.x * diffStart.y).toSquareFeet
-    val discriminant = dr_squared * radius.toFeet * radius.toFeet - det * det
+    val discriminant = drSquared * radius.toFeet * radius.toFeet - det * det
 
-    if (dr_squared == 0) {
+    if (drSquared == 0) {
       throw new IllegalArgumentException("Segment is a point, so no line can be fit through it")
     }
 
@@ -41,13 +41,13 @@ object MathUtilities {
       val signDy = if (dy < 0) -1D else 1D
 
       val positiveSolution = Point(
-        Feet((det * dy + signDy * sqrtDiscrim * dx) / dr_squared + posX),
-        Feet((-det * dx + abs(dy) * sqrtDiscrim) / dr_squared + posY)
+        Feet((det * dy + signDy * sqrtDiscrim * dx) / drSquared + posX),
+        Feet((-det * dx + abs(dy) * sqrtDiscrim) / drSquared + posY)
       )
 
       val negativeSolution = Point(
-        Feet((det * dy - signDy * sqrtDiscrim * dx) / dr_squared + posX),
-        Feet((-det * dx - abs(dy) * sqrtDiscrim) / dr_squared + posY)
+        Feet((det * dy - signDy * sqrtDiscrim * dx) / drSquared + posX),
+        Feet((-det * dx - abs(dy) * sqrtDiscrim) / drSquared + posY)
       )
 
       Some(negativeSolution, positiveSolution)
@@ -55,7 +55,10 @@ object MathUtilities {
   }
 
   /**
-    * This finds the point furthest from the start and if that point's angle formed with the start point is
+    * Finds the intersection of the ray defined by segment and the circle defined by center and radius.
+    * To acheive this, the intersection with line and circle are passed through the following tests:
+    *
+    * If that point's angle formed with the start point is
     * the same as the angle of the segment, it returns that point.
     *
     * If the point furthest of the start doesn't meet the angle condition, it checks if the other point meets it and
@@ -67,24 +70,15 @@ object MathUtilities {
     * @param radius the radius of the circle that intersects
     * @return
     */
-  def intersectionLineCircleFurthestFromStart(segment: Segment,
-                                              center: Point,
-                                              radius: Length): Option[Point] = {
+  def intersectionRayCircleFurthestFromStart(segment: Segment,
+                                             center: Point,
+                                             radius: Length): Option[Point] = {
     val solutions = interSectionCircleLine(segment, center, radius)
     solutions.flatMap { case (positive, negative) =>
         val positiveDiffWithStart = segment.start distanceTo positive
         val negativeDiffWithStart = segment.start distanceTo negative
 
-        val positiveDiffWithEnd = segment.end distanceTo positive
-        val negativeDiffWithEnd = segment.end distanceTo negative
-
-       val closestToEnd = if (positiveDiffWithEnd <= negativeDiffWithEnd) {
-         positive
-       } else {
-         negative
-       }
-
-        val furthestFromStart = if ( positiveDiffWithStart > negativeDiffWithStart ) {
+        val furtherFromStart = if ( positiveDiffWithStart > negativeDiffWithStart ) {
           positive
         } else {
           negative
@@ -94,23 +88,17 @@ object MathUtilities {
         } else {
           negative
         }
-        val tolerance = Radians(0.0001)
 
         // Pick point such that look ahead point angle to end point is same as angle
         // of segment, ensuring that we drive toward the correct direction
-//        if ((segment.angle - Segment(segment.start, furthestFromStart).angle).abs < tolerance ) {
-//          Some(furthestFromStart)
-//        } else if ( (segment.angle - Segment(segment.start, closerToStart).angle).abs < tolerance ) {
-//          Some(closerToStart)
-//        } else {
-//          None
-//        }
-       if ((closestToEnd distanceTo segment.end) <= radius / 2) {
-         Some(furthestFromStart)
-       } else {
-         Some(closestToEnd)
-       }
-
+        val tolerance = Radians(0.0001)
+        if ((segment.angle - Segment(segment.start, furtherFromStart).angle).abs < tolerance ) {
+          Some(furtherFromStart)
+        } else if ( (segment.angle - Segment(segment.start, closerToStart).angle).abs < tolerance ) {
+          Some(closerToStart)
+        } else {
+          None
+        }
     }
   }
 

@@ -48,8 +48,9 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         steadyOutput,
         maxTurnOutput)
 
-      drive.setController(lowerLevelOpenLoop(unicycle.withCheckZipped(error) { e =>
+      drive.setController(lowerLevelVelocityControl(unicycle.withCheckZipped(error) { e =>
         if (e.exists(_ < tolerance)) {
+          println("finished")
           finished()
         }
       }))

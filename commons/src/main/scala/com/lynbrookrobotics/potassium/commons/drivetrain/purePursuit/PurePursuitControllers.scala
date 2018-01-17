@@ -72,15 +72,12 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                                (implicit props: Signal[DrivetrainProperties], hardware: DrivetrainHardware): (Stream[Dimensionless],
                                                                                    Stream[Double],
                                                                                    Stream[Point]) = {
-//    val lookAheadWriter = new PrintWriter(new File("/home/lvuser/look head"))
     val lookAheadPoint = position.zip(biSegmentPath).map { case (pose, path) =>
       val ret = getExtrapolatedLookAheadPoint(
         path,
         pose,
         props.get.defaultLookAheadDistance
       )
-      println(s"look ahead ${ret}")
-      //  lookAheadWriter.println(s"${ret}")
       ret
     }
 
@@ -89,35 +86,42 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     }
 
     val trigHeadingToTarget = headingToTarget.map(MathUtilities.swapTrigonemtricAndCompass)
-    val compassHeadingToLookAhead = trigHeadingToTarget//.map(h => limitToPlusMinus90(h))
+    val compassHeadingToLookAhead = trigHeadingToTarget
+
+    var reachedLastPoint = false
 
     val forwardMultiplier = position.zip(turnPosition).zip(lookAheadPoint).zip(biSegmentPath).map { p =>
       val (((pose, currAngle), lookAhead), path) = p
       val lastSegment = path._2.getOrElse(path._1)
 
-      var turnAround = false
-
       if (lookAhead.onLine(lastSegment, Feet(0.1))) {
         val currTrigAngle = MathUtilities.swapTrigonemtricAndCompass(currAngle)
         val angleErrorToLastWayPoint = headingToPoint(pose, lastSegment.end) - currTrigAngle
-        if (angleErrorToLastWayPoint.abs >= Degrees(90) && pose.distanceTo(lastSegment.end) < props.get.defaultLookAheadDistance) {
-          println("reversing")
-          turnAround = true
+
+        if (pose.distanceTo(lastSegment.end) < props.get.defaultLookAheadDistance) {
+          reachedLastPoint = true
+        }
+
+        if (angleErrorToLastWayPoint.abs >= Degrees(90) && reachedLastPoint) {
+          println(s"reversing. Pose: $pose look ahead: $lookAhead curr angle ${currTrigAngle.toDegrees} to Last ${angleErrorToLastWayPoint.toDegrees}")
           -1D
         } else {
+          println(s"not reverse Pose: $pose look ahead: $lookAhead curr angle ${currTrigAngle.toDegrees} to Last ${angleErrorToLastWayPoint.toDegrees}")
           1D
         }
       } else {
+        println(s"not reverse Pose: $pose look ahead: $lookAhead")
         1D
       }
     }
+
     val limitedTurn = PIDF.pid(
       turnPosition,
       compassHeadingToLookAhead,
       props.map(_.turnPositionControlGains)
     ).map(MathUtilities.clamp(_, maxTurnOutput))
 
-    (limitedTurn, forwardMultiplier.mapToConstant(1.0), lookAheadPoint)
+    (limitedTurn, forwardMultiplier, lookAheadPoint)
   }
 
 
@@ -125,16 +129,16 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                                     currPosition: Point,
                                     lookAheadDistance: Length): Point = {
     import MathUtilities._
-    val firstLookAheadPoint = intersectionLineCircleFurthestFromStart(
+    val firstLookAheadPoint = intersectionRayCircleFurthestFromStart(
       biSegmentPath._1,
       currPosition,
       lookAheadDistance)
 
     val secondLookAheadPoint = biSegmentPath._2.flatMap { s =>
-      intersectionLineCircleFurthestFromStart(s, currPosition, lookAheadDistance)
+      intersectionRayCircleFurthestFromStart(s, currPosition, lookAheadDistance)
     }
 
-    println(s"first $firstLookAheadPoint  second $secondLookAheadPoint  currPose $currPosition path $biSegmentPath")
+    //println(s"first $firstLookAheadPoint  second $secondLookAheadPoint  currPose $currPosition path $biSegmentPath")
 
 
 

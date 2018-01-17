@@ -26,7 +26,7 @@ class MathUtilitiesTest extends FunSuite {
     assert(solutions.get._1 == negSolution)
     assert(solutions.get._2 == posSolution)
 
-    val solutionClosestToEnd = MathUtilities.intersectionLineCircleFurthestFromStart(
+    val solutionClosestToEnd = MathUtilities.intersectionRayCircleFurthestFromStart(
       segment,
       origin,
       Feet(1)
@@ -58,7 +58,7 @@ class MathUtilitiesTest extends FunSuite {
   test("Circle and non intersecting segment do not intersect") {
     val secondPoint = new Point(Feet(1), Feet(0))
 
-    assert(MathUtilities.intersectionLineCircleFurthestFromStart(
+    assert(MathUtilities.intersectionRayCircleFurthestFromStart(
       Segment(origin, secondPoint),
       new Point(Feet(0), Feet(1)),
       Feet(0.5)
@@ -72,7 +72,7 @@ class MathUtilitiesTest extends FunSuite {
     )
     val currPose = new Point(Feet(0), Feet(1))
 
-    val solutionClosestToEnd = MathUtilities.intersectionLineCircleFurthestFromStart(
+    val solutionClosestToEnd = MathUtilities.intersectionRayCircleFurthestFromStart(
       segment,
       currPose,
       Feet(2)
