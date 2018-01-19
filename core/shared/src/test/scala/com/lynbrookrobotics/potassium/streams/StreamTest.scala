@@ -193,34 +193,6 @@ class StreamTest extends FunSuite {
     assert(lastValue == 1)
   }
 
-  test("Deferring values produces correct values") {
-    val (str, pub) = Stream.manual[Int]
-    val deferred = str.defer
-    var lastValue = -1
-
-    val rootThread = Thread.currentThread()
-
-    val triggeredPromise = Promise[Unit]()
-    deferred.foreach { v =>
-      if (Platform.isJVM) {
-        assert(Thread.currentThread() != rootThread)
-      }
-
-      lastValue = v
-      triggeredPromise.success(())
-    }
-
-    assert(lastValue == -1)
-
-    pub(1)
-
-    if (Platform.isJVM) {
-      Await.result(triggeredPromise.future, Duration.Inf)
-    }
-
-    assert(lastValue == 1)
-  }
-
   test("Periodically polling a stream produces values at correct rate") {
     implicit val (clock, update) = ClockMocking.mockedClockTicker
     val (str, pub) = Stream.manual[Int]
@@ -245,6 +217,7 @@ class StreamTest extends FunSuite {
 
     var emitted = -1
     val checked = str.withCheck(emitted = _)
+    val checkedListener = checked.foreach(_ => ()) // boot up the stream
 
     assert(emitted == -1)
 
