@@ -1,8 +1,8 @@
 package com.lynbrookrobotics.potassium.streams
 
 class EagerZippedStream[A, B](parentA: Stream[A], parentB: Stream[B]) extends Stream[(A, B)] {
-  var parentAUnsubscribe: Cancel = null
-  var parentBUnsubscribe: Cancel = null
+  private[this] var parentAUnsubscribe: Cancel = null
+  private[this] var parentBUnsubscribe: Cancel = null
 
   override def subscribeToParents(): Unit = {
     parentAUnsubscribe = parentA.foreach(this.receiveA)

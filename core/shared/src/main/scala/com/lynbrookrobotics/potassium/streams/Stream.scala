@@ -50,10 +50,9 @@ abstract class Stream[+T] { self =>
 
     new Cancel {
       override def cancel(): Unit = self.synchronized {
-        val beforeSize = listeners.size
         listeners = listeners.filterNot(_ eq thunk)
 
-        if (beforeSize > 0 && listeners.isEmpty) {
+        if (listeners.isEmpty) {
           // we are shutting down!
           unsubscribeFromParents()
           hasShutdown = true
@@ -131,7 +130,7 @@ abstract class Stream[+T] { self =>
     * @return a stream with the values from both streams brought together
     */
   def zip[O](other: Stream[O]): Stream[(T, O)] = {
-    new ZippedStream[T, O](this, other, false)
+    new ZippedStream[T, O](this, other, skipTimestampCheck = false)
   }
 
   /**
