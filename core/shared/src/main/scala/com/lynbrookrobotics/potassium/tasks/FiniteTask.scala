@@ -3,8 +3,6 @@ package com.lynbrookrobotics.potassium.tasks
 import com.lynbrookrobotics.potassium.clock.Clock
 import squants.Time
 
-import scala.ref.WeakReference
-
 /**
   * A interface for tasks that need to listen to finish events from other tasks. This is used
   * for task composers such as [[SequentialTask]] and [[TimeoutFiniteTask]]
@@ -18,14 +16,15 @@ trait FiniteTaskFinishedListener {
   */
 abstract class FiniteTask extends Task { self =>
   private var running = false
-  private var listeners: List[WeakReference[FiniteTaskFinishedListener]] = List.empty
+  private var listener: Option[FiniteTaskFinishedListener] = None
 
   /**
     * Adds a task finish listener to listen to this task.
     * @param listener the listener of finish events
     */
-  def addFinishedListener(listener: FiniteTaskFinishedListener): Unit = {
-    listeners = WeakReference(listener) :: listeners
+  def setFinishedListener(newListener: FiniteTaskFinishedListener): Unit = {
+    assert(listener == None)
+    listener = Some(newListener)
   }
 
   /**
@@ -37,15 +36,8 @@ abstract class FiniteTask extends Task { self =>
       onEnd()
       running = false
 
-      listeners = listeners.filter { ref =>
-        ref.get match {
-          case Some(listener) =>
-            listener.onFinished(this)
-            true
-
-          case None => false
-        }
-      }
+      listener.foreach(_.onFinished(this))
+      listener = None
     }
   }
 
@@ -65,6 +57,8 @@ abstract class FiniteTask extends Task { self =>
     if (running) {
       onEnd()
       running = false
+
+      listener = None
     }
   }
 
