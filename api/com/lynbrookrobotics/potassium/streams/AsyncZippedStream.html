@@ -151,6 +151,12 @@
                         </a>
                       </li><li class="current-entities indented4">
                         <span class="separator"></span>
+                        <a class="trait" href="package$$Cancel.html" title=""></a>
+                        <a href="package$$Cancel.html" title="">
+                          Cancel
+                        </a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
                         <a class="class" href="EagerZippedStream.html" title=""></a>
                         <a href="EagerZippedStream.html" title="">
                           EagerZippedStream
@@ -359,6 +365,22 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.streams.Stream#checkRelaunch" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="checkRelaunch():Unit"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/AsyncZippedStream.html#checkRelaunch():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">checkRelaunch</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a></dd></dl></div>
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
@@ -398,24 +420,6 @@
       
       <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>returns a stream of first value this stream will publish
         from the time this method is called</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a></dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.streams.Stream#defer" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="defer:com.lynbrookrobotics.potassium.streams.Stream[T]"></a><a id="defer:Stream[(A,B)]"></a>
-      <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/streams/AsyncZippedStream.html#defer:com.lynbrookrobotics.potassium.streams.Stream[T]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">defer</span><span class="result">: <a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[(<span class="extype" name="com.lynbrookrobotics.potassium.streams.AsyncZippedStream.A">A</span>, <span class="extype" name="com.lynbrookrobotics.potassium.streams.AsyncZippedStream.B">B</span>)]</span>
-      </span>
-      
-      <p class="shortcomment cmt">Defers emitted values from this stream to another thread
-Note: right now, this only works on the JVM</p><div class="fullcomment"><div class="comment cmt"><p>Defers emitted values from this stream to another thread
-Note: right now, this only works on the JVM</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a stream that emits values in the context of a new thread</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a></dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.streams.Stream#derivative" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="derivative[D&lt;:squants.Quantity[D]withsquants.time.TimeDerivative[_]](implicitintEv:T=&gt;squants.time.TimeIntegral[D]):com.lynbrookrobotics.potassium.streams.Stream[D]"></a><a id="derivative[D&lt;:Quantity[D]withTimeDerivative[_]](((A,B))⇒TimeIntegral[D]):Stream[D]"></a>
       <span class="permalink">
@@ -434,22 +438,6 @@ Note: right now, this only works on the JVM</p></div><dl class="paramcmts block"
       <p class="shortcomment cmt">Calculates the derivative of the stream, producing units of
 the derivative of the stream's units</p><div class="fullcomment"><div class="comment cmt"><p>Calculates the derivative of the stream, producing units of
 the derivative of the stream's units</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a stream producing values that are the derivative of the stream</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a></dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.streams.Stream#drop" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="drop(n:Int):com.lynbrookrobotics.potassium.streams.Stream[T]"></a><a id="drop(Int):Stream[(A,B)]"></a>
-      <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/streams/AsyncZippedStream.html#drop(n:Int):com.lynbrookrobotics.potassium.streams.Stream[T]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">drop</span><span class="params">(<span name="n">n: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[(<span class="extype" name="com.lynbrookrobotics.potassium.streams.AsyncZippedStream.A">A</span>, <span class="extype" name="com.lynbrookrobotics.potassium.streams.AsyncZippedStream.B">B</span>)]</span>
-      </span>
-      
-      <p class="shortcomment cmt">Returns a stream that skips emitting the first n values</p><div class="fullcomment"><div class="comment cmt"><p>Returns a stream that skips emitting the first n values</p></div><dl class="paramcmts block"><dt class="param">n</dt><dd class="cmt"><p>the number of values to skip</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a></dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -566,7 +554,7 @@ the stream is true</p></div><dl class="paramcmts block"><dt class="param">condit
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">foreach</span><span class="params">(<span name="thunk">thunk: ((<span class="extype" name="com.lynbrookrobotics.potassium.streams.AsyncZippedStream.A">A</span>, <span class="extype" name="com.lynbrookrobotics.potassium.streams.AsyncZippedStream.B">B</span>)) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span><span class="result">: <a href="index.html#Cancel=()=&gt;Unit" class="extmbr" name="com.lynbrookrobotics.potassium.streams.Cancel">Cancel</a></span>
+        <span class="name">foreach</span><span class="params">(<span name="thunk">thunk: ((<span class="extype" name="com.lynbrookrobotics.potassium.streams.AsyncZippedStream.A">A</span>, <span class="extype" name="com.lynbrookrobotics.potassium.streams.AsyncZippedStream.B">B</span>)) ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span><span class="result">: <a href="package$$Cancel.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Cancel">Cancel</a></span>
       </span>
       
       <p class="shortcomment cmt">Adds a listener for elements of this stream.</p><div class="fullcomment"><div class="comment cmt"><p>Adds a listener for elements of this stream. Callbacks will be executed
@@ -641,9 +629,9 @@ the integral of the signal's units</p></div><dl class="paramcmts block"><dt>retu
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.streams.Stream#map" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="map[O](f:T=&gt;O):com.lynbrookrobotics.potassium.streams.Stream[O]"></a><a id="map[O](((A,B))⇒O):Stream[O]"></a>
+      <a id="map[O](f:T=&gt;O,allowRestart:Boolean):com.lynbrookrobotics.potassium.streams.Stream[O]"></a><a id="map[O](((A,B))⇒O,Boolean):Stream[O]"></a>
       <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/streams/AsyncZippedStream.html#map[O](f:T=&gt;O):com.lynbrookrobotics.potassium.streams.Stream[O]" title="Permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/AsyncZippedStream.html#map[O](f:T=&gt;O,allowRestart:Boolean):com.lynbrookrobotics.potassium.streams.Stream[O]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -652,7 +640,7 @@ the integral of the signal's units</p></div><dl class="paramcmts block"><dt>retu
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">map</span><span class="tparams">[<span name="O">O</span>]</span><span class="params">(<span name="f">f: ((<span class="extype" name="com.lynbrookrobotics.potassium.streams.AsyncZippedStream.A">A</span>, <span class="extype" name="com.lynbrookrobotics.potassium.streams.AsyncZippedStream.B">B</span>)) ⇒ <span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.map.O">O</span></span>)</span><span class="result">: <a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.map.O">O</span>]</span>
+        <span class="name">map</span><span class="tparams">[<span name="O">O</span>]</span><span class="params">(<span name="f">f: ((<span class="extype" name="com.lynbrookrobotics.potassium.streams.AsyncZippedStream.A">A</span>, <span class="extype" name="com.lynbrookrobotics.potassium.streams.AsyncZippedStream.B">B</span>)) ⇒ <span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.map.O">O</span></span>, <span name="allowRestart">allowRestart: <span class="extype" name="scala.Boolean">Boolean</span> = <span class="symbol">true</span></span>)</span><span class="result">: <a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.Stream.map.O">O</span>]</span>
       </span>
       
       <p class="shortcomment cmt">Transforms a stream using a single value function from original stream
@@ -888,6 +876,22 @@ with each emitted value of this stream to produce a new value</p></div><dl class
       </span>
       
       <p class="shortcomment cmt">Applies a fixed size sliding window over the stream</p><div class="fullcomment"><div class="comment cmt"><p>Applies a fixed size sliding window over the stream</p></div><dl class="paramcmts block"><dt class="param">size</dt><dd class="cmt"><p>the size of the window</p></dd><dt>returns</dt><dd class="cmt"><p>a stream returning complete windows</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a></dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.streams.AsyncZippedStream#subscribeToParents" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="subscribeToParents():Unit"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/AsyncZippedStream.html#subscribeToParents():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">subscribeToParents</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.AsyncZippedStream">AsyncZippedStream</a> → <a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a></dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.streams.Stream#syncTo" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="syncTo(o:com.lynbrookrobotics.potassium.streams.Stream[_]):com.lynbrookrobotics.potassium.streams.Stream[T]"></a><a id="syncTo(Stream[_]):Stream[(A,B)]"></a>
       <span class="permalink">
@@ -938,6 +942,22 @@ stream through polling</p></div><dl class="paramcmts block"><dt class="param">o<
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.streams.AsyncZippedStream#unsubscribeFromParents" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="unsubscribeFromParents():Unit"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/AsyncZippedStream.html#unsubscribeFromParents():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">unsubscribeFromParents</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.lynbrookrobotics.potassium.streams.AsyncZippedStream">AsyncZippedStream</a> → <a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a></dd></dl></div>
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
