@@ -30,13 +30,12 @@ class TargetTrackingTest extends FunSuite {
 
     cubePosition.foreach(lastCubePosition = _)
 
+
     for(_ <- 1 to periodsPerSecond){
       clockTrigger.apply(period)
       pubXAngle.apply(Degrees(0))
       pubYAngle.apply(Degrees(-45))
     }
-
-    println(lastCubePosition)
 
     implicit val tolerance: Length = Feet(0.1)
     assert(target ~= lastCubePosition)
@@ -66,8 +65,6 @@ class TargetTrackingTest extends FunSuite {
       pubXAngle.apply(Degrees(6))
       pubYAngle.apply(Degrees(-42))
     }
-
-    println(lastCubePosition)
 
     implicit val tolerance: Length = Feet(0.1)
     assert(target ~= lastCubePosition)
