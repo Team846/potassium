@@ -59,9 +59,9 @@ case class Matrix3by3(elems: Seq[Double]*) {
 
   def *[T <: Quantity[T]](other: Value3D[T]): Value3D[T] = {
     Value3D(
-      elems(1)(1) * other.x + elems(1)(2) * other.y + elems(1)(3) * other.z,
-      elems(2)(1) * other.x + elems(2)(2) * other.y + elems(2)(3) * other.z,
-      elems(3)(1) * other.x + elems(3)(2) * other.y + elems(3)(3) * other.z
+      elems(0)(0) * other.x + elems(0)(1) * other.y + elems(0)(2) * other.z,
+      elems(1)(0) * other.x + elems(1)(1) * other.y + elems(1)(2) * other.z,
+      elems(2)(0) * other.x + elems(2)(1) * other.y + elems(2)(2) * other.z
     )
   }
 }
