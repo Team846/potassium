@@ -50,6 +50,10 @@ object Point {
   def apply(v: Value3D[Length]): Point = {
     new Point(v.x, v.y, v.z)
   }
+
+  def apply(r: Length, ang: Angle): Point = {
+    new Point(r * ang.sin, r * ang.cos)
+  }
 }
 
 case class Segment(start: Point, end: Point) {
