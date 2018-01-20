@@ -10,25 +10,27 @@ private[frc] class WPIClockShared(stopOnException: Boolean) extends Clock {
     var lastTime: Option[Time] = None
     var running = false
 
-    val notifier = new Notifier(() => {
-      if (!running) {
-        running = true
-        val currentTime = Microseconds(Utility.getFPGATime)
-        lastTime.foreach { l =>
-          if (stopOnException) {
-            thunk(currentTime - l)
-          } else {
-            try {
+    val notifier = new Notifier(new Runnable {
+      override def run(): Unit = {
+        if (!running) {
+          running = true
+          val currentTime = Microseconds(Utility.getFPGATime)
+          lastTime.foreach { l =>
+            if (stopOnException) {
               thunk(currentTime - l)
-            } catch {
-              case e: Throwable =>
-                e.printStackTrace()
+            } else {
+              try {
+                thunk(currentTime - l)
+              } catch {
+                case e: Throwable =>
+                  e.printStackTrace()
+              }
             }
           }
-        }
 
-        lastTime = Some(currentTime)
-        running = false
+          lastTime = Some(currentTime)
+          running = false
+        }
       }
     })
 
@@ -38,8 +40,10 @@ private[frc] class WPIClockShared(stopOnException: Boolean) extends Clock {
   }
 
   override def singleExecution(delay: Time)(thunk: => Unit): Unit = {
-    val notifier = new Notifier(() => {
-      thunk
+    val notifier = new Notifier(new Runnable {
+      override def run(): Unit = {
+        thunk
+      }
     })
 
     notifier.startSingle(delay.to(Seconds))

@@ -50,10 +50,12 @@ object Implicits {
     def onDataReceived: ImpulseEvent = {
       val source = new ImpulseEventSource
 
-      new Thread(() => {
-        while (!Thread.interrupted()) {
-          ds.waitForData()
-          source.fire()
+      new Thread(new Runnable {
+        override def run(): Unit = {
+          while (!Thread.interrupted()) {
+            ds.waitForData()
+            source.fire()
+          }
         }
       }).start()
 

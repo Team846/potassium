@@ -1,4 +1,4 @@
-import sbtcrossproject.{crossProject, CrossType, CrossClasspathDependency}
+import sbtcrossproject.{crossProject, CrossType}
 
 enablePlugins(GitVersioning, TravisScalaStylePlugin)
 
@@ -15,7 +15,7 @@ git.formattedShaVersion := git.gitHeadCommit.value map { sha =>
 
 scalaVersion in ThisBuild := "2.12.1"
 
-resolvers in ThisBuild += "Funky-Repo" at "http://team846.github.io/repo"
+resolvers in ThisBuild += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
 
 concurrentRestrictions in Global += Tags.limit(Tags.Test, 1)
 parallelExecution in Global := false
@@ -40,9 +40,9 @@ lazy val potassium = project.in(file(".")).
     controlJVM, controlJS, controlNative,
     remote,
     vision,
-    frc,
+    frcJVM, frcNative,
     config,
-    sensors,
+    sensorsJVM, sensorsJS, sensorsNative,
     commonsJVM, commonsJS, commonsNative,
     lighting
   ).settings(
@@ -51,7 +51,7 @@ lazy val potassium = project.in(file(".")).
 )
 
 lazy val nativeSettings = Def.settings(
-  scalaVersion := "2.11.11",
+  scalaVersion := "2.11.12",
   libraryDependencies := libraryDependencies.value.filterNot(_.configurations.exists(_ == Test.name)),
   test := {
     (compile in Compile).value
@@ -97,12 +97,26 @@ lazy val vision = project.dependsOn(coreJVM).settings(
   libraryDependencies ++= jvmDependencies
 )
 
-lazy val frc = project.dependsOn(coreJVM, sensors).settings(
+lazy val frc = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core, sensors).settings(
   name := "potassium-frc",
-  libraryDependencies ++= sharedDependencies.value,
-  libraryDependencies ++= jvmDependencies
+  libraryDependencies ++= sharedDependencies.value
+).jvmSettings(
+  libraryDependencies ++= jvmDependencies,
+  resolvers += "WPILib-Maven" at "http://team846.github.io/wpilib-maven",
+
+  libraryDependencies += "edu.wpi.first" % "wpilib" % "2018.1.1",
+  libraryDependencies += "edu.wpi.first" % "ntcore" % "2018.1.1",
+  libraryDependencies += "com.ctre" % "phoenix" % "5.1.3.1"
+).nativeSettings(
+  resolvers += "Funky-Repo" at "http://team846.github.io/repo",
+  libraryDependencies += "com.lynbrookrobotics" %%% "wpilib-scala-native" % "0.1-SNAPSHOT",
+//  libraryDependencies += "com.lynbrookrobotics" % "ntcore" % "2018.1.1"
+  libraryDependencies += "com.lynbrookrobotics" %%% "phoenix-scala-native" % "0.1-SNAPSHOT",
+  nativeSettings
 )
 
+lazy val frcJVM = frc.jvm
+lazy val frcNative = frc.native
 
 lazy val config = project.dependsOn(coreJVM).settings(
   name := "potassium-config",
@@ -116,11 +130,15 @@ lazy val lighting = project.dependsOn(coreJVM).settings(
   libraryDependencies ++= jvmDependencies
 )
 
-lazy val sensors = project.dependsOn(coreJVM).settings(
+lazy val sensors = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core).settings(
   name := "potassium-sensors",
   libraryDependencies ++= sharedDependencies.value,
   libraryDependencies ++= jvmDependencies
-)
+).nativeSettings(nativeSettings)
+
+lazy val sensorsJVM = sensors.jvm
+lazy val sensorsJS = sensors.js
+lazy val sensorsNative = sensors.native
 
 lazy val commons = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).
   dependsOn(
@@ -140,7 +158,7 @@ lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site t
 lazy val docs = project
   .enablePlugins(ScalaUnidocPlugin)
   .dependsOn(coreJVM, model, controlJVM,
-    remote, vision, frc, config, sensors,
+    remote, vision, frcJVM, config, sensorsJVM,
     commonsJVM, lighting)
   .settings(
     autoAPIMappings := true,
@@ -148,7 +166,7 @@ lazy val docs = project
     addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docsMappingsAPIDir),
     unidocProjectFilter in (ScalaUnidoc, unidoc) :=
       inProjects(coreJVM, model, controlJVM,
-        remote, vision, frc, config, lighting, sensors, commonsJVM)
+        remote, vision, frcJVM, config, lighting, sensorsJVM, commonsJVM)
   )
 
 publishArtifact := false

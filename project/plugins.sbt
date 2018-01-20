@@ -1,4 +1,4 @@
-resolvers += "Funky-Repo" at "http://team846.github.io/repo"
+resolvers += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
 
 addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0-RC10")
 
@@ -10,13 +10,13 @@ addSbtPlugin("org.scalastyle" %% "scalastyle-sbt-plugin" % "0.8.0")
 
 addSbtPlugin("com.lynbrookrobotics" % "travis-scalastyle" % "0.2.0")
 
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.16")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.21")
 
-addSbtPlugin("org.scala-native" % "sbt-crossproject" % "0.1.0")
+addSbtPlugin("org.portable-scala" % "sbt-crossproject" % "0.3.0")
 
-addSbtPlugin("org.scala-native" % "sbt-scalajs-crossproject" % "0.1.0")
+addSbtPlugin("org.portable-scala" % "sbt-scalajs-crossproject" % "0.3.0")
 
-addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.2.1")
+addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.3.7-arm-jni-threads" exclude("org.scala-native", "sbt-crossproject"))
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.8.5")
 
