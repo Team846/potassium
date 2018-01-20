@@ -34,9 +34,13 @@ class TargetTrackingTest extends FunSuite {
     cubePosition.foreach(lastCubePosition = _)
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> added unit tests
+=======
+
+>>>>>>> refactoring with polar coordinates
     for(_ <- 1 to periodsPerSecond){
       clockTrigger.apply(period)
       pubXAngle.apply(Degrees(0))
@@ -44,10 +48,13 @@ class TargetTrackingTest extends FunSuite {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     println(lastCubePosition)
 
 >>>>>>> added unit tests
+=======
+>>>>>>> refactoring with polar coordinates
     implicit val tolerance: Length = Feet(0.1)
     assert(target ~= lastCubePosition)
   }
@@ -78,10 +85,13 @@ class TargetTrackingTest extends FunSuite {
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     println(lastCubePosition)
 
 >>>>>>> added unit tests
+=======
+>>>>>>> refactoring with polar coordinates
     implicit val tolerance: Length = Feet(0.1)
     assert(target ~= lastCubePosition)
   }
