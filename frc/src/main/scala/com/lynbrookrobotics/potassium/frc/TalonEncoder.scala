@@ -16,6 +16,6 @@ class TalonEncoder(talon: TalonController,
 
   def getAngularVelocity: AngularVelocity = {
     // we multiply by 10 because we read in units of ticks/100ms
-    (conversionFactor * Each(talon.rawPosition) * 10) / Seconds(1)
+    (conversionFactor * Each(talon.rawVelocity) * 10) / Seconds(1)
   }
 }
