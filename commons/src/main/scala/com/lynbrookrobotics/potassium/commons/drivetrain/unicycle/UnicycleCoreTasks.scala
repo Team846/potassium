@@ -275,8 +275,7 @@ trait UnicycleCoreTasks {
             forwardError.value > 0
           }
 
-          // TODO: remove angle condition
-          if (beyond && turnError.abs < toleranceAngle) {
+          if (beyond) {
             finished()
           }
       }
@@ -351,7 +350,6 @@ trait UnicycleCoreTasks {
                                  props: Signal[DrivetrainProperties],
                                  clock: Clock) extends FiniteTask {
 
-    // TODO: requires review
     val positionSlide: Stream[Queue[(Angle, Time)]] = hardware.turnPosition.zipWithTime.sliding(20)
 
     override def onStart(): Unit = {
