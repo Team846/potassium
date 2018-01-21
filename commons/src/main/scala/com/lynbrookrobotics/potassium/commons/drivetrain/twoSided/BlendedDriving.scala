@@ -7,16 +7,19 @@ import squants.motion.RadiansPerSecond
 import squants.{Dimensionless, Each, Length, Percent, Velocity}
 
 object BlendedDriving {
-  def circularMotion(targetForward: Stream[Velocity],
+  def circularMotion(velocity: Stream[Velocity],
                      radius: Stream[Length])
                     (implicit props: Signal[TwoSidedDriveProperties]): Stream[TwoSidedVelocity] = {
-    targetForward.zip(radius).map { case (velocity, radius) =>
+    velocity.zip(radius).map { case (velocity, radius) =>
+      if (radius.value == Double.PositiveInfinity || radius.value == Double.NegativeInfinity || radius.value == Double.NaN) {
+        TwoSidedVelocity(velocity, velocity)
+      } else {
+        val angularVelocity = RadiansPerSecond(velocity.toFeetPerSecond / radius.toFeet)
 
-      val angularVelocity = RadiansPerSecond(velocity.toFeetPerSecond / radius.toFeet)
-
-      val left = angularVelocity onRadius (radius - props.get.track / 2)
-      val right = angularVelocity onRadius (radius + props.get.track / 2)
-      TwoSidedVelocity(left, right)
+        val left = angularVelocity onRadius (radius - props.get.track / 2)
+        val right = angularVelocity onRadius (radius + props.get.track / 2)
+        TwoSidedVelocity(left, right)
+      }
     }
   }
 
@@ -40,7 +43,7 @@ object BlendedDriving {
     val normalizedTargetForwardSpeed = targetForward / props.get.maxForwardVelocity
 
     val constantRadiusWeight = Each(
-      math.pow(normalizedTargetForwardSpeed, props.get.blendExponent))
+      math.pow(normalizedTargetForwardSpeed.abs, props.get.blendExponent)) * normalizedTargetForwardSpeed.signum
     val tankWeight = Percent(100) - constantRadiusWeight
 
     tankWeight.toEach * tankSpeed + constantRadiusWeight.toEach * constantRadiusSpeed
@@ -56,7 +59,7 @@ object BlendedDriving {
     zippedSpeeds.map { case ((tankSpeed, carSpeed), targetForward) =>
       TwoSidedVelocity(
         blend(carSpeed.left, tankSpeed.left, targetForward),
-        blend(carSpeed.left, tankSpeed.left, targetForward))
+        blend(carSpeed.right, tankSpeed.right, targetForward))
     }
   }
 }

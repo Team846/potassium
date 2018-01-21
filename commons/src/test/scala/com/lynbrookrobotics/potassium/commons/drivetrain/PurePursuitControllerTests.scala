@@ -231,7 +231,7 @@ class PurePursuitControllerTests extends FunSuite {
     triggerClock.apply(period)
     triggerClock.apply(period)
 
-    implicit val Tolerance = Percent(0.001)
+    implicit val Tolerance: Dimensionless = Percent(0.001)
     assert(out ~= Percent(0))
   }
 }
