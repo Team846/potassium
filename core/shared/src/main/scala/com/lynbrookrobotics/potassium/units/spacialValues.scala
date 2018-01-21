@@ -25,6 +25,29 @@ class Point(override val x: Length,
       (other.z ~= this.z)
   }
 
+  /**
+    * produce a point rotated about the z axis with the given
+    * angle of rotation
+    * @param angle the angle to rotate by
+    * @return a new point rotated about the z axis with given angle
+    */
+  def rotateBy(angle: Angle): Point = {
+    val rotationMatrix =
+      Matrix3by3(
+        Seq(angle.cos, -angle.sin, 0.0),
+        Seq(angle.sin,  angle.cos, 0.0),
+        Seq(0.0,        0.0,       1.0)
+      )
+
+    Point(rotationMatrix * this)
+  }
+
+  def rotateAround(center: Point, angle: Angle): Point = {
+    val translatedPoint = this - center
+    val rotatedPoint = translatedPoint.rotateBy(angle)
+    rotatedPoint + center
+  }
+
   def onLine(toTest: Segment, tolerance: Length): Boolean = {
     implicit val implicitTolerance = tolerance
 
