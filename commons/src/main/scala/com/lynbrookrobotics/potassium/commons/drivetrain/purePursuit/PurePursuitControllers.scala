@@ -103,14 +103,14 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
         }
 
         if (angleErrorToLastWayPoint.abs >= Degrees(90) && reachedLastPoint) {
-          println(s"reversing. Pose: $pose look ahead: $lookAhead curr angle ${currTrigAngle.toDegrees} to Last ${angleErrorToLastWayPoint.toDegrees}")
+//          println(s"reversing. Pose: $pose look ahead: $lookAhead curr angle ${currTrigAngle.toDegrees} to Last ${angleErrorToLastWayPoint.toDegrees}")
           -1D
         } else {
-          println(s"not reverse Pose: $pose look ahead: $lookAhead curr angle ${currTrigAngle.toDegrees} to Last ${angleErrorToLastWayPoint.toDegrees}")
+//          println(s"not reverse Pose: $pose look ahead: $lookAhead curr angle ${currTrigAngle.toDegrees} to Last ${angleErrorToLastWayPoint.toDegrees}")
           1D
         }
       } else {
-        println(s"not reverse Pose: $pose look ahead: $lookAhead")
+//        println(s"not reverse Pose: $pose look ahead: $lookAhead")
         1D
       }
     }
@@ -140,16 +140,18 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
 
 
     secondLookAheadPoint.getOrElse(
-      firstLookAheadPoint.getOrElse(
+      firstLookAheadPoint.getOrElse {
+//        println(s"loo" +
+//          s"k ahead distance: $lookAheadDistance \t bi segment path: $biSegmentPath \t current position: $currPosition")
         getExtrapolatedLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
-      )
+      }
     )
   }
 
   def followWayPointsController(wayPoints: Seq[Point],
                                 position: Stream[Point],
                                 turnPosition: Stream[Angle],
-                                steadyOutput: Dimensionless,
+                                __UNUSED: Dimensionless,
                                 maxTurnOutput: Dimensionless)
                                 (implicit hardware: DrivetrainHardware,
                                 props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
@@ -170,10 +172,10 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
 
     val selectedPath = position.map { _ =>
       if (previousLookAheadPoint.exists{ p =>
-        currPath._2.exists(_.containsInXY(p, Feet(0.1)))
+        currPath._2.exists(_.containsInXY(p, Feet(0.001)))
       }) {
         if (biSegmentPaths.hasNext) {
-          println("********** advancing path ***********")
+          println("********** advancing path 1 ***********")
           currPath = biSegmentPaths.next()
         }
       }
@@ -199,10 +201,11 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     }
 
     val limitedForward = forwardOutput.map{ s =>
-      if ( !biSegmentPaths.hasNext ) {
-        s min steadyOutput
-      } else {
+      val steadyOutput = props.get.forwardPositionControlGains.kp * props.get.defaultLookAheadDistance
+      if ( biSegmentPaths.hasNext ) {
         steadyOutput
+      } else {
+        s min steadyOutput
       }
     }
 

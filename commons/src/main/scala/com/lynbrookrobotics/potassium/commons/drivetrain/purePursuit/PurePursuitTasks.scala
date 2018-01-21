@@ -51,18 +51,19 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
 
       var ticksWithingTolerance = 0
 
-      drive.setController(lowerLevelVelocityControl(unicycle.withCheckZipped(error) { e =>
+      drive.setController(lowerLevelVelocityControl(speedControl(unicycle.withCheckZipped(error) { e =>
         if (e.exists(_ < tolerance)) {
-          println("Within tolerance")
+//          println("Within tolerance")
           ticksWithingTolerance = ticksWithingTolerance + 1
         } else {
           ticksWithingTolerance = 0
         }
 
         if (ticksWithingTolerance >= targetTicksWithingTolerance) {
-          println("finished.")
+//          println("finished.")
+          finished()
         }
-      }))
+      })))
     }
 
     override def onEnd(): Unit = {
