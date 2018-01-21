@@ -315,14 +315,14 @@
         <span class="name">apply</span><span class="params">(<span name="angle">angle: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.Angle">Angle</span>]</span>, <span name="distanceTraveled">distanceTraveled: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.space.Length">Length</span>]</span>)</span><span class="result">: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<a href="../../units/Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a>]</span>
       </span>
       
-      <p class="shortcomment cmt">returns signal of current xy position provided distance traveled since
-start of calculations and current angle.</p><div class="fullcomment"><div class="comment cmt"><p>returns signal of current xy position provided distance traveled since
-start of calculations and current angle. It assumes that motion of the robot is
-a straight line between ticks, and then using vector addition to continually update
+      <p class="shortcomment cmt">returns Stream of current xy position provided distance traveled
+and current angle.</p><div class="fullcomment"><div class="comment cmt"><p>returns Stream of current xy position provided distance traveled
+and current angle. It assumes that motion of the robot is a straight line
+between ticks, and then using vector addition to continually update
 the position</p></div><dl class="paramcmts block"><dt class="param">angle</dt><dd class="cmt"><p>current trigonometric angle in about z axis (in the xy
              plane), where 0 is defined at the x axis. Used as the angle of the
              vector in vector addition</p></dd><dt class="param">distanceTraveled</dt><dd class="cmt"><p>the total distance/arclength traveled. Used as the
-                        magnitude of the vector used in vector addition</p></dd></dl></div>
+                        magnitude of the vector used in vector addition</p></dd><dt>returns</dt><dd class="cmt"><p>a stream of points of the robot's path</p></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
@@ -339,6 +339,27 @@ the position</p></div><dl class="paramcmts block"><dt class="param">angle</dt><d
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition#circularTracking" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="circularTracking(angle:com.lynbrookrobotics.potassium.streams.Stream[squants.Angle],distanceTraveled:com.lynbrookrobotics.potassium.streams.Stream[squants.space.Length]):com.lynbrookrobotics.potassium.streams.Stream[com.lynbrookrobotics.potassium.units.Point]"></a><a id="circularTracking(Stream[Angle],Stream[Length]):Stream[Point]"></a>
+      <span class="permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/commons/cartesianPosition/XYPosition$.html#circularTracking(angle:com.lynbrookrobotics.potassium.streams.Stream[squants.Angle],distanceTraveled:com.lynbrookrobotics.potassium.streams.Stream[squants.space.Length]):com.lynbrookrobotics.potassium.streams.Stream[com.lynbrookrobotics.potassium.units.Point]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">circularTracking</span><span class="params">(<span name="angle">angle: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.Angle">Angle</span>]</span>, <span name="distanceTraveled">distanceTraveled: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.space.Length">Length</span>]</span>)</span><span class="result">: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<a href="../../units/Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a>]</span>
+      </span>
+      
+      <p class="shortcomment cmt">tracks the position of the robot by assuming a circular motion between every tick,
+to create a more realistic model of the robot's angular velocity</p><div class="fullcomment"><div class="comment cmt"><p>tracks the position of the robot by assuming a circular motion between every tick,
+to create a more realistic model of the robot's angular velocity</p></div><dl class="paramcmts block"><dt class="param">angle</dt><dd class="cmt"><p>current trigonometric angle in about z axis (in the xy
+             plane), where 0 is defined at the x axis. Used as the angle of the
+             vector in vector addition</p></dd><dt class="param">distanceTraveled</dt><dd class="cmt"><p>the distance traveled. Used to calculate the
+                        length of the circular arc between every tick</p></dd><dt>returns</dt><dd class="cmt"><p>stream of points of the robot's path</p></dd></dl></div>
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
@@ -511,7 +532,7 @@ the position</p></div><dl class="paramcmts block"><dt class="param">angle</dt><d
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition#positionWithSimpsons" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition#positionWithSimpsons" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="positionWithSimpsons(angle:com.lynbrookrobotics.potassium.streams.Stream[squants.Angle],velocity:com.lynbrookrobotics.potassium.streams.Stream[squants.motion.Velocity]):com.lynbrookrobotics.potassium.streams.Stream[com.lynbrookrobotics.potassium.units.Point]"></a><a id="positionWithSimpsons(Stream[Angle],Stream[Velocity]):Stream[Point]"></a>
       <span class="permalink">
       <a href="../../../../../com/lynbrookrobotics/potassium/commons/cartesianPosition/XYPosition$.html#positionWithSimpsons(angle:com.lynbrookrobotics.potassium.streams.Stream[squants.Angle],velocity:com.lynbrookrobotics.potassium.streams.Stream[squants.motion.Velocity]):com.lynbrookrobotics.potassium.streams.Stream[com.lynbrookrobotics.potassium.units.Point]" title="Permalink">
@@ -526,7 +547,9 @@ the position</p></div><dl class="paramcmts block"><dt class="param">angle</dt><d
         <span class="name">positionWithSimpsons</span><span class="params">(<span name="angle">angle: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.Angle">Angle</span>]</span>, <span name="velocity">velocity: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.motion.Velocity">Velocity</span>]</span>)</span><span class="result">: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<a href="../../units/Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a>]</span>
       </span>
       
-      <p class="shortcomment cmt">differentiates x and y position, then reintegrates with Simpsons integration</p>
+      <p class="shortcomment cmt">differentiates x and y position, then reintegrates with Simpsons integration</p><div class="fullcomment"><div class="comment cmt"><p>differentiates x and y position, then reintegrates with Simpsons integration</p></div><dl class="paramcmts block"><dt class="param">angle</dt><dd class="cmt"><p>current trigonometric angle in about z axis (in the xy
+             plane), where 0 is defined at the x axis. Used as the angle of the
+             vector in vector addition</p></dd><dt class="param">velocity</dt><dd class="cmt"><p>a stream of the robot's velocity</p></dd><dt>returns</dt><dd class="cmt"><p>a stream of points of the robot's path</p></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
