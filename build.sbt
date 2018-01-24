@@ -23,7 +23,7 @@ parallelExecution in Global := false
 lazy val sharedDependencies = Def.setting(Seq(
   "org.typelevel"  %%% "squants"  % "1.3.0",
   "org.scalatest" %%% "scalatest" % "3.0.1" % Test,
-  "org.scalacheck" %%% "scalacheck" % "1.13.4" % Test
+  "org.scalacheck" %%% "scalacheck" % "1.13.5" % Test
 ))
 
 lazy val jvmDependencies = Seq(
@@ -52,10 +52,7 @@ lazy val potassium = project.in(file(".")).
 
 lazy val nativeSettings = Def.settings(
   scalaVersion := "2.11.12",
-  libraryDependencies := libraryDependencies.value.filterNot(_.configurations.exists(_ == Test.name)),
-  test := {
-    (compile in Compile).value
-  }
+  nativeLinkStubs in Test := true
 )
 
 lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Full).settings(
@@ -97,7 +94,7 @@ lazy val vision = project.dependsOn(coreJVM).settings(
   libraryDependencies ++= jvmDependencies
 )
 
-lazy val frc = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core, sensors).settings(
+lazy val frc = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Full).dependsOn(core, sensors).settings(
   name := "potassium-frc",
   libraryDependencies ++= sharedDependencies.value
 ).jvmSettings(
@@ -109,9 +106,15 @@ lazy val frc = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Pur
   libraryDependencies += "com.ctre" % "phoenix" % "5.1.3.1"
 ).nativeSettings(
   resolvers += "Funky-Repo" at "http://team846.github.io/repo",
-  libraryDependencies += "com.lynbrookrobotics" %%% "wpilib-scala-native" % "0.1-SNAPSHOT",
-//  libraryDependencies += "com.lynbrookrobotics" % "ntcore" % "2018.1.1"
-  libraryDependencies += "com.lynbrookrobotics" %%% "phoenix-scala-native" % "0.1-SNAPSHOT",
+  if (System.getenv("NATIVE_TARGET") == "ARM32") {
+    Seq(
+      libraryDependencies += "com.lynbrookrobotics" %%% "wpilib-scala-native" % "0.1-SNAPSHOT",
+      //  libraryDependencies += "com.lynbrookrobotics" % "ntcore" % "2018.1.1",
+      libraryDependencies += "com.lynbrookrobotics" %%% "phoenix-scala-native" % "0.1-SNAPSHOT"
+    )
+  } else Seq(
+    test := {}
+  ),
   nativeSettings
 )
 
@@ -132,8 +135,7 @@ lazy val lighting = project.dependsOn(coreJVM).settings(
 
 lazy val sensors = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core).settings(
   name := "potassium-sensors",
-  libraryDependencies ++= sharedDependencies.value,
-  libraryDependencies ++= jvmDependencies
+  libraryDependencies ++= sharedDependencies.value
 ).nativeSettings(nativeSettings)
 
 lazy val sensorsJVM = sensors.jvm
