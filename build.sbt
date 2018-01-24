@@ -36,7 +36,7 @@ parallelExecution in ThisBuild := false
 lazy val potassium = project.in(file(".")).
   aggregate(
     coreJVM, coreJS, coreNative,
-    model,
+    modelJVM,
     controlJVM, controlJS, controlNative,
     remote,
     vision,
@@ -67,11 +67,14 @@ lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 lazy val coreNative = core.native
 
-lazy val model = project.dependsOn(coreJVM, commonsJVM).settings(
+lazy val model = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core, commons).settings(
   name := "potassium-model",
-  libraryDependencies ++= sharedDependencies.value,
-  libraryDependencies ++= jvmDependencies
-)
+  libraryDependencies ++= sharedDependencies.value
+).nativeSettings(nativeSettings)
+
+lazy val modelJVM = model.jvm
+lazy val modelJS = model.js
+lazy val modelNative = model.native
 
 lazy val control = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core).settings(
   name := "potassium-control",
@@ -159,7 +162,7 @@ lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site t
 
 lazy val docs = project
   .enablePlugins(ScalaUnidocPlugin)
-  .dependsOn(coreJVM, model, controlJVM,
+  .dependsOn(coreJVM, modelJVM, controlJVM,
     remote, vision, frcJVM, config, sensorsJVM,
     commonsJVM, lighting)
   .settings(
@@ -167,7 +170,7 @@ lazy val docs = project
     docsMappingsAPIDir := "api",
     addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docsMappingsAPIDir),
     unidocProjectFilter in (ScalaUnidoc, unidoc) :=
-      inProjects(coreJVM, model, controlJVM,
+      inProjects(coreJVM, modelJVM, controlJVM,
         remote, vision, frcJVM, config, lighting, sensorsJVM, commonsJVM)
   )
 
