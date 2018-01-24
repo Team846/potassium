@@ -53,7 +53,7 @@ lazy val potassium = project.in(file(".")).
 lazy val nativeSettings = Def.settings(
   scalaVersion := "2.11.12",
   nativeLinkStubs in Test := true,
-  coverageExcludedPackages := "*"
+  coverageExcludedPackages := ".*"
 )
 
 lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Full).settings(
