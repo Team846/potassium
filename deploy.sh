@@ -15,6 +15,7 @@ ssh-add .travisdeploykey
 # clone the current gh-pages branch into the repo folder
 git clone -b gh-pages --single-branch git@github.com:Team846/repo.git repo
 
+export NATIVE_TARGET="ARM32"
 sbt publish
 
 # go to the out directory

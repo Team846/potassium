@@ -23,7 +23,7 @@ parallelExecution in Global := false
 lazy val sharedDependencies = Def.setting(Seq(
   "org.typelevel"  %%% "squants"  % "1.3.0",
   "org.scalatest" %%% "scalatest" % "3.0.1" % Test,
-  "org.scalacheck" %%% "scalacheck" % "1.13.4" % Test
+  "org.scalacheck" %%% "scalacheck" % "1.13.5" % Test
 ))
 
 lazy val jvmDependencies = Seq(
@@ -36,7 +36,7 @@ parallelExecution in ThisBuild := false
 lazy val potassium = project.in(file(".")).
   aggregate(
     coreJVM, coreJS, coreNative,
-    model,
+    modelJVM,
     controlJVM, controlJS, controlNative,
     remote,
     vision,
@@ -52,10 +52,8 @@ lazy val potassium = project.in(file(".")).
 
 lazy val nativeSettings = Def.settings(
   scalaVersion := "2.11.12",
-  libraryDependencies := libraryDependencies.value.filterNot(_.configurations.exists(_ == Test.name)),
-  test := {
-    (compile in Compile).value
-  }
+  nativeLinkStubs in Test := true,
+  coverageExcludedPackages := ".*"
 )
 
 lazy val core = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Full).settings(
@@ -70,11 +68,14 @@ lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 lazy val coreNative = core.native
 
-lazy val model = project.dependsOn(coreJVM, commonsJVM).settings(
+lazy val model = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core, commons).settings(
   name := "potassium-model",
-  libraryDependencies ++= sharedDependencies.value,
-  libraryDependencies ++= jvmDependencies
-)
+  libraryDependencies ++= sharedDependencies.value
+).nativeSettings(nativeSettings)
+
+lazy val modelJVM = model.jvm
+lazy val modelJS = model.js
+lazy val modelNative = model.native
 
 lazy val control = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core).settings(
   name := "potassium-control",
@@ -97,7 +98,7 @@ lazy val vision = project.dependsOn(coreJVM).settings(
   libraryDependencies ++= jvmDependencies
 )
 
-lazy val frc = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core, sensors).settings(
+lazy val frc = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Full).dependsOn(core, sensors).settings(
   name := "potassium-frc",
   libraryDependencies ++= sharedDependencies.value
 ).jvmSettings(
@@ -109,9 +110,15 @@ lazy val frc = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Pur
   libraryDependencies += "com.ctre" % "phoenix" % "5.1.3.1"
 ).nativeSettings(
   resolvers += "Funky-Repo" at "http://team846.github.io/repo",
-  libraryDependencies += "com.lynbrookrobotics" %%% "wpilib-scala-native" % "0.1-SNAPSHOT",
-//  libraryDependencies += "com.lynbrookrobotics" % "ntcore" % "2018.1.1"
-  libraryDependencies += "com.lynbrookrobotics" %%% "phoenix-scala-native" % "0.1-SNAPSHOT",
+  if (System.getenv("NATIVE_TARGET") == "ARM32") {
+    Seq(
+      libraryDependencies += "com.lynbrookrobotics" %%% "wpilib-scala-native" % "0.1-SNAPSHOT",
+      //  libraryDependencies += "com.lynbrookrobotics" % "ntcore" % "2018.1.1",
+      libraryDependencies += "com.lynbrookrobotics" %%% "phoenix-scala-native" % "0.1-SNAPSHOT"
+    )
+  } else Seq(
+    test := {}
+  ),
   nativeSettings
 )
 
@@ -132,8 +139,7 @@ lazy val lighting = project.dependsOn(coreJVM).settings(
 
 lazy val sensors = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core).settings(
   name := "potassium-sensors",
-  libraryDependencies ++= sharedDependencies.value,
-  libraryDependencies ++= jvmDependencies
+  libraryDependencies ++= sharedDependencies.value
 ).nativeSettings(nativeSettings)
 
 lazy val sensorsJVM = sensors.jvm
@@ -157,7 +163,7 @@ lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site t
 
 lazy val docs = project
   .enablePlugins(ScalaUnidocPlugin)
-  .dependsOn(coreJVM, model, controlJVM,
+  .dependsOn(coreJVM, modelJVM, controlJVM,
     remote, vision, frcJVM, config, sensorsJVM,
     commonsJVM, lighting)
   .settings(
@@ -165,7 +171,7 @@ lazy val docs = project
     docsMappingsAPIDir := "api",
     addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docsMappingsAPIDir),
     unidocProjectFilter in (ScalaUnidoc, unidoc) :=
-      inProjects(coreJVM, model, controlJVM,
+      inProjects(coreJVM, modelJVM, controlJVM,
         remote, vision, frcJVM, config, lighting, sensorsJVM, commonsJVM)
   )
 
