@@ -43,25 +43,25 @@ class PurePursuitTasksTest extends FunSuite {
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
     override val defaultLookAheadDistance: Length = Feet(0.5)
 
-    override val forwardControlGains = PIDConfig(
+    override val forwardControlGains: ForwardVelocityGains = PIDConfig(
       Percent(0) / MetersPerSecond(1),
       Percent(0) / Meters(1),
       Percent(0) / MetersPerSecondSquared(1)
     )
 
-    override val turnControlGains = PIDConfig(
+    override val turnControlGains: TurnVelocityGains = PIDConfig(
       Percent(0) / DegreesPerSecond(1),
       Percent(0) / Degrees(1),
       Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1))
     )
 
-    override val forwardPositionControlGains = PIDConfig(
+    override val forwardPositionControlGains: ForwardPositionGains = PIDConfig(
       Percent(100) / defaultLookAheadDistance,
       Percent(0) / (Meters(1).toGeneric * Seconds(1)),
       Percent(0) / MetersPerSecond(1)
     )
 
-    override val turnPositionControlGains = PIDConfig(
+    override val turnPositionControlGains: TurnPositionGains = PIDConfig(
       Percent(100) / Degrees(90),
       Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
       Percent(0) / DegreesPerSecond(1)
