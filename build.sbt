@@ -22,7 +22,7 @@ parallelExecution in Global := false
 
 lazy val sharedDependencies = Def.setting(Seq(
   "org.typelevel"  %%% "squants"  % "1.3.0",
-  "org.scalatest" %%% "scalatest" % "3.0.1" % Test,
+  "org.scalatest" %%% "scalatest" % "3.1.0-SNAP6" % Test,
   "org.scalacheck" %%% "scalacheck" % "1.13.5" % Test
 ))
 
