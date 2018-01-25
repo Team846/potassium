@@ -17,8 +17,7 @@ scalaVersion in ThisBuild := "2.12.1"
 
 resolvers in ThisBuild += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
 
-concurrentRestrictions in Global += Tags.limit(Tags.Test, 1)
-parallelExecution in Global := false
+concurrentRestrictions in Global += Tags.exclusive(Tags.Test)
 
 lazy val sharedDependencies = Def.setting(Seq(
   "org.typelevel"  %%% "squants"  % "1.3.0",
@@ -31,12 +30,10 @@ lazy val jvmDependencies = Seq(
   "com.storm-enroute" %% "scalameter-core" % "0.8.2" % Test
 )
 
-parallelExecution in ThisBuild := false
-
 lazy val potassium = project.in(file(".")).
   aggregate(
     coreJVM, coreJS, coreNative,
-    modelJVM,
+    modelJVM, modelJS, modelNative,
     controlJVM, controlJS, controlNative,
     remote,
     vision,
