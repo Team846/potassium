@@ -19,11 +19,17 @@ resolvers in ThisBuild += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
 
 concurrentRestrictions in Global += Tags.exclusive(Tags.Test)
 
-lazy val sharedDependencies = Def.setting(Seq(
-  "org.typelevel"  %%% "squants"  % "1.3.0",
-  "org.scalatest" %%% "scalatest" % "3.1.0-SNAP6" % Test,
-  "org.scalacheck" %%% "scalacheck" % "1.13.5" % Test
-))
+lazy val sharedDependencies = if (System.getenv("NATIVE_TARGET") == "ARM32") { 
+  Def.setting(Seq(
+    "org.typelevel"  %%% "squants"  % "1.3.0"
+  ))
+} else {
+  Def.setting(Seq(
+    "org.typelevel"  %%% "squants"  % "1.3.0",
+    "org.scalatest" %%% "scalatest" % "3.1.0-SNAP6" % Test,
+    "org.scalacheck" %%% "scalacheck" % "1.13.5" % Test
+  ))
+}
 
 lazy val jvmDependencies = Seq(
   "org.mockito" % "mockito-core" % "2.3.11" % Test,
