@@ -84,8 +84,8 @@ object SimulateDrivetrain extends App {
     wayPoints,
     Inches(5),
     1,
-    Percent(70),
-    Percent(30)
+    maxTurnOutput = Percent(30),
+    driveBackwards = false
   )(simulatedComponent)
 //  val task = new drivetrainContainer.unicycleTasks.RotateToAngle(
 //    Degrees(1e200),

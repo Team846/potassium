@@ -89,11 +89,14 @@ class PurePursuitControllerTests extends FunSuite {
 
     val position = hardware.turnPosition.mapToConstant(origin)
 
+    val driveBackwards = false
+
     val output = controllers.purePursuitControllerTurn(
       hardware.turnPosition.mapToConstant(Degrees(0)),
       position,
       path,
-      unlimitedTurnOutput)._1
+      unlimitedTurnOutput,
+      driveBackwards)._1
 
     var lastOutput = Percent(-10)
     output.foreach(lastOutput = _)
@@ -123,11 +126,14 @@ class PurePursuitControllerTests extends FunSuite {
 
     val position = hardware.turnPosition.mapToConstant(Point(Feet(1), Feet(1)))
 
+    val driveBackwards = false
+
     val output = controllers.purePursuitControllerTurn(
       hardware.turnPosition.mapToConstant(Degrees(0)),
       position,
       path,
-      unlimitedTurnOutput
+      unlimitedTurnOutput,
+      driveBackwards
     )._1
 
     var out = Percent(-10)
@@ -187,11 +193,14 @@ class PurePursuitControllerTests extends FunSuite {
     val path: Stream[(Segment, Option[Segment])] =
       hardware.turnPosition.mapToConstant((Segment(origin, target), None))
 
+    val driveBackwards = false
+
     val output = controllers.purePursuitControllerTurn(
       hardware.turnPosition.mapToConstant(Degrees(-85)),
       position,
       path,
-      unlimitedTurnOutput
+      unlimitedTurnOutput,
+      driveBackwards
     )._1
 
     var out = Percent(-10)
@@ -218,11 +227,14 @@ class PurePursuitControllerTests extends FunSuite {
     val position = hardware.turnPosition.mapToConstant(Point(Feet(2), Feet(2)))
     val path = hardware.turnPosition.mapToConstant((Segment(origin, target), None))
 
+    val driveBackwards = false
+
     val output = controllers.purePursuitControllerTurn(
       hardware.turnPosition.mapToConstant(Degrees(45)),
       position,
       path,
-      unlimitedTurnOutput
+      unlimitedTurnOutput,
+      driveBackwards
     )._1
 
     var out = Percent(-10)

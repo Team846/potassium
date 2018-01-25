@@ -41,7 +41,7 @@ case class TwoSidedDriveForce(left: Force, right: Force)
 class SimulatedTwoSidedHardware(constantFriction: Force,
                                 mass: Mass,
                                 momentOfInertia: MomentOfInertia,
-                                clock: Clock,
+                                val clock: Clock,
                                 period: Time)
                                 (implicit props: TwoSidedDriveProperties) extends TwoSidedDriveHardware {
   override val track: Length = props.track

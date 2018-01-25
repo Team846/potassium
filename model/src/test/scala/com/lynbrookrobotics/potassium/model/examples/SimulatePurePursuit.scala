@@ -23,30 +23,30 @@ class SimulatePurePursuit extends FunSuite {
   val container = new TwoSidedDriveContainerSimulator
 
   implicit val propsVal: TwoSidedDriveProperties = new TwoSidedDriveProperties {
-    override val maxLeftVelocity: Velocity = FeetPerSecond(15)
-    override val maxRightVelocity: Velocity = FeetPerSecond(15)
+    override val maxLeftVelocity: Velocity = FeetPerSecond(17)
+    override val maxRightVelocity: Velocity = FeetPerSecond(17)
 
-    override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
+    override val maxTurnVelocity: AngularVelocity = RadiansPerSecond((((maxLeftVelocity + maxRightVelocity) * Seconds(1)) / Inches(21.75)) / 2)
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(16.5)
     override val defaultLookAheadDistance: Length = Feet(1)
 
     override val turnControlGains = PIDConfig(
-      Percent(100) / DegreesPerSecond(1),
+      Percent(50) / DegreesPerSecond(360),
       Percent(0) / Degrees(1),
       Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)))
 
     override val forwardPositionControlGains = PIDConfig(
-      Percent(100) / Feet(4),
+      Percent(17.5) / Feet(1),
       Percent(0) / (Meters(1).toGeneric * Seconds(1)),
       Percent(0) / MetersPerSecond(1))
 
     override val turnPositionControlGains = PIDConfig(
-      kp = Percent(5) / Degrees(1),
+      kp = Percent(60) / Degrees(90),
       ki = Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
       kd = Percent(0.5) / DegreesPerSecond(1))
 
     override val leftControlGains = PIDConfig(
-      Percent(100) / FeetPerSecond(1),
+      Percent(60) / FeetPerSecond(5),
       Percent(0) / Meters(1),
       Percent(0) / MetersPerSecondSquared(1))
 
@@ -61,7 +61,8 @@ class SimulatePurePursuit extends FunSuite {
                                         timeOut: Time,
                                         log: Boolean = false,
                                         distanceTolerance: Length = Feet(0.5),
-                                        angleTolerance: Angle = Degrees(8)): Unit = {
+                                        angleTolerance: Angle = Degrees(8),
+                                        driveBackwards: Boolean = false): Unit = {
     implicit val (clock, triggerClock) = mockedClockTicker
     implicit val hardware = new SimulatedTwoSidedHardware(
       Pounds(88) * MetersPerSecondSquared(1) / 2,
@@ -75,9 +76,9 @@ class SimulatePurePursuit extends FunSuite {
     val task = new container.unicycleTasks.FollowWayPoints(
       wayPoints,
       Inches(3),
-      1,
+      20,
       Percent(30),
-      Percent(30)
+      driveBackwards
     )(drivetrain)
 
     println("change id: 3")
@@ -127,66 +128,104 @@ class SimulatePurePursuit extends FunSuite {
       s"\nLast angle was ${lastAngle.toDegrees}")
   }
 
-  test("Reach destination with path from (0,0) to (-5, 5)") {
-    testPurePursuitReachesDestination(
-      Seq(Point.origin, Point(Feet(-5), Feet(5))),
-      timeOut = Seconds(8)
-    )
-  }
+//  test("Reach destination with path from (0,0) to (-5, 5)") {
+//    testPurePursuitReachesDestination(
+//      Seq(Point.origin, Point(Feet(-5), Feet(5))),
+//      timeOut = Seconds(8)
+//    )
+//  }
+//
+//  test("Reach destination with path from (0,0) to (-5, -5)") {
+//    testPurePursuitReachesDestination(
+//      Seq(Point.origin, Point(Feet(-5), Feet(-5))),
+//      timeOut = Seconds(8),
+//      log = false
+//    )
+//  }
+//
+//  test("Reach destination with path from (0,0) to (-15, -15)") {
+//    testPurePursuitReachesDestination(
+//      Seq(Point.origin, Point(Feet(-15), Feet(-15))),
+//      timeOut = Seconds(20),
+//      log = false
+//    )
+//  }
+//
+//  test("Reach destination with path from (0,0) to (5, 5)") {
+//    testPurePursuitReachesDestination(
+//      Seq(Point.origin, Point(Feet(5), Feet(5))),
+//      timeOut = Seconds(8),
+//      log = false
+//    )
+//  }
+//
+//  test("Reach destination with path from (0,0) to (-.5, -.5)") {
+//    testPurePursuitReachesDestination(
+//      Seq(Point.origin, Point(Feet(-0.5), Feet(-0.5))),
+//      timeOut = Seconds(8),
+//      log = false
+//    )
+//  }
+//
+//
+//
+//  test("Reach destination with path from (0,0) to (0, 5) to (5, 5)") {
+//    testPurePursuitReachesDestination(
+//      Seq(
+//        Point.origin,
+//        Point(Feet(0), Feet(5)),
+//        Point(Feet(5), Feet(5))
+//      ),
+//      timeOut = Seconds(8),
+//      log = false
+//    )
+//  }
+//
+//  test("Center switch turned right scenario") {
+//    testPurePursuitReachesDestination(
+//      Seq(
+//        Point.origin,
+//        Point(Inches(0), Inches(56.6)),
+//        Point(Inches(-55.393), Inches(111.993)),
+//        Point(Inches(-55.393), Inches(143.993))
+//      ),
+//      timeOut = Seconds(30),
+//      log = false
+//    )
+//  }
 
-  test("Reach destination with path from (0,0) to (-5, -5)") {
-    testPurePursuitReachesDestination(
-      Seq(Point.origin, Point(Feet(-5), Feet(-5))),
-      timeOut = Seconds(8),
-      log = true
-    )
-  }
-
-  test("Reach destination with path from (0,0) to (-15, -15)") {
-    testPurePursuitReachesDestination(
-      Seq(Point.origin, Point(Feet(-15), Feet(-15))),
-      timeOut = Seconds(20)
-    )
-  }
-
-  test("Reach destination with path from (0,0) to (5, 5)") {
-    testPurePursuitReachesDestination(
-      Seq(Point.origin, Point(Feet(5), Feet(5))),
-      timeOut = Seconds(8),
-      log = true
-    )
-  }
-
-  test("Reach destination with path from (0,0) to (-.5, -.5)") {
-    testPurePursuitReachesDestination(
-      Seq(Point.origin, Point(Feet(-0.5), Feet(-0.5))),
-      timeOut = Seconds(8),
-      log = true
-    )
-  }
-
-
-
-  test("Reach destination with path from (0,0) to (0, 5) to (5, 5)") {
+  test("Go backwards five feeeeeetttttt") {
     testPurePursuitReachesDestination(
       Seq(
         Point.origin,
-        Point(Feet(0), Feet(5)),
-        Point(Feet(5), Feet(5))
+        Point(Feet(0), Feet(-10))
       ),
-      timeOut = Seconds(8),
-      log = true
+      timeOut = Seconds(10),
+      log = true,
+      driveBackwards = true
+    )
+  }
+
+  test("Reach destination (-5, -5)") {
+    testPurePursuitReachesDestination(
+      Seq(
+        Point.origin,
+        Point(Feet(-5), Feet(-5))
+      ),
+      timeOut = Seconds(10),
+      log = true,
+      driveBackwards = true
     )
   }
 //
 //  test("Reach destination with path from (0,0) to (0, 5)") {
 //    testPurePursuitReachesDestination(
 //      Seq(Point.origin, Point(Feet(0), Feet(5))),
-//      timeOut = Seconds(5)
+//      timeOut = Seconds(10)
 //    )
 //  }
-//
-//
+
+
 //  test("Reach destination with path from (0,0) to (0, -5)") {
 //    testPurePursuitReachesDestination(
 //      Seq(Point.origin, Point(Feet(0), Feet(-5))),
