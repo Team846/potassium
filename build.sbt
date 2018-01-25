@@ -17,8 +17,9 @@ scalaVersion in ThisBuild := "2.12.1"
 
 resolvers in ThisBuild += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
 
-parallelExecution in Global := false
-concurrentRestrictions in Global += Tags.limit(Tags.Test, 1)
+Global / concurrentRestrictions := Seq(
+  Tags.limitAll(1)
+)
 
 lazy val sharedDependencies = if (System.getenv("NATIVE_TARGET") == "ARM32") { 
   Def.setting(Seq(
