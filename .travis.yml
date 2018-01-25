@@ -3,8 +3,12 @@ language: scala
 branches:
   only:
     - master
+env:
+  - PLATFORM=jvm
+  - PLATFORM=js
+  - PLATFORM=native
 before_install:
-  - curl https://raw.githubusercontent.com/scala-native/scala-native/v0.3.6/bin/travis_setup.sh | bash -x
+  - - 'if [[ $PLATFORM == "native" ]]; then curl https://raw.githubusercontent.com/scala-native/scala-native/v0.3.6/bin/travis_setup.sh | bash -x; fi'
 install:
   - . $HOME/.nvm/nvm.sh
   - nvm install stable
@@ -18,7 +22,7 @@ install:
 script:
   - mkdir -p ~/.sbt/0.13/plugins
   - echo 'addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0")' > ~/.sbt/0.13/plugins/build.sbt
-  - 'sbt "clean" "coverage" "test" "coverageReport"'
+  - 'sbt "clean" "coverage" "$PLATFORM/test" "coverageReport"'
   - 'sbt coverageAggregate'
 jdk: oraclejdk8
 after_success:

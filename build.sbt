@@ -17,10 +17,6 @@ scalaVersion in ThisBuild := "2.12.1"
 
 resolvers in ThisBuild += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
 
-concurrentRestrictions in Global := Seq(
-  Tags.limitAll(1)
-)
-
 lazy val sharedDependencies = if (System.getenv("NATIVE_TARGET") == "ARM32") { 
   Def.setting(Seq(
     "org.typelevel"  %%% "squants"  % "1.3.0"
@@ -50,6 +46,48 @@ lazy val potassium = project.in(file(".")).
     sensorsJVM, sensorsJS, sensorsNative,
     commonsJVM, commonsJS, commonsNative,
     lighting
+  ).settings(
+  publish := {},
+  publishLocal := {}
+)
+
+lazy val jvm = project.
+  aggregate(
+    coreJVM,
+    modelJVM,
+    controlJVM,
+    remote,
+    vision,
+    frcJVM,
+    config,
+    sensorsJVM,
+    commonsJVM,
+    lighting
+  ).settings(
+  publish := {},
+  publishLocal := {}
+)
+
+lazy val js = project.
+  aggregate(
+    coreJS,
+    modelJS,
+    controlJS,
+    sensorsJS,
+    commonsJS
+  ).settings(
+  publish := {},
+  publishLocal := {}
+)
+
+lazy val native = project.
+  aggregate(
+    coreNative,
+    modelNative,
+    controlNative,
+    frcNative,
+    sensorsNative,
+    commonsNative
   ).settings(
   publish := {},
   publishLocal := {}
