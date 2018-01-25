@@ -37,7 +37,7 @@ lazy val jvmDependencies = Seq(
 lazy val potassium = project.in(file(".")).
   aggregate(
     coreJVM, coreJS, coreNative,
-    modelJVM, modelJS, modelNative,
+    modelJVM, modelNative,
     controlJVM, controlJS, controlNative,
     remote,
     vision,
@@ -71,7 +71,6 @@ lazy val jvm = project.
 lazy val js = project.
   aggregate(
     coreJS,
-    modelJS,
     controlJS,
     sensorsJS,
     commonsJS
@@ -111,13 +110,12 @@ lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 lazy val coreNative = core.native
 
-lazy val model = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core, commons).settings(
+lazy val model = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core, commons).settings(
   name := "potassium-model",
   libraryDependencies ++= sharedDependencies.value
 ).nativeSettings(nativeSettings)
 
 lazy val modelJVM = model.jvm
-lazy val modelJS = model.js
 lazy val modelNative = model.native
 
 lazy val control = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core).settings(
