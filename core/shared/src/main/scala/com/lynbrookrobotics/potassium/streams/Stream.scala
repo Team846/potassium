@@ -5,7 +5,7 @@ import squants.Quantity
 import squants.time.{Time, TimeDerivative, TimeIntegral}
 
 import scala.collection.immutable.Queue
-import com.lynbrookrobotics.potassium.events.{ContinuousEvent, ImpulseEvent, ImpulseEventSource, PollingContinuousEvent}
+import com.lynbrookrobotics.potassium.events.{ContinuousEvent, ImpulseEvent, ImpulseEventSource}
 
 import scala.annotation.unchecked.uncheckedVariance
 
