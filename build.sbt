@@ -17,7 +17,7 @@ scalaVersion in ThisBuild := "2.12.1"
 
 resolvers in ThisBuild += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
 
-Global / concurrentRestrictions := Seq(
+concurrentRestrictions in Global := Seq(
   Tags.limitAll(1)
 )
 
