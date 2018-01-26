@@ -15,7 +15,7 @@ git.formattedShaVersion := git.gitHeadCommit.value map { sha =>
 
 scalaVersion in ThisBuild := "2.12.1"
 
-resolvers in ThisBuild += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
+resolvers += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
 
 lazy val sharedDependencies = if (System.getenv("NATIVE_TARGET") == "ARM32") { 
   Def.setting(Seq(
@@ -37,59 +37,26 @@ lazy val jvmDependencies = Seq(
 lazy val potassium = project.in(file(".")).
   aggregate(
     coreJVM, coreJS, coreNative,
-    modelJVM, modelNative,
     controlJVM, controlJS, controlNative,
-    remote,
-    vision,
-    frcJVM, frcNative,
-    config,
     sensorsJVM, sensorsJS, sensorsNative,
     commonsJVM, commonsJS, commonsNative,
-    lighting
-  ).settings(
-  publish := {},
-  publishLocal := {}
-)
-
-lazy val jvm = project.
-  aggregate(
-    coreJVM,
-    modelJVM,
-    controlJVM,
+    modelJVM, modelNative,
+    frcJVM, frcNative,
     remote,
     vision,
-    frcJVM,
     config,
-    sensorsJVM,
-    commonsJVM,
     lighting
   ).settings(
   publish := {},
   publishLocal := {}
 )
 
-lazy val js = project.
-  aggregate(
-    coreJS,
-    controlJS,
-    sensorsJS,
-    commonsJS
-  ).settings(
-  publish := {},
-  publishLocal := {}
-)
-
-lazy val native = project.
-  aggregate(
-    coreNative,
-    modelNative,
-    controlNative,
-    frcNative,
-    sensorsNative,
-    commonsNative
-  ).settings(
-  publish := {},
-  publishLocal := {}
+addCommandAlias(
+  "testAll",
+  (potassium: ProjectDefinition[ProjectReference])
+    .aggregate
+    .map(p => s"${p.asInstanceOf[LocalProject].project}/test")
+    .mkString(";", ";", "")
 )
 
 lazy val nativeSettings = Def.settings(

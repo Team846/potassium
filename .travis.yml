@@ -15,10 +15,10 @@ install:
   - gem update --system
   - gem install sass
   - gem install jekyll
-script:
   - mkdir -p ~/.sbt/0.13/plugins
   - echo 'addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0")' > ~/.sbt/0.13/plugins/build.sbt
-  - 'sbt "clean" "coverage" "jvm/test" "js/test" "coreNative/test" "modelNative/test" "controlNative/test" "frcNative/test" "sensorsNative/test" "commonsNative/test" "coverageReport"'
+script:
+  - 'sbt clean coverage testAll coverageReport'
   - 'sbt coverageAggregate'
 jdk: oraclejdk8
 after_success:
