@@ -2,6 +2,9 @@ package com.lynbrookrobotics.potassium.units
 
 import squants.time.{Milliseconds, Time}
 import java.util.function.DoubleConsumer
+import java.io._
+
+import com.team846.frc2015.logging.AsyncLogger
 
 /**
   * Created by the-magical-llamicorn on 4/19/17.
@@ -23,13 +26,13 @@ class Histogram(min: Time, max: Time, binCount: Int) {
   }
 
   def printStatus(): Unit =  {
-    print(s"< $min : ${bins(0)} \n")
+    AsyncLogger.info(s"< $min : ${bins(0)} \n")
 
     for  (i <- 1 until binCount) {
-        println(s"${bins(i)} to ${min + (interval * (i -  1))} : " +
+        AsyncLogger.info(s"${bins(i)} to ${min + (interval * (i -  1))} : " +
                 s"${min + (interval * i)}")
     }
 
-    println(s"> $max : ${bins(binCount + 1)}")
+    AsyncLogger.info(s"> $max : ${bins(binCount + 1)}")
   }
 }
