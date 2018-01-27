@@ -12,7 +12,7 @@ class LimelightNetwork(table: NetworkTable)(implicit clock: Clock) {
   val yOffsetAngle: Stream[Angle] = Stream.periodic(Milliseconds(5))(Degrees(table.getEntry("tx").getDouble(0)))
 }
 
-object LimelightNetwork {
+object LimelightNetwork{
   def apply(implicit clock: Clock): LimelightNetwork = {
     new LimelightNetwork(NetworkTableInstance.getDefault.getTable("/limelight"))
   }
