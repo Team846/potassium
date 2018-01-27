@@ -117,7 +117,6 @@ lazy val frc = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Ful
   libraryDependencies += "edu.wpi.first" % "ntcore" % "2018.1.1",
   libraryDependencies += "com.ctre" % "phoenix" % "5.1.3.1"
 ).nativeSettings(
-  resolvers += "Funky-Repo" at "http://team846.github.io/repo",
   if (System.getenv("NATIVE_TARGET") == "ARM32") {
     Seq(
       libraryDependencies += "com.lynbrookrobotics" %%% "wpilib-scala-native" % "0.1-SNAPSHOT",
@@ -125,7 +124,12 @@ lazy val frc = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Ful
       libraryDependencies += "com.lynbrookrobotics" %%% "phoenix-scala-native" % "0.1-SNAPSHOT"
     )
   } else Seq(
-    test := {}
+    resolvers += "WPILib-Maven" at "http://team846.github.io/wpilib-maven",
+
+    libraryDependencies += "edu.wpi.first" % "wpilib" % "2018.1.1",
+    libraryDependencies += "edu.wpi.first" % "ntcore" % "2018.1.1",
+    libraryDependencies += "com.ctre" % "phoenix" % "5.1.3.1",
+    test := { (compile in Compile).value }
   ),
   nativeSettings
 )
