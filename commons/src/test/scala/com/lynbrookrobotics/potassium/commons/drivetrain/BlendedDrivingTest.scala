@@ -61,9 +61,10 @@ class BlendedDrivingTest extends FunSuite {
     })
   }
 
-  implicit val props: Signal[TwoSidedDriveProperties] = generateProps(0.5)
 
-  test("drive at a radius of 1 foot") {
+  test("Test driving at a radius of 1 foot and -track / 2") {
+    implicit val props: Signal[TwoSidedDriveProperties] = generateProps(0.5)
+
     var lastBlendedSpeed: TwoSidedVelocity = null
 
     val (radiuses, publishRadius) = Stream.manual[Length]
@@ -82,29 +83,36 @@ class BlendedDrivingTest extends FunSuite {
     assert(lastBlendedSpeed.right.toFeetPerSecond == 1 && lastBlendedSpeed.left.toFeetPerSecond == 3)
   }
 
-  def runBlendedDrive(props: Signal[TwoSidedDriveProperties]): Velocity = {
-    BlendedDriving.blend(FeetPerSecond(0), FeetPerSecond(1), FeetPerSecond(1))(props)
+  test("Test blend function produces correct weighted averages") {
+    assert(
+      BlendedDriving.blend(
+        FeetPerSecond(0),
+        FeetPerSecond(1),
+        FeetPerSecond(1))(generateProps(blendExp = 0)) == FeetPerSecond(0))
+
+    assert(BlendedDriving.blend(
+      FeetPerSecond(0),
+      FeetPerSecond(1),
+      FeetPerSecond(1))(generateProps(blendExp = 1, FeetPerSecond(2))) == FeetPerSecond(0.5))
+
+    assert(BlendedDriving.blend(
+      FeetPerSecond(0),
+      FeetPerSecond(1),
+      FeetPerSecond(1))(generateProps(blendExp = 0.5, FeetPerSecond(4))) == FeetPerSecond(0.5))
   }
 
-  test("Test blend function") {
-    var propsWithBlend = generateProps(0)
-    assert(runBlendedDrive(propsWithBlend) == FeetPerSecond(0))
-
-    propsWithBlend = generateProps(1, FeetPerSecond(2))
-    assert(runBlendedDrive(propsWithBlend) == FeetPerSecond(0.5))
-
-    propsWithBlend = generateProps(0.5, FeetPerSecond(4))
-    assert(runBlendedDrive(propsWithBlend) == FeetPerSecond(0.5))
-  }
-
-  test("blendedDriving with infinity radius & negative velocity") {
+  test("blendedDriving with infinity radius & negative velocity results in straight backwards motion") {
     val (tankSpeeds, publishTankSpeed) = Stream.manual[TwoSidedVelocity]
     val (targetForwards, publishTargetForwards) = Stream.manual[Velocity]
     val (curvatures, publishCurvatures) = Stream.manual[Ratio[Dimensionless, Length]]
+
     var lastBlendedSpeed: TwoSidedVelocity = null
 
     val props = generateProps(0)
-    BlendedDriving.blendedDrive(tankSpeeds, targetForwards, curvatures)(props).foreach(lastBlendedSpeed = _)
+    BlendedDriving.blendedDrive(
+      tankSpeeds,
+      targetForwards,
+      curvatures)(props).foreach(lastBlendedSpeed = _)
 
     publishTankSpeed(TwoSidedVelocity(FeetPerSecond(0), FeetPerSecond(0)))
     publishTargetForwards(FeetPerSecond(-1))
@@ -116,13 +124,6 @@ class BlendedDrivingTest extends FunSuite {
     publishTargetForwards(FeetPerSecond(-2))
     publishCurvatures(Ratio(Each(0), Feet(1)))
 
-    assert(lastBlendedSpeed.left.value < 0 && lastBlendedSpeed.right.value < 0)
-  }
-
-  test("Steering angles at forward and negative velocities") {
-    val (velocityStream, publishVelocity) = Stream.manual[Velocity]
-    val (curvatureStream, publishCurvature) = Stream.manual[Ratio[Dimensionless, Length]]
-
-
+    assert(lastBlendedSpeed.left < FeetPerSecond(0) && lastBlendedSpeed.right < FeetPerSecond(0))
   }
 }

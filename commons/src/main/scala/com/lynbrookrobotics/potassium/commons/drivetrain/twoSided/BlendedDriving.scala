@@ -23,14 +23,6 @@ object BlendedDriving {
     }
   }
 
-  private def driveWithCurvature(targetForwardVelocity: Stream[Velocity],
-                                 curvature: Stream[Ratio[Dimensionless, Length]])
-                                (implicit properties: Signal[TwoSidedDriveProperties]): Stream[TwoSidedVelocity] = {
-    circularMotion(
-      targetForwardVelocity,
-      radius = curvature.map(curvature => curvature.den / curvature.num.toEach))
-  }
-
   /**
     * Take the weighted average of the speed for tank like driving and for
     * driving at a constant radius. The weight of the average is decided by
@@ -52,7 +44,9 @@ object BlendedDriving {
                    targetForwardVelocity: Stream[Velocity],
                    curvature: Stream[Ratio[Dimensionless, Length]])
                   (implicit properties: Signal[TwoSidedDriveProperties]): Stream[TwoSidedVelocity] = {
-    val constantRadiusSpeed = driveWithCurvature(targetForwardVelocity, curvature)
+    val constantRadiusSpeed = circularMotion(
+      targetForwardVelocity,
+      radius = curvature.map(curvature => curvature.den / curvature.num.toEach))
 
     val zippedSpeeds = tankSpeed.zip(constantRadiusSpeed).zip(targetForwardVelocity)
     zippedSpeeds.map { case ((tankSpeed, carSpeed), targetForward) =>
