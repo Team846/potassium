@@ -26,6 +26,7 @@ trait ArmHardware {
 abstract class Arm {
   type Properties <: ArmProperties
   type Hardware <: ArmHardware
+  type Comp <: Component[Dimensionless]
 
   def positionControl(target: Stream[Angle])
                      (implicit properties: Signal[Properties],
@@ -35,7 +36,7 @@ abstract class Arm {
       hardware.angle,
       target,
       properties.map(_.positionGains)
-    ).map(_ max Percent(0)))
+    ))
   }
 
   object positionTasks {
@@ -47,6 +48,7 @@ abstract class Arm {
                           hardware: Hardware) extends WrapperTask {
       override def onStart(): Unit = {
         val (error, control) = positionControl(target)
+
         arm.setController(control.withCheckZipped(error) { error =>
           if (error.abs < tolerance) { //check whether arm is close enough to target. If so, run inner.
             readyToRunInner()
@@ -65,17 +67,14 @@ abstract class Arm {
                             (implicit properties: Signal[Properties],
                              hardware: Hardware) extends WrapperTask {
       override def onStart(): Unit = {
-        val (error, control) = (hardware.angle.zipAsync(target).map(t => t._2 - t._1), Percent(75))
+        val (error, control) = (hardware.angle.zipAsync(target).map(t => t._2 - t._1), Percent(100))
 
-        arm.setController(hardware.angle.mapToConstant(control).withCheckZipped(error) { error: Angle =>
-          if (error < Degrees(0)) { //check whether arm is above target. If so, run inner.
+        arm.setController(error.mapToConstant(control).withCheckZipped(error) { error: Angle =>
+          if (error <= Degrees(0)) { //check whether arm is above target. If so, run inner.
             readyToRunInner()
           }
         })
-
-
       }
-
       override def onEnd(): Unit = arm.resetToDefault()
     }
 
@@ -91,16 +90,8 @@ abstract class Arm {
             readyToRunInner()
           }
         })
-
-
       }
-
       override def onEnd(): Unit = arm.resetToDefault()
     }
-
   }
-
-
-
-  type Comp <: Component[Dimensionless]
 }
