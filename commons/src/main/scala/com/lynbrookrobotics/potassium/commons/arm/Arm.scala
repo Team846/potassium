@@ -1,23 +1,21 @@
 package com.lynbrookrobotics.potassium.commons.arm
 
-import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.{Component, Signal}
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.control.{PIDConfig, PIDF}
-import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask, WrapperTask}
-import com.lynbrookrobotics.potassium.units.{GenericDerivative, GenericValue}
-import squants.{Angle, Dimensionless, Percent}
+import com.lynbrookrobotics.potassium.tasks.WrapperTask
+import com.lynbrookrobotics.potassium.units.{GenericIntegral, GenericValue}
+import squants.{Dimensionless, Percent}
 import squants.motion.AngularVelocity
-import squants.Angle
 import squants.space.{Angle, Degrees}
 
 
 trait ArmProperties {
   def positionGains: PIDConfig[Angle,
-    GenericValue[Angle],
     Angle,
+    GenericValue[Angle],
     AngularVelocity,
-    Dimensionless,
+    GenericIntegral[Angle],
     Dimensionless]
 }
 
@@ -40,20 +38,17 @@ abstract class Arm {
     ).map(_ max Percent(0)))
   }
 
-
-  // while at position
-  // while above postion - 100 down until above position
-  //while below position - 100 up until below position
   object positionTasks {
 
-    class WhileAtPosition(angle: Stream[Angle], tolerance: Angle)
+    //move arm to target using PID control. When the arm is at target (within the tolerance), run inner (finite) task.
+    class WhileAtPosition(target: Stream[Angle], tolerance: Angle)
                          (arm: Comp)
                          (implicit properties: Signal[Properties],
                           hardware: Hardware) extends WrapperTask {
       override def onStart(): Unit = {
-        val (error, control) = positionControl(angle)
+        val (error, control) = positionControl(target)
         arm.setController(control.withCheckZipped(error) { error =>
-          if (error.abs < tolerance) {
+          if (error.abs < tolerance) { //check whether arm is close enough to target. If so, run inner.
             readyToRunInner()
           }
         })
@@ -64,15 +59,16 @@ abstract class Arm {
       }
     }
 
-    class WhileAbovePosition(angle: Stream[Angle])
+    //move arm above target using bangbang control. When it is above target, run inner (finite) task.
+    class WhileAbovePosition(target: Stream[Angle])
                             (arm: Comp)
                             (implicit properties: Signal[Properties],
                              hardware: Hardware) extends WrapperTask {
       override def onStart(): Unit = {
-        val (error, control) = (hardware.angle.zipAsync(angle).map(t => t._2 - t._1), 100)
+        val (error, control) = (hardware.angle.zipAsync(target).map(t => t._2 - t._1), Percent(75))
 
-        arm.setController(control { error: Angle =>
-          if (error < Degrees(0)) { //if the arm is above the position then put full power down
+        arm.setController(hardware.angle.mapToConstant(control).withCheckZipped(error) { error: Angle =>
+          if (error < Degrees(0)) { //check whether arm is above target. If so, run inner.
             readyToRunInner()
           }
         })
@@ -80,17 +76,18 @@ abstract class Arm {
 
       }
 
-      override def onEnd(): Unit = ???
+      override def onEnd(): Unit = arm.resetToDefault()
     }
 
-    class WhileBelowPosition(angle: Stream[Angle])
+    //move arm below target using bangbang control. When it is below target, run inner (finite) task.
+    class WhileBelowPosition(target: Stream[Angle])
                             (arm: Comp)
                             (implicit properties: Signal[Properties],
                              hardware: Hardware) extends WrapperTask {
       override def onStart(): Unit = {
-        val (error, control) = (hardware.angle.zipAsync(angle).map(t => t._2 - t._1), 100)
-        arm.setController(control { error: Angle =>
-          if (error > Degrees(0)) { //if the arm is below the position then put full power down
+        val (error, control) = (hardware.angle.zipAsync(target).map(t => t._2 - t._1), Percent(-100))
+        arm.setController(hardware.angle.mapToConstant(control).withCheckZipped(error) { error: Angle =>
+          if (error > Degrees(0)) { //check whether arm is below target. If so, run inner.
             readyToRunInner()
           }
         })
@@ -98,7 +95,7 @@ abstract class Arm {
 
       }
 
-      override def onEnd(): Unit = ???
+      override def onEnd(): Unit = arm.resetToDefault()
     }
 
   }
