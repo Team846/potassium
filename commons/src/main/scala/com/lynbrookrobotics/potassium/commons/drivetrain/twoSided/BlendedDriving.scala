@@ -16,8 +16,8 @@ object BlendedDriving {
       } else {
         val angularVelocity = RadiansPerSecond(velocity.toFeetPerSecond / radius.toFeet)
 
-        val left = angularVelocity onRadius (radius - props.get.track / 2)
-        val right = angularVelocity onRadius (radius + props.get.track / 2)
+        val left = angularVelocity onRadius (radius + props.get.track / 2)
+        val right = angularVelocity onRadius (radius - props.get.track / 2)
         TwoSidedVelocity(left, right)
       }
     }
@@ -43,9 +43,8 @@ object BlendedDriving {
     val normalizedTargetForwardSpeed = targetForward / props.get.maxForwardVelocity
 
     val constantRadiusWeight = Each(
-      math.pow(normalizedTargetForwardSpeed.abs, props.get.blendExponent)) * normalizedTargetForwardSpeed.signum
+      math.pow(normalizedTargetForwardSpeed.abs, props.get.blendExponent))
     val tankWeight = Percent(100) - constantRadiusWeight
-
     tankWeight.toEach * tankSpeed + constantRadiusWeight.toEach * constantRadiusSpeed
   }
 
