@@ -39,7 +39,7 @@ abstract class Component[T] (printsOnOverflow: Boolean = false) {
       controller.zipWithDt.foreach{ case (_, dt: Time) =>
         histogram.apply(dt)
         if (controller.expectedPeriodicity.asInstanceOf[Periodic].period > 2 * dt ) {
-          histogram.toString
+          histogram.printStatus
         }
      }
     )
