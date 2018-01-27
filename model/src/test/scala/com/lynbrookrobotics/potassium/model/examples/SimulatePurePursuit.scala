@@ -128,71 +128,72 @@ class SimulatePurePursuit extends FunSuite {
       s"\nLast angle was ${lastAngle.toDegrees}")
   }
 
-//  test("Reach destination with path from (0,0) to (-5, 5)") {
-//    testPurePursuitReachesDestination(
-//      Seq(Point.origin, Point(Feet(-5), Feet(5))),
-//      timeOut = Seconds(8)
-//    )
-//  }
-//
-//  test("Reach destination with path from (0,0) to (-5, -5)") {
-//    testPurePursuitReachesDestination(
-//      Seq(Point.origin, Point(Feet(-5), Feet(-5))),
-//      timeOut = Seconds(8),
-//      log = false
-//    )
-//  }
-//
-//  test("Reach destination with path from (0,0) to (-15, -15)") {
-//    testPurePursuitReachesDestination(
-//      Seq(Point.origin, Point(Feet(-15), Feet(-15))),
-//      timeOut = Seconds(20),
-//      log = false
-//    )
-//  }
-//
-//  test("Reach destination with path from (0,0) to (5, 5)") {
-//    testPurePursuitReachesDestination(
-//      Seq(Point.origin, Point(Feet(5), Feet(5))),
-//      timeOut = Seconds(8),
-//      log = false
-//    )
-//  }
-//
-//  test("Reach destination with path from (0,0) to (-.5, -.5)") {
-//    testPurePursuitReachesDestination(
-//      Seq(Point.origin, Point(Feet(-0.5), Feet(-0.5))),
-//      timeOut = Seconds(8),
-//      log = false
-//    )
-//  }
-//
-//
-//
-//  test("Reach destination with path from (0,0) to (0, 5) to (5, 5)") {
-//    testPurePursuitReachesDestination(
-//      Seq(
-//        Point.origin,
-//        Point(Feet(0), Feet(5)),
-//        Point(Feet(5), Feet(5))
-//      ),
-//      timeOut = Seconds(8),
-//      log = false
-//    )
-//  }
-//
-//  test("Center switch turned right scenario") {
-//    testPurePursuitReachesDestination(
-//      Seq(
-//        Point.origin,
-//        Point(Inches(0), Inches(56.6)),
-//        Point(Inches(-55.393), Inches(111.993)),
-//        Point(Inches(-55.393), Inches(143.993))
-//      ),
-//      timeOut = Seconds(30),
-//      log = false
-//    )
-//  }
+  test("Reach destination with path from (0,0) to (-5, 5)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(-5), Feet(5))),
+      timeOut = Seconds(8),
+      log = false
+    )
+  }
+
+  test("Reach destination with path from (0,0) to (-5, -5)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(-5), Feet(-5))),
+      timeOut = Seconds(8),
+      log = true
+    )
+  }
+
+  test("Reach destination with path from (0,0) to (-15, -15)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(-15), Feet(-15))),
+      timeOut = Seconds(20),
+      log = false
+    )
+  }
+
+  test("Reach destination with path from (0,0) to (5, 5)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(5), Feet(5))),
+      timeOut = Seconds(8),
+      log = false
+    )
+  }
+
+  test("Reach destination with path from (0,0) to (-.5, -.5)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(-0.5), Feet(-0.5))),
+      timeOut = Seconds(8),
+      log = false
+    )
+  }
+
+
+
+  test("Reach destination with path from (0,0) to (0, 5) to (5, 5)") {
+    testPurePursuitReachesDestination(
+      Seq(
+        Point.origin,
+        Point(Feet(0), Feet(5)),
+        Point(Feet(5), Feet(5))
+      ),
+      timeOut = Seconds(8),
+      log = false
+    )
+  }
+
+  test("Center switch turned right scenario") {
+    testPurePursuitReachesDestination(
+      Seq(
+        Point.origin,
+        Point(Inches(0), Inches(56.6)),
+        Point(Inches(-55.393), Inches(111.993)),
+        Point(Inches(-55.393), Inches(143.993))
+      ),
+      timeOut = Seconds(30),
+      log = false
+    )
+  }
 
   test("Go backwards five feeeeeetttttt") {
     testPurePursuitReachesDestination(
@@ -210,7 +211,7 @@ class SimulatePurePursuit extends FunSuite {
     testPurePursuitReachesDestination(
       Seq(
         Point.origin,
-        Point(Feet(-5), Feet(-5))
+        Point(Feet(-10), Feet(-10))
       ),
       timeOut = Seconds(10),
       log = true,
@@ -218,32 +219,32 @@ class SimulatePurePursuit extends FunSuite {
     )
   }
 //
-//  test("Reach destination with path from (0,0) to (0, 5)") {
-//    testPurePursuitReachesDestination(
-//      Seq(Point.origin, Point(Feet(0), Feet(5))),
-//      timeOut = Seconds(10)
-//    )
-//  }
+  test("Reach destination with path from (0,0) to (0, 5)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(0), Feet(5))),
+      timeOut = Seconds(10)
+    )
+  }
 
 
-//  test("Reach destination with path from (0,0) to (0, -5)") {
-//    testPurePursuitReachesDestination(
-//      Seq(Point.origin, Point(Feet(0), Feet(-5))),
-//      timeOut = Seconds(5)
-//    )
-//  }
+  test("Reach destination with path from (0,0) to (0, -10)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(0), Feet(-10))),
+      timeOut = Seconds(10)
+    )
+  }
 //
-//  test("Reach destination with path from (0,0) to (0, 5) to (5, 10)") {
-//    testPurePursuitReachesDestination(
-//      Seq(Point.origin, Point(Feet(0), Feet(5)), Point(Feet(5), Feet(10))),
-//      timeOut = Seconds(10)
-//    )
-//  }
+  test("Reach destination with path from (0,0) to (0, 5) to (5, 10)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(0), Feet(5)), Point(Feet(5), Feet(10))),
+      timeOut = Seconds(10)
+    )
+  }
 //
-//  test("Reach destination with path from (0,0) to (0, 5) to (-5, 10)") {
-//    testPurePursuitReachesDestination(
-//      Seq(Point.origin, Point(Feet(0), Feet(5)), Point(Feet(-5), Feet(10))),
-//      timeOut = Seconds(10)
-//    )
-//  }
+  test("Reach destination with path from (0,0) to (0, 5) to (-5, 10)") {
+    testPurePursuitReachesDestination(
+      Seq(Point.origin, Point(Feet(0), Feet(5)), Point(Feet(-5), Feet(10))),
+      timeOut = Seconds(10)
+    )
+  }
 }

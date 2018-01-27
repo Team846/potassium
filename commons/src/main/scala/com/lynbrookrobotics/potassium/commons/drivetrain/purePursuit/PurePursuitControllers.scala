@@ -88,10 +88,6 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
 
     val compassHeadingToLookAhead = headingToTarget.map(MathUtilities.swapTrigonemtricAndCompass)
 
-    headingToTarget.foreach(p => println(s"trig: ${p.toDegrees}"))
-    compassHeadingToLookAhead.foreach(p => println(s"compass: ${p.toDegrees}"))
-
-
     var reachedLastPoint = false
 
     val forwardMultiplier = position.zip(turnPosition).zip(lookAheadPoint).zip(biSegmentPath).map { p =>

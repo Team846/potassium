@@ -30,7 +30,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                         tolerance: Length,
                         targetTicksWithingTolerance: Int = 1,
                         maxTurnOutput: Dimensionless,
-                        driveBackwards: Boolean)
+                        driveBackwards: Boolean = false)
                        (drive: Drivetrain)
                        (implicit properties: Signal[controllers.DrivetrainProperties], hardware: controllers.DrivetrainHardware) extends FiniteTask {
     override def onStart(): Unit = {
