@@ -1,4 +1,4 @@
-resolvers in ThisBuild += "Funky-Repo" at "http://team846.github.io/repo"
+resolvers in ThisBuild += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
 
 libraryDependencies += "com.lihaoyi" %% "upickle" % "0.4.4"
 

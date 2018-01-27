@@ -9,7 +9,7 @@ import squants.time.Milliseconds
 
 class LimelightNetwork(table: NetworkTable)(implicit clock: Clock) {
   val percentArea: Stream[Dimensionless] = Stream.periodic(Milliseconds(5))(Percent(table.getEntry("ta").getDouble(0)))
-  val yOffsetAngle: Stream[Angle] = Stream.periodic(Milliseconds(5))(Degrees(table.getEntry("tx").getDouble(0)))
+  val xOffsetAngle: Stream[Angle] = Stream.periodic(Milliseconds(5))(Degrees(table.getEntry("tx").getDouble(0)))
 }
 
 object LimelightNetwork {
