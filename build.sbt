@@ -15,39 +15,48 @@ git.formattedShaVersion := git.gitHeadCommit.value map { sha =>
 
 scalaVersion in ThisBuild := "2.12.1"
 
-resolvers in ThisBuild += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
+resolvers += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
 
-concurrentRestrictions in Global += Tags.limit(Tags.Test, 1)
-parallelExecution in Global := false
-
-lazy val sharedDependencies = Def.setting(Seq(
-  "org.typelevel"  %%% "squants"  % "1.3.0",
-  "org.scalatest" %%% "scalatest" % "3.0.1" % Test,
-  "org.scalacheck" %%% "scalacheck" % "1.13.5" % Test
-))
+lazy val sharedDependencies = if (System.getenv("NATIVE_TARGET") == "ARM32") { 
+  Def.setting(Seq(
+    "org.typelevel"  %%% "squants"  % "1.3.0"
+  ))
+} else {
+  Def.setting(Seq(
+    "org.typelevel"  %%% "squants"  % "1.3.0",
+    "org.scalatest" %%% "scalatest" % "3.1.0-SNAP6" % Test,
+    "org.scalacheck" %%% "scalacheck" % "1.13.5" % Test
+  ))
+}
 
 lazy val jvmDependencies = Seq(
   "org.mockito" % "mockito-core" % "2.3.11" % Test,
   "com.storm-enroute" %% "scalameter-core" % "0.8.2" % Test
 )
 
-parallelExecution in ThisBuild := false
-
 lazy val potassium = project.in(file(".")).
   aggregate(
     coreJVM, coreJS, coreNative,
-    modelJVM,
     controlJVM, controlJS, controlNative,
-    remote,
-    vision,
-    frcJVM, frcNative,
-    config,
     sensorsJVM, sensorsJS, sensorsNative,
     commonsJVM, commonsJS, commonsNative,
+    modelJVM, modelNative,
+    frcJVM, frcNative,
+    remote,
+    vision,
+    config,
     lighting
   ).settings(
   publish := {},
   publishLocal := {}
+)
+
+addCommandAlias(
+  "testAll",
+  (potassium: ProjectDefinition[ProjectReference])
+    .aggregate
+    .map(p => s"${p.asInstanceOf[LocalProject].project}/test")
+    .mkString(";", ";", "")
 )
 
 lazy val nativeSettings = Def.settings(
@@ -68,13 +77,12 @@ lazy val coreJVM = core.jvm
 lazy val coreJS = core.js
 lazy val coreNative = core.native
 
-lazy val model = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core, commons).settings(
+lazy val model = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core, commons).settings(
   name := "potassium-model",
   libraryDependencies ++= sharedDependencies.value
 ).nativeSettings(nativeSettings)
 
 lazy val modelJVM = model.jvm
-lazy val modelJS = model.js
 lazy val modelNative = model.native
 
 lazy val control = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core).settings(
