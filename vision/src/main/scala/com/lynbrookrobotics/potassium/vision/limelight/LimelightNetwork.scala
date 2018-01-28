@@ -7,9 +7,19 @@ import squants.{Dimensionless, Percent}
 import squants.space.{Angle, Degrees}
 import squants.time.Milliseconds
 
-class LimelightNetwork(table: NetworkTable)(implicit clock: Clock) {
-  val percentArea: Stream[Dimensionless] = Stream.periodic(Milliseconds(5))(Percent(table.getEntry("ta").getDouble(0)))
-  val xOffsetAngle: Stream[Angle] = Stream.periodic(Milliseconds(5))(Degrees(table.getEntry("tx").getDouble(0)))
+class LimelightNetwork(val table: NetworkTable)(implicit clock: Clock) {
+  private val percentEntry = table.getEntry("ta")
+  val percentArea: Stream[Option[Dimensionless]] = Stream.periodic(Milliseconds(5)) {
+    val value = percentEntry.getDouble(0)
+    if (value == 0) {
+      None
+    } else {
+      Some(Percent(value))
+    }
+  }
+
+  private val txEntry = table.getEntry("tx")
+  val xOffsetAngle: Stream[Angle] = Stream.periodic(Milliseconds(5))(Degrees(txEntry.getDouble(0)))
 }
 
 object LimelightNetwork {
