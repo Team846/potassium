@@ -7,12 +7,21 @@ import squants.{Dimensionless, Each, Velocity}
 case class UnicycleSignal(forward: Dimensionless, turn: Dimensionless) {
   def +(that: UnicycleSignal): UnicycleSignal =
     UnicycleSignal(this.forward + that.forward, this.turn + that.turn)
+
+  def toUnicycleVelocity(implicit p: Signal[UnicycleProperties]): UnicycleVelocity = {
+    val curProps = p.get
+    UnicycleVelocity(
+      curProps.maxForwardVelocity * forward.toEach,
+      curProps.maxTurnVelocity * turn.toEach
+    )
+  }
 }
 
 case class UnicycleVelocity(forward: Velocity, turn: AngularVelocity) {
-  def toUnicycleSignal(implicit unicycleProperties: Signal[UnicycleProperties]) = {
+  def toUnicycleSignal(implicit p: Signal[UnicycleProperties]): UnicycleSignal = {
+    val curProps = p.get
     UnicycleSignal(
-      Each(forward / unicycleProperties.get.maxForwardVelocity),
-      Each(turn / unicycleProperties.get.maxTurnVelocity))
+      Each(forward / curProps.maxForwardVelocity),
+      Each(turn / curProps.maxTurnVelocity))
   }
 }
