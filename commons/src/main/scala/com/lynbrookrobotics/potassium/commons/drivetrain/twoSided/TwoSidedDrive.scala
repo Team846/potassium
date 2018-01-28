@@ -5,7 +5,7 @@ import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleDrive
 import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units._
-import squants.Dimensionless
+import squants.{Dimensionless, Velocity}
 import squants.space.Length
 
 
@@ -74,6 +74,7 @@ abstract class TwoSidedDrive
   }
 
   def blendedVelocityControl(combinedSignal: Stream[UnicycleSignal],
+                             targetForwardVelocity: Stream[Velocity],
                              curvature: Stream[Ratio[Dimensionless, Length]])
                             (implicit hardware: Hardware,
                              props: Signal[Properties]): Stream[TwoSidedSignal] = {
@@ -81,8 +82,7 @@ abstract class TwoSidedDrive
       convertUnicycleToDrive
     ).map(expectedVelocity(_)(props.get))
 
-    val targetForwardSpeed = targetTankSpeeds.map(p => (p.left + p.right) / 2)
-    val blendedVelocities = BlendedDriving.blendedDrive(targetTankSpeeds, targetForwardSpeed, curvature)
+    val blendedVelocities = BlendedDriving.blendedDrive(targetTankSpeeds, targetForwardVelocity, curvature)
     velocityControl(blendedVelocities)
   }
 }
