@@ -1,7 +1,7 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.Signal
-import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.{BlendedDriving, TwoSidedDriveProperties, TwoSidedVelocity}
+import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.{BlendedDriving, TwoSided, TwoSidedDriveProperties}
 import com.lynbrookrobotics.potassium.control.PIDConfig
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.GenericValue._
@@ -66,7 +66,7 @@ class BlendedDrivingTest extends FunSuite {
   test("Test driving at a radius of 1 foot and -track / 2") {
     implicit val props: Signal[TwoSidedDriveProperties] = generateProps(blendExp = 0.5)
 
-    var lastBlendedSpeed: TwoSidedVelocity = null
+    var lastBlendedSpeed: TwoSided[Velocity] = null
 
     val (radius, publishRadius) = Stream.manual[Length]
     val (velocity, publishVelocity) = Stream.manual[Velocity]
@@ -105,11 +105,11 @@ class BlendedDrivingTest extends FunSuite {
   }
 
   test("blendedDriving with infinity radius & negative velocity results in straight backwards motion") {
-    val (tankSpeed, publishTankSpeed) = Stream.manual[TwoSidedVelocity]
+    val (tankSpeed, publishTankSpeed) = Stream.manual[TwoSided[Velocity]]
     val (targetForwardVelocity, publishTargetForward) = Stream.manual[Velocity]
     val (curvature, publishCurvature) = Stream.manual[Ratio[Dimensionless, Length]]
 
-    var lastBlendedSpeed: TwoSidedVelocity = null
+    var lastBlendedSpeed: TwoSided[Velocity] = null
 
     implicit val props = generateProps(blendExp = 0)
     BlendedDriving.blendedDrive(
@@ -117,13 +117,13 @@ class BlendedDrivingTest extends FunSuite {
       targetForwardVelocity,
       curvature).foreach(lastBlendedSpeed = _)
 
-    publishTankSpeed(TwoSidedVelocity(FeetPerSecond(0), FeetPerSecond(0)))
+    publishTankSpeed(TwoSided(FeetPerSecond(0), FeetPerSecond(0)))
     publishTargetForward(FeetPerSecond(-1))
     publishCurvature(Ratio(Each(0), Feet(1)))
 
     assert(lastBlendedSpeed.left < FeetPerSecond(0) && lastBlendedSpeed.right < FeetPerSecond(0))
 
-    publishTankSpeed(TwoSidedVelocity(FeetPerSecond(0), FeetPerSecond(0)))
+    publishTankSpeed(TwoSided(FeetPerSecond(0), FeetPerSecond(0)))
     publishTargetForward(FeetPerSecond(-2))
     publishCurvature(Ratio(Each(0), Feet(1)))
 

@@ -31,6 +31,7 @@ class UnicycleDriveControlTest extends FunSuite {
 
   private class TestDrivetrain extends UnicycleDrive {
     override type DriveSignal = UnicycleSignal
+    override type OpenLoopSignal = UnicycleSignal
 
     override type Hardware = UnicycleHardware
     override type Properties = UnicycleProperties
@@ -40,10 +41,11 @@ class UnicycleDriveControlTest extends FunSuite {
     override protected def controlMode(implicit hardware: Hardware,
                                        props: Properties): UnicycleControlMode = NoOperation
 
-    override protected def driveClosedLoop(signal: Stream[DriveSignal])
-                                          (implicit hardware: Hardware,
-                                           props: Signal[Properties]): Stream[DriveSignal] =
-      signal
+    override protected def driveClosedLoop(signal: Stream[UnicycleSignal])
+                                          (implicit hardware: UnicycleHardware,
+                                           props: Signal[UnicycleProperties]): Stream[UnicycleSignal] = signal
+
+    override protected def openLoopToDriveSignal(openLoop: UnicycleSignal): UnicycleSignal = openLoop
 
     override type Drivetrain = Nothing
   }
@@ -55,45 +57,6 @@ class UnicycleDriveControlTest extends FunSuite {
   implicit val arbitraryAngularVelocity: Arbitrary[AngularVelocity] = Arbitrary(
     Gen.chooseNum[Double](-100D, 100D).map(d => DegreesPerSecond(d))
   )
-
-  test("Open forward loop produces same forward speed as input and zero turn speed") {
-    val drive = new TestDrivetrain
-
-    check(forAll { x: Double =>
-      val out = drive.UnicycleControllers.openForwardOpenDrive(
-        hardware.forwardVelocity.mapToConstant(Each(x)))
-
-      var forward = Percent(-10)
-      var turn = Percent(-10)
-      out.foreach(o => {
-        forward = o.forward
-        turn = o.turn
-      })
-
-      trigggerClock.apply(period)
-
-      forward.toEach == x && turn.toEach == 0
-    })
-  }
-
-  test("Open turn loop produces same turn speed as input and zero forward speed") {
-    val drive = new TestDrivetrain
-
-    check(forAll { x: Double =>
-      val out = drive.UnicycleControllers.openTurnOpenDrive(hardware.turnVelocity.mapToConstant(Each(x)))
-
-      var forward = Percent(-10)
-      var turn = Percent(-10)
-      out.foreach(o => {
-        forward = o.forward
-        turn = o.turn
-      })
-
-      trigggerClock.apply(period)
-
-      turn.toEach == x && forward.toEach == 0
-    })
-  }
 
   test("Closed loop with only feed-forward is essentially open loop") {
     implicit val props = Signal.constant(new UnicycleProperties {

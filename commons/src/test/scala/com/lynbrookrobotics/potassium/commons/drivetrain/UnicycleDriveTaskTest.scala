@@ -18,6 +18,7 @@ import org.scalatest.FunSuite
 class UnicycleDriveTaskTest extends FunSuite {
   class TestDrivetrain extends UnicycleDrive {
     override type DriveSignal = UnicycleSignal
+    override type OpenLoopSignal = UnicycleSignal
 
     override type Hardware = UnicycleHardware
     override type Properties = UnicycleProperties
@@ -27,9 +28,11 @@ class UnicycleDriveTaskTest extends FunSuite {
     override protected def controlMode(implicit hardware: Hardware,
                                        props: Properties): UnicycleControlMode = NoOperation
 
-    override protected def driveClosedLoop(signal: Stream[DriveSignal])
-                                          (implicit hardware: Hardware,
-                                           props: Signal[Properties]): Stream[DriveSignal] = signal
+    override protected def driveClosedLoop(signal: Stream[UnicycleSignal])
+                                          (implicit hardware: UnicycleHardware,
+                                           props: Signal[UnicycleProperties]): Stream[UnicycleSignal] = signal
+
+    override protected def openLoopToDriveSignal(openLoop: UnicycleSignal): UnicycleSignal = openLoop
 
     override type Drivetrain = Component[DriveSignal]
   }
