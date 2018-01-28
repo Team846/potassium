@@ -38,7 +38,7 @@ class LiftTaskTest extends FunSuite {
 
     var liftSignal: Dimensionless = null
 
-    val liftmoo = new Component[Dimensionless] {
+    val testLift = new Component[Dimensionless] {
       override def defaultController: Stream[Dimensionless] = Stream.periodic(tickPeriod)(Percent(0))
 
       override def applySignal(signal: Dimensionless): Unit = {
@@ -50,7 +50,7 @@ class LiftTaskTest extends FunSuite {
       override def position: Stream[Length] = Stream.periodic(tickPeriod)(currentLength)
     }
 
-    val task = new lift.positionTasks.WhileAbovePosition(hardware.position.mapToConstant(Inches(90)))(liftmoo).toFinite
+    val task = new lift.positionTasks.WhileAbovePosition(hardware.position.mapToConstant(Inches(90)))(testLift).toFinite
 
     task.init()
 
@@ -89,7 +89,7 @@ class LiftTaskTest extends FunSuite {
 
     var liftSignal: Dimensionless = null
 
-    val liftmoo = new Component[Dimensionless] {
+    val testLift = new Component[Dimensionless] {
       override def defaultController: Stream[Dimensionless] = Stream.periodic(tickPeriod)(Percent(0))
 
       override def applySignal(signal: Dimensionless): Unit = {
@@ -101,7 +101,7 @@ class LiftTaskTest extends FunSuite {
       override def position: Stream[Length] = Stream.periodic(tickPeriod)(currentLength)
     }
 
-    val task = new lift.positionTasks.WhileBelowPosition(hardware.position.mapToConstant(Inches(90)))(liftmoo).toFinite
+    val task = new lift.positionTasks.WhileBelowPosition(hardware.position.mapToConstant(Inches(90)))(testLift).toFinite
 
     task.init()
 
@@ -142,7 +142,7 @@ class LiftTaskTest extends FunSuite {
 
     var liftSignal: Dimensionless = null
 
-    val liftmoo = new Component[Dimensionless] {
+    val testLift = new Component[Dimensionless] {
       override def defaultController: Stream[Dimensionless] = Stream.periodic(tickPeriod)(Percent(0))
 
       override def applySignal(signal: Dimensionless): Unit = {
@@ -154,7 +154,7 @@ class LiftTaskTest extends FunSuite {
       override def position: Stream[Length] = Stream.periodic(tickPeriod)(currentLength)
     }
 
-    val task = new lift.positionTasks.WhileAtPosition(hardware.position.mapToConstant(Inches(90)), Inches(5))(liftmoo).toFinite
+    val task = new lift.positionTasks.WhileAtPosition(hardware.position.mapToConstant(Inches(90)), Inches(5))(testLift).toFinite
 
     task.init()
 
