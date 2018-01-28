@@ -5,14 +5,10 @@ import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, Task}
 
 /**
   * An event that has a start, running, and ending phase.
-  * @param condition a boolean condition for when the event should be active
-  * @param polling the event that is called each time the event should be updated
   */
-class ContinuousEvent(condition: => Boolean)(implicit polling: ImpulseEvent) {
+class ContinuousEvent {
   private val onStartSource = new ImpulseEventSource
   private val onEndSource = new ImpulseEventSource
-
-  private[ContinuousEvent] def conditionValue: Boolean = condition
 
   /**
     * An event that is fired when the continuous event starts
@@ -24,12 +20,16 @@ class ContinuousEvent(condition: => Boolean)(implicit polling: ImpulseEvent) {
     */
   val onEnd: ImpulseEvent = onEndSource.event
 
-  private var tickingCallbacks: List[() => Unit] = List.empty
+  private var onEventTrueCallbacks: List[() => Unit] = List.empty
+  private var onUpdateCallbacks: List[Boolean => Unit] = List.empty
+
   private[events] var isRunning = false
 
-  polling.foreach { () =>
-    if (condition) {
-      tickingCallbacks.foreach(_.apply())
+  protected def updateEventState(eventTrue: Boolean): Unit = {
+    onUpdateCallbacks.foreach(_.apply(eventTrue))
+
+    if (eventTrue) {
+      onEventTrueCallbacks.foreach(_.apply())
 
       if (!isRunning) {
         onStartSource.fire()
@@ -43,11 +43,20 @@ class ContinuousEvent(condition: => Boolean)(implicit polling: ImpulseEvent) {
   }
 
   /**
-    * Adds a listener to be called while the event is running
-    * @param onTicking a function to be called continuously when the event is running
+    * Adds a listener to be called while the event is happening (aka, condition returns true)
+    * @param onTrue a function to be called continuously when the event is happening
     */
-  def foreach(onTicking: () => Unit): Unit = {
-    tickingCallbacks = onTicking :: tickingCallbacks
+  def foreach(onTrue: () => Unit): Unit = {
+    onEventTrueCallbacks = onTrue :: onEventTrueCallbacks
+  }
+
+
+  /**
+    * For each update of the event, regardless if the event is true or not
+    * @param onUpdate
+    */
+  private[events] def foreachUpdate(onUpdate: Boolean => Unit) = {
+    onUpdateCallbacks = onUpdate :: onUpdateCallbacks
   }
 
   /**
@@ -83,13 +92,41 @@ class ContinuousEvent(condition: => Boolean)(implicit polling: ImpulseEvent) {
 
   /**
     * Returns a continuous event that is an intersection of both events
-    * @param event the event to intersect with the original
+    * @param other the event to intersect with the original
     */
-  def &&(event: ContinuousEvent): ContinuousEvent = {
-    Signal(event.conditionValue && this.conditionValue).filter(identity)
+  def &&(other: ContinuousEvent): ContinuousEvent = {
+    val (intersectionEvent, updateAndEvent) = ContinuousEvent.newEvent
+
+    var parentATrue = false
+    var parentBTrue = false
+
+    this.foreachUpdate { isTrue =>
+      parentATrue = isTrue
+      updateAndEvent.apply(parentATrue && parentBTrue)
+    }
+
+    other.foreachUpdate { isTrue =>
+      parentBTrue = isTrue
+      updateAndEvent.apply(parentATrue && parentBTrue)
+    }
+
+    intersectionEvent
   }
 
   def unary_!(): ContinuousEvent = {
-    Signal(!conditionValue).filter(identity)
+    val (negatedEvent, updateNegatedEventState) = ContinuousEvent.newEvent
+    this.foreachUpdate(parentEventTrue => updateNegatedEventState(!parentEventTrue))
+    negatedEvent
+  }
+}
+
+object ContinuousEvent {
+  /**
+    * @return a ContinuousEvent and a function to update whether the event
+    *         is true or not
+    */
+  def newEvent: (ContinuousEvent, Boolean => Unit) = {
+    val ret = new ContinuousEvent
+    (ret, condition => ret.updateEventState(condition))
   }
 }

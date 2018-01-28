@@ -25,7 +25,7 @@ trait Clock {
   def singleExecution(delay: Time)(thunk: => Unit): Unit
 
   /**
-    * Creates an impule event that fires at a fixed rate
+    * Creates an impulse event that fires at a fixed rate
     * @param period the period to fire the event at
     * @return an event that fires at the given rate
     */

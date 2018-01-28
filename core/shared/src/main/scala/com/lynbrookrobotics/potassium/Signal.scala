@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium
 
-import com.lynbrookrobotics.potassium.events.{ContinuousEvent, ImpulseEvent}
+import com.lynbrookrobotics.potassium.events.ImpulseEvent
 import squants.Time
 
 /**
@@ -35,16 +35,6 @@ abstract class Signal[+T] { self =>
   def zip[O](other: Signal[O]): Signal[(T, O)] = new Signal[(T, O)] {
     def get: (T, O) = (self.get, other.get)
   }
-
-  /**
-    * Generates an event from the signal by checking a condition
-    * @param condition the condition to trigger the event when true
-    * @param polling the logic for polling the signal for new data
-    * @return a continuous event that is active when the condition is true
-    */
-  def filter(condition: T => Boolean)(implicit polling: ImpulseEvent): ContinuousEvent = {
-    new ContinuousEvent(condition(get))
-  }
 }
 
 class ConstantSignal[T](v: T) extends Signal[T] {
@@ -60,11 +50,6 @@ class ConstantSignal[T](v: T) extends Signal[T] {
     } else {
       super.zip(other)
     }
-  }
-
-  override def filter(condition: (T) => Boolean)(implicit polling: ImpulseEvent): ContinuousEvent = {
-    val conditionResult = condition(v)
-    new ContinuousEvent(conditionResult)
   }
 }
 

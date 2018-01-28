@@ -14,9 +14,9 @@ class AndUntilDoneTask private[tasks](first: FiniteTask, second: ContinuousTask)
     }
   }
 
-  first.addFinishedListener(this)
-
   override def onStart(): Unit = {
+    first.setFinishedListener(this)
+
     first.init()
     second.init()
   }

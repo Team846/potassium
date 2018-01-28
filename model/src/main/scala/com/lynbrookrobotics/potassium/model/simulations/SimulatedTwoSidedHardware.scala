@@ -2,7 +2,9 @@ package com.lynbrookrobotics.potassium.model.simulations
 
 import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
-import com.lynbrookrobotics.potassium.commons.drivetrain.{TwoSidedDrive, _}
+import com.lynbrookrobotics.potassium.commons.drivetrain._
+import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.{TwoSidedDrive, TwoSidedDriveHardware, TwoSidedDriveProperties, TwoSidedSignal}
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.UnicycleProperties
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.Point
 import com.lynbrookrobotics.potassium.{Component, Signal}
@@ -37,12 +39,13 @@ object RobotVelocities {
 case class TwoSidedDriveForce(left: Force, right: Force)
 
 class SimulatedTwoSidedHardware(constantFriction: Force,
-                                override val track: Length,
                                 mass: Mass,
                                 momentOfInertia: MomentOfInertia,
                                 clock: Clock,
                                 period: Time)
                                 (implicit props: TwoSidedDriveProperties) extends TwoSidedDriveHardware {
+  override val track: Length = props.track
+
   val leftMotor = new SimulatedMotor(clock, period)
   val rightMotor = new SimulatedMotor(clock, period)
 
@@ -70,7 +73,7 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
     val newForwardVelocity = forwardVelocity + acceleration * dt
 
     // radius from center, located halfway between wheels
-    val radius = track / 2
+    val radius = props.track / 2
     val netTorque = (netRightForce * radius - netLeftForce * radius).asTorque
 
     // Newton's second law for angular acceleration

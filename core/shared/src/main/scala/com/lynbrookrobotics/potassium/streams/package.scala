@@ -1,5 +1,7 @@
 package com.lynbrookrobotics.potassium
 
 package object streams {
-  type Cancel = () => Unit
+  trait Cancel {
+    def cancel(): Unit
+  }
 }

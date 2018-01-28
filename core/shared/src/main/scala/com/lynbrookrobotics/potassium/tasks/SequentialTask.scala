@@ -23,11 +23,12 @@ class SequentialTask private[tasks] (first: FiniteTask, second: FiniteTask)
     }
   }
 
-  first.addFinishedListener(this)
-  second.addFinishedListener(this)
+
 
   override def onStart(): Unit = {
     currentPhase = RunningFirst
+    first.setFinishedListener(this)
+    second.setFinishedListener(this)
     first.init()
   }
 
