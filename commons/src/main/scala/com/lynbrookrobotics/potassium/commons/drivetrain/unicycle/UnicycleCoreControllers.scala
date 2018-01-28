@@ -10,33 +10,17 @@ import scala.collection.immutable.Queue
 
 trait UnicycleCoreControllers {
   type DriveSignal
+  type OpenLoopSignal
   type DrivetrainHardware <: UnicycleHardware
   type DrivetrainProperties <: UnicycleProperties
 
-  def lowerLevelOpenLoop(unicycle: Stream[UnicycleSignal]): Stream[DriveSignal] = parentOpenLoop(unicycle)
+  def openLoopToDriveSignal(openLoop: OpenLoopSignal): DriveSignal
 
-  def parentOpenLoop(unicycle: Stream[UnicycleSignal]): Stream[DriveSignal]
+  def childOpenLoop(unicycle: Stream[UnicycleSignal]): Stream[OpenLoopSignal]
 
-  def lowerLevelVelocityControl(unicycle: Stream[UnicycleSignal])(implicit hardware: DrivetrainHardware,
-                                                                      props: Signal[DrivetrainProperties]): Stream[DriveSignal]
-
-  def openForwardOpenDrive(forwardSpeed: Stream[Dimensionless]): Stream[DriveSignal] = {
-    parentOpenLoop(forwardSpeed.map(f => UnicycleSignal(f, Percent(0))))
-  }
-
-  def openForwardClosedDrive(forwardSpeed: Stream[Dimensionless])(implicit hardware: DrivetrainHardware,
-                                                                  props: Signal[DrivetrainProperties]): Stream[DriveSignal] = {
-    lowerLevelVelocityControl(forwardSpeed.map(f => UnicycleSignal(f, Percent(0))))
-  }
-
-  def openTurnOpenDrive(turnSpeed: Stream[Dimensionless]): Stream[DriveSignal] = {
-    parentOpenLoop(turnSpeed.map(t => UnicycleSignal(Percent(0), t)))
-  }
-
-  def openTurnClosedDrive(turnSpeed: Stream[Dimensionless])(implicit hardware: DrivetrainHardware,
-                                                            props: Signal[DrivetrainProperties]): Stream[DriveSignal] = {
-    lowerLevelVelocityControl(turnSpeed.map(t => UnicycleSignal(Percent(0), t)))
-  }
+  def childVelocityControl(unicycle: Stream[UnicycleSignal])
+                          (implicit hardware: DrivetrainHardware,
+                           props: Signal[DrivetrainProperties]): Stream[DriveSignal]
 
   def velocityControl(target: Stream[UnicycleVelocity])
                      (implicit hardware: DrivetrainHardware,
@@ -62,24 +46,8 @@ trait UnicycleCoreControllers {
 
   def speedControl(unicycle: Stream[UnicycleSignal])
                        (implicit hardware: DrivetrainHardware,
-                        props: Signal[DrivetrainProperties]): Stream[UnicycleSignal] = {
-    velocityControl(unicycle.map(s => UnicycleVelocity(
-      props.get.maxForwardVelocity * s.forward, props.get.maxTurnVelocity * s.turn
-    )))
-  }
-
-  def calculateTargetFromOffsetWithLatency[T <: Quantity[T]]
-    (timestampedOffset: Stream[(T, Time)],
-     positionSlide: Stream[Queue[(T, Time)]]) = {
-    positionSlide.zip(timestampedOffset).map { t =>
-      val (positionHistory, (offset, offsetTime)) = t
-        val closestTimeSoFar = positionHistory.minBy{ case (position, positionTime) =>
-          Math.abs(positionTime.value - offsetTime.value)
-        }
-
-        closestTimeSoFar._1 + offset
-    }
-  }
+                        props: Signal[DrivetrainProperties]): Stream[UnicycleSignal] =
+    velocityControl(unicycle.map(_.toUnicycleVelocity))
 
   def forwardPositionControl(targetAbsolute: Length)
                             (implicit hardware: DrivetrainHardware,

@@ -35,7 +35,7 @@ class UnicycleDriveControlTest extends FunSuite {
     override type Hardware = UnicycleHardware
     override type Properties = UnicycleProperties
 
-    override protected def convertUnicycleToDrive(uni: UnicycleSignal): DriveSignal = uni
+    override protected def unicycleToOpenLoopSignal(uni: UnicycleSignal): DriveSignal = uni
 
     override protected def controlMode(implicit hardware: Hardware,
                                        props: Properties): UnicycleControlMode = NoOperation

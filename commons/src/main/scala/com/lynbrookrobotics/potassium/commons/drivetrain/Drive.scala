@@ -14,6 +14,7 @@ trait Drive {
 
   /**
     * Drives with the signal with closed-loop control
+    *
     * @param signal the signal to drive with
     * @return
     */
@@ -21,7 +22,7 @@ trait Drive {
                                (implicit hardware: Hardware,
                                 props: Signal[Properties]): Stream[DriveSignal]
 
-  protected def openLoopToDriveSignal(openLoop:OpenLoopSignal):DriveSignal
+  protected def openLoopToDriveSignal(openLoop: OpenLoopSignal): DriveSignal
 
   protected def defaultController(implicit hardware: Hardware,
                                   props: Signal[Properties]): Stream[DriveSignal]

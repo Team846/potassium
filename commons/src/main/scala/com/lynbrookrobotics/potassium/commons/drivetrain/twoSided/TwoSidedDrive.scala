@@ -28,7 +28,7 @@ abstract class TwoSidedDrive
     */
   protected def output(hardware: Hardware, signal: TwoSidedSignal): Unit
 
-  protected def convertUnicycleToDrive(uni: UnicycleSignal): TwoSidedSignal = {
+  protected def unicycleToOpenLoopSignal(uni: UnicycleSignal): TwoSidedSignal = {
     TwoSidedSignal(
       uni.forward + uni.turn,
       uni.forward - uni.turn
@@ -78,7 +78,7 @@ abstract class TwoSidedDrive
                              targetForwardVelocity: Stream[Velocity])
                             (implicit hardware: Hardware,
                              props: Signal[Properties]): Stream[TwoSidedSignal] = {
-    val twoSidedSignal = arcadeSignal.map(convertUnicycleToDrive)
+    val twoSidedSignal = arcadeSignal.map(unicycleToOpenLoopSignal)
     val targetTankSpeeds = twoSidedSignal.map(expectedVelocity(_)(props.get))
 
     val blendedVelocities = BlendedDriving.blendedDrive(

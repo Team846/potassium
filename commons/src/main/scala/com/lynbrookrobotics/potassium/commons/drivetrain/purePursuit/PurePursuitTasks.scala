@@ -48,11 +48,11 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         steadyOutput,
         maxTurnOutput)
 
-      drive.setController(lowerLevelOpenLoop(unicycle.withCheckZipped(error) { e =>
+      drive.setController(childOpenLoop(unicycle.withCheckZipped(error) { e =>
         if (e.exists(_ < tolerance)) {
           finished()
         }
-      }))
+      }).map(openLoopToDriveSignal))
     }
 
     override def onEnd(): Unit = {
@@ -77,11 +77,11 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         steadyOutput,
         maxTurnOutput)
 
-      drive.setController(lowerLevelOpenLoop(unicycle.withCheckZipped(error) {e =>
+      drive.setController(childOpenLoop(unicycle.withCheckZipped(error) { e =>
         if (e.exists(_ < tolerance)) {
           finished()
         }
-      }))
+      }).map(openLoopToDriveSignal))
     }
 
     override def onEnd(): Unit = {

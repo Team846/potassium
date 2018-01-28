@@ -7,7 +7,7 @@ import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask}
 import com.lynbrookrobotics.potassium.{Component, Signal}
 import squants.motion.{AngularVelocity, DegreesPerSecond}
 import squants.space.{Degrees, Feet}
-import squants.{Acceleration, Angle, Dimensionless, Length, Percent, Time, Velocity}
+import squants.{Acceleration, Angle, Dimensionless, Length, Percent, Quantity, Time, Velocity}
 
 import scala.collection.immutable.Queue
 
@@ -24,7 +24,7 @@ trait UnicycleCoreTasks {
                       props: Signal[DrivetrainProperties]) extends ContinuousTask {
     override def onStart(): Unit = {
       val combined = forward.zip(turn).map(t => UnicycleSignal(t._1, t._2))
-      drive.setController(lowerLevelOpenLoop(combined))
+      drive.setController(childOpenLoop(combined).map(openLoopToDriveSignal))
     }
 
     override def onEnd(): Unit = {
@@ -39,7 +39,7 @@ trait UnicycleCoreTasks {
                               props: Signal[DrivetrainProperties]) extends ContinuousTask {
     override def onStart(): Unit = {
       val combined = forward.zip(turn).map(t => UnicycleSignal(t._1, t._2))
-      drive.setController(lowerLevelVelocityControl(combined))
+      drive.setController(childVelocityControl(combined))
     }
 
     override def onEnd(): Unit = {
@@ -53,7 +53,7 @@ trait UnicycleCoreTasks {
                                 props: Signal[DrivetrainProperties]) extends ContinuousTask {
     override def onStart(): Unit = {
       val combined = forward.zip(turn).map(t => UnicycleVelocity(t._1, t._2))
-      drive.setController(lowerLevelVelocityControl(velocityControl(combined)))
+      drive.setController(childVelocityControl(velocityControl(combined)))
     }
 
     override def onEnd(): Unit = {
@@ -75,7 +75,7 @@ trait UnicycleCoreTasks {
         }
       }
 
-      drive.setController(lowerLevelVelocityControl(speedControl(checkedController)))
+      drive.setController(childVelocityControl(speedControl(checkedController)))
     }
 
     override def onEnd(): Unit = {
@@ -113,7 +113,7 @@ trait UnicycleCoreTasks {
       val forwardOutput = idealVelocity.map(UnicycleVelocity(_, DegreesPerSecond(0)).toUnicycleSignal)
       val combinedController = forwardOutput.zip(turnController).map(t => t._1 + t._2)
 
-      val uncheckedController = lowerLevelVelocityControl(speedControl(combinedController))
+      val uncheckedController = childVelocityControl(speedControl(combinedController))
       val zippedError = forwardError.zip(turnError)
       drive.setController(uncheckedController.withCheckZipped(zippedError) {
         case (forwardError, turnError) =>
@@ -188,7 +188,7 @@ trait UnicycleCoreTasks {
       }
 
       drive.setController(
-        lowerLevelVelocityControl(speedControl(checkedController))
+        childVelocityControl(speedControl(checkedController))
       )
     }
 
@@ -227,7 +227,7 @@ trait UnicycleCoreTasks {
       }
 
       drive.setController(
-        lowerLevelVelocityControl(speedControl(checkedController))
+        childVelocityControl(speedControl(checkedController))
       )
     }
 
@@ -281,7 +281,7 @@ trait UnicycleCoreTasks {
       }
 
       drive.setController(
-        lowerLevelVelocityControl(speedControl(checkedController))
+        childVelocityControl(speedControl(checkedController))
       )
     }
 
@@ -316,7 +316,7 @@ trait UnicycleCoreTasks {
         }
       }
 
-      drive.setController(lowerLevelVelocityControl(speedControl(checkedController)))
+      drive.setController(childVelocityControl(speedControl(checkedController)))
     }
 
     override def onEnd(): Unit = {
@@ -336,7 +336,7 @@ trait UnicycleCoreTasks {
         }
       }
 
-      drive.setController(lowerLevelVelocityControl(speedControl(checkedController)))
+      drive.setController(childVelocityControl(speedControl(checkedController)))
     }
 
     override def onEnd(): Unit = {
@@ -352,6 +352,19 @@ trait UnicycleCoreTasks {
 
     val positionSlide: Stream[Queue[(Angle, Time)]] = hardware.turnPosition.zipWithTime.sliding(20)
 
+    private def calculateTargetFromOffsetWithLatency[T <: Quantity[T]]
+    (timestampedOffset: Stream[(T, Time)],
+     positionSlide: Stream[Queue[(T, Time)]]) = {
+      positionSlide.zip(timestampedOffset).map { t =>
+        val (positionHistory, (offset, offsetTime)) = t
+        val closestTimeSoFar = positionHistory.minBy{ case (position, positionTime) =>
+          Math.abs(positionTime.value - offsetTime.value)
+        }
+
+        closestTimeSoFar._1 + offset
+      }
+    }
+
     override def onStart(): Unit = {
       val targetAbsolute = calculateTargetFromOffsetWithLatency(timestampedOffset, positionSlide)
 
@@ -363,7 +376,7 @@ trait UnicycleCoreTasks {
         }
       }.map(_._1)
 
-      drive.setController(lowerLevelVelocityControl(speedControl(checkedController)))
+      drive.setController(childVelocityControl(speedControl(checkedController)))
     }
 
     override def onEnd(): Unit = {
