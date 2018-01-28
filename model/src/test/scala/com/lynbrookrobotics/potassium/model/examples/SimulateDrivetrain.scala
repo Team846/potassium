@@ -44,12 +44,12 @@ object SimulateDrivetrain extends App {
       Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
       Percent(0) / DegreesPerSecond(1))
 
-    override val leftControlGains: ForwardVelocityGains = PIDConfig(
+    override val leftVelocityGains: ForwardVelocityGains = PIDConfig(
       Percent(100) / FeetPerSecond(1),
       Percent(0) / Meters(1),
       Percent(0) / MetersPerSecondSquared(1))
 
-    override val rightControlGains: ForwardVelocityGains = leftControlGains
+    override val rightVelocityGains: ForwardVelocityGains = leftVelocityGains
 
     override val track: Distance = Inches(21.75)
     override val blendExponent: Double = Double.NaN

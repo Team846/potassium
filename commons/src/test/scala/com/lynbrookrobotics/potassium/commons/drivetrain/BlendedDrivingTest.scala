@@ -47,12 +47,12 @@ class BlendedDrivingTest extends FunSuite {
 
       override val maxLeftVelocity: Velocity = FeetPerSecond(10)
       override val maxRightVelocity: Velocity = FeetPerSecond(10)
-      override val leftControlGains: ForwardVelocityGains = PIDConfig(
+      override val leftVelocityGains: ForwardVelocityGains = PIDConfig(
         Percent(100) / FeetPerSecond(90),
         Percent(0) / Feet(1),
         Percent(0) / FeetPerSecondSquared(1)
       )
-      override val rightControlGains: ForwardVelocityGains = PIDConfig(
+      override val rightVelocityGains: ForwardVelocityGains = PIDConfig(
         Percent(100) / FeetPerSecond(90),
         Percent(0) / Feet(1),
         Percent(0) / FeetPerSecondSquared(1)

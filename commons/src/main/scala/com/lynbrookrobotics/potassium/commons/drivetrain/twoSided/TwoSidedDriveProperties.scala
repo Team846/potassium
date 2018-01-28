@@ -12,13 +12,13 @@ trait TwoSidedDriveProperties extends UnicycleProperties {
   val maxLeftVelocity: Velocity
   val maxRightVelocity: Velocity
 
-  val leftControlGains: ForwardVelocityGains
-  val rightControlGains: ForwardVelocityGains
+  val leftVelocityGains: ForwardVelocityGains
+  val rightVelocityGains: ForwardVelocityGains
 
-  lazy val leftControlGainsFull: ForwardVelocityGains#Full =
-    leftControlGains.withF(Percent(100) / maxLeftVelocity)
-  lazy val rightControlGainsFull: ForwardVelocityGains#Full =
-    rightControlGains.withF(Percent(100) / maxRightVelocity)
+  lazy val leftVelocityGainsFull: ForwardVelocityGains#Full =
+    leftVelocityGains.withF(Percent(100) / maxLeftVelocity)
+  lazy val rightVelocityGainsFull: ForwardVelocityGains#Full =
+    rightVelocityGains.withF(Percent(100) / maxRightVelocity)
 
   lazy val maxForwardVelocity: Velocity = maxLeftVelocity min maxRightVelocity
 
