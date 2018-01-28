@@ -31,17 +31,17 @@ class SimulatePurePursuit extends FunSuite {
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(16.5)
     override val defaultLookAheadDistance: Length = Feet(1)
 
-    override val turnControlGains: TurnVelocityGains = PIDConfig(
+    override val turnVelocityGains: TurnVelocityGains = PIDConfig(
       Percent(100) / DegreesPerSecond(1),
       Percent(0) / Degrees(1),
       Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)))
 
-    override val forwardPositionControlGains: ForwardPositionGains = PIDConfig(
+    override val forwardPositionGains: ForwardPositionGains = PIDConfig(
       Percent(100) / Feet(4),
       Percent(0) / (Meters(1).toGeneric * Seconds(1)),
       Percent(0) / MetersPerSecond(1))
 
-    override val turnPositionControlGains: TurnPositionGains = PIDConfig(
+    override val turnPositionGains: TurnPositionGains = PIDConfig(
       kp = Percent(5) / Degrees(1),
       ki = Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
       kd = Percent(0.5) / DegreesPerSecond(1))

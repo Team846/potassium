@@ -28,7 +28,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     (PIDF.pid(
       distanceToTarget.mapToConstant(Feet(0)),
       distanceToTarget,
-      properties.map(_.forwardPositionControlGains)),
+      properties.map(_.forwardPositionGains)),
       distanceToTarget)
   }
 
@@ -103,7 +103,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     val limitedTurn = PIDF.pid(
       turnPosition,
       compassHeadingToLookAhead,
-      props.map(_.turnPositionControlGains)
+      props.map(_.turnPositionGains)
     ).map(MathUtilities.clamp(_, maxTurnOutput))
 
     (limitedTurn, forwardMultiplier, lookAheadPoint)

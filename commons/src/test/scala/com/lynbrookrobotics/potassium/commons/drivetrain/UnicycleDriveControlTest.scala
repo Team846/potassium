@@ -102,20 +102,20 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
       override val defaultLookAheadDistance: Length = null
 
-      override val forwardControlGains: ForwardVelocityGains = PIDConfig(
+      override val forwardVelocityGains: ForwardVelocityGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
         Percent(0) / Meters(1),
         Percent(0) / MetersPerSecondSquared(1)
       )
 
-      override val turnControlGains: TurnVelocityGains = PIDConfig(
+      override val turnVelocityGains: TurnVelocityGains = PIDConfig(
         Percent(0) / DegreesPerSecond(1),
         Percent(0) / Degrees(1),
         Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1))
       )
 
-      override val forwardPositionControlGains: ForwardPositionGains = null
-      override val turnPositionControlGains: TurnPositionGains = null
+      override val forwardPositionGains: ForwardPositionGains = null
+      override val turnPositionGains: TurnPositionGains = null
     })
 
     val drive = new TestDrivetrain
@@ -148,16 +148,16 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxAcceleration: Acceleration = null
       override val defaultLookAheadDistance: Length = null
 
-      override val forwardControlGains: ForwardVelocityGains = null
-      override val turnControlGains = null
+      override val forwardVelocityGains: ForwardVelocityGains = null
+      override val turnVelocityGains = null
 
-      override val forwardPositionControlGains: ForwardPositionGains = PIDConfig(
+      override val forwardPositionGains: ForwardPositionGains = PIDConfig(
         Percent(100) / Meters(1),
         Percent(0) / (Meters(1).toGeneric * Seconds(1)),
         Percent(0) / MetersPerSecond(1)
       )
 
-      override val turnPositionControlGains: TurnPositionGains = null
+      override val turnPositionGains: TurnPositionGains = null
     })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
@@ -193,16 +193,16 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxAcceleration: Acceleration = null
       override val defaultLookAheadDistance: Length = null
 
-      override val forwardControlGains: ForwardVelocityGains = null
-      override val turnControlGains = null
+      override val forwardVelocityGains: ForwardVelocityGains = null
+      override val turnVelocityGains = null
 
-      override val forwardPositionControlGains: ForwardPositionGains = PIDConfig(
+      override val forwardPositionGains: ForwardPositionGains = PIDConfig(
         Percent(100) / Meters(10),
         Percent(0) / (Meters(1).toGeneric * Seconds(1)),
         Percent(0) / MetersPerSecond(1)
       )
 
-      override val turnPositionControlGains: TurnPositionGains = null
+      override val turnPositionGains: TurnPositionGains = null
     })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
@@ -238,16 +238,16 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxAcceleration: Acceleration = null
       override val defaultLookAheadDistance: Length = null
 
-      override val forwardControlGains: ForwardVelocityGains = null
-      override val turnControlGains = null
+      override val forwardVelocityGains: ForwardVelocityGains = null
+      override val turnVelocityGains = null
 
-      override val forwardPositionControlGains: ForwardPositionGains = PIDConfig(
+      override val forwardPositionGains: ForwardPositionGains = PIDConfig(
         Percent(100) / Meters(10),
         Percent(0) / (Meters(1).toGeneric * Seconds(1)),
         Percent(0) / MetersPerSecond(1)
       )
 
-      override val turnPositionControlGains: TurnPositionGains = null
+      override val turnPositionGains: TurnPositionGains = null
     })
 
     val hardware: UnicycleHardware = new UnicycleHardware {
@@ -283,12 +283,12 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxAcceleration: Acceleration = null
       override val defaultLookAheadDistance: Length = null
 
-      override val forwardControlGains: ForwardVelocityGains = null
-      override val turnControlGains = null
+      override val forwardVelocityGains: ForwardVelocityGains = null
+      override val turnVelocityGains = null
 
-      override val forwardPositionControlGains: ForwardPositionGains = null
+      override val forwardPositionGains: ForwardPositionGains = null
 
-      override val turnPositionControlGains: TurnPositionGains = PIDConfig(
+      override val turnPositionGains: TurnPositionGains = PIDConfig(
         Percent(100) / Degrees(1),
         Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
         Percent(0) / DegreesPerSecond(1)
@@ -328,12 +328,12 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxAcceleration: Acceleration = null
       override val defaultLookAheadDistance: Length = null
 
-      override val forwardControlGains: ForwardVelocityGains = null
-      override val turnControlGains = null
+      override val forwardVelocityGains: ForwardVelocityGains = null
+      override val turnVelocityGains = null
 
-      override val forwardPositionControlGains: ForwardPositionGains = null
+      override val forwardPositionGains: ForwardPositionGains = null
 
-      override val turnPositionControlGains: TurnPositionGains = PIDConfig(
+      override val turnPositionGains: TurnPositionGains = PIDConfig(
         Percent(100) / Degrees(10),
         Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
         Percent(0) / DegreesPerSecond(1)
@@ -373,12 +373,12 @@ class UnicycleDriveControlTest extends FunSuite {
       override val maxAcceleration: Acceleration = null
       override val defaultLookAheadDistance: Length = null
 
-      override val forwardControlGains: ForwardVelocityGains = null
-      override val turnControlGains = null
+      override val forwardVelocityGains: ForwardVelocityGains = null
+      override val turnVelocityGains = null
 
-      override val forwardPositionControlGains: ForwardPositionGains = null
+      override val forwardPositionGains: ForwardPositionGains = null
 
-      override val turnPositionControlGains: TurnPositionGains = PIDConfig(
+      override val turnPositionGains: TurnPositionGains = PIDConfig(
         Percent(100) / Degrees(10),
         Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
         Percent(0) / DegreesPerSecond(1)

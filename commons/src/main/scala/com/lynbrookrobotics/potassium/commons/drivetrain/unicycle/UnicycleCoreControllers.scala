@@ -46,13 +46,13 @@ trait UnicycleCoreControllers {
     val forwardControl = PIDF.pidf(
       forwardVelocity,
       target.map(_.forward),
-      props.map(_.forwardControlGainsFull)
+      props.map(_.forwardVelocityGainsFull)
     )
 
     val turnControl = PIDF.pidf(
       turnVelocity,
       target.map(_.turn),
-      props.map(_.turnControlGainsFull)
+      props.map(_.turnVelocityGainsFull)
     )
 
     forwardControl.zip(turnControl).map { s =>
@@ -89,7 +89,7 @@ trait UnicycleCoreControllers {
     val control = PIDF.pid(
       hardware.forwardPosition,
       hardware.forwardPosition.mapToConstant(targetAbsolute),
-      props.map(_.forwardPositionControlGains)
+      props.map(_.forwardPositionGains)
     ).map(s => UnicycleSignal(s, Percent(0)))
 
     (control, error)
@@ -103,7 +103,7 @@ trait UnicycleCoreControllers {
     val control = PIDF.pid(
       hardware.forwardPosition,
       targetAbsolute,
-      props.map(_.forwardPositionControlGains)
+      props.map(_.forwardPositionGains)
     ).map(s => UnicycleSignal(s, Percent(0)))
 
     (control, error)
@@ -120,7 +120,7 @@ trait UnicycleCoreControllers {
     val control = PIDF.pid(
       hardware.turnPosition,
       targetAbsolute,
-      props.map(_.turnPositionControlGains)
+      props.map(_.turnPositionGains)
     ).map(s => UnicycleSignal(Percent(0), s))
 
     (control, error)
@@ -134,7 +134,7 @@ trait UnicycleCoreControllers {
     val control = PIDF.pid(
       hardware.turnPosition,
       hardware.turnPosition.mapToConstant(targetAbsolute),
-      props.map(_.turnPositionControlGains)
+      props.map(_.turnPositionGains)
     ).map(s => UnicycleSignal(Percent(0), s))
 
     (control, error)
@@ -148,7 +148,7 @@ trait UnicycleCoreControllers {
     val control = PIDF.pid(
       hardware.turnPosition,
       targetAbsolute,
-      props.map(_.turnPositionControlGains)
+      props.map(_.turnPositionGains)
     ).map(s => UnicycleSignal(Percent(0), s))
 
     (control, error)

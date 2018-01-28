@@ -22,7 +22,7 @@ trait TwoSidedDriveProperties extends UnicycleProperties {
 
   lazy val maxForwardVelocity: Velocity = maxLeftVelocity min maxRightVelocity
 
-  val forwardControlGains: ForwardVelocityGains = PIDConfig(
+  val forwardVelocityGains: ForwardVelocityGains = PIDConfig(
     Each(0) / MetersPerSecond(1),
     Each(0) / Meters(1),
     Each(0) / MetersPerSecondSquared(1)
