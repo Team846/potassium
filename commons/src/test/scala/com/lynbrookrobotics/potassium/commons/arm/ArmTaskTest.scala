@@ -1,7 +1,7 @@
 package com.lynbrookrobotics.potassium.commons.arm
 
 import com.lynbrookrobotics.potassium.control.PIDConfig
-import com.lynbrookrobotics.potassium.{ClockMocking, Component, Signal, streams}
+import com.lynbrookrobotics.potassium.{ClockMocking, Component, Signal}
 import com.lynbrookrobotics.potassium.streams.{Periodic, Stream}
 import com.lynbrookrobotics.potassium.units.GenericValue
 import org.scalatest.FunSuite
@@ -21,7 +21,6 @@ class ArmTaskTest extends FunSuite {
     val arm = new Arm {
       override type Properties = ArmProperties
       override type Hardware = ArmHardware
-
       override type Comp = Component[Dimensionless]
     }
 
@@ -61,24 +60,18 @@ class ArmTaskTest extends FunSuite {
     assert(armSignal == Percent(100))
 
     currentAngle = Degrees(45)
-
     ticker(Milliseconds(5))
-
     assert(armSignal == Percent(100))
 
     currentAngle = Degrees(95)
-
     ticker(Milliseconds(5))
-
     assert(!task.isRunning)
-
   }
 
   test("Arm starts above target and then moves down. After moving down, runs inner function") {
     val arm = new Arm {
       override type Properties = ArmProperties
       override type Hardware = ArmHardware
-
       override type Comp = Component[Dimensionless]
     }
 
@@ -120,25 +113,18 @@ class ArmTaskTest extends FunSuite {
     assert(armSignal == Percent(-100))
 
     currentAngle = Degrees(135)
-
     ticker(Milliseconds(5))
-
     assert(armSignal == Percent(-100))
 
     currentAngle = Degrees(0)
-
     ticker(Milliseconds(5))
-
     assert(!task.isRunning)
-
-
   }
 
-  test("mooooooo") {
+  test("Testing correct percentage outputs for given values when running proportional control") {
     val arm = new Arm {
       override type Properties = ArmProperties
       override type Hardware = ArmHardware
-
       override type Comp = Component[Dimensionless]
     }
 
@@ -178,28 +164,19 @@ class ArmTaskTest extends FunSuite {
     assert(armSignal == Percent(100))
 
     currentAngle = Degrees(45)
-
     ticker(Milliseconds(5))
-
     assert(armSignal == Percent(50))
 
     currentAngle = Degrees(180)
-
     ticker(Milliseconds(5))
-
     assert(armSignal == Percent(-100))
 
     currentAngle = Degrees(135)
-
     ticker(Milliseconds(5))
-
     assert(armSignal == Percent(-50))
 
     currentAngle = Degrees(90)
-
     ticker(Milliseconds(5))
-
     assert(!task.isRunning)
-
   }
 }
