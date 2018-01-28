@@ -1,11 +1,13 @@
 package com.lynbrookrobotics.potassium.model.examples
 
+import com.lynbrookrobotics.potassium.ClockMocking._
 import com.lynbrookrobotics.potassium.Signal
-import com.lynbrookrobotics.potassium.model.simulations.TwoSidedDriveContainerSimulator
+import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.TwoSidedDriveProperties
 import com.lynbrookrobotics.potassium.control.PIDConfig
+import com.lynbrookrobotics.potassium.model.simulations.TwoSidedDriveContainerSimulator
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
-import squants.{Acceleration, Length, Percent, Velocity}
+import squants.mass.{KilogramsMetersSquared, Pounds}
 import squants.motion._
 import squants.space.{Degrees, Feet, Inches, Meters}
 import squants.time.{Milliseconds, Seconds}
@@ -14,6 +16,7 @@ import com.lynbrookrobotics.potassium.ClockMocking._
 import com.lynbrookrobotics.potassium.commons.drivetrain.{ForwardPositionGains, ForwardVelocityGains, TurnPositionGains, TurnVelocityGains}
 import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.TwoSidedDriveProperties
 import squants.mass.{KilogramsMetersSquared, Pounds}
+import squants.{Acceleration, Length, Percent, Velocity}
 
 import scala.reflect.io.File
 
@@ -47,6 +50,9 @@ object SimulateDrivetrain extends App {
       Percent(0) / MetersPerSecondSquared(1))
 
     override val rightControlGains: ForwardVelocityGains = leftControlGains
+
+    override val track: Distance = Inches(21.75)
+    override val blendExponent: Double = Double.NaN
   }
 
   implicit val props = Signal.constant(propsVal)
@@ -57,7 +63,6 @@ object SimulateDrivetrain extends App {
   val drivetrainContainer = new TwoSidedDriveContainerSimulator
   implicit val hardware = new drivetrainContainer.Hardware(
     Pounds(88) * MetersPerSecondSquared(1) / 2,
-    Inches(21.75),
     Pounds(88),
     KilogramsMetersSquared(3.909),
     clock,
