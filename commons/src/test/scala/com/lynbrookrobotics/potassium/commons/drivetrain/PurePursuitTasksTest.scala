@@ -99,8 +99,7 @@ class PurePursuitTasksTest extends FunSuite {
       Seq(Point.origin, target),
       Feet(1),
       1,
-      Percent(70),
-      unlimitedTurnOutput
+      Percent(70)
     )(drivetrainComp)
 
     task.init()
@@ -131,8 +130,7 @@ class PurePursuitTasksTest extends FunSuite {
       Seq(Point.origin, target),
       Feet(0.1),
       1,
-      Percent(70),
-      unlimitedTurnOutput
+      Percent(70)
     )(testDrivetrainComp)
 
     task.init()
