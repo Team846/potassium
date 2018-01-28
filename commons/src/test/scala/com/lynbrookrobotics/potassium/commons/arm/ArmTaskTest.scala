@@ -37,7 +37,7 @@ class ArmTaskTest extends FunSuite {
 
     var armSignal: Dimensionless = null
 
-    val armmoo = new Component[Dimensionless] {
+    val testArm = new Component[Dimensionless] {
       override def defaultController: Stream[Dimensionless] = Stream.periodic(tickPeriod)(Percent(0))
 
       override def applySignal(signal: Dimensionless): Unit = {
@@ -49,7 +49,7 @@ class ArmTaskTest extends FunSuite {
       override def angle: Stream[Angle] = Stream.periodic(tickPeriod)(currentAngle)
     }
 
-    val task = new arm.positionTasks.WhileAbovePosition(hardware.angle.mapToConstant(Degrees(90)))(armmoo).toFinite
+    val task = new arm.positionTasks.WhileAbovePosition(hardware.angle.mapToConstant(Degrees(90)))(testArm).toFinite
 
     task.init()
 
@@ -88,7 +88,7 @@ class ArmTaskTest extends FunSuite {
 
     var armSignal: Dimensionless = null
 
-    val armmoo = new Component[Dimensionless] {
+    val testArm = new Component[Dimensionless] {
       override def defaultController: Stream[Dimensionless] = Stream.periodic(tickPeriod)(Percent(0))
 
       override def applySignal(signal: Dimensionless): Unit = {
@@ -100,7 +100,7 @@ class ArmTaskTest extends FunSuite {
       override def angle: Stream[Angle] = Stream.periodic(tickPeriod)(currentAngle)
     }
 
-    val task = new arm.positionTasks.WhileBelowPosition(hardware.angle.mapToConstant(Degrees(90)))(armmoo).toFinite
+    val task = new arm.positionTasks.WhileBelowPosition(hardware.angle.mapToConstant(Degrees(90)))(testArm).toFinite
 
     task.init()
 
@@ -141,7 +141,7 @@ class ArmTaskTest extends FunSuite {
 
     var armSignal: Dimensionless = null
 
-    val armmoo = new Component[Dimensionless] {
+    val testArm = new Component[Dimensionless] {
       override def defaultController: Stream[Dimensionless] = Stream.periodic(tickPeriod)(Percent(0))
 
       override def applySignal(signal: Dimensionless): Unit = {
@@ -153,7 +153,7 @@ class ArmTaskTest extends FunSuite {
       override def angle: Stream[Angle] = Stream.periodic(tickPeriod)(currentAngle)
     }
 
-    val task = new arm.positionTasks.WhileAtPosition(hardware.angle.mapToConstant(Degrees(90)), Degrees(5))(armmoo).toFinite
+    val task = new arm.positionTasks.WhileAtPosition(hardware.angle.mapToConstant(Degrees(90)), Degrees(5))(testArm).toFinite
 
     task.init()
 
