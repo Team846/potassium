@@ -34,7 +34,7 @@ class DeallocationTest extends FunSuite {
     var count = 0
 
     while (value.get.isDefined) {
-      if (count >= 20) {
+      if (count >= 30) {
         assert(false, "Did not deallocate")
       }
 
@@ -44,7 +44,7 @@ class DeallocationTest extends FunSuite {
   }
 
   private def testDoesNotDeallocate[T <: AnyRef](value: WeakReference[T]): Unit = {
-    (1 to 20).foreach(_ => System.gc())
+    (1 to 30).foreach(_ => System.gc())
 
     if (value.get.isEmpty) {
       assert(false, "Did deallocate")

@@ -1,7 +1,10 @@
 package com.lynbrookrobotics.potassium.model.examples
 
+import java.io.{FileWriter, PrintWriter}
+
 import com.lynbrookrobotics.potassium.ClockMocking.mockedClockTicker
 import com.lynbrookrobotics.potassium.Signal
+import com.lynbrookrobotics.potassium.commons.drivetrain.{ForwardPositionGains, ForwardVelocityGains, TurnPositionGains, TurnVelocityGains}
 import com.lynbrookrobotics.potassium.commons.drivetrain.purePursuit.MathUtilities
 import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.TwoSidedDriveProperties
 import com.lynbrookrobotics.potassium.control.PIDConfig
@@ -14,8 +17,6 @@ import squants.motion._
 import squants.space._
 import squants.time.{Milliseconds, Seconds}
 import squants.{Acceleration, Length, Percent, Time, Velocity}
-
-import scala.reflect.io.File
 
 class SimulatePurePursuit extends FunSuite {
   val period = Milliseconds(5)
@@ -30,27 +31,27 @@ class SimulatePurePursuit extends FunSuite {
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(16.5)
     override val defaultLookAheadDistance: Length = Feet(1)
 
-    override val turnControlGains = PIDConfig(
+    override val turnControlGains: TurnVelocityGains = PIDConfig(
       Percent(100) / DegreesPerSecond(1),
       Percent(0) / Degrees(1),
       Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)))
 
-    override val forwardPositionControlGains = PIDConfig(
+    override val forwardPositionControlGains: ForwardPositionGains = PIDConfig(
       Percent(100) / Feet(4),
       Percent(0) / (Meters(1).toGeneric * Seconds(1)),
       Percent(0) / MetersPerSecond(1))
 
-    override val turnPositionControlGains = PIDConfig(
+    override val turnPositionControlGains: TurnPositionGains = PIDConfig(
       kp = Percent(5) / Degrees(1),
       ki = Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
       kd = Percent(0.5) / DegreesPerSecond(1))
 
-    override val leftControlGains = PIDConfig(
+    override val leftControlGains: ForwardVelocityGains = PIDConfig(
       Percent(100) / FeetPerSecond(1),
       Percent(0) / Meters(1),
       Percent(0) / MetersPerSecondSquared(1))
 
-    override val rightControlGains = leftControlGains
+    override val rightControlGains: ForwardVelocityGains = leftControlGains
   }
 
   implicit val props = Signal.constant(propsVal)
@@ -82,7 +83,7 @@ class SimulatePurePursuit extends FunSuite {
 
     if (log) {
       val logName = s"simlog-${wayPoints.mkString.split("Value3D").mkString(",")}"
-      val writer = new File(new java.io.File(logName)).printWriter()
+      val writer = new PrintWriter(new FileWriter(new java.io.File(logName)))
       writer.println(s"Time\tx\ty\tvelocity\tangle\tturnSpeed")
 
       var i = 0

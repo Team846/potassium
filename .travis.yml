@@ -3,6 +3,8 @@ language: scala
 branches:
   only:
     - master
+before_install:
+  - curl https://raw.githubusercontent.com/scala-native/scala-native/v0.3.6/bin/travis_setup.sh | bash -x
 install:
   - . $HOME/.nvm/nvm.sh
   - nvm install stable
@@ -13,10 +15,10 @@ install:
   - gem update --system
   - gem install sass
   - gem install jekyll
-script:
   - mkdir -p ~/.sbt/0.13/plugins
   - echo 'addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0")' > ~/.sbt/0.13/plugins/build.sbt
-  - 'sbt "clean" "coverage" "test" "coverageReport"'
+script:
+  - 'sbt clean coverage testAll coverageReport'
   - 'sbt coverageAggregate'
 jdk: oraclejdk8
 after_success:
