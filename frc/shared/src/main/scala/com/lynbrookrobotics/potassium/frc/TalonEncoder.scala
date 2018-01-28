@@ -1,9 +1,11 @@
 package com.lynbrookrobotics.potassium.frc
-//import com.ctre.phoenix.motorcontrol.FeedbackDevice
+
+import com.ctre.phoenix.motorcontrol.FeedbackDevice
+import com.ctre.phoenix.motorcontrol.can.TalonSRX
 import com.lynbrookrobotics.potassium.units.Ratio
+import squants.{Angle, Dimensionless, Each}
 import squants.motion.AngularVelocity
 import squants.time.Seconds
-import squants.{Angle, Dimensionless, Each}
 
 class TalonEncoder(talon: TalonController,
                    conversionFactor: Ratio[Angle, Dimensionless]) {

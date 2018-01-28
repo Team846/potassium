@@ -73,16 +73,19 @@ abstract class TwoSidedDrive
     velocityControl(signal.map(s => expectedVelocity(s)(props.get)))
   }
 
-  def blendedVelocityControl(combinedSignal: Stream[UnicycleSignal],
-                             targetForwardVelocity: Stream[Velocity],
-                             curvature: Stream[Ratio[Dimensionless, Length]])
+  def blendedVelocityControl(arcadeSignal: Stream[UnicycleSignal],
+                             curvature: Stream[Ratio[Dimensionless, Length]],
+                             targetForwardVelocity: Stream[Velocity])
                             (implicit hardware: Hardware,
                              props: Signal[Properties]): Stream[TwoSidedSignal] = {
-    val targetTankSpeeds: Stream[TwoSidedVelocity] = combinedSignal.map(
-      convertUnicycleToDrive
-    ).map(expectedVelocity(_)(props.get))
+    val twoSidedSignal = arcadeSignal.map(convertUnicycleToDrive)
+    val targetTankSpeeds = twoSidedSignal.map(expectedVelocity(_)(props.get))
 
-    val blendedVelocities = BlendedDriving.blendedDrive(targetTankSpeeds, targetForwardVelocity, curvature)
+    val blendedVelocities = BlendedDriving.blendedDrive(
+      targetTankSpeeds,
+      targetForwardVelocity,
+      curvature)
+
     velocityControl(blendedVelocities)
   }
 }

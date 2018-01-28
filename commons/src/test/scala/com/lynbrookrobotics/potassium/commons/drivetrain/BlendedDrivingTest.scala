@@ -13,7 +13,8 @@ import squants.time.Seconds
 import squants.{Acceleration, Dimensionless, Each, Length, Percent, Velocity}
 
 class BlendedDrivingTest extends FunSuite {
-  def generateProps(blendExp: Double, maxForward: Velocity = MetersPerSecond(10)): Signal[TwoSidedDriveProperties] = {
+  def generateProps(blendExp: Double,
+                    maxForward: Velocity = MetersPerSecond(10)): Signal[TwoSidedDriveProperties] = {
     Signal.constant(new TwoSidedDriveProperties {
       lazy override val maxForwardVelocity: Velocity = maxForward
       override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
@@ -63,14 +64,14 @@ class BlendedDrivingTest extends FunSuite {
 
 
   test("Test driving at a radius of 1 foot and -track / 2") {
-    implicit val props: Signal[TwoSidedDriveProperties] = generateProps(0.5)
+    implicit val props: Signal[TwoSidedDriveProperties] = generateProps(blendExp = 0.5)
 
     var lastBlendedSpeed: TwoSidedVelocity = null
 
-    val (radiuses, publishRadius) = Stream.manual[Length]
-    val (velocities, publishVelocity) = Stream.manual[Velocity]
-    val circularMotions = BlendedDriving.circularMotion(velocities, radiuses)
-    circularMotions.foreach(lastBlendedSpeed = _)
+    val (radius, publishRadius) = Stream.manual[Length]
+    val (velocity, publishVelocity) = Stream.manual[Velocity]
+    val circularMotion = BlendedDriving.driveWithRadius(radius, velocity)
+    circularMotion.foreach(lastBlendedSpeed = _)
 
     publishRadius(-props.get.track / 2)
     publishVelocity(FeetPerSecond(1))
@@ -90,39 +91,41 @@ class BlendedDrivingTest extends FunSuite {
         FeetPerSecond(1),
         FeetPerSecond(1))(generateProps(blendExp = 0)) == FeetPerSecond(0))
 
-    assert(BlendedDriving.blend(
-      FeetPerSecond(0),
-      FeetPerSecond(1),
-      FeetPerSecond(1))(generateProps(blendExp = 1, FeetPerSecond(2))) == FeetPerSecond(0.5))
+    assert(
+      BlendedDriving.blend(
+        FeetPerSecond(0),
+        FeetPerSecond(1),
+        FeetPerSecond(1))(generateProps(blendExp = 1, FeetPerSecond(2))) == FeetPerSecond(0.5))
 
-    assert(BlendedDriving.blend(
-      FeetPerSecond(0),
-      FeetPerSecond(1),
-      FeetPerSecond(1))(generateProps(blendExp = 0.5, FeetPerSecond(4))) == FeetPerSecond(0.5))
+    assert(
+      BlendedDriving.blend(
+        FeetPerSecond(0),
+        FeetPerSecond(1),
+        FeetPerSecond(1))(generateProps(blendExp = 0.5, FeetPerSecond(4))) == FeetPerSecond(0.5))
   }
 
   test("blendedDriving with infinity radius & negative velocity results in straight backwards motion") {
-    val (tankSpeeds, publishTankSpeed) = Stream.manual[TwoSidedVelocity]
-    val (targetForwards, publishTargetForwards) = Stream.manual[Velocity]
-    val (curvatures, publishCurvatures) = Stream.manual[Ratio[Dimensionless, Length]]
+    val (tankSpeed, publishTankSpeed) = Stream.manual[TwoSidedVelocity]
+    val (targetForwardVelocity, publishTargetForward) = Stream.manual[Velocity]
+    val (curvature, publishCurvature) = Stream.manual[Ratio[Dimensionless, Length]]
 
     var lastBlendedSpeed: TwoSidedVelocity = null
 
-    val props = generateProps(0)
+    implicit val props = generateProps(blendExp = 0)
     BlendedDriving.blendedDrive(
-      tankSpeeds,
-      targetForwards,
-      curvatures)(props).foreach(lastBlendedSpeed = _)
+      tankSpeed,
+      targetForwardVelocity,
+      curvature).foreach(lastBlendedSpeed = _)
 
     publishTankSpeed(TwoSidedVelocity(FeetPerSecond(0), FeetPerSecond(0)))
-    publishTargetForwards(FeetPerSecond(-1))
-    publishCurvatures(Ratio(Each(0), Feet(1)))
+    publishTargetForward(FeetPerSecond(-1))
+    publishCurvature(Ratio(Each(0), Feet(1)))
 
-    assert(lastBlendedSpeed.left.value < 0 && lastBlendedSpeed.right.value < 0)
+    assert(lastBlendedSpeed.left < FeetPerSecond(0) && lastBlendedSpeed.right < FeetPerSecond(0))
 
     publishTankSpeed(TwoSidedVelocity(FeetPerSecond(0), FeetPerSecond(0)))
-    publishTargetForwards(FeetPerSecond(-2))
-    publishCurvatures(Ratio(Each(0), Feet(1)))
+    publishTargetForward(FeetPerSecond(-2))
+    publishCurvature(Ratio(Each(0), Feet(1)))
 
     assert(lastBlendedSpeed.left < FeetPerSecond(0) && lastBlendedSpeed.right < FeetPerSecond(0))
   }

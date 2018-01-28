@@ -7,9 +7,9 @@ import squants.motion.RadiansPerSecond
 import squants.{Dimensionless, Each, Length, Percent, Velocity}
 
 object BlendedDriving {
-  def circularMotion(velocity: Stream[Velocity],
-                     radius: Stream[Length])
-                    (implicit props: Signal[TwoSidedDriveProperties]): Stream[TwoSidedVelocity] = {
+  def driveWithRadius(radius: Stream[Length],
+                      velocity: Stream[Velocity])
+                     (implicit props: Signal[TwoSidedDriveProperties]): Stream[TwoSidedVelocity] = {
     velocity.zip(radius).map { case (velocity, radius) =>
       if (radius.value == Double.PositiveInfinity || radius.value == Double.NegativeInfinity || radius.value == Double.NaN) {
         TwoSidedVelocity(velocity, velocity)
@@ -35,8 +35,10 @@ object BlendedDriving {
     val normalizedTargetForwardSpeed = targetForward / props.get.maxForwardVelocity
 
     val constantRadiusWeight = Each(
-      math.pow(normalizedTargetForwardSpeed.abs, props.get.blendExponent))
+      math.pow(normalizedTargetForwardSpeed.abs, props.get.blendExponent)
+    )
     val tankWeight = Percent(100) - constantRadiusWeight
+
     tankWeight.toEach * tankSpeed + constantRadiusWeight.toEach * constantRadiusSpeed
   }
 
@@ -44,15 +46,13 @@ object BlendedDriving {
                    targetForwardVelocity: Stream[Velocity],
                    curvature: Stream[Ratio[Dimensionless, Length]])
                   (implicit properties: Signal[TwoSidedDriveProperties]): Stream[TwoSidedVelocity] = {
-    val constantRadiusSpeed = circularMotion(
-      targetForwardVelocity,
-      radius = curvature.map(curvature => curvature.den / curvature.num.toEach))
+    val constantRadiusSpeed = driveWithRadius(radius = curvature.map(curvature => curvature.den / curvature.num.toEach), targetForwardVelocity)
 
-    val zippedSpeeds = tankSpeed.zip(constantRadiusSpeed).zip(targetForwardVelocity)
-    zippedSpeeds.map { case ((tankSpeed, carSpeed), targetForward) =>
-      TwoSidedVelocity(
-        blend(carSpeed.left, tankSpeed.left, targetForward),
-        blend(carSpeed.right, tankSpeed.right, targetForward))
+    tankSpeed.zip(constantRadiusSpeed).zip(targetForwardVelocity).map {
+      case ((tankSpeed, carSpeed), targetForward) =>
+        TwoSidedVelocity(
+          blend(carSpeed.left, tankSpeed.left, targetForward),
+          blend(carSpeed.right, tankSpeed.right, targetForward))
     }
   }
 }

@@ -46,7 +46,7 @@ class TestXYPosition extends FunSuite{
       pubAngle.apply(Degrees(90))
     }
 
-    implicit val tolerance: Length = Feet(0.1)
+    implicit val tolerance = Feet(0.1)
     assert(lastPosition ~= targetPosition)
     assert(lastSimpsonPosition ~= targetPosition)
     assert(lastCircularPosition ~= targetPosition)
