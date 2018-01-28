@@ -84,7 +84,7 @@ abstract class OffloadedDrive extends TwoSidedDrive {
 
   def ticks(x: GenericIntegral[Length])(implicit p: Properties): Dimensionless = ticks(x / Milliseconds(1))
 
-  def ticks(x: Length)(implicit p: Properties): Dimensionless = p.floorPerTick.recip() * x
+  def ticks(x: Length)(implicit p: Properties): Dimensionless = p.floorPerTick.recip * x
 
   def ticks(x: Velocity)(implicit p: Properties): Dimensionless = ticks(x * p.escTimeConst)
 

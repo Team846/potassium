@@ -20,6 +20,9 @@ case class Ratio[N <: Quantity[N], D <: Quantity[D]](num: N, den: D) {
 
   def *(value: Double): Ratio[N, D] = Ratio(value * num, den)
   def *(value: D): N = value / den * num
+  def *[D2 <: Quantity[D2]](r: Ratio[D, D2]): Ratio[N, D2] = Ratio(num, r.den) * (r.num / den)
+
+  lazy val recip: Ratio[D, N] = Ratio(den, num)
 
   override def toString: String = {
     num.toString() + " / " + den.toString()
