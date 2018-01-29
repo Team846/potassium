@@ -1,12 +1,10 @@
-package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle
+package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control
 
 import com.lynbrookrobotics.potassium.Signal
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleHardware, UnicycleProperties, UnicycleSignal, UnicycleVelocity}
 import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.streams.Stream
-import com.lynbrookrobotics.potassium.units._
-import squants.{Angle, Dimensionless, Length, Percent, Quantity, Time}
-
-import scala.collection.immutable.Queue
+import squants.{Angle, Length, Percent}
 
 trait UnicycleCoreControllers {
   type DriveSignal

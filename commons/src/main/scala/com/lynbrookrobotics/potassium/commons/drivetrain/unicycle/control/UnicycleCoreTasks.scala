@@ -1,7 +1,8 @@
-package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle
+package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control
 
 import com.lynbrookrobotics.potassium.clock.Clock
-import com.lynbrookrobotics.potassium.commons.drivetrain.purePursuit.PurePursuitControllers
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitControllers
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleSignal, UnicycleVelocity}
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask}
 import com.lynbrookrobotics.potassium.{Component, Signal}
