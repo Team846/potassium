@@ -16,10 +16,10 @@ trait UnicycleDrive extends Drive {
   type Properties <: UnicycleProperties
 
   /**
-    * Converts a unicycle signal value to the parent's signal type
+    * Converts a unicycle signal value to the child's signal type
     *
     * @param uni the unicycle value to convert
-    * @return the parent's equivalent signal
+    * @return the child's equivalent signal
     */
   protected def unicycleToOpenLoopSignal(uni: UnicycleSignal): OpenLoopSignal
 
@@ -42,10 +42,10 @@ trait UnicycleDrive extends Drive {
       unicycle.map(unicycleToOpenLoopSignal)
 
     /**
-      * Uses the parent's closed loop control for the drive signal for the unicycle signal
+      * Uses the child's closed loop control for the drive signal for the unicycle signal
       *
       * @param unicycle the unicycle signal to closed-loop drive with
-      * @return a signal controlled with closed-loop on the parent
+      * @return a signal controlled with closed-loop on the child
       */
     def childVelocityControl(unicycle: Stream[UnicycleSignal])
                             (implicit hardware: DrivetrainHardware,
