@@ -12,9 +12,7 @@ trait UnicycleCoreControllers {
   type DrivetrainHardware <: UnicycleHardware
   type DrivetrainProperties <: UnicycleProperties
 
-  def openLoopToDriveSignal(openLoop: OpenLoopSignal): DriveSignal
-
-  def childOpenLoop(unicycle: Stream[UnicycleSignal]): Stream[OpenLoopSignal]
+  def childOpenLoop(unicycle: Stream[UnicycleSignal]): Stream[DriveSignal]
 
   def childVelocityControl(unicycle: Stream[UnicycleSignal])
                           (implicit hardware: DrivetrainHardware,

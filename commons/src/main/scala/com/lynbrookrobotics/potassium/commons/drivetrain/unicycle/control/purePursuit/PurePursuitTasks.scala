@@ -52,7 +52,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         if (e.exists(_ < tolerance)) {
           finished()
         }
-      }).map(openLoopToDriveSignal))
+      }))
     }
 
     override def onEnd(): Unit = {
@@ -81,7 +81,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         if (e.exists(_ < tolerance)) {
           finished()
         }
-      }).map(openLoopToDriveSignal))
+      }))
     }
 
     override def onEnd(): Unit = {

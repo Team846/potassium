@@ -29,17 +29,14 @@ trait UnicycleDrive extends Drive {
     type DrivetrainHardware = self.Hardware
     type DrivetrainProperties = self.Properties
 
-    override def openLoopToDriveSignal(openLoop: OpenLoopSignal): DriveSignal =
-      self.openLoopToDriveSignal(openLoop)
-
     /**
       * Uses the childs's open loop control for the equivalent drive signal for the unicycle signal
       *
       * @param unicycle the unicycle signal to drive with
       * @return a signal controlled with open-loop on the child
       */
-    def childOpenLoop(unicycle: Stream[UnicycleSignal]): Stream[OpenLoopSignal] =
-      unicycle.map(unicycleToOpenLoopSignal)
+    def childOpenLoop(unicycle: Stream[UnicycleSignal]): Stream[DriveSignal] =
+      unicycle.map(unicycleToOpenLoopSignal).map(self.openLoopToDriveSignal)
 
     /**
       * Uses the child's closed loop control for the drive signal for the unicycle signal
@@ -72,14 +69,14 @@ trait UnicycleDrive extends Drive {
             .mapToConstant(
               UnicycleSignal(Percent(0), Percent(0))
             )
-        ).map(openLoopToDriveSignal)
+        )
 
       case ArcadeControlsOpen(forward, turn) =>
         childOpenLoop(
           forward
             .zip(turn)
             .map(t => UnicycleSignal(t._1, t._2))
-        ).map(openLoopToDriveSignal)
+        )
 
       case ArcadeControlsClosed(forward, turn) =>
         childVelocityControl(

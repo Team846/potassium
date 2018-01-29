@@ -25,7 +25,7 @@ trait UnicycleCoreTasks {
                       props: Signal[DrivetrainProperties]) extends ContinuousTask {
     override def onStart(): Unit = {
       val combined = forward.zip(turn).map(t => UnicycleSignal(t._1, t._2))
-      drive.setController(childOpenLoop(combined).map(openLoopToDriveSignal))
+      drive.setController(childOpenLoop(combined))
     }
 
     override def onEnd(): Unit = {
