@@ -1,12 +1,10 @@
 package com.lynbrookrobotics.potassium.units
 
-import squants.motion.AngularVelocity
-import squants.space.{Angle, Degrees}
-import squants.time.{Time, TimeDerivative}
-import squants.{Angle, Dimension, Quantity, UnitOfMeasure}
+import squants.Quantity
 
 /**
   * Represents a ratio between two quantities
+  *
   * @param num the numerator of the ratio
   * @param den the denominator of the ratio
   * @tparam N the units of the numerator
@@ -22,7 +20,7 @@ case class Ratio[N <: Quantity[N], D <: Quantity[D]](num: N, den: D) {
   def *(value: D): N = value / den * num
   def *[D2 <: Quantity[D2]](r: Ratio[D, D2]): Ratio[N, D2] = Ratio(num, r.den) * (r.num / den)
 
-  lazy val recip: Ratio[D, N] = Ratio(den, num)
+  def recip: Ratio[D, N] = Ratio(den, num)
 
   override def toString: String = {
     num.toString() + " / " + den.toString()
