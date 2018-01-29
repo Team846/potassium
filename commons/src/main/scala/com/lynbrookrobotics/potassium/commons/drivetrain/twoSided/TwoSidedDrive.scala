@@ -66,4 +66,10 @@ abstract class TwoSidedDrive
       props.maxForwardVelocity * drive.right
     )
   }
+
+  override protected def unicycleToOpenLoopSignal(uni: UnicycleSignal): TwoSided[Dimensionless] =
+    TwoSided(
+      uni.forward + uni.turn,
+      uni.forward - uni.turn
+    )
 }

@@ -29,17 +29,5 @@ abstract class OnloadedDrive extends TwoSidedDrive {
     leftControl.zip(rightControl).map(s => TwoSided(s._1, s._2))
   }
 
-  /**
-    * Converts a unicycle signal value to the parent's signal type
-    *
-    * @param uni the unicycle value to convert
-    * @return the parent's equivalent signal
-    */
-  override protected def unicycleToOpenLoopSignal(uni: UnicycleSignal): TwoSided[Dimensionless] =
-    TwoSided(
-      uni.forward + uni.turn,
-      uni.forward - uni.turn
-    )
-
   override protected def openLoopToDriveSignal(openLoop: TwoSided[Dimensionless]) = openLoop
 }
