@@ -53,18 +53,11 @@ class LazyTalon(val t: TalonSRX, val idx: Int, val timeout: Int) {
   }
 
   def applyCommand(s: OpenLoop): Unit = {
-    println(s"inside applyCommand OpenLoop s=$s")
-    println(s"last=$last")
     import s.signal
     last match {
       case Some(last: OpenLoop) =>
-        println("Some(last: OpenLoop) =>")
-        if (signal != last.signal) {
-          println("signal != last.signal")
-          t.set(ControlMode.PercentOutput, signal.toEach)
-        }
+        if (signal != last.signal) t.set(ControlMode.PercentOutput, signal.toEach)
       case _ =>
-        println("case _ =>")
         t.set(ControlMode.PercentOutput, signal.toEach)
     }
     last = Some(s)
