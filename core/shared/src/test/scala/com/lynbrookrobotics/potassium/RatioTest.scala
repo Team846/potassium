@@ -1,9 +1,8 @@
 package com.lynbrookrobotics.potassium
 
+import com.lynbrookrobotics.potassium.units._
 import org.scalatest.FunSuite
-import squants.Each
 import squants.space.{Degrees, Meters, Radians}
-import units._
 
 class RatioTest extends FunSuite {
   test("Ratio multiply produces correct values") {
