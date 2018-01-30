@@ -2,7 +2,8 @@ package com.lynbrookrobotics.potassium.frc
 
 import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.can.TalonSRX
-import com.lynbrookrobotics.potassium.control.{OffloadedSignal, OpenLoop, PositionControl, VelocityControl}
+import com.lynbrookrobotics.potassium.control.offload.OffloadedSignal
+import com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.{OpenLoop, PositionControl, VelocityControl}
 
 class LazyTalon(val t: TalonSRX, val idx: Int, val timeout: Int) {
   private var last: Option[OffloadedSignal] = None
