@@ -53,7 +53,7 @@ class Point(override val x: Length,
   }
 
   def onLine(toTest: Segment, tolerance: Length): Boolean = {
-    implicit val implicitTolerance: Length = tolerance
+    implicit val implicitTolerance = tolerance
 
     val xySlope = toTest.xySlope
     if (xySlope != Double.NaN && math.abs(xySlope) != Double.PositiveInfinity) {
@@ -80,13 +80,13 @@ object Point {
 }
 
 case class Segment(start: Point, end: Point) {
-  val diff: Point = end - start
-  val length: Length = diff.magnitude
-  val xySlope: Double = (end.y - start.y) / (end.x - start.x)
+  val diff = end - start
+  val length = diff.magnitude
+  val xySlope = (end.y - start.y) / (end.x - start.x)
 
-  val dz: Length = end.z - start.z
-  val dy: Length = end.y - start.y
-  val dx: Length = end.x - start.x
+  val dz = end.z - start.z
+  val dy = end.y - start.y
+  val dx = end.x - start.x
 
   def between0and2Pi(angle: Angle): Angle = {
     if (angle >= Degrees(360)) {
@@ -138,17 +138,17 @@ case class Segment(start: Point, end: Point) {
       val posX = center.x.toFeet
       val posY = center.y.toFeet
 
-      val sqrtDiscriminant: Double = sqrt(discriminant)
+      val sqrtDiscrim = sqrt(discriminant)
       val signDy = if (dy < 0) -1D else 1D
 
       val positiveSolution = Point(
-        Feet((det * dy + signDy * sqrtDiscriminant * dx) / dr_squared + posX),
-        Feet((-det * dx + abs(dy) * sqrtDiscriminant) / dr_squared + posY)
+        Feet((det * dy + signDy * sqrtDiscrim * dx) / dr_squared + posX),
+        Feet((-det * dx + abs(dy) * sqrtDiscrim) / dr_squared + posY)
       )
 
       val negativeSolution = Point(
-        Feet((det * dy - signDy * sqrtDiscriminant * dx) / dr_squared + posX),
-        Feet((-det * dx - abs(dy) * sqrtDiscriminant) / dr_squared + posY)
+        Feet((det * dy - signDy * sqrtDiscrim * dx) / dr_squared + posX),
+        Feet((-det * dx - abs(dy) * sqrtDiscrim) / dr_squared + posY)
       )
 
       Some(negativeSolution, positiveSolution)
@@ -156,13 +156,13 @@ case class Segment(start: Point, end: Point) {
   }
 }
 
-case class Line(slope: Angle, yIntercept: Length) {
+case class Line(angleSlope: Angle, yIntercept: Length) {
   def xIntercept: Length =
-    if (slope == Degrees(0)) {
+    if (angleSlope == Degrees(0)) {
       Inches(Double.PositiveInfinity)
     }
     else {
-      val rateOfChange = slope.tan
-      -yIntercept / rateOfChange
+      val slope = angleSlope.tan
+      -yIntercept / slope
     }
 }
