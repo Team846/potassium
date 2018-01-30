@@ -1,42 +1,22 @@
-package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle
+package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control
 
 import com.lynbrookrobotics.potassium.Signal
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleHardware, UnicycleProperties, UnicycleSignal, UnicycleVelocity}
 import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.streams.Stream
-import com.lynbrookrobotics.potassium.units._
-import squants.{Angle, Dimensionless, Length, Percent, Quantity, Time}
-
-import scala.collection.immutable.Queue
+import squants.{Angle, Length, Percent}
 
 trait UnicycleCoreControllers {
   type DriveSignal
+  type OpenLoopSignal
   type DrivetrainHardware <: UnicycleHardware
   type DrivetrainProperties <: UnicycleProperties
 
-  def lowerLevelOpenLoop(unicycle: Stream[UnicycleSignal]): Stream[DriveSignal] = parentOpenLoop(unicycle)
+  def childOpenLoop(unicycle: Stream[UnicycleSignal]): Stream[DriveSignal]
 
-  def parentOpenLoop(unicycle: Stream[UnicycleSignal]): Stream[DriveSignal]
-
-  def lowerLevelVelocityControl(unicycle: Stream[UnicycleSignal])(implicit hardware: DrivetrainHardware,
-                                                                      props: Signal[DrivetrainProperties]): Stream[DriveSignal]
-
-  def openForwardOpenDrive(forwardSpeed: Stream[Dimensionless]): Stream[DriveSignal] = {
-    parentOpenLoop(forwardSpeed.map(f => UnicycleSignal(f, Percent(0))))
-  }
-
-  def openForwardClosedDrive(forwardSpeed: Stream[Dimensionless])(implicit hardware: DrivetrainHardware,
-                                                                  props: Signal[DrivetrainProperties]): Stream[DriveSignal] = {
-    lowerLevelVelocityControl(forwardSpeed.map(f => UnicycleSignal(f, Percent(0))))
-  }
-
-  def openTurnOpenDrive(turnSpeed: Stream[Dimensionless]): Stream[DriveSignal] = {
-    parentOpenLoop(turnSpeed.map(t => UnicycleSignal(Percent(0), t)))
-  }
-
-  def openTurnClosedDrive(turnSpeed: Stream[Dimensionless])(implicit hardware: DrivetrainHardware,
-                                                            props: Signal[DrivetrainProperties]): Stream[DriveSignal] = {
-    lowerLevelVelocityControl(turnSpeed.map(t => UnicycleSignal(Percent(0), t)))
-  }
+  def childVelocityControl(unicycle: Stream[UnicycleSignal])
+                          (implicit hardware: DrivetrainHardware,
+                           props: Signal[DrivetrainProperties]): Stream[DriveSignal]
 
   def velocityControl(target: Stream[UnicycleVelocity])
                      (implicit hardware: DrivetrainHardware,
@@ -46,13 +26,13 @@ trait UnicycleCoreControllers {
     val forwardControl = PIDF.pidf(
       forwardVelocity,
       target.map(_.forward),
-      props.map(_.forwardControlGainsFull)
+      props.map(_.forwardVelocityGainsFull)
     )
 
     val turnControl = PIDF.pidf(
       turnVelocity,
       target.map(_.turn),
-      props.map(_.turnControlGainsFull)
+      props.map(_.turnVelocityGainsFull)
     )
 
     forwardControl.zip(turnControl).map { s =>
@@ -62,24 +42,8 @@ trait UnicycleCoreControllers {
 
   def speedControl(unicycle: Stream[UnicycleSignal])
                        (implicit hardware: DrivetrainHardware,
-                        props: Signal[DrivetrainProperties]): Stream[UnicycleSignal] = {
-    velocityControl(unicycle.map(s => UnicycleVelocity(
-      props.get.maxForwardVelocity * s.forward, props.get.maxTurnVelocity * s.turn
-    )))
-  }
-
-  def calculateTargetFromOffsetWithLatency[T <: Quantity[T]]
-    (timestampedOffset: Stream[(T, Time)],
-     positionSlide: Stream[Queue[(T, Time)]]) = {
-    positionSlide.zip(timestampedOffset).map { t =>
-      val (positionHistory, (offset, offsetTime)) = t
-        val closestTimeSoFar = positionHistory.minBy{ case (position, positionTime) =>
-          Math.abs(positionTime.value - offsetTime.value)
-        }
-
-        closestTimeSoFar._1 + offset
-    }
-  }
+                        props: Signal[DrivetrainProperties]): Stream[UnicycleSignal] =
+    velocityControl(unicycle.map(_.toUnicycleVelocity))
 
   def forwardPositionControl(targetAbsolute: Length)
                             (implicit hardware: DrivetrainHardware,
@@ -89,7 +53,7 @@ trait UnicycleCoreControllers {
     val control = PIDF.pid(
       hardware.forwardPosition,
       hardware.forwardPosition.mapToConstant(targetAbsolute),
-      props.map(_.forwardPositionControlGains)
+      props.map(_.forwardPositionGains)
     ).map(s => UnicycleSignal(s, Percent(0)))
 
     (control, error)
@@ -103,7 +67,7 @@ trait UnicycleCoreControllers {
     val control = PIDF.pid(
       hardware.forwardPosition,
       targetAbsolute,
-      props.map(_.forwardPositionControlGains)
+      props.map(_.forwardPositionGains)
     ).map(s => UnicycleSignal(s, Percent(0)))
 
     (control, error)
@@ -120,7 +84,7 @@ trait UnicycleCoreControllers {
     val control = PIDF.pid(
       hardware.turnPosition,
       targetAbsolute,
-      props.map(_.turnPositionControlGains)
+      props.map(_.turnPositionGains)
     ).map(s => UnicycleSignal(Percent(0), s))
 
     (control, error)
@@ -134,7 +98,7 @@ trait UnicycleCoreControllers {
     val control = PIDF.pid(
       hardware.turnPosition,
       hardware.turnPosition.mapToConstant(targetAbsolute),
-      props.map(_.turnPositionControlGains)
+      props.map(_.turnPositionGains)
     ).map(s => UnicycleSignal(Percent(0), s))
 
     (control, error)
@@ -148,7 +112,7 @@ trait UnicycleCoreControllers {
     val control = PIDF.pid(
       hardware.turnPosition,
       targetAbsolute,
-      props.map(_.turnPositionControlGains)
+      props.map(_.turnPositionGains)
     ).map(s => UnicycleSignal(Percent(0), s))
 
     (control, error)

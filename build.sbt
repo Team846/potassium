@@ -106,7 +106,7 @@ lazy val vision = project.dependsOn(coreJVM).settings(
   libraryDependencies ++= jvmDependencies
 )
 
-lazy val frc = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Full).dependsOn(core, sensors).settings(
+lazy val frc = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Full).dependsOn(core, sensors, control).settings(
   name := "potassium-frc",
   libraryDependencies ++= sharedDependencies.value
 ).jvmSettings(

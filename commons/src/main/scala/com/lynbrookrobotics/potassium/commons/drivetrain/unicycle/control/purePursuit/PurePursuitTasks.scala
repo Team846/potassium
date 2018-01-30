@@ -1,8 +1,8 @@
-package com.lynbrookrobotics.potassium.commons.drivetrain.purePursuit
+package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit
 
 import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
-import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.UnicycleCoreTasks
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleCoreTasks
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.FiniteTask
 import com.lynbrookrobotics.potassium.units.Point
@@ -48,7 +48,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         steadyOutput,
         maxTurnOutput)
 
-      drive.setController(lowerLevelOpenLoop(unicycle.withCheckZipped(error) { e =>
+      drive.setController(childOpenLoop(unicycle.withCheckZipped(error) { e =>
         if (e.exists(_ < tolerance)) {
           finished()
         }
@@ -77,7 +77,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         steadyOutput,
         maxTurnOutput)
 
-      drive.setController(lowerLevelOpenLoop(unicycle.withCheckZipped(error) {e =>
+      drive.setController(childOpenLoop(unicycle.withCheckZipped(error) { e =>
         if (e.exists(_ < tolerance)) {
           finished()
         }

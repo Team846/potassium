@@ -11,19 +11,15 @@ trait UnicycleProperties {
   val maxAcceleration: Acceleration
   val defaultLookAheadDistance: Length
 
-  val forwardControlGains: ForwardVelocityGains
+  val forwardVelocityGains: ForwardVelocityGains
+  val turnVelocityGains: TurnVelocityGains
 
-  lazy val forwardControlGainsFull: ForwardVelocityGains#Full = {
-    forwardControlGains.withF(Percent(100) / maxForwardVelocity)
-  }
+  lazy val forwardVelocityGainsFull: ForwardVelocityGains#Full =
+    forwardVelocityGains.withF(Percent(100) / maxForwardVelocity)
 
-  val turnControlGains: TurnVelocityGains
+  lazy val turnVelocityGainsFull: TurnVelocityGains#Full =
+    turnVelocityGains.withF(Percent(100) / maxTurnVelocity)
 
-  lazy val turnControlGainsFull: TurnVelocityGains#Full = {
-    turnControlGains.withF(Percent(100) / maxTurnVelocity)
-  }
-
-  val forwardPositionControlGains: ForwardPositionGains
-
-  val turnPositionControlGains: TurnPositionGains
+  val forwardPositionGains: ForwardPositionGains
+  val turnPositionGains: TurnPositionGains
 }

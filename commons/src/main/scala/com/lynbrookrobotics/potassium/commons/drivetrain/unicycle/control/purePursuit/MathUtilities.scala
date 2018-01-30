@@ -1,4 +1,4 @@
-package com.lynbrookrobotics.potassium.commons.drivetrain.purePursuit
+package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit
 
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import squants.space.{Degrees, Feet, Length, Radians}
