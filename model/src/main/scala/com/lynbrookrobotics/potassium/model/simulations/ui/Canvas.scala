@@ -7,16 +7,16 @@ import squants.Angle
 
 class Canvas(val w: Int, val h: Int) extends JPanel {
 
-  var x: Int = _
-  var y: Int = _
+  var xPos: Int = _
+  var yPos: Int = _
   var angle: Int = _
 
   var positionChanged = false
   var angleChanged = false
 
   def setPoint(x: Int, y: Int): Unit = {
-    this.x = x
-    this.y = y
+    this.xPos = x
+    this.yPos = y
     positionChanged = true
   }
 
@@ -25,11 +25,11 @@ class Canvas(val w: Int, val h: Int) extends JPanel {
     angleChanged = true
   }
 
-  def rotatePointByAngleAroundOrigin(x: Int, y: Int, a: Int): (Double, Double) = {
+  def rotatePointByAngleAroundOrigin(x: Int, y: Int, a: Int): (Int, Int) = {
     val sin = math.sin(a)
     val cos = math.cos(a)
 
-    (x * cos - y * sin, x * sin + y * cos)
+    ((x * cos - y * sin).toInt, (x * sin + y * cos).toInt)
   }
 
   override def paintComponent(g: Graphics): Unit = {
@@ -38,9 +38,9 @@ class Canvas(val w: Int, val h: Int) extends JPanel {
 
     if (positionChanged && angleChanged) {
       g.setColor(Color.BLACK)
-      val (x1, y1) = rotatePointByAngleAroundOrigin(x, y, angle)
-      val (x2, y2) = rotatePointByAngleAroundOrigin(x - 5, y + 10, angle)
-      val (x3, y3) = rotatePointByAngleAroundOrigin(x + 5, y + 10, angle)
+      val (x1, y1) = rotatePointByAngleAroundOrigin(xPos, yPos, angle)
+      val (x2, y2) = rotatePointByAngleAroundOrigin(xPos - 5, yPos + 10, angle)
+      val (x3, y3) = rotatePointByAngleAroundOrigin(xPos + 5, yPos + 10, angle)
       val xValues = Array(x1, x2, x3)
       val yValues = Array(y1, y2, y3)
       g.fillPolygon(xValues, yValues, 3)
