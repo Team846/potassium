@@ -18,9 +18,4 @@ class LineTest extends FunSuite {
     val line = Line(Degrees(135), Inches(1))
     assert((line.xIntercept.toInches + 0.5).toInt == Inches(1).toInches.toInt)
   }
-
-  test("negative radius for BusDriving") {
-    val line = Line(Degrees(45), Inches(1))
-    assert(line.xIntercept.toInches < 0)
-  }
 }
