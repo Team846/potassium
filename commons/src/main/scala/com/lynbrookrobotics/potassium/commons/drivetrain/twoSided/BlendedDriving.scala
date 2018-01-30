@@ -9,16 +9,16 @@ import squants.{Dimensionless, Each, Length, Percent, Velocity}
 object BlendedDriving {
   def driveWithRadius(radius: Stream[Length],
                       velocity: Stream[Velocity])
-                     (implicit props: Signal[TwoSidedDriveProperties]): Stream[TwoSidedVelocity] = {
+                     (implicit props: Signal[TwoSidedDriveProperties]): Stream[TwoSided[Velocity]] = {
     velocity.zip(radius).map { case (velocity, radius) =>
       if (radius.value == Double.PositiveInfinity || radius.value == Double.NegativeInfinity || radius.value == Double.NaN) {
-        TwoSidedVelocity(velocity, velocity)
+        TwoSided(velocity, velocity)
       } else {
         val angularVelocity = RadiansPerSecond(velocity.toFeetPerSecond / radius.toFeet)
 
         val left = angularVelocity onRadius (radius + props.get.track / 2)
         val right = angularVelocity onRadius (radius - props.get.track / 2)
-        TwoSidedVelocity(left, right)
+        TwoSided(left, right)
       }
     }
   }
@@ -42,15 +42,15 @@ object BlendedDriving {
     tankWeight.toEach * tankSpeed + constantRadiusWeight.toEach * constantRadiusSpeed
   }
 
-  def blendedDrive(tankSpeed: Stream[TwoSidedVelocity],
+  def blendedDrive(tankSpeed: Stream[TwoSided[Velocity]],
                    targetForwardVelocity: Stream[Velocity],
                    curvature: Stream[Ratio[Dimensionless, Length]])
-                  (implicit properties: Signal[TwoSidedDriveProperties]): Stream[TwoSidedVelocity] = {
+                  (implicit properties: Signal[TwoSidedDriveProperties]): Stream[TwoSided[Velocity]] = {
     val constantRadiusSpeed = driveWithRadius(radius = curvature.map(curvature => curvature.den / curvature.num.toEach), targetForwardVelocity)
 
     tankSpeed.zip(constantRadiusSpeed).zip(targetForwardVelocity).map {
       case ((tankSpeed, carSpeed), targetForward) =>
-        TwoSidedVelocity(
+        TwoSided(
           blend(carSpeed.left, tankSpeed.left, targetForward),
           blend(carSpeed.right, tankSpeed.right, targetForward))
     }

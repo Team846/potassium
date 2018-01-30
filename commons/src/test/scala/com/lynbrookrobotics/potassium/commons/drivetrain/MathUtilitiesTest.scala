@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
-import com.lynbrookrobotics.potassium.commons.drivetrain.purePursuit.MathUtilities
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.MathUtilities
 import org.scalatest.FunSuite
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import squants.space.Feet

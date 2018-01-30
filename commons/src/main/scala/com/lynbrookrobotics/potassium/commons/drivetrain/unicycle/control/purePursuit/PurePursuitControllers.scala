@@ -1,7 +1,8 @@
-package com.lynbrookrobotics.potassium.commons.drivetrain.purePursuit
+package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit
 
 import com.lynbrookrobotics.potassium.Signal
-import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleCoreControllers, UnicycleHardware, UnicycleProperties, UnicycleSignal}
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleCoreControllers
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleHardware, UnicycleProperties, UnicycleSignal}
 import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
@@ -28,7 +29,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     (PIDF.pid(
       distanceToTarget.mapToConstant(Feet(0)),
       distanceToTarget,
-      properties.map(_.forwardPositionControlGains)),
+      properties.map(_.forwardPositionGains)),
       distanceToTarget)
   }
 
@@ -103,7 +104,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     val limitedTurn = PIDF.pid(
       turnPosition,
       compassHeadingToLookAhead,
-      props.map(_.turnPositionControlGains)
+      props.map(_.turnPositionGains)
     ).map(MathUtilities.clamp(_, maxTurnOutput))
 
     (limitedTurn, forwardMultiplier, lookAheadPoint)

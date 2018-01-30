@@ -1,7 +1,7 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
 import com.lynbrookrobotics.potassium.Signal
-import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.{BlendedDriving, TwoSidedDriveProperties, TwoSidedVelocity}
+import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.{BlendedDriving, TwoSided, TwoSidedDriveProperties}
 import com.lynbrookrobotics.potassium.control.PIDConfig
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.GenericValue._
@@ -21,25 +21,25 @@ class BlendedDrivingTest extends FunSuite {
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
       override val defaultLookAheadDistance: Length = Feet(0.5)
 
-      override val forwardControlGains: ForwardVelocityGains = PIDConfig(
+      override val forwardVelocityGains: ForwardVelocityGains = PIDConfig(
         Percent(0) / MetersPerSecond(1),
         Percent(0) / Meters(1),
         Percent(0) / MetersPerSecondSquared(1)
       )
 
-      override val turnControlGains: TurnVelocityGains = PIDConfig(
+      override val turnVelocityGains: TurnVelocityGains = PIDConfig(
         Percent(0) / DegreesPerSecond(1),
         Percent(0) / Degrees(1),
         Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1))
       )
 
-      override val forwardPositionControlGains: ForwardPositionGains = PIDConfig(
+      override val forwardPositionGains: ForwardPositionGains = PIDConfig(
         Percent(100) / defaultLookAheadDistance,
         Percent(0) / (Meters(1).toGeneric * Seconds(1)),
         Percent(0) / MetersPerSecond(1)
       )
 
-      override val turnPositionControlGains: TurnPositionGains = PIDConfig(
+      override val turnPositionGains: TurnPositionGains = PIDConfig(
         Percent(100) / Degrees(90),
         Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
         Percent(0) / DegreesPerSecond(1)
@@ -47,12 +47,12 @@ class BlendedDrivingTest extends FunSuite {
 
       override val maxLeftVelocity: Velocity = FeetPerSecond(10)
       override val maxRightVelocity: Velocity = FeetPerSecond(10)
-      override val leftControlGains: ForwardVelocityGains = PIDConfig(
+      override val leftVelocityGains: ForwardVelocityGains = PIDConfig(
         Percent(100) / FeetPerSecond(90),
         Percent(0) / Feet(1),
         Percent(0) / FeetPerSecondSquared(1)
       )
-      override val rightControlGains: ForwardVelocityGains = PIDConfig(
+      override val rightVelocityGains: ForwardVelocityGains = PIDConfig(
         Percent(100) / FeetPerSecond(90),
         Percent(0) / Feet(1),
         Percent(0) / FeetPerSecondSquared(1)
@@ -66,7 +66,7 @@ class BlendedDrivingTest extends FunSuite {
   test("Test driving at a radius of 1 foot and -track / 2") {
     implicit val props: Signal[TwoSidedDriveProperties] = generateProps(blendExp = 0.5)
 
-    var lastBlendedSpeed: TwoSidedVelocity = null
+    var lastBlendedSpeed: TwoSided[Velocity] = null
 
     val (radius, publishRadius) = Stream.manual[Length]
     val (velocity, publishVelocity) = Stream.manual[Velocity]
@@ -105,11 +105,11 @@ class BlendedDrivingTest extends FunSuite {
   }
 
   test("blendedDriving with infinity radius & negative velocity results in straight backwards motion") {
-    val (tankSpeed, publishTankSpeed) = Stream.manual[TwoSidedVelocity]
+    val (tankSpeed, publishTankSpeed) = Stream.manual[TwoSided[Velocity]]
     val (targetForwardVelocity, publishTargetForward) = Stream.manual[Velocity]
     val (curvature, publishCurvature) = Stream.manual[Ratio[Dimensionless, Length]]
 
-    var lastBlendedSpeed: TwoSidedVelocity = null
+    var lastBlendedSpeed: TwoSided[Velocity] = null
 
     implicit val props = generateProps(blendExp = 0)
     BlendedDriving.blendedDrive(
@@ -117,13 +117,13 @@ class BlendedDrivingTest extends FunSuite {
       targetForwardVelocity,
       curvature).foreach(lastBlendedSpeed = _)
 
-    publishTankSpeed(TwoSidedVelocity(FeetPerSecond(0), FeetPerSecond(0)))
+    publishTankSpeed(TwoSided(FeetPerSecond(0), FeetPerSecond(0)))
     publishTargetForward(FeetPerSecond(-1))
     publishCurvature(Ratio(Each(0), Feet(1)))
 
     assert(lastBlendedSpeed.left < FeetPerSecond(0) && lastBlendedSpeed.right < FeetPerSecond(0))
 
-    publishTankSpeed(TwoSidedVelocity(FeetPerSecond(0), FeetPerSecond(0)))
+    publishTankSpeed(TwoSided(FeetPerSecond(0), FeetPerSecond(0)))
     publishTargetForward(FeetPerSecond(-2))
     publishCurvature(Ratio(Each(0), Feet(1)))
 
