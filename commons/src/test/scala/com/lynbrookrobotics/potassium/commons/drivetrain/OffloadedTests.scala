@@ -35,12 +35,9 @@ class OffloadedTests extends FunSuite {
         * 1 encoder rotation / 100 encoder ticks
         * => 5pi in / 200 tick
         **/
-
-      override val escTimeConst: Time = Milliseconds(100)
       override val wheelDiameter: Length = Inches(5)
       override val wheelOverEncoderGears: Ratio[Angle, Angle] = Ratio(Turns(1), Turns(2))
       override val encoderAngleOverTicks: Ratio[Angle, Dimensionless] = Ratio(Turns(1), Each(100))
-      override val escNativeOutputOverPercent: Ratio[Dimensionless, Dimensionless] = Ratio(Each(1000), Percent(100))
     }
     import props.floorPerTick
     asserteq(

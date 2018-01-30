@@ -6,8 +6,6 @@ import squants.space.{Degrees, Length}
 import squants.{Angle, Dimensionless, Time}
 
 trait OffloadedProperties extends TwoSidedDriveProperties {
-  val escNativeOutputOverPercent: Ratio[Dimensionless, Dimensionless]
-  val escTimeConst: Time
   val wheelDiameter: Length
   val wheelOverEncoderGears: Ratio[Angle, Angle]
   val encoderAngleOverTicks: Ratio[Angle, Dimensionless]
