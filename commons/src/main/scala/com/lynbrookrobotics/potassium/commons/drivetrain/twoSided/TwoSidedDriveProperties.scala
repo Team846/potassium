@@ -28,6 +28,8 @@ trait TwoSidedDriveProperties extends UnicycleProperties {
     Each(0) / MetersPerSecondSquared(1)
   )
 
+  val robotLength: Length
+
   val track: Length
 
   val blendExponent: Double
