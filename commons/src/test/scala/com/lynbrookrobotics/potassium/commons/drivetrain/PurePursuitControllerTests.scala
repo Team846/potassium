@@ -246,4 +246,76 @@ class PurePursuitControllerTests extends FunSuite {
     implicit val Tolerance = Percent(0.001)
     assert(out ~= Percent(0))
   }
+
+  test("Test if pure pursuit drives back correctly"){
+    val origin = Point.origin
+    val period = Milliseconds(5)
+    implicit val (clock, triggerClock) = ClockMocking.mockedClockTicker
+
+    val testDrivetrain = new TestDrivetrain
+
+    var turnAngle: Angle = Degrees(0)
+    implicit val hardware = new UnicycleHardware {
+      override val forwardPosition: Stream[Length] = null
+      override val turnPosition: Stream[Angle] = Stream.periodic(period)(turnAngle)(clock)
+
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))(clock)
+      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))(clock)
+    }
+    val controllers = testDrivetrain.UnicycleControllers
+
+    val target = Point(Feet(0), Feet(-2))
+
+    var pose = Point.origin
+    val position = hardware.turnPosition.map(_ => pose)
+    val path = hardware.turnPosition.mapToConstant((Segment(origin, target), None))
+
+    val driveBackwards = true
+
+    val (turnOutput: Stream[Dimensionless], frdMult: Stream[Double], _) = controllers.purePursuitControllerTurn(
+      hardware.turnPosition,
+      position,
+      path,
+      unlimitedTurnOutput,
+      driveBackwards
+    )
+
+    var lastTurnout: Dimensionless = null
+    turnOutput.foreach(lastTurnout = _)
+
+    var lastFrdMult: Double = Double.NaN
+    frdMult.foreach(lastFrdMult = _)
+
+    implicit val Tolerance = Percent(0.001)
+
+    turnAngle = Degrees(0)
+    triggerClock.apply(Milliseconds(5))
+    triggerClock.apply(Milliseconds(5))
+
+    assert(lastTurnout ~= Percent(0))
+    assert(lastFrdMult == -1)
+
+    pose = Point(Feet(0), Feet(-1.5))
+    triggerClock(period)
+    assert(lastTurnout ~= Percent(0))
+    assert(lastFrdMult == -1)
+
+    pose = Point(Feet(0), Feet(-1.9))
+    triggerClock(period)
+    assert(lastTurnout ~= Percent(0))
+    assert(lastFrdMult == -1)
+
+    pose = Point(Feet(0), Feet(-2.1))
+    triggerClock(period)
+    assert(lastTurnout ~= Percent(0))
+    assert(lastFrdMult == 1)
+
+//
+//    pose = Point(Feet(0), Feet(-2.5))
+//    triggerClock(period)
+//    assert(lastTurnout ~= Percent(0))
+//    assert(lastFrdMult == 1)
+    println("finished hurray!")
+  }
+
 }

@@ -86,16 +86,18 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       angleBetweenPoints(p._1, p._2)
     }
 
-    val compassHeadingToLookAhead = headingToTarget.map(MathUtilities.swapTrigonemtricAndCompass)
+    val compassHeadingToLookAhead = headingToTarget.map { h =>
+      MathUtilities.swapTrigonemtricAndCompass(h)
+    }
 
     var reachedLastPoint = false
 
-    val forwardMultiplier = position.zip(turnPosition).zip(lookAheadPoint).zip(biSegmentPath).map { p =>
+    val shouldReverseDirection = position.zip(turnPosition).zip(lookAheadPoint).zip(biSegmentPath).map { p =>
       val (((pose, currAngle), lookAhead), path) = p
       val lastSegment = path._2.getOrElse(path._1)
 
       if (lookAhead.onLine(lastSegment, Feet(0.1))) {
-        val currTrigAngle = MathUtilities.swapTrigonemtricAndCompass{
+        val currTrigAngle = MathUtilities.swapTrigonemtricAndCompass {
           if (driveBackwards) {
             currAngle + Degrees(180)
           } else {
@@ -103,32 +105,43 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
           }
         }
         val angleErrorToLastWayPoint = angleBetweenPoints(pose, lastSegment.end) - currTrigAngle
+        angleErrorToLastWayPoint.abs >= Degrees(90) && reachedLastPoint
+      } else {
+        false
+      }
+    }
+
+    val forwardMultiplier = position.zip(turnPosition).zip(lookAheadPoint).zip(biSegmentPath).zip(shouldReverseDirection).map { p =>
+      val ((((pose, currAngle), lookAhead), path), shouldReverseDirection) = p
+      val lastSegment = path._2.getOrElse(path._1)
+
+      val regularDirection = if (driveBackwards) {
+        -1D
+      } else {
+        1D
+      }
+
+      if (lookAhead.onLine(lastSegment, Feet(0.1))) {
 
         if (pose.distanceTo(lastSegment.end) < props.get.defaultLookAheadDistance) {
           reachedLastPoint = true
         }
 
-        if (driveBackwards) {
-          if (angleErrorToLastWayPoint.abs >= Degrees(90) && reachedLastPoint) {
-            1D
-          } else {
-            -1D
-          }
-        } else if (angleErrorToLastWayPoint.abs >= Degrees(90) && reachedLastPoint) {
-          -1D
+        if (shouldReverseDirection) {
+          -1 * regularDirection
         } else {
-          1D
+          regularDirection
         }
       } else {
-        1D
+        regularDirection
       }
     }
 
-    val effectiveTurnPosition = turnPosition.zip(forwardMultiplier).map { case (turnPose, forwardMult) =>
-      if (forwardMult == 1D) {
-        turnPose
-      } else {
+    val effectiveTurnPosition = turnPosition.zip(forwardMultiplier).map { case (turnPose, shouldReverse) =>
+      if (shouldReverse == -1D) {
         turnPose + Degrees(180)
+      } else {
+        turnPose
       }
     }
 
@@ -192,8 +205,10 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
         currPath._2.exists(_.containsInXY(p, Feet(0.001)))
       }) {
         if (biSegmentPaths.hasNext) {
-          println("********** advancing path 1 ***********")
+          println("********** advancing path ***********")
+          println(s"was $currPath")
           currPath = biSegmentPaths.next()
+          println(s"now $currPath")
         }
       }
 
