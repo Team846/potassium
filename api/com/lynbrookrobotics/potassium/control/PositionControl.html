@@ -208,7 +208,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">PositionControl</span><span class="params">(<span name="encoderTickConversionFactor">encoderTickConversionFactor: <span class="extype" name="squants.Ratio">Ratio</span>[<span class="extype" name="squants.Angle">Angle</span>, <span class="extype" name="squants.Dimensionless">Dimensionless</span>]</span>)</span><span class="params">(<span name="gains">gains: <a href="OffloadedSignal$.html#PositionGains=com.lynbrookrobotics.potassium.control.PIDConfig[squants.Angle,squants.Angle,com.lynbrookrobotics.potassium.units.GenericValue[squants.Angle],squants.motion.AngularVelocity,com.lynbrookrobotics.potassium.units.GenericIntegral[squants.Angle],squants.Dimensionless]" class="extmbr" name="com.lynbrookrobotics.potassium.control.OffloadedSignal.PositionGains">PositionGains</a></span>)</span><span class="params">(<span name="signal">signal: <span class="extype" name="squants.Angle">Angle</span></span>)</span><span class="result"> extends <a href="OffloadedSignal.html" class="extype" name="com.lynbrookrobotics.potassium.control.OffloadedSignal">OffloadedSignal</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">PositionControl</span><span class="params">(<span name="gains">gains: <a href="OffloadedSignal$$EscPositionGains.html" class="extype" name="com.lynbrookrobotics.potassium.control.OffloadedSignal.EscPositionGains">EscPositionGains</a></span>, <span name="signal">signal: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>)</span><span class="result"> extends <a href="OffloadedSignal.html" class="extype" name="com.lynbrookrobotics.potassium.control.OffloadedSignal">OffloadedSignal</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -264,9 +264,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.lynbrookrobotics.potassium.control.PositionControl#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(encoderTickConversionFactor:squants.Ratio[squants.Angle,squants.Dimensionless])(gains:com.lynbrookrobotics.potassium.control.OffloadedSignal.PositionGains)(signal:squants.Angle):com.lynbrookrobotics.potassium.control.PositionControl"></a><a id="&lt;init&gt;:PositionControl"></a>
+      <a id="&lt;init&gt;(gains:com.lynbrookrobotics.potassium.control.OffloadedSignal.EscPositionGains,signal:squants.Dimensionless):com.lynbrookrobotics.potassium.control.PositionControl"></a><a id="&lt;init&gt;:PositionControl"></a>
       <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/control/PositionControl.html#&lt;init&gt;(encoderTickConversionFactor:squants.Ratio[squants.Angle,squants.Dimensionless])(gains:com.lynbrookrobotics.potassium.control.OffloadedSignal.PositionGains)(signal:squants.Angle):com.lynbrookrobotics.potassium.control.PositionControl" title="Permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/control/PositionControl.html#&lt;init&gt;(gains:com.lynbrookrobotics.potassium.control.OffloadedSignal.EscPositionGains,signal:squants.Dimensionless):com.lynbrookrobotics.potassium.control.PositionControl" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -275,7 +275,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">PositionControl</span><span class="params">(<span name="encoderTickConversionFactor">encoderTickConversionFactor: <span class="extype" name="squants.Ratio">Ratio</span>[<span class="extype" name="squants.Angle">Angle</span>, <span class="extype" name="squants.Dimensionless">Dimensionless</span>]</span>)</span><span class="params">(<span name="gains">gains: <a href="OffloadedSignal$.html#PositionGains=com.lynbrookrobotics.potassium.control.PIDConfig[squants.Angle,squants.Angle,com.lynbrookrobotics.potassium.units.GenericValue[squants.Angle],squants.motion.AngularVelocity,com.lynbrookrobotics.potassium.units.GenericIntegral[squants.Angle],squants.Dimensionless]" class="extmbr" name="com.lynbrookrobotics.potassium.control.OffloadedSignal.PositionGains">PositionGains</a></span>)</span><span class="params">(<span name="signal">signal: <span class="extype" name="squants.Angle">Angle</span></span>)</span>
+        <span class="name">PositionControl</span><span class="params">(<span name="gains">gains: <a href="OffloadedSignal$$EscPositionGains.html" class="extype" name="com.lynbrookrobotics.potassium.control.OffloadedSignal.EscPositionGains">EscPositionGains</a></span>, <span name="signal">signal: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>)</span>
       </span>
       
       
@@ -375,22 +375,6 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.control.PositionControl#encoderTickConversionFactor" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="encoderTickConversionFactor:squants.Ratio[squants.Angle,squants.Dimensionless]"></a><a id="encoderTickConversionFactor:Ratio[Angle,Dimensionless]"></a>
-      <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/control/PositionControl.html#encoderTickConversionFactor:squants.Ratio[squants.Angle,squants.Dimensionless]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">encoderTickConversionFactor</span><span class="result">: <span class="extype" name="squants.Ratio">Ratio</span>[<span class="extype" name="squants.Angle">Angle</span>, <span class="extype" name="squants.Dimensionless">Dimensionless</span>]</span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -429,6 +413,22 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.control.PositionControl#gains" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="gains:com.lynbrookrobotics.potassium.control.OffloadedSignal.EscPositionGains"></a><a id="gains:EscPositionGains"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/control/PositionControl.html#gains:com.lynbrookrobotics.potassium.control.OffloadedSignal.EscPositionGains" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">gains</span><span class="result">: <a href="OffloadedSignal$$EscPositionGains.html" class="extype" name="com.lynbrookrobotics.potassium.control.OffloadedSignal.EscPositionGains">EscPositionGains</a></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
@@ -509,6 +509,22 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.control.PositionControl#signal" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="signal:squants.Dimensionless"></a><a id="signal:Dimensionless"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/control/PositionControl.html#signal:squants.Dimensionless" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">signal</span><span class="result">: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>
+      </span>
+      
+      
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
