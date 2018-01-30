@@ -38,12 +38,16 @@ class Canvas(val w: Int, val h: Int) extends JPanel {
 
     if (positionChanged && angleChanged) {
       g.setColor(Color.BLACK)
-      val (x1, y1) = rotatePointByAngleAroundOrigin(xPos, yPos, angle)
-      val (x2, y2) = rotatePointByAngleAroundOrigin(xPos - 5, yPos + 10, angle)
-      val (x3, y3) = rotatePointByAngleAroundOrigin(xPos + 5, yPos + 10, angle)
+      val (x1, y1) = (xPos, yPos)
+      val point2 = rotatePointByAngleAroundOrigin(-5, 10, angle)
+      val (x2, y2) = (point2._1 + xPos, point2._2 + yPos)
+      val point3 = rotatePointByAngleAroundOrigin(5, 10, angle)
+      val (x3, y3) = (point2._1 + xPos, point2._2 + yPos)
       val xValues = Array(x1, x2, x3)
       val yValues = Array(y1, y2, y3)
       g.fillPolygon(xValues, yValues, 3)
+      println(x1, x2, x3)
+      println(y1, y2, y3)
     }
   }
 
