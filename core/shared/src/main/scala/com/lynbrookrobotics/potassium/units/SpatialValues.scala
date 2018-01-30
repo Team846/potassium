@@ -16,7 +16,9 @@ class Point(override val x: Length,
   def magnitude: Length = (x * x + y * y + z * z).squareRoot
 
   def -(other: Point): Point = new Point(super.-(other))
+
   def +(other: Point): Point = new Point(super.+(other))
+
   override def *(scalar: Double): Point = new Point(super.*(scalar))
 
   def ~=(other: Point)(implicit tolerance: Length): Boolean = {
@@ -28,6 +30,7 @@ class Point(override val x: Length,
   /**
     * produce a point rotated about the z axis with the given
     * angle of rotation
+    *
     * @param angle the angle to rotate by
     * @return a new point rotated about the z axis with given angle
     */
@@ -35,8 +38,8 @@ class Point(override val x: Length,
     val rotationMatrix =
       Matrix3by3(
         Seq(angle.cos, -angle.sin, 0.0),
-        Seq(angle.sin,  angle.cos, 0.0),
-        Seq(0.0,        0.0,       1.0)
+        Seq(angle.sin, angle.cos, 0.0),
+        Seq(0.0, 0.0, 1.0)
       )
 
     Point(rotationMatrix * this)
@@ -140,4 +143,15 @@ case class Segment(start: Point, end: Point) {
       Some(negativeSolution, positiveSolution)
     }
   }
+}
+
+case class Line(angleSlope: Angle, yIntercept: Length) {
+  def xIntercept: Length =
+    if (angleSlope == Degrees(0)) {
+      Inches(Double.PositiveInfinity)
+    }
+    else {
+      val slope = angleSlope.tan
+      -yIntercept / slope
+    }
 }
