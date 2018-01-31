@@ -75,7 +75,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                                 maxTurnOutput: Dimensionless,
                                 forwardBackwardMode: ForwardBackwardMode)
                                (implicit props: Signal[DrivetrainProperties],
-                                hardware: DrivetrainHardware): (Stream[Dimensionless], Stream[Double], Stream[Point]) = {
+                                hardware: DrivetrainHardware): (Stream[Dimensionless], Stream[Double]) = {
     val lookAheadPoint = position.zip(biSegmentPath).map { case (pose, path) =>
       getExtrapolatedLookAheadPoint(
         path,
@@ -105,8 +105,6 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     }
 
     val compassHeadingToLookAhead = compassHeadingToLookAheadAndReversed.map(_._1)
-    val reversed = compassHeadingToLookAheadAndReversed.map(_._2)
-    val forwardMultiplier = reversed.map(b => if (b) -1D else 1)
 
     val limitedTurn = PIDF.pid(
       errorToTarget.mapToConstant(Degrees(0)),
@@ -114,7 +112,10 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       props.map(_.turnPositionGains)
     ).map(MathUtilities.clamp(_, maxTurnOutput))
 
-    (limitedTurn, forwardMultiplier, lookAheadPoint.map(_._1))
+    val reversed = compassHeadingToLookAheadAndReversed.map(_._2)
+    val forwardMultiplier = reversed.map(b => if (b) -1D else 1)
+
+    (limitedTurn, forwardMultiplier)
   }
 
 
@@ -162,12 +163,9 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     }.sliding(2).map(l => (l.head, Some(l.last)))
 
     var currPath = biSegmentPaths.next()
-    var previousLookAheadPoint: Option[Point] = None
 
-    val selectedPath = position.map { _ =>
-      if (previousLookAheadPoint.exists { p =>
-        currPath._2.exists(_.containsInXY(p, Feet(0.1)))
-      }) {
+    val selectedPath = position.map { currPos =>
+      if (currPath._2.exists(s => MathUtilities.interSectionCircleLine(s, currPos, props.get.defaultLookAheadDistance).isDefined)) {
         if (biSegmentPaths.hasNext) {
           println("********** advancing path ***********")
           currPath = biSegmentPaths.next()
@@ -177,7 +175,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       currPath
     }
 
-    val (turnOutput, multiplier, lookAheadPoint) = purePursuitControllerTurn(
+    val (turnOutput, multiplier) = purePursuitControllerTurn(
       turnPosition,
       position,
       selectedPath,
@@ -210,8 +208,6 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       } else {
         None
       }
-    }.withCheckZipped(lookAheadPoint) { p =>
-      previousLookAheadPoint = Some(p)
     }
 
     (
