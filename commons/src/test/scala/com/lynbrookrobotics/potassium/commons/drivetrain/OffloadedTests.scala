@@ -3,6 +3,7 @@ package com.lynbrookrobotics.potassium.commons.drivetrain
 import java.lang.Math.PI
 
 import com.lynbrookrobotics.potassium.commons.drivetrain.offloaded.OffloadedProperties
+import com.lynbrookrobotics.potassium.control.offload.EscConfig
 import com.lynbrookrobotics.potassium.units.Ratio
 import org.scalatest.{Assertion, FunSuite}
 import squants.motion.AngularVelocity
@@ -14,6 +15,7 @@ class OffloadedTests extends FunSuite {
   test("OffloadedProperties floorPerTick returns correct values") {
     def asserteq(a: Double, b: Double): Assertion = assert(Math.abs(a - b) < 0.0001)
     val props = new OffloadedProperties {
+      override val escConfig: EscConfig[Length] = null
       override val rightVelocityGains: ForwardVelocityGains = null
       override val maxRightVelocity: Velocity = null
       override val maxLeftVelocity: Velocity = null
