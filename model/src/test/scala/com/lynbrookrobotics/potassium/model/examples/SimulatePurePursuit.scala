@@ -78,7 +78,6 @@ class SimulatePurePursuit extends FunSuite {
       wayPoints,
       Inches(3),
       Percent(30),
-      Percent(30),
       driveBackwards
     )(drivetrain)
 

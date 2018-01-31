@@ -19,7 +19,6 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
 
   class FollowWayPoints(wayPoints: Seq[Point],
                         tolerance: Length,
-                        steadyOutput: Dimensionless,
                         maxTurnOutput: Dimensionless,
                         backwards: Boolean = false)
                        (drive: Drivetrain)
@@ -45,7 +44,6 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         tolerance,
         position,
         turnPosition,
-        steadyOutput,
         maxTurnOutput,
         backwards
       )(drive)
@@ -67,7 +65,6 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                                     tolerance: Length,
                                     position: Stream[Point],
                                     turnPosition: Stream[Angle],
-                                    steadyOutput: Dimensionless,
                                     maxTurnOutput: Dimensionless,
                                     backwards: Boolean = false)
                                    (drive: Drivetrain)
@@ -78,7 +75,6 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         wayPoints,
         position,
         turnPosition,
-        steadyOutput,
         maxTurnOutput)
 
       drive.setController(childVelocityControl(speedControl(unicycle.withCheckZipped(error) { e =>
