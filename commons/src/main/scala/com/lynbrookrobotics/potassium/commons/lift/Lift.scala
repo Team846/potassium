@@ -1,13 +1,13 @@
 package com.lynbrookrobotics.potassium.commons.lift
 
-import com.lynbrookrobotics.potassium.{Component, Signal}
-import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.control.{PIDConfig, PIDF}
+import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.WrapperTask
 import com.lynbrookrobotics.potassium.units.{GenericIntegral, GenericValue}
-import squants.{Dimensionless, Percent}
-import squants.motion.{Velocity}
+import com.lynbrookrobotics.potassium.{Component, Signal}
+import squants.motion.Velocity
 import squants.space.{Feet, Length}
+import squants.{Dimensionless, Percent}
 
 
 trait LiftProperties {
@@ -24,20 +24,27 @@ trait LiftHardware {
 }
 
 abstract class Lift {
+  type LiftSignal
   type Properties <: LiftProperties
   type Hardware <: LiftHardware
-  type Comp <: Component[Dimensionless]
+  type Comp <: Component[LiftSignal]
 
   def positionControl(target: Stream[Length])
                      (implicit properties: Signal[Properties],
-                      hardware: Hardware): (Stream[Length], Stream[Dimensionless]) = {
-    val error = hardware.position.zipAsync(target).map(t => t._2 - t._1)
-    (error, PIDF.pid(
+                      hardware: Hardware): (Stream[Length], Stream[LiftSignal]) = (
+    hardware.
+      position.
+      zipAsync(target)
+      .map(t => t._2 - t._1),
+
+    PIDF.pid(
       hardware.position,
       target,
       properties.map(_.positionGains)
-    ))
-  }
+    ).map(openLoopToLiftSignal)
+  )
+
+  def openLoopToLiftSignal(x: Dimensionless): LiftSignal
 
   object positionTasks {
 
@@ -67,7 +74,8 @@ abstract class Lift {
                             (implicit properties: Signal[Properties],
                              hardware: Hardware) extends WrapperTask {
       override def onStart(): Unit = {
-        val (error, control) = (hardware.position.zipAsync(target).map(t => t._2 - t._1), Percent(100))
+        val error = hardware.position.zipAsync(target).map(t => t._2 - t._1)
+        val control = openLoopToLiftSignal(Percent(100))
 
         arm.setController(error.mapToConstant(control).withCheckZipped(error) { error: Length =>
           if (error <= Feet(0)) { //check whether arm is above target. If so, run inner.
@@ -75,6 +83,7 @@ abstract class Lift {
           }
         })
       }
+
       override def onEnd(): Unit = arm.resetToDefault()
     }
 
@@ -84,14 +93,18 @@ abstract class Lift {
                             (implicit properties: Signal[Properties],
                              hardware: Hardware) extends WrapperTask {
       override def onStart(): Unit = {
-        val (error, control) = (hardware.position.zipAsync(target).map(t => t._2 - t._1), Percent(-100))
+        val error = hardware.position.zipAsync(target).map(t => t._2 - t._1)
+        val control = openLoopToLiftSignal(Percent(-100))
         arm.setController(hardware.position.mapToConstant(control).withCheckZipped(error) { error: Length =>
           if (error > Feet(0)) { //check whether arm is below target. If so, run inner.
             readyToRunInner()
           }
         })
       }
+
       override def onEnd(): Unit = arm.resetToDefault()
     }
+
   }
+
 }
