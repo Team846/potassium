@@ -21,7 +21,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                         tolerance: Length,
                         maxTurnOutput: Dimensionless,
                         targetTicksWithingTolerance: Int = 1,
-                        backwards: Boolean = false)
+                        forwardBackwardMode: ForwardBackwardMode = Auto)
                        (drive: Drivetrain)
                        (implicit properties: Signal[controllers.DrivetrainProperties],
                         hardware: controllers.DrivetrainHardware) extends FiniteTask with FiniteTaskFinishedListener {
@@ -47,7 +47,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         turnPosition,
         maxTurnOutput,
         targetTicksWithingTolerance,
-        backwards
+        forwardBackwardMode
       )(drive)
 
       absoluteFollow.setFinishedListener(this)
@@ -69,7 +69,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                                     turnPosition: Stream[Angle],
                                     maxTurnOutput: Dimensionless,
                                     targetTicksWithingTolerance: Int = 1,
-                                    backwards: Boolean = false)
+                                    forwardBackwardMode: ForwardBackwardMode = Auto)
                                    (drive: Drivetrain)
                                    (implicit properties: Signal[DrivetrainProperties],
                                     hardware: DrivetrainHardware) extends FiniteTask {
@@ -81,7 +81,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         position,
         turnPosition,
         maxTurnOutput,
-        backwards
+        forwardBackwardMode
       )
 
       drive.setController(childVelocityControl(speedControl(unicycle.withCheckZipped(error) { e =>
