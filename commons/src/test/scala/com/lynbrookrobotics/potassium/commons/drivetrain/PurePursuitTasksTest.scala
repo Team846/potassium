@@ -146,7 +146,7 @@ class PurePursuitTasksTest extends FunSuite {
     assert(lastAppliedSignal.forward ~= Percent(100), s"actual forward ${lastAppliedSignal.forward.toPercent}%")
   }
 
-  test("Test that going left and back 1 foot (with reversed enabled) does not result in full turn"){
+  test("Test that going left and back 1 foot does not result in full turn"){
     var lastAppliedSignal = zeroSignal
     val drivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
 
@@ -174,8 +174,7 @@ class PurePursuitTasksTest extends FunSuite {
     val task = new drive.unicycleTasks.FollowWayPoints(
       Seq(Point.origin, target),
       Feet(1),
-      unlimitedTurnOutput,
-      backwards = true
+      unlimitedTurnOutput
     )(drivetrainComp)
 
     task.init()

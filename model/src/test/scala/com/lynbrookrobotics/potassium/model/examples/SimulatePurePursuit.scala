@@ -5,7 +5,7 @@ import java.io.{FileWriter, PrintWriter}
 import com.lynbrookrobotics.potassium.ClockMocking.mockedClockTicker
 import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.commons.drivetrain.{ForwardPositionGains, ForwardVelocityGains, TurnPositionGains, TurnVelocityGains}
-import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.MathUtilities
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.{Auto, BackwardsOnly, ForwardBackwardMode, MathUtilities}
 import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.TwoSidedDriveProperties
 import com.lynbrookrobotics.potassium.control.PIDConfig
 import com.lynbrookrobotics.potassium.model.simulations.{SimulatedTwoSidedHardware, TwoSidedDriveContainerSimulator}
@@ -63,7 +63,7 @@ class SimulatePurePursuit extends FunSuite {
                                         log: Boolean = false,
                                         distanceTolerance: Length = Feet(0.5),
                                         angleTolerance: Angle = Degrees(8),
-                                        driveBackwards: Boolean = false): Unit = {
+                                        forwardBackwardMode: ForwardBackwardMode = Auto): Unit = {
     implicit val (clock, triggerClock) = mockedClockTicker
     implicit val hardware = new SimulatedTwoSidedHardware(
       Pounds(88) * MetersPerSecondSquared(1) / 2,
@@ -79,7 +79,7 @@ class SimulatePurePursuit extends FunSuite {
       Inches(3),
       Percent(30),
       20,
-      driveBackwards
+      forwardBackwardMode
     )(drivetrain)
 
     task.init()
@@ -261,7 +261,7 @@ class SimulatePurePursuit extends FunSuite {
       ),
       timeOut = Seconds(15),
       log = true,
-      driveBackwards = true
+      forwardBackwardMode = BackwardsOnly
     )
   }
 }
