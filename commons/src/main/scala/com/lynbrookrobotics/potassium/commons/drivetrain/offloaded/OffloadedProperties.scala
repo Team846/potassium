@@ -7,7 +7,7 @@ import squants.space.{Degrees, Length}
 import squants.{Angle, Dimensionless}
 
 trait OffloadedProperties extends TwoSidedDriveProperties {
-  implicit val escConfig: EscConfig[Length]
+  val escConfig: EscConfig[Length]
 
   val wheelDiameter: Length
   val wheelOverEncoderGears: Ratio[Angle, Angle]
