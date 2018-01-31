@@ -165,11 +165,12 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     var currPath = biSegmentPaths.next()
 
     val selectedPath = position.map { currPos =>
-      if (currPath._2.exists(s => MathUtilities.interSectionCircleLine(s, currPos, props.get.defaultLookAheadDistance).isDefined)) {
-        if (biSegmentPaths.hasNext) {
-          println("********** advancing path ***********")
-          currPath = biSegmentPaths.next()
-        }
+      if (biSegmentPaths.hasNext &&
+          currPath._2.exists(s =>
+            MathUtilities.interSectionCircleLine(s, currPos, props.get.defaultLookAheadDistance).isDefined
+          )) {
+        println("********** advancing path ***********")
+        currPath = biSegmentPaths.next()
       }
 
       currPath
