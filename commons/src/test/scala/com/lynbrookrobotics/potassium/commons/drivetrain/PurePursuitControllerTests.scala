@@ -95,7 +95,9 @@ class PurePursuitControllerTests extends FunSuite {
       hardware.turnPosition.mapToConstant(Degrees(0)),
       position,
       path,
-      unlimitedTurnOutput)._1
+      unlimitedTurnOutput,
+      isReversed = false
+    )._1
 
     var lastOutput = Percent(-10)
     output.foreach(lastOutput = _)
@@ -129,7 +131,8 @@ class PurePursuitControllerTests extends FunSuite {
       hardware.turnPosition.mapToConstant(Degrees(0)),
       position,
       path,
-      unlimitedTurnOutput
+      unlimitedTurnOutput,
+      isReversed = false
     )._1
 
     var out = Percent(-10)
@@ -193,7 +196,8 @@ class PurePursuitControllerTests extends FunSuite {
       hardware.turnPosition.mapToConstant(Degrees(-85)),
       position,
       path,
-      unlimitedTurnOutput
+      unlimitedTurnOutput,
+      isReversed = false
     )._1
 
     var out = Percent(-10)
@@ -224,7 +228,8 @@ class PurePursuitControllerTests extends FunSuite {
       hardware.turnPosition.mapToConstant(Degrees(45)),
       position,
       path,
-      unlimitedTurnOutput
+      unlimitedTurnOutput,
+      isReversed = false
     )._1
 
     var out = Percent(-10)
