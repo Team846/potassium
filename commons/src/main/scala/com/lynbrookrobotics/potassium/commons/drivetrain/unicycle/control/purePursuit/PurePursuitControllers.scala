@@ -20,41 +20,42 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
   def pointDistanceControl(position: Stream[Point],
                            target: Stream[Point])
                           (implicit properties: Signal[UnicycleProperties],
-                           hardware: UnicycleHardware): (Stream[Dimensionless],
-                                                   Stream[Length]) = {
+                           hardware: UnicycleHardware): Stream[Dimensionless] = {
     val distanceToTarget = position.zip(target).map { p =>
       p._1 distanceTo p._2
     }
 
-    (PIDF.pid(
+    PIDF.pid(
       distanceToTarget.mapToConstant(Feet(0)),
       distanceToTarget,
-      properties.map(_.forwardPositionGains)),
-      distanceToTarget)
+      properties.map(_.forwardPositionGains))
   }
 
   def headingToPoint(start: Point, end: Point): Angle = {
-      val diff = end - start
-      Radians(Math.atan2(
-        diff.y.toFeet,
-        diff.x.toFeet
-      ))
+    val diff = end - start
+    Radians(Math.atan2(
+      diff.y.toFeet,
+      diff.x.toFeet
+    ))
   }
 
   /**
     * returns an angle limited from -180 to 180 equivalent to the input
     * @param degrees
-    * @return angle betwee -90 and 90
+    * @return angle between -90 and 90
     */
-  def limitToPlusMinus90(degrees: Angle): Angle = {
+  def limitToPlusMinus90(degrees: Angle): (Angle, Boolean) = {
     if (degrees < Degrees(-90)) {
-      limitToPlusMinus90(degrees + Degrees(180))
+      val (angle, reversed) = limitToPlusMinus90(degrees + Degrees(180))
+      (angle, !reversed)
     } else if (degrees > Degrees(90)) {
-      limitToPlusMinus90(degrees - Degrees(180))
+      val (angle, reversed) = limitToPlusMinus90(degrees - Degrees(180))
+      (angle, !reversed)
     } else {
-      degrees
+      (degrees, false)
     }
   }
+
   /**
     * see: https://www.mathworks.com/help/robotics/ug/pure-pursuit-controller.html
     * @param position the current x,y,z position of the robot
@@ -67,10 +68,9 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                                 position: Stream[Point],
                                 biSegmentPath: Stream[(Segment, Option[Segment])],
                                 maxTurnOutput: Dimensionless)
-                               (implicit props: Signal[DrivetrainProperties], hardware: DrivetrainHardware): (Stream[Dimensionless],
-                                                                                   Stream[Double],
-                                                                                   Stream[Point]) = {
-    val lookAheadPoint = position.zip(biSegmentPath).map{ case (pose, path) =>
+                               (implicit props: Signal[DrivetrainProperties],
+                                hardware: DrivetrainHardware): (Stream[Dimensionless], Stream[Double], Stream[Point]) = {
+    val lookAheadPoint = position.zip(biSegmentPath).map { case (pose, path) =>
       getExtrapolatedLookAheadPoint(
         path,
         pose,
@@ -78,29 +78,16 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       )
     }
 
-    val headingToTarget = position.zip(lookAheadPoint).map{p =>
+    val headingToTarget = position.zip(lookAheadPoint).map {p =>
       headingToPoint(p._1, p._2)
     }
 
     val trigHeadingToTarget = headingToTarget.map(MathUtilities.swapTrigonemtricAndCompass)
-    val compassHeadingToLookAhead = trigHeadingToTarget.map(h => limitToPlusMinus90(h))
+    val compassHeadingToLookAheadAndReversed = trigHeadingToTarget.map(h => limitToPlusMinus90(h))
+    val compassHeadingToLookAhead = compassHeadingToLookAheadAndReversed.map(_._1)
+    val reversed = compassHeadingToLookAheadAndReversed.map(_._2)
+    val forwardMultiplier = reversed.map(b => if (b) -1D else 1)
 
-    val forwardMultiplier = position.zip(turnPosition).zip(lookAheadPoint).zip(biSegmentPath).map {p =>
-      val (((pose, currAngle), lookAhead), path) = p
-      val lastSegment = path._2.getOrElse(path._1)
-
-      if (lookAhead.onLine(lastSegment, Feet(0.1))) {
-        val currTrigAngle = MathUtilities.swapTrigonemtricAndCompass(currAngle)
-        val angleErrorToLastWayPoint = headingToPoint(pose, lastSegment.end) - currTrigAngle
-        if (angleErrorToLastWayPoint.abs >= Degrees(90)) {
-          -1D
-        } else {
-          1D
-        }
-      } else {
-        1D
-      }
-    }
     val limitedTurn = PIDF.pid(
       turnPosition,
       compassHeadingToLookAhead,
@@ -137,7 +124,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                                 steadyOutput: Dimensionless,
                                 maxTurnOutput: Dimensionless)
                                 (implicit hardware: DrivetrainHardware,
-                                props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
+                                 props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
     val biSegmentPaths = wayPoints.sliding(3).map { points =>
       (
         Segment(points(0), points(1)),
@@ -153,7 +140,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     var previousLookAheadPoint: Option[Point] = None
 
     val selectedPath = position.map { _ =>
-      if (previousLookAheadPoint.exists{ p =>
+      if (previousLookAheadPoint.exists { p =>
         currPath._2.exists(_.containsInXY(p, Feet(0.1)))
       }) {
         if (biSegmentPaths.hasNext) {
@@ -170,21 +157,19 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       position,
       selectedPath,
       maxTurnOutput)
-    val lookAheadHandle = lookAheadPoint.foreach{ p =>
-      previousLookAheadPoint = Some(p)
-    }
 
     val forwardOutput = pointDistanceControl(
       position,
       selectedPath.map(p => p._2.getOrElse(p._1).end)
-    )._1
-    val distanceToLast = position.map{ pose =>
+    ).zip(multiplier).map(t => t._1 * t._2)
+
+    val distanceToLast = position.map { pose =>
       pose distanceTo wayPoints.last
     }
 
-    val limitedForward = forwardOutput.map{ s =>
-      if ( !biSegmentPaths.hasNext ) {
-        s min steadyOutput
+    val limitedForward = forwardOutput.map { s =>
+      if (!biSegmentPaths.hasNext) {
+        s min steadyOutput max -steadyOutput
       } else {
         steadyOutput
       }
@@ -197,11 +182,13 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       } else {
         None
       }
+    }.withCheckZipped(lookAheadPoint) { p =>
+      previousLookAheadPoint = Some(p)
     }
 
     (
-      limitedForward.zip(turnOutput).zip(multiplier).map { case ((forward, turn), fdMultiplier) =>
-        UnicycleSignal(forward * fdMultiplier, turn)
+      limitedForward.zip(turnOutput).map { case (forward, turn) =>
+        UnicycleSignal(forward, turn)
       },
       errorToLast
     )
