@@ -121,7 +121,7 @@ class SimulatePurePursuit extends FunSuite {
     val lastPosition = hardware.positionListening.apply().get
     assert(lastPosition ~= wayPoints.last, s"\nLast position was $lastPosition")
 
-    val lastSegmentAngle = MathUtilities.swapTrigonemtricAndCompass(
+    val lastSegmentAngle = MathUtilities.convertTrigonometricAngleToCompass(
       Segment(wayPoints(wayPoints.length - 2), wayPoints.last).angle
     )
     val lastAngle = hardware.angleListening.apply().get
