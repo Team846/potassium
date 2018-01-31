@@ -20,7 +20,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
   class FollowWayPoints(wayPoints: Seq[Point],
                         tolerance: Length,
                         steadyOutput: Dimensionless,
-                        maxTurnOutput: Dimensionless)
+                        maxTurnOutput: Dimensionless,
+                        backwards: Boolean = false)
                        (drive: Drivetrain)
                        (implicit properties: Signal[controllers.DrivetrainProperties],
                         hardware: controllers.DrivetrainHardware) extends FiniteTask with FiniteTaskFinishedListener {
@@ -45,7 +46,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         position,
         turnPosition,
         steadyOutput,
-        maxTurnOutput
+        maxTurnOutput,
+        backwards
       )(drive)
 
       absoluteFollow.setFinishedListener(this)
@@ -66,7 +68,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                                     position: Stream[Point],
                                     turnPosition: Stream[Angle],
                                     steadyOutput: Dimensionless,
-                                    maxTurnOutput: Dimensionless)
+                                    maxTurnOutput: Dimensionless,
+                                    backwards: Boolean = false)
                                    (drive: Drivetrain)
                                    (implicit properties: Signal[DrivetrainProperties],
                                     hardware: DrivetrainHardware) extends FiniteTask {
@@ -78,11 +81,11 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         steadyOutput,
         maxTurnOutput)
 
-      drive.setController(childOpenLoop(unicycle.withCheckZipped(error) { e =>
+      drive.setController(childVelocityControl(speedControl(unicycle.withCheckZipped(error) { e =>
         if (e.exists(_ < tolerance)) {
           finished()
         }
-      }))
+      })))
     }
 
     override def onEnd(): Unit = {
