@@ -7,20 +7,18 @@ import com.lynbrookrobotics.potassium.control.offload.{EscConfig, OffloadedSigna
 import com.lynbrookrobotics.potassium.streams.Stream
 import squants.space.Length
 import squants.{Dimensionless, Velocity}
+import EscConfig._
 
 abstract class OffloadedDrive extends TwoSidedDrive {
   override type DriveSignal = TwoSided[OffloadedSignal]
   override type Properties <: OffloadedProperties
-
-  implicit val escConfig: EscConfig[Length]
-
-  import EscConfig._
 
   override def velocityControl(target: Stream[TwoSided[Velocity]])
                               (implicit hardware: Hardware,
                                props: Signal[Properties]): Stream[DriveSignal] = target.map {
     case TwoSided(left, right) =>
       implicit val curProps: Properties = props.get
+      import curProps.escConfig
       TwoSided(
         VelocityControl(
           forwardToAngularVelocityGains(curProps.leftVelocityGainsFull), ticks(left)
@@ -36,6 +34,7 @@ abstract class OffloadedDrive extends TwoSidedDrive {
                       props: Signal[Properties]): Stream[DriveSignal] = target.map {
     case TwoSided(left, right) =>
       implicit val curProps: Properties = props.get
+      import curProps.escConfig
       TwoSided(
         PositionControl(
           forwardToAngularPositionGains(curProps.forwardPositionGains), ticks(left)
