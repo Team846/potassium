@@ -110,7 +110,7 @@ object MathUtilities {
     * @param trigonemtricAngle
     * @return
     */
-  def swapTrigonemtricAndCompass(trigonemtricAngle: Angle): Angle = {
+  def convertTrigonometricAngleToCompass(trigonemtricAngle: Angle): Angle = {
     Degrees(90) - trigonemtricAngle
   }
 

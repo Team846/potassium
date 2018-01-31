@@ -84,11 +84,11 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       )
     }
 
-    val headingToTarget = position.zip(lookAheadPoint).map {p =>
+    val headingToTarget = position.zip(lookAheadPoint).map { p =>
       headingToPoint(p._1, p._2._1)
     }
 
-    val errorToTarget = headingToTarget.map(MathUtilities.swapTrigonemtricAndCompass).zip(turnPosition).map { case (target, current) =>
+    val errorToTarget = headingToTarget.map(MathUtilities.convertTrigonometricAngleToCompass).zip(turnPosition).map { case (target, current) =>
       target - current
     }
     val compassHeadingToLookAheadAndReversed = errorToTarget
@@ -134,6 +134,10 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     implicit val tolerance = Radians(0.00001)
 
     lookAheadOnNextSegment.map { laPoint =>
+      // We project the robot's location onto the segment line (not line segment) and verify that it is on the line
+      // by comparing the angle of the projected point to the end versus the start to the end. If these are equal,
+      // the robot has not overshot but if they are different (off by 180 degrees), the robot has overshot and we need
+      // to forcibly reverse the direction of the robot.
       val angleRobotProjectionToEnd = Segment(biSegmentPath._2.get.pointClosestToOnLine(currPosition), biSegmentPath._2.get.end).angle
       (laPoint, !(angleRobotProjectionToEnd ~= biSegmentPath._2.get.angle))
     }.getOrElse(
