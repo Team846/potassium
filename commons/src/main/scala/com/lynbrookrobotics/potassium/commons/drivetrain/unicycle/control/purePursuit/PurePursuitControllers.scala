@@ -76,21 +76,23 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
         pose,
         props.get.defaultLookAheadDistance
       )
-    }
+    }//.withCheck(println)
 
     val headingToTarget = position.zip(lookAheadPoint).map {p =>
       headingToPoint(p._1, p._2)
     }
 
-    val trigHeadingToTarget = headingToTarget.map(MathUtilities.swapTrigonemtricAndCompass)
-    val compassHeadingToLookAheadAndReversed = trigHeadingToTarget.map(h => limitToPlusMinus90(h))
+    val errorToTarget = headingToTarget.map(MathUtilities.swapTrigonemtricAndCompass).zip(turnPosition).map { case (target, current) =>
+      target - current
+    }
+    val compassHeadingToLookAheadAndReversed = errorToTarget.map(h => limitToPlusMinus90(h))
     val compassHeadingToLookAhead = compassHeadingToLookAheadAndReversed.map(_._1)
     val reversed = compassHeadingToLookAheadAndReversed.map(_._2)
     val forwardMultiplier = reversed.map(b => if (b) -1D else 1)
 
     val limitedTurn = PIDF.pid(
-      turnPosition,
-      compassHeadingToLookAhead,
+      errorToTarget.mapToConstant(Degrees(0)),
+      compassHeadingToLookAhead/*.withCheck(println)*/,
       props.map(_.turnPositionGains)
     ).map(MathUtilities.clamp(_, maxTurnOutput))
 
@@ -102,17 +104,17 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                                     currPosition: Point,
                                     lookAheadDistance: Length): Point = {
     import MathUtilities._
-    val firstLookAheadPoint = intersectionLineCircleFurthestFromStart(
+    val lookAheadOnCurrentSegment = intersectionLineCircleFurthestFromStart(
       biSegmentPath._1,
       currPosition,
       lookAheadDistance)
 
-    val secondLookAheadPoint = biSegmentPath._2.flatMap { s =>
+    val lookAheadOnNextSegment = biSegmentPath._2.flatMap { s =>
       intersectionLineCircleFurthestFromStart(s, currPosition, lookAheadDistance)
     }
 
-    secondLookAheadPoint.getOrElse(
-      firstLookAheadPoint.getOrElse(
+    lookAheadOnNextSegment.getOrElse(
+      lookAheadOnCurrentSegment.getOrElse(
         getExtrapolatedLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
       )
     )
@@ -125,16 +127,11 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                                 maxTurnOutput: Dimensionless)
                                 (implicit hardware: DrivetrainHardware,
                                  props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
-    val biSegmentPaths = wayPoints.sliding(3).map { points =>
-      (
-        Segment(points(0), points(1)),
-        if (points.size == 3) {
-          Some(Segment(points(1), points(2)))
-        } else {
-          None
-        }
-      )
+    val segments = wayPoints.sliding(2).map { points =>
+      Segment(points(0), points(1))
     }
+
+    val biSegmentPaths = segments.sliding(2).map(l => (l.head, Some(l.last)))
 
     var currPath = biSegmentPaths.next()
     var previousLookAheadPoint: Option[Point] = None

@@ -71,31 +71,36 @@ object MathUtilities {
                                               center: Point,
                                               radius: Length): Option[Point] = {
     val solutions = interSectionCircleLine(segment, center, radius)
-    solutions.flatMap {case (positive, negative) =>
-        val positiveDiffWithStart = segment.start distanceTo positive
-        val negativeDiffWithStart = segment.start distanceTo negative
+    solutions.flatMap { case (positive, negative) =>
+      val positiveDiffWithStart = segment.start distanceTo positive
+      val negativeDiffWithStart = segment.start distanceTo negative
 
-        val furthestFromStart = if ( positiveDiffWithStart > negativeDiffWithStart ) {
-          positive
-        } else {
-          negative
-        }
-        val closerToStart = if ( positiveDiffWithStart <= negativeDiffWithStart ) {
-          positive
-        } else {
-          negative
-        }
-        val tolerance = Radians(0.0001)
+      val furthestFromStart = if ( positiveDiffWithStart > negativeDiffWithStart ) {
+        positive
+      } else {
+        negative
+      }
+      val closerToStart = if ( positiveDiffWithStart <= negativeDiffWithStart ) {
+        positive
+      } else {
+        negative
+      }
 
-        // Pick point such that look ahead point angle to end point is same as angle
-        // of segment, ensuring that we drive toward the correct direction
-        if ((segment.angle - Segment(segment.start, furthestFromStart).angle).abs < tolerance ) {
-          Some(furthestFromStart)
-        } else if ( (segment.angle - Segment(segment.start, closerToStart).angle).abs < tolerance ) {
-          Some(closerToStart)
-        } else {
-          None
-        }
+      val tolerance = Radians(0.0001)
+
+      val onLine = segment.pointClosestToOnLine(center)
+
+      // Pick point such that look ahead point angle to end point is same as angle
+      // of segment, ensuring that we drive toward the correct direction
+      if ((segment.angle - Segment(segment.start, furthestFromStart).angle).abs < tolerance &&
+        (Segment(onLine, segment.end).angle - Segment(onLine, furthestFromStart).angle).abs < tolerance) {
+        Some(furthestFromStart)
+      } else if ((segment.angle - Segment(segment.start, closerToStart).angle).abs < tolerance &&
+        (Segment(onLine, segment.end).angle - Segment(onLine, closerToStart).angle).abs < tolerance) {
+        Some(closerToStart)
+      } else {
+        None
+      }
     }
   }
 

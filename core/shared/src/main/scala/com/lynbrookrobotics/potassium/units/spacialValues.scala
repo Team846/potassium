@@ -108,4 +108,11 @@ case class Segment(start: Point, end: Point) {
   def angle: Angle = {
     Radians(math.atan2(dy.toFeet, dx.toFeet))
   }
+
+  def pointClosestToOnLine(pt: Point): Point = {
+    val lengthSquared = length.squared
+    val ap = Segment(start, pt)
+    val interpolation = (ap.dx * dx + ap.dy * dy) / lengthSquared
+    start + ((end - start) * interpolation)
+  }
 }
