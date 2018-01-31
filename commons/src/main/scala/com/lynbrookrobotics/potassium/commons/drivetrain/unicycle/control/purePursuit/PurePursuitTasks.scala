@@ -4,7 +4,7 @@ import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
 import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleCoreTasks
 import com.lynbrookrobotics.potassium.streams.Stream
-import com.lynbrookrobotics.potassium.tasks.FiniteTask
+import com.lynbrookrobotics.potassium.tasks.{FiniteTask, FiniteTaskFinishedListener}
 import com.lynbrookrobotics.potassium.units.Point
 import squants.Dimensionless
 import squants.space.{Angle, Degrees, Feet, Length}
@@ -13,17 +13,8 @@ import squants.space.{Angle, Degrees, Feet, Length}
 trait PurePursuitTasks extends UnicycleCoreTasks {
   import controllers._
 
-  val origin = new Point(
-    Feet(0),
-    Feet(0)
-  )
-
   def compassToTrigonometric(angle: Angle): Angle = {
     Degrees(90) - angle
-  }
-
-  def clamp(toClamp: Dimensionless, maxMagnitude: Dimensionless): Dimensionless = {
-    toClamp min maxMagnitude max -maxMagnitude
   }
 
   class FollowWayPoints(wayPoints: Seq[Point],
@@ -31,7 +22,14 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                         steadyOutput: Dimensionless,
                         maxTurnOutput: Dimensionless)
                        (drive: Drivetrain)
-                       (implicit properties: Signal[controllers.DrivetrainProperties], hardware: controllers.DrivetrainHardware) extends FiniteTask {
+                       (implicit properties: Signal[controllers.DrivetrainProperties],
+                        hardware: controllers.DrivetrainHardware) extends FiniteTask with FiniteTaskFinishedListener {
+    private var absoluteFollow: FollowWayPointsWithPosition = null
+
+    override def onFinished(task: FiniteTask): Unit = {
+      finished()
+    }
+
     override def onStart(): Unit = {
       val turnPosition = hardware.turnPosition.relativize(
         (initialTurnPosition, curr) => curr - initialTurnPosition)
@@ -41,22 +39,25 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         hardware.forwardPosition
       )
 
-      val (unicycle, error) = followWayPointsController(
+      absoluteFollow = new FollowWayPointsWithPosition(
         wayPoints,
+        tolerance,
         position,
         turnPosition,
         steadyOutput,
-        maxTurnOutput)
+        maxTurnOutput
+      )(drive)
 
-      drive.setController(childOpenLoop(unicycle.withCheckZipped(error) { e =>
-        if (e.exists(_ < tolerance)) {
-          finished()
-        }
-      }))
+      absoluteFollow.setFinishedListener(this)
+      absoluteFollow.init()
     }
 
     override def onEnd(): Unit = {
-      drive.resetToDefault()
+      if (absoluteFollow.isRunning) {
+        absoluteFollow.abort()
+      }
+
+      absoluteFollow = null
     }
   }
 
