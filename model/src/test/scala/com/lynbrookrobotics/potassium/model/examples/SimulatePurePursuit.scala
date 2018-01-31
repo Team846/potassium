@@ -131,7 +131,7 @@ class SimulatePurePursuit extends FunSuite {
 
     // this is an acceptable target angle if driving backwards is required
     assert(
-      (angleDiff ~= Degrees(0)) || (angleDiff ~= Degrees(0)),
+      (angleDiff ~= Degrees(0)) || (angleDiff ~= Degrees(180)),
       s"\nLast angle was off by ${angleDiff.toDegrees} degrees")
   }
 
