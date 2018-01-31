@@ -76,7 +76,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
         pose,
         props.get.defaultLookAheadDistance
       )
-    }//.withCheck(println)
+    }
 
     val headingToTarget = position.zip(lookAheadPoint).map {p =>
       headingToPoint(p._1, p._2)
@@ -92,7 +92,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
 
     val limitedTurn = PIDF.pid(
       errorToTarget.mapToConstant(Degrees(0)),
-      compassHeadingToLookAhead/*.withCheck(println)*/,
+      compassHeadingToLookAhead,
       props.map(_.turnPositionGains)
     ).map(MathUtilities.clamp(_, maxTurnOutput))
 
@@ -127,11 +127,9 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                                 maxTurnOutput: Dimensionless)
                                 (implicit hardware: DrivetrainHardware,
                                  props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
-    val segments = wayPoints.sliding(2).map { points =>
+    val biSegmentPaths = wayPoints.sliding(2).map { points =>
       Segment(points(0), points(1))
-    }
-
-    val biSegmentPaths = segments.sliding(2).map(l => (l.head, Some(l.last)))
+    }.sliding(2).map(l => (l.head, Some(l.last)))
 
     var currPath = biSegmentPaths.next()
     var previousLookAheadPoint: Option[Point] = None
@@ -158,19 +156,19 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     val forwardOutput = pointDistanceControl(
       position,
       selectedPath.map(p => p._2.getOrElse(p._1).end)
-    ).zip(multiplier).map(t => t._1 * t._2)
+    )
 
     val distanceToLast = position.map { pose =>
       pose distanceTo wayPoints.last
     }
 
-    val limitedForward = forwardOutput.map { s =>
+    val limitedAndReversedForward = forwardOutput.map { s =>
       if (!biSegmentPaths.hasNext) {
-        s min steadyOutput max -steadyOutput
+        s min steadyOutput
       } else {
         steadyOutput
       }
-    }
+    }.zip(multiplier).map(t => t._1 * t._2)
 
     val errorToLast = distanceToLast.map { d =>
       // error does not exist if we are not on our last segment
@@ -184,7 +182,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     }
 
     (
-      limitedForward.zip(turnOutput).map { case (forward, turn) =>
+      limitedAndReversedForward.zip(turnOutput).map { case (forward, turn) =>
         UnicycleSignal(forward, turn)
       },
       errorToLast
