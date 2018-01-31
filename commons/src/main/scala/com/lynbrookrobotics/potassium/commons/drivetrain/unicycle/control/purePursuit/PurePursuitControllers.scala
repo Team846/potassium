@@ -123,7 +123,6 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
   def followWayPointsController(wayPoints: Seq[Point],
                                 position: Stream[Point],
                                 turnPosition: Stream[Angle],
-                                steadyOutput: Dimensionless,
                                 maxTurnOutput: Dimensionless)
                                 (implicit hardware: DrivetrainHardware,
                                  props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
@@ -163,6 +162,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     }
 
     val limitedAndReversedForward = forwardOutput.map { s =>
+      val steadyOutput = props.get.forwardPositionGains.kp * props.get.defaultLookAheadDistance
       if (!biSegmentPaths.hasNext) {
         s min steadyOutput
       } else {
