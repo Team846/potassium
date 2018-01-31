@@ -80,7 +80,9 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         wayPoints,
         position,
         turnPosition,
-        maxTurnOutput)
+        maxTurnOutput,
+        backwards
+      )
 
       drive.setController(childVelocityControl(speedControl(unicycle.withCheckZipped(error) { e =>
         if (e.exists(_ < tolerance)) {

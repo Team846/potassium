@@ -67,7 +67,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
   def purePursuitControllerTurn(turnPosition: Stream[Angle],
                                 position: Stream[Point],
                                 biSegmentPath: Stream[(Segment, Option[Segment])],
-                                maxTurnOutput: Dimensionless)
+                                maxTurnOutput: Dimensionless,
+                                isReversed: Boolean)
                                (implicit props: Signal[DrivetrainProperties],
                                 hardware: DrivetrainHardware): (Stream[Dimensionless], Stream[Double], Stream[Point]) = {
     val lookAheadPoint = position.zip(biSegmentPath).map { case (pose, path) =>
@@ -79,13 +80,22 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     }
 
     val headingToTarget = position.zip(lookAheadPoint).map {p =>
-      headingToPoint(p._1, p._2)
+      headingToPoint(p._1, p._2._1)
     }
 
     val errorToTarget = headingToTarget.map(MathUtilities.swapTrigonemtricAndCompass).zip(turnPosition).map { case (target, current) =>
       target - current
     }
-    val compassHeadingToLookAheadAndReversed = errorToTarget.map(h => limitToPlusMinus90(h))
+    val compassHeadingToLookAheadAndReversed = errorToTarget
+      .map(h => limitToPlusMinus90(h))
+      .zip(lookAheadPoint.map(_._2)).map { case ((angle, reversed), purposefullyReversed) =>
+      if (reversed == isReversed || purposefullyReversed) {
+        (angle, reversed)
+      } else {
+        (if (angle > Degrees(0)) angle - Degrees(180) else angle + Degrees(180), isReversed)
+      }
+    }
+
     val compassHeadingToLookAhead = compassHeadingToLookAheadAndReversed.map(_._1)
     val reversed = compassHeadingToLookAheadAndReversed.map(_._2)
     val forwardMultiplier = reversed.map(b => if (b) -1D else 1)
@@ -96,13 +106,13 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       props.map(_.turnPositionGains)
     ).map(MathUtilities.clamp(_, maxTurnOutput))
 
-    (limitedTurn, forwardMultiplier, lookAheadPoint)
+    (limitedTurn, forwardMultiplier, lookAheadPoint.map(_._1))
   }
 
 
   def getExtrapolatedLookAheadPoint(biSegmentPath: (Segment, Option[Segment]),
                                     currPosition: Point,
-                                    lookAheadDistance: Length): Point = {
+                                    lookAheadDistance: Length): (Point, Boolean) = { // point, is backing up after overshoot
     import MathUtilities._
     val lookAheadOnCurrentSegment = intersectionLineCircleFurthestFromStart(
       biSegmentPath._1,
@@ -113,8 +123,16 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       intersectionLineCircleFurthestFromStart(s, currPosition, lookAheadDistance)
     }
 
-    lookAheadOnNextSegment.getOrElse(
-      lookAheadOnCurrentSegment.getOrElse(
+    implicit val tolerance = Radians(0.00001)
+
+    lookAheadOnNextSegment.map { laPoint =>
+      val angleRobotProjectionToEnd = Segment(biSegmentPath._2.get.pointClosestToOnLine(currPosition), biSegmentPath._2.get.end).angle
+      (laPoint, !(angleRobotProjectionToEnd ~= biSegmentPath._2.get.angle))
+    }.getOrElse(
+      lookAheadOnCurrentSegment.map { laPoint =>
+        val angleRobotProjectionToEnd = Segment(biSegmentPath._1.pointClosestToOnLine(currPosition), biSegmentPath._1.end).angle
+        (laPoint, !(angleRobotProjectionToEnd ~= biSegmentPath._1.angle))
+      }.getOrElse(
         getExtrapolatedLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
       )
     )
@@ -123,7 +141,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
   def followWayPointsController(wayPoints: Seq[Point],
                                 position: Stream[Point],
                                 turnPosition: Stream[Angle],
-                                maxTurnOutput: Dimensionless)
+                                maxTurnOutput: Dimensionless,
+                                isReversed: Boolean)
                                 (implicit hardware: DrivetrainHardware,
                                  props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
     val biSegmentPaths = wayPoints.sliding(2).map { points =>
@@ -150,7 +169,9 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       turnPosition,
       position,
       selectedPath,
-      maxTurnOutput)
+      maxTurnOutput,
+      isReversed
+    )
 
     val forwardOutput = pointDistanceControl(
       position,
