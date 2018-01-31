@@ -111,7 +111,7 @@ class SimulatePurePursuit extends FunSuite {
     }
 
     if (task.isRunning) {
-      println(s"Task aborted at time ${clock.currentTime}")
+      throw new IllegalStateException(s"Task aborted at time ${clock.currentTime}")
     } else {
       println(s"Task finished in ${clock.currentTime}")
     }
@@ -119,7 +119,6 @@ class SimulatePurePursuit extends FunSuite {
     implicit val implicitDistanceTolerance = distanceTolerance
     implicit val implicitAngleTolerance = angleTolerance
     val lastPosition = hardware.positionListening.apply().get
-    println(lastPosition)
     assert(lastPosition ~= wayPoints.last, s"\nLast position was $lastPosition")
 
     val lastSegmentAngle = MathUtilities.swapTrigonemtricAndCompass(
