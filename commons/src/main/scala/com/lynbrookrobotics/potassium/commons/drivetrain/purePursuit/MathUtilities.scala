@@ -74,6 +74,7 @@ object MathUtilities {
                                              center: Point,
                                              radius: Length): Option[Point] = {
     val solutions = interSectionCircleLine(segment, center, radius)
+    //println( s"solutions: $solutions" )
     solutions.flatMap { case (positive, negative) =>
         val positiveDiffWithStart = segment.start distanceTo positive
         val negativeDiffWithStart = segment.start distanceTo negative
@@ -91,10 +92,21 @@ object MathUtilities {
 
         // Pick point such that look ahead point angle to end point is same as angle
         // of segment, ensuring that we drive toward the correct direction
+
+//        val furtherStartDiff = (segment.angle - Segment(segment.start, furtherFromStart).angle).abs
+//        println(s"segment.angle: ${segment.angle} \t " +
+//          s"Segment(segment.start, furtherFromStart).angle: ${Segment(segment.start, furtherFromStart).angle} \t " +
+//          s"furtherStartDiff: $furtherStartDiff")
+//
+//        val closerStartDiff = (segment.angle - Segment(segment.start, closerToStart).angle).abs
+//        println(
+//        s"Segment(segment.start, closerToStart).angle: ${Segment(segment.start, closerToStart).angle} \t " +
+//        s"closerStartDiff: $closerStartDiff")
+
         val tolerance = Radians(0.0001)
-        if ((segment.angle - Segment(segment.start, furtherFromStart).angle).abs < tolerance ) {
+        if (between0to2PI((segment.angle - Segment(segment.start, furtherFromStart).angle).abs) < tolerance) {
           Some(furtherFromStart)
-        } else if ( (segment.angle - Segment(segment.start, closerToStart).angle).abs < tolerance ) {
+        } else if (between0to2PI((segment.angle - Segment(segment.start, closerToStart).angle).abs) < tolerance) {
           Some(closerToStart)
         } else {
           None
@@ -119,5 +131,16 @@ object MathUtilities {
     } else {
       toClamp
     }
+  }
+
+  // TODO doesn't work with negative angles
+  def between0to2PI(angle: Angle): Angle = {
+    var modAngle = angle
+    while( modAngle >= Radians(2 * Math.PI)) {
+      modAngle = modAngle - Radians(2 * Math.PI)
+//      println("in while loop")
+//      println(s"modAngle: $modAngle")
+    }
+    modAngle
   }
 }

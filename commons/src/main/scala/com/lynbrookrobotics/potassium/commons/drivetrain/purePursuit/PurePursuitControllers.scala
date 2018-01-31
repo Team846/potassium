@@ -83,6 +83,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     }
 
     val headingToTarget = position.zip(lookAheadPoint).map{p =>
+      println(s"look ahead point: ${p._2}")
       angleBetweenPoints(p._1, p._2)
     }
 
@@ -137,8 +138,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       }
     }
 
-    val effectiveTurnPosition = turnPosition.zip(forwardMultiplier).map { case (turnPose, shouldReverse) =>
-      if (shouldReverse == -1D) {
+    val effectiveTurnPosition = turnPosition.map { turnPose =>
+      if (driveBackwards) {
         turnPose + Degrees(180)
       } else {
         turnPose

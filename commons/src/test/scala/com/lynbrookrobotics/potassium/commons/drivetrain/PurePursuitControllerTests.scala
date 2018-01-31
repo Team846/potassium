@@ -311,11 +311,9 @@ class PurePursuitControllerTests extends FunSuite {
     assert(lastFrdMult == 1)
 
 //
-//    pose = Point(Feet(0), Feet(-2.5))
-//    triggerClock(period)
-//    assert(lastTurnout ~= Percent(0))
-//    assert(lastFrdMult == 1)
-    println("finished hurray!")
+    pose = Point(Feet(0), Feet(-2.5))
+    triggerClock(period)
+    assert(lastTurnout ~= Percent(0))
+    assert(lastFrdMult == 1)
   }
-
 }

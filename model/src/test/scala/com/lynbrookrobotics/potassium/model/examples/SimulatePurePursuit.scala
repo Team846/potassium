@@ -150,11 +150,12 @@ class SimulatePurePursuit extends FunSuite {
         Point(
           Feet(-3),
           Feet(-3)
-        ),
-        Point(
-          Feet(-3),
-          Feet(5)
         )
+//        ),
+//        Point(
+//          Feet(-3),
+//          Feet(5)
+//        )
       ),
       timeOut = Seconds(15),
       log = true,
@@ -233,17 +234,17 @@ class SimulatePurePursuit extends FunSuite {
 //    )
 //  }
 //
-//  test("Reach destination (-5, -5)") {
-//    testPurePursuitReachesDestination(
-//      Seq(
-//        Point.origin,
-//        Point(Feet(-10), Feet(-10))
-//      ),
-//      timeOut = Seconds(10),
-//      log = false/*true*/,
-//      driveBackwards = true
-//    )
-//  }
+  test("Reach destination (-5, -5)") {
+    testPurePursuitReachesDestination(
+      Seq(
+        Point.origin,
+        Point(Feet(-10), Feet(-10))
+      ),
+      timeOut = Seconds(10),
+      log = false/*true*/,
+      driveBackwards = true
+    )
+  }
 ////
 //  test("Reach destination with path from (0,0) to (0, 5)") {
 //    testPurePursuitReachesDestination(

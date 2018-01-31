@@ -93,7 +93,17 @@ object SimulateDrivetrain extends App {
 //  )(simulatedComponent)
 
 
-  task.init()
+  import drivetrainContainer.unicycleTasks._
+
+//  val task = new DriveDistanceStraight(
+//    Feet(-1),
+//    Inches(3),
+//    Degrees(2),
+//    Percent(10)
+//  ).then(new RotateToAngle(Degrees(90), Degrees(1))
+//  ).then()
+//
+//  task.init()
 
 
   for (i <- 1 to (20D / period.toSeconds).round.toInt) {
