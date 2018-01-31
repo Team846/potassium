@@ -4,7 +4,6 @@ import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import squants.space.{Degrees, Feet, Length, Radians}
 import squants.{Angle, Dimensionless}
 
-
 object MathUtilities {
   /**
     * see http://mathworld.wolfram.com/Circle-LineIntersection.html
@@ -75,31 +74,23 @@ object MathUtilities {
       val positiveDiffWithStart = segment.start distanceTo positive
       val negativeDiffWithStart = segment.start distanceTo negative
 
-      val furthestFromStart = if (positiveDiffWithStart > negativeDiffWithStart) {
-        positive
+      val (furthestFromStart, closerToStart) = if (positiveDiffWithStart > negativeDiffWithStart) {
+        (positive, negative)
       } else {
-        negative
+        (negative, positive)
       }
-      val closerToStart = if (positiveDiffWithStart <= negativeDiffWithStart) {
-        positive
-      } else {
-        negative
-      }
-
-      val tolerance = Radians(0.0001)
 
       val onLine = segment.pointClosestToOnLine(center)
 
-      // Pick point such that look ahead point angle to end point is same as angle
-      // of segment and the look ahead point is in the direction of the final point,
-      // ensuring that we drive toward the correct direction
-      if ((Segment(onLine, segment.end).angle - Segment(onLine, furthestFromStart).angle).abs < tolerance) {
+      implicit val tolerance: Angle = Radians(0.0001)
+
+      // Pick point such that angle from the robot location projected on the segment to the end is the same
+      // as the robot location projection to the look ahead point, ensuring that we drive toward the correct direction
+      if (Segment(onLine, segment.end).angle ~= Segment(onLine, furthestFromStart).angle) {
         Some(furthestFromStart)
-      } else if ((Segment(onLine, segment.end).angle - Segment(onLine, closerToStart).angle).abs < tolerance) {
+      } else if (Segment(onLine, segment.end).angle ~= Segment(onLine, closerToStart).angle) {
         Some(closerToStart)
-      } else {
-        None
-      }
+      } else None
     }
   }
 
@@ -107,11 +98,11 @@ object MathUtilities {
     * swapps a trigometric angle, as used in the mathematics
     * (right is 0 degrees, increasing counter clockwise) to
     * compass angle, forward is 0, increases clockwise, or vice versa
-    * @param trigonemtricAngle
+    * @param trigonometricAngle
     * @return
     */
-  def convertTrigonometricAngleToCompass(trigonemtricAngle: Angle): Angle = {
-    Degrees(90) - trigonemtricAngle
+  def convertTrigonometricAngleToCompass(trigonometricAngle: Angle): Angle = {
+    Degrees(90) - trigonometricAngle
   }
 
   def clamp[T](toClamp: Dimensionless, max: Dimensionless): Dimensionless = {
