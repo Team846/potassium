@@ -11,7 +11,7 @@ import squants.space.{Inches, Length, Turns}
 import squants.time.Milliseconds
 import squants.{Acceleration, Angle, Dimensionless, Each, Percent, Time, Velocity}
 
-class OffloadedTests extends FunSuite {
+class OffloadedDriveTests extends FunSuite {
   test("OffloadedProperties floorPerTick returns correct values") {
     def asserteq(a: Double, b: Double): Assertion = assert(Math.abs(a - b) < 0.0001)
     val props = new OffloadedProperties {
