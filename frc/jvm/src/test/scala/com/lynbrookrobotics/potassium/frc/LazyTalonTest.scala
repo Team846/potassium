@@ -3,8 +3,8 @@ package com.lynbrookrobotics.potassium.frc
 import com.ctre.phoenix.ErrorCode
 import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.can.TalonSRX
-import com.lynbrookrobotics.potassium.control.OffloadedSignal.{EscPositionGains, EscVelocityGains}
-import com.lynbrookrobotics.potassium.control.{OpenLoop, PositionControl, VelocityControl}
+import com.lynbrookrobotics.potassium.control.offload.EscConfig.{NativePositionGains, NativeVelocityGains}
+import com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.{OpenLoop, PositionControl, VelocityControl}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when
@@ -77,8 +77,8 @@ class LazyTalonTest extends FunSuite with MockitoSugar {
       ErrorCode.OK
     })
 
-    val pctrl1 = PositionControl(EscPositionGains(1, 2, 3), Each(4))
-    val pctrl2 = PositionControl(EscPositionGains(5, 6, 7), Each(8))
+    val pctrl1 = PositionControl(NativePositionGains(1, 2, 3), Each(4))
+    val pctrl2 = PositionControl(NativePositionGains(5, 6, 7), Each(8))
 
     lazyTalon.applyCommand(pctrl1)
     assert(posOutCalled == 1)
@@ -151,8 +151,8 @@ class LazyTalonTest extends FunSuite with MockitoSugar {
       ErrorCode.OK
     })
 
-    val vctrl1 = VelocityControl(EscVelocityGains(1, 2, 3, 4), Each(5))
-    val vctrl2 = VelocityControl(EscVelocityGains(6, 7, 8, 9), Each(10))
+    val vctrl1 = VelocityControl(NativeVelocityGains(1, 2, 3, 4), Each(5))
+    val vctrl2 = VelocityControl(NativeVelocityGains(6, 7, 8, 9), Each(10))
 
     lazyTalon.applyCommand(vctrl1)
     assert(velOutCalled == 1)
