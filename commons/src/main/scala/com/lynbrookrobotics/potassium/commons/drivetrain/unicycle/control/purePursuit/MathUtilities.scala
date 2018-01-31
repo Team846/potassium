@@ -75,12 +75,12 @@ object MathUtilities {
       val positiveDiffWithStart = segment.start distanceTo positive
       val negativeDiffWithStart = segment.start distanceTo negative
 
-      val furthestFromStart = if ( positiveDiffWithStart > negativeDiffWithStart ) {
+      val furthestFromStart = if (positiveDiffWithStart > negativeDiffWithStart) {
         positive
       } else {
         negative
       }
-      val closerToStart = if ( positiveDiffWithStart <= negativeDiffWithStart ) {
+      val closerToStart = if (positiveDiffWithStart <= negativeDiffWithStart) {
         positive
       } else {
         negative
@@ -91,12 +91,11 @@ object MathUtilities {
       val onLine = segment.pointClosestToOnLine(center)
 
       // Pick point such that look ahead point angle to end point is same as angle
-      // of segment, ensuring that we drive toward the correct direction
-      if ((segment.angle - Segment(segment.start, furthestFromStart).angle).abs < tolerance &&
-        (Segment(onLine, segment.end).angle - Segment(onLine, furthestFromStart).angle).abs < tolerance) {
+      // of segment and the look ahead point is in the direction of the final point,
+      // ensuring that we drive toward the correct direction
+      if ((Segment(onLine, segment.end).angle - Segment(onLine, furthestFromStart).angle).abs < tolerance) {
         Some(furthestFromStart)
-      } else if ((segment.angle - Segment(segment.start, closerToStart).angle).abs < tolerance &&
-        (Segment(onLine, segment.end).angle - Segment(onLine, closerToStart).angle).abs < tolerance) {
+      } else if ((Segment(onLine, segment.end).angle - Segment(onLine, closerToStart).angle).abs < tolerance) {
         Some(closerToStart)
       } else {
         None
