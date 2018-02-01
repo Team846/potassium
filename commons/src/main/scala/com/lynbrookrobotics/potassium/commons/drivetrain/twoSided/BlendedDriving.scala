@@ -48,6 +48,7 @@ object BlendedDriving {
                   (implicit properties: Signal[TwoSidedDriveProperties]): Stream[TwoSided[Velocity]] = {
     val constantRadiusSpeed = driveWithRadius(radius = curvature.map(curvature => curvature.den / curvature.num.toEach), targetForwardVelocity)
 
+
     tankSpeed.zip(constantRadiusSpeed).zip(targetForwardVelocity).map {
       case ((tankSpeed, carSpeed), targetForward) =>
         TwoSided(
