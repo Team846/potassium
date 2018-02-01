@@ -1,6 +1,6 @@
 import sbtcrossproject.{crossProject, CrossType}
 
-enablePlugins(GitVersioning, TravisScalaStylePlugin)
+enablePlugins(GitVersioning)
 
 name := "potassium"
 
