@@ -1,8 +1,12 @@
 resolvers += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
 
+<<<<<<< HEAD
 addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0")
 
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.1")
+=======
+addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.0")
+>>>>>>> refactoring code
 
 addSbtPlugin("org.scoverage" % "sbt-coveralls" % "1.2.2")
 
