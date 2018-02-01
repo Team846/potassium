@@ -49,7 +49,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
 
   /**
     * returns an angle limited from -180 to 180 equivalent to the input
-    * @param degrees
+    * @param degrees the original, uncapped angle
     * @return angle between -90 and 90
     */
   def limitToPlusMinus90(degrees: Angle): (Angle, Boolean) = {
@@ -96,12 +96,12 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     }
     val compassHeadingToLookAheadAndReversed = errorToTarget
       .map(h => limitToPlusMinus90(h))
-      .zip(lookAheadPoint.map(_._2)).map { case ((angle, reversed), purposefullyReversed) =>
+      .zip(lookAheadPoint.map(_._2)).map { case ((angle, autoReversed), purposefullyReversed) =>
       if ((forwardBackwardMode == Auto) ||
-          (reversed && forwardBackwardMode == BackwardsOnly) ||
-          (!reversed && forwardBackwardMode == ForwardsOnly) ||
+          (autoReversed && forwardBackwardMode == BackwardsOnly) ||
+          (!autoReversed && forwardBackwardMode == ForwardsOnly) ||
           purposefullyReversed /* we are doing the opposite of what is requested due to overshoot */) {
-        (angle, reversed)
+        (angle, autoReversed)
       } else {
         (if (angle > Degrees(0)) angle - Degrees(180) else angle + Degrees(180), forwardBackwardMode == BackwardsOnly)
       }
@@ -125,14 +125,14 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
   /**
     * Finds the look ahead, extrapolating beyond the segment when needed
     * @param biSegmentPath a group of the current and next segments
-    * @param currPosition
-    * @param lookAheadDistance
-    * @return
+    * @param currPosition the current position of the robot
+    * @param lookAheadDistance the look ahead distance to find a point at
+    * @return the look ahead point, and a boolean that is true when the robot is backing up after overshoot
     */
   @tailrec
   final def getExtrapolatedLookAheadPoint(biSegmentPath: (Segment, Option[Segment]),
                                     currPosition: Point,
-                                    lookAheadDistance: Length): (Point, Boolean) = { // point, is backing up after overshoot
+                                    lookAheadDistance: Length): (Point, Boolean) = {
     val lookAheadOnCurrentSegment = intersectionLineCircleFurthestFromStart(
       biSegmentPath._1,
       currPosition,
@@ -142,7 +142,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       intersectionLineCircleFurthestFromStart(s, currPosition, lookAheadDistance)
     }
 
-    implicit val tolerance = Radians(0.00001)
+    implicit val tolerance: Angle = Radians(0.00001)
 
     if (lookAheadOnNextSegment.isDefined) {
       val laPoint = lookAheadOnNextSegment.get
