@@ -91,12 +91,12 @@ class SimulatePurePursuit extends FunSuite {
       val handle = hardware.robotStateStream.foreach{ e =>
         if(i % 10 == 0) {
           writer.println(
-            s"${e.time.toSeconds}\t" +
-            s"${e.position.x.toFeet}\t" +
-            s"${e.position.y.toFeet}\t" +
-            s"${e.forwardVelocity.toFeetPerSecond}\t" +
-            s"${e.angle.toDegrees}\t",
-            s"${e.turnSpeed.toDegreesPerSecond}"
+            s"${e.time}\t" +
+            s"${e.position.x}\t" +
+            s"${e.position.y}\t" +
+            s"${e.forwardVelocity}\t" +
+            s"${e.angle}\t",
+            s"${e.turnSpeed}"
           )
         }
         i = i + 1
@@ -230,7 +230,8 @@ class SimulatePurePursuit extends FunSuite {
   test("Reach destination with path from (-0.1,0) to (0, 5) to (-5, 10)") {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(-0.1), Feet(5)), Point(Feet(-5), Feet(10))),
-      timeOut = Seconds(10)
+      timeOut = Seconds(10),
+      log = true
     )
   }
 }

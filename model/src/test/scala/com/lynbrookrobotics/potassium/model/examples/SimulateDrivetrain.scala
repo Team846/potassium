@@ -3,6 +3,7 @@ package com.lynbrookrobotics.potassium.model.examples
 import com.lynbrookrobotics.potassium.ClockMocking._
 import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.TwoSidedDriveProperties
+import com.lynbrookrobotics.potassium.commons.drivetrain.{ForwardPositionGains, ForwardVelocityGains, TurnPositionGains, TurnVelocityGains}
 import com.lynbrookrobotics.potassium.control.PIDConfig
 import com.lynbrookrobotics.potassium.model.simulations.TwoSidedDriveContainerSimulator
 import com.lynbrookrobotics.potassium.units.GenericValue._
@@ -11,11 +12,6 @@ import squants.mass.{KilogramsMetersSquared, Pounds}
 import squants.motion._
 import squants.space.{Degrees, Feet, Inches, Meters}
 import squants.time.{Milliseconds, Seconds}
-import squants.Time
-import com.lynbrookrobotics.potassium.ClockMocking._
-import com.lynbrookrobotics.potassium.commons.drivetrain.{ForwardPositionGains, ForwardVelocityGains, TurnPositionGains, TurnVelocityGains}
-import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.TwoSidedDriveProperties
-import squants.mass.{KilogramsMetersSquared, Pounds}
 import squants.{Acceleration, Length, Percent, Velocity}
 
 import scala.reflect.io.File
@@ -71,13 +67,16 @@ object SimulateDrivetrain extends App {
   val simulatedComponent = new drivetrainContainer.Drivetrain
 
   var itr = 0l
-  val log = new File(new java.io.File("simlog")).printWriter()
+  private val logLocation = new java.io.File("simlog")
+  println(logLocation.getAbsolutePath)
+  val log = new File(logLocation).printWriter()
   val streamPrintingCancel = hardware.robotStateStream.foreach { e =>
     if (itr == 0) {
       log.println(s"Time\tx\ty\tvelocity\tangle")
     }
     if (itr % 10 == 0) {
-      log.println(s"${e.time.toSeconds}\t${e.position.x.toFeet}\t ${e.position.y.toFeet}\t${e.forwardVelocity.toFeetPerSecond}\t${e.angle.toDegrees}")
+      log.println(s"" +
+        s"${e.time.toSeconds}\t${e.position.x.toFeet}\t ${e.position.y.toFeet}\t${e.forwardVelocity.toFeetPerSecond}\t${e.angle.toDegrees}")
     }
 
     itr += 1
