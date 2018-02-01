@@ -81,7 +81,15 @@ class StreamTest extends FunSuite {
 
     called = false
 
-    preserved.foreach(_ => {}).cancel()
+    preserved.foreach(_ => {}).cancel() // launch
+
+    pub(1)
+
+    assert(called)
+
+    called = false
+
+    preserved.foreach(_ => {}).cancel() // relaunch
 
     pub(1)
 
