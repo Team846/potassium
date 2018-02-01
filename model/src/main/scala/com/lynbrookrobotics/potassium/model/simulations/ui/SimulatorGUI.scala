@@ -1,10 +1,15 @@
 package com.lynbrookrobotics.potassium.model.simulations.ui
 
 import java.awt.Dimension
+import java.io.File
+import java.util.Scanner
 import javax.swing.JFrame
 
 import com.lynbrookrobotics.potassium.units.Point
 import squants.space.{Angle, Length}
+import upickle._
+
+import scala.collection.mutable.ArrayBuffer
 
 class SimulatorGUI(val fieldWidth: Length,
                    val fieldHeight: Length,
@@ -32,5 +37,15 @@ class SimulatorGUI(val fieldWidth: Length,
     val (x, y) = pointToPixels(p)
     canvas.setPoint(x, y)
     canvas.setAngle(a)
+    canvas.repaint()
+  }
+
+  def useLogFile(log: File, doNotLoadIntoMemory: Boolean = false): Unit = {
+    val scanner = new Scanner(log)
+    val data = new ArrayBuffer[Array[String]]()
+    while (scanner.hasNextLine) {
+      val data = scanner.nextLine.replace(",", "").split(" ")
+      val timeStamp = squants
+    }
   }
 }

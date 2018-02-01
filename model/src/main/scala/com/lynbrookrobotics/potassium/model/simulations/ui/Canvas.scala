@@ -49,8 +49,6 @@ class Canvas(val w: Int, val h: Int) extends JPanel {
       val xValues = Array(x1, x2, x3)
       val yValues = Array(y1, y2, y3)
       g.fillPolygon(xValues, yValues, 3)
-      println(x1, x2, x3)
-      println(y1, y2, y3)
 
     }
   }
