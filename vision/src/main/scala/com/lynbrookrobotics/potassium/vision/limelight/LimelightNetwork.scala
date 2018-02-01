@@ -20,6 +20,9 @@ class LimelightNetwork(val table: NetworkTable)(implicit clock: Clock) {
 
   private val txEntry = table.getEntry("tx")
   val xOffsetAngle: Stream[Angle] = Stream.periodic(Milliseconds(5))(Degrees(txEntry.getDouble(0)))
+
+  private val tvEntry = table.getEntry("tv")
+  val hasTarget: Stream[Boolean] = Stream.periodic(Milliseconds(5))(tvEntry.getDouble(0) == 1.0)
 }
 
 object LimelightNetwork{

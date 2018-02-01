@@ -2,6 +2,7 @@ package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle
 
 import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.commons.drivetrain.purePursuit.PurePursuitControllers
+import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.TwoSidedSignal
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask}
 import com.lynbrookrobotics.potassium.{Component, Signal}
@@ -369,6 +370,33 @@ trait UnicycleCoreTasks {
     override def onEnd(): Unit = {
       drive.resetToDefault()
     }
+  }
+
+  class DriveToTarget(drivetrainComponent: Drivetrain, distanceToTarget: Stream[Option[Length]], angleToTarget: Stream[Angle])
+            (implicit val drivetrainHardware: DrivetrainHardware,
+             implicit val props: Signal[DrivetrainProperties]) extends FiniteTask {
+
+    override def onStart(): Unit = {
+      val turnController: Stream[UnicycleSignal] = turnPositionControl(angleToTarget)._1
+
+      val out = lowerLevelOpenLoop(
+        turnController.map{ p =>
+          UnicycleSignal(Percent(-15), p.turn max Percent(-20) min Percent(20))
+        }
+      )
+
+      drivetrainComponent.setController(out.withCheck(_ =>
+        distanceToTarget.foreach(p =>
+          if (!p.exists(_ >= Feet(2))) {
+            finished()
+          }
+      )))
+    }
+
+    override def onEnd(): Unit = {
+      drivetrainComponent.resetToDefault()
+    }
+
   }
 
 }
