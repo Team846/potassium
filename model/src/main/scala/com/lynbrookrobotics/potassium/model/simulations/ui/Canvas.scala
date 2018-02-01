@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.model.simulations.ui
 
-import java.awt.{Color, Dimension, Graphics}
+import java.awt._
 import javax.swing.JPanel
 
 import squants.Angle
@@ -25,16 +25,19 @@ class Canvas(val w: Int, val h: Int) extends JPanel {
     angleChanged = true
   }
 
-  def rotatePointByAngleAroundOrigin(x: Int, y: Int, a: Int): (Int, Int) = {
+  def rotatePointByAngleAroundOrigin(x: Int, y: Int, a: Int): Tuple2[Int, Int] = {
     val sin = math.sin(a)
     val cos = math.cos(a)
 
     ((x * cos - y * sin).toInt, (x * sin + y * cos).toInt)
   }
 
+
+
   override def paintComponent(g: Graphics): Unit = {
     g.setColor(Color.WHITE)
     g.fillRect(0, 0, w, h)
+
 
     if (positionChanged && angleChanged) {
       g.setColor(Color.BLACK)
@@ -42,12 +45,13 @@ class Canvas(val w: Int, val h: Int) extends JPanel {
       val point2 = rotatePointByAngleAroundOrigin(-5, 10, angle)
       val (x2, y2) = (point2._1 + xPos, point2._2 + yPos)
       val point3 = rotatePointByAngleAroundOrigin(5, 10, angle)
-      val (x3, y3) = (point2._1 + xPos, point2._2 + yPos)
+      val (x3, y3) = (point3._1 + xPos, point3._2 + yPos)
       val xValues = Array(x1, x2, x3)
       val yValues = Array(y1, y2, y3)
       g.fillPolygon(xValues, yValues, 3)
       println(x1, x2, x3)
       println(y1, y2, y3)
+
     }
   }
 
