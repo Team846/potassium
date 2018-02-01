@@ -87,35 +87,14 @@ case class Segment(start: Point, end: Point) {
   val dy = end.y - start.y
   val dx = end.x - start.x
 
-  def withInBoundries(toTest: Point): Boolean = {
-    val minX = (start.x min end.x) - Feet(0.01)
-    val maxX = (start.x max end.x) + Feet(0.01)
-
-    val minY = (start.y min end.y) - Feet(0.01)
-    val maxY = (start.y max end.y) + Feet(0.01)
-
-    toTest.x >= minX && toTest.x <= maxX &&
-      toTest.y >= minY && toTest.y <= maxY
-  }
-
-  /**
-    *
-    * @param toTest to the point to test if contained by this
-    * @return whether the given point is contained by this segment IN THE XY
-    *         plane
-    */
-  def containsInXY(toTest: Point, tolerance: Length): Boolean = {
-    withInBoundries(toTest) && toTest.onLine(this, tolerance)
-  }
-
   def angle: Angle = {
     Radians(math.atan2(dy.toFeet, dx.toFeet))
   }
 
   def pointClosestToOnLine(pt: Point): Point = {
     val lengthSquared = length.squared
-    val ap = Segment(start, pt)
-    val interpolation = (ap.dx * dx + ap.dy * dy) / lengthSquared
+    val apDiff = pt - start
+    val interpolation = diff.dot(apDiff) / lengthSquared
     start + ((end - start) * interpolation)
   }
 }
