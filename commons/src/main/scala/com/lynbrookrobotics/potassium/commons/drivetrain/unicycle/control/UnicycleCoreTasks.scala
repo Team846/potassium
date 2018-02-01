@@ -3,12 +3,12 @@ package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control
 import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitControllers
 import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleSignal, UnicycleVelocity}
+
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask}
 import com.lynbrookrobotics.potassium.{Component, Signal}
 import squants.motion.{AngularVelocity, DegreesPerSecond}
 import squants.space.{Degrees, Feet}
-import squants.time.Milliseconds
 import squants.{Acceleration, Angle, Dimensionless, Length, Percent, Quantity, Time, Velocity}
 
 import scala.collection.immutable.Queue
@@ -387,28 +387,31 @@ trait UnicycleCoreTasks {
   }
 
   class DriveToTarget(drivetrainComponent: Drivetrain, distanceToTarget: Stream[Option[Length]], angleToTarget: Stream[Angle])
-                     (implicit val drivetrainHardware: DrivetrainHardware,
+                    (implicit val drivetrainHardware: DrivetrainHardware,
                       implicit val props: Signal[DrivetrainProperties]) extends FiniteTask {
 
     override def onStart(): Unit = {
-      val turnPosition = drivetrainHardware.turnPosition.zipAsync(angleToTarget).map{t =>
+
+      val turnPosition = drivetrainHardware.turnPosition.zipAsync(angleToTarget).map { t =>
         t._1 + t._2
       }
 
       val turnController: Stream[UnicycleSignal] = turnPositionControl(turnPosition)._1
 
       val out = childOpenLoop(
-        turnController.map{ p =>
+        turnController.map { p =>
           UnicycleSignal(Percent(-15), p.turn max Percent(-20) min Percent(20))
         }
       )
+
+
 
       drivetrainComponent.setController(out.withCheck(_ =>
         distanceToTarget.foreach(p =>
           if (!p.exists(_ >= Feet(2))) {
             finished()
           }
-        )))
+      )))
     }
 
     override def onEnd(): Unit = {
