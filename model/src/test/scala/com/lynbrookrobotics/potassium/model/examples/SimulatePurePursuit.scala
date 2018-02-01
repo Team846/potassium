@@ -242,7 +242,7 @@ class SimulatePurePursuit extends FunSuite {
     )
   }
 
-  test("two cube auto") {
+  test("Two cube auto - path from switch towards scale") {
     testPurePursuitReachesDestination(
       Seq(
         Point.origin,
