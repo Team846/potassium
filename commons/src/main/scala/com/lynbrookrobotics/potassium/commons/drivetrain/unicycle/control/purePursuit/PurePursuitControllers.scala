@@ -8,6 +8,7 @@ import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import squants.Dimensionless
 import squants.space.{Angle, _}
+import MathUtilities._
 
 sealed trait ForwardBackwardMode
 case object Auto extends ForwardBackwardMode
@@ -27,7 +28,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                           (implicit properties: Signal[UnicycleProperties],
                            hardware: UnicycleHardware): Stream[Dimensionless] = {
     val distanceToTarget = position.zip(target).map { p =>
-      p._1 distanceTo p._2
+      p._1.distanceTo(p._2)
     }
 
     PIDF.pid(
@@ -88,7 +89,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       headingToPoint(p._1, p._2._1)
     }
 
-    val errorToTarget = headingToTarget.map(MathUtilities.convertTrigonometricAngleToCompass).zip(turnPosition).map { case (target, current) =>
+    val errorToTarget = headingToTarget.map(convertTrigonometricAngleToCompass).zip(turnPosition).map { case (target, current) =>
       target - current
     }
     val compassHeadingToLookAheadAndReversed = errorToTarget
@@ -110,7 +111,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       errorToTarget.mapToConstant(Degrees(0)),
       compassHeadingToLookAhead,
       props.map(_.turnPositionGains)
-    ).map(MathUtilities.clamp(_, maxTurnOutput))
+    ).map(clamp(_, maxTurnOutput))
 
     val reversed = compassHeadingToLookAheadAndReversed.map(_._2)
     val forwardMultiplier = reversed.map(b => if (b) -1D else 1)
@@ -119,10 +120,16 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
   }
 
 
+  /**
+    * Finds the look ahead, extrapolating beyond the segment when needed
+    * @param biSegmentPath a group of the current and next segments
+    * @param currPosition
+    * @param lookAheadDistance
+    * @return
+    */
   def getExtrapolatedLookAheadPoint(biSegmentPath: (Segment, Option[Segment]),
                                     currPosition: Point,
                                     lookAheadDistance: Length): (Point, Boolean) = { // point, is backing up after overshoot
-    import MathUtilities._
     val lookAheadOnCurrentSegment = intersectionLineCircleFurthestFromStart(
       biSegmentPath._1,
       currPosition,
@@ -158,18 +165,24 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                                 forwardBackwardMode: ForwardBackwardMode)
                                 (implicit hardware: DrivetrainHardware,
                                  props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
-    val biSegmentPaths = wayPoints.sliding(2).map { points =>
-      Segment(points(0), points(1))
-    }.sliding(2).map(l => (l.head, Some(l.last)))
+    val segments = wayPoints.sliding(2).map { points =>
+      Segment(
+        points.head,
+        points.tail.headOption.getOrElse(
+          throw new IllegalArgumentException("There must be at least two waypoints. Did you forget to add the initial point?"
+          )
+        )
+      )
+    }.toSeq
+
+    val biSegmentPaths = segments.sliding(2).map(l => (l.head, l.tail.headOption))
 
     var currPath = biSegmentPaths.next()
 
     val selectedPath = position.map { currPos =>
       if (biSegmentPaths.hasNext &&
-          currPath._2.exists(s =>
-            MathUtilities.interSectionCircleLine(s, currPos, props.get.defaultLookAheadDistance).isDefined
-          )) {
-        println("********** advancing path ***********")
+          currPath._2.exists(s => interSectionCircleLine(s, currPos, props.get.defaultLookAheadDistance).isDefined)) {
+        println("********** Advancing pure pursuit path ***********")
         currPath = biSegmentPaths.next()
       }
 
@@ -190,7 +203,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     )
 
     val distanceToLast = position.map { pose =>
-      pose distanceTo wayPoints.last
+      pose.distanceTo(wayPoints.last)
     }
 
     val limitedAndReversedForward = forwardOutput.map { s =>
