@@ -7,7 +7,7 @@ import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.{FiniteTask, FiniteTaskFinishedListener}
 import com.lynbrookrobotics.potassium.units.Point
 import squants.Dimensionless
-import squants.space.{Angle, Degrees, Feet, Length}
+import squants.space.{Angle, Degrees, Length}
 
 
 trait PurePursuitTasks extends UnicycleCoreTasks {
@@ -25,7 +25,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                        (drive: Drivetrain)
                        (implicit properties: Signal[controllers.DrivetrainProperties],
                         hardware: controllers.DrivetrainHardware) extends FiniteTask with FiniteTaskFinishedListener {
-    private var absoluteFollow: FollowWayPointsWithPosition = null
+    private var absoluteFollow: FollowWayPointsWithPosition = _
 
     override def onFinished(task: FiniteTask): Unit = {
       finished()
