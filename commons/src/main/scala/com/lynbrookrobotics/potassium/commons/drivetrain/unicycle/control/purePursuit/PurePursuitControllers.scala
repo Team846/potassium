@@ -10,6 +10,8 @@ import squants.Dimensionless
 import squants.space.{Angle, _}
 import MathUtilities._
 
+import scala.annotation.tailrec
+
 sealed trait ForwardBackwardMode
 case object Auto extends ForwardBackwardMode
 case object ForwardsOnly extends ForwardBackwardMode
@@ -127,7 +129,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     * @param lookAheadDistance
     * @return
     */
-  def getExtrapolatedLookAheadPoint(biSegmentPath: (Segment, Option[Segment]),
+  @tailrec
+  final def getExtrapolatedLookAheadPoint(biSegmentPath: (Segment, Option[Segment]),
                                     currPosition: Point,
                                     lookAheadDistance: Length): (Point, Boolean) = { // point, is backing up after overshoot
     val lookAheadOnCurrentSegment = intersectionLineCircleFurthestFromStart(
@@ -141,21 +144,21 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
 
     implicit val tolerance = Radians(0.00001)
 
-    lookAheadOnNextSegment.map { laPoint =>
+    if (lookAheadOnNextSegment.isDefined) {
+      val laPoint = lookAheadOnNextSegment.get
       // We project the robot's location onto the segment line (not line segment) and verify that it is on the line
       // by comparing the angle of the projected point to the end versus the start to the end. If these are equal,
       // the robot has not overshot but if they are different (off by 180 degrees), the robot has overshot and we need
       // to forcibly reverse the direction of the robot.
       val angleRobotProjectionToEnd = Segment(biSegmentPath._2.get.pointClosestToOnLine(currPosition), biSegmentPath._2.get.end).angle
       (laPoint, !(angleRobotProjectionToEnd ~= biSegmentPath._2.get.angle))
-    }.getOrElse(
-      lookAheadOnCurrentSegment.map { laPoint =>
-        val angleRobotProjectionToEnd = Segment(biSegmentPath._1.pointClosestToOnLine(currPosition), biSegmentPath._1.end).angle
-        (laPoint, !(angleRobotProjectionToEnd ~= biSegmentPath._1.angle))
-      }.getOrElse(
-        getExtrapolatedLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
-      )
-    )
+    } else if (lookAheadOnCurrentSegment.isDefined) {
+      val laPoint = lookAheadOnCurrentSegment.get
+      val angleRobotProjectionToEnd = Segment(biSegmentPath._1.pointClosestToOnLine(currPosition), biSegmentPath._1.end).angle
+      (laPoint, !(angleRobotProjectionToEnd ~= biSegmentPath._1.angle))
+    } else {
+      getExtrapolatedLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
+    }
   }
 
   def followWayPointsController(wayPoints: Seq[Point],
