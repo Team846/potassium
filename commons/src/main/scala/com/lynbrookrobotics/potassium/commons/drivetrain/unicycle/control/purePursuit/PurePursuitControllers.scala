@@ -7,7 +7,7 @@ import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import squants.Dimensionless
-import squants.space.{Angle, _}
+import squants.space._
 import MathUtilities._
 
 import scala.annotation.tailrec
