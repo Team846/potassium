@@ -14,8 +14,7 @@ class MathUtilitiesTest extends FunSuite {
 
     val segment = Segment(firstPoint, secondPoint)
 
-    val solutions = MathUtilities.interSectionCircleLine(
-      segment,
+    val solutions = segment.intersectionWithCircle(
       origin,
       Feet(1)
     )
@@ -42,8 +41,7 @@ class MathUtilitiesTest extends FunSuite {
 
     val segment = Segment(firstPoint, secondPoint)
 
-    val solutions = MathUtilities.interSectionCircleLine(
-      segment,
+    val solutions = segment.intersectionWithCircle(
       origin,
       Feet(1)
     )
