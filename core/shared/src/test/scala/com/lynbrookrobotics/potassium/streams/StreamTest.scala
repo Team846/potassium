@@ -78,6 +78,14 @@ class StreamTest extends FunSuite {
     pub(0)
 
     assert(called)
+
+    called = false
+
+    preserved.foreach(_ => {}).cancel()
+
+    pub(1)
+
+    assert(called)
   }
 
   test("Sliding over a stream produces correct values") {
