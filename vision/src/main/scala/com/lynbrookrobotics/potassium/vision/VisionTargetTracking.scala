@@ -18,6 +18,6 @@ object VisionTargetTracking {
 
   def angleToTarget(xOffset: Stream[Angle])
                    (implicit props: Signal[VisionProperties]): Stream[Angle] = {
-    xOffset.map(_ + props.get.cameraHorizontalOffset)
+    xOffset.map(-_ - props.get.cameraHorizontalOffset)
   }
 }
