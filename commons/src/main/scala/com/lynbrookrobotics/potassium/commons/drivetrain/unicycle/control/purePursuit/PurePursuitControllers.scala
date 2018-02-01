@@ -165,7 +165,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                                 forwardBackwardMode: ForwardBackwardMode)
                                 (implicit hardware: DrivetrainHardware,
                                  props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
-    val segments = wayPoints.sliding(2).map { points =>
+    val biSegmentPaths = wayPoints.sliding(2).map { points =>
       Segment(
         points.head,
         points.tail.headOption.getOrElse(
@@ -173,9 +173,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
           )
         )
       )
-    }.toSeq
-
-    val biSegmentPaths = segments.sliding(2).map(l => (l.head, l.tail.headOption))
+    }.sliding(2).map(l => (l.head, l.tail.headOption))
 
     var currPath = biSegmentPaths.next()
 
