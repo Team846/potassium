@@ -7,10 +7,10 @@ import squants.motion.RadiansPerSecond
 import squants.{Dimensionless, Each, Length, Percent, Velocity}
 
 object BlendedDriving {
-  def driveWithRadius(radius: Stream[Length],
-                      velocity: Stream[Velocity])
+  def driveWithRadius(radiusStream: Stream[Length],
+                      velocityStream: Stream[Velocity])
                      (implicit props: Signal[TwoSidedDriveProperties]): Stream[TwoSided[Velocity]] = {
-    velocity.zip(radius).map { case (velocity, radius) =>
+    velocityStream.zip(radiusStream).map { case (velocity, radius) =>
       if (radius.value == Double.PositiveInfinity || radius.value == Double.NegativeInfinity || radius.value == Double.NaN) {
         TwoSided(velocity, velocity)
       } else {
@@ -46,7 +46,7 @@ object BlendedDriving {
                    targetForwardVelocity: Stream[Velocity],
                    curvature: Stream[Ratio[Dimensionless, Length]])
                   (implicit properties: Signal[TwoSidedDriveProperties]): Stream[TwoSided[Velocity]] = {
-    val constantRadiusSpeed = driveWithRadius(radius = curvature.map(curvature => curvature.den / curvature.num.toEach), targetForwardVelocity)
+    val constantRadiusSpeed = driveWithRadius(radiusStream = curvature.map(curvature => curvature.den / curvature.num.toEach), targetForwardVelocity)
 
 
     tankSpeed.zip(constantRadiusSpeed).zip(targetForwardVelocity).map {
