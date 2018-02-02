@@ -51,7 +51,6 @@ object BlendedDriving {
 
 
 
-
     tankSpeed.zip(constantRadiusSpeed).zip(targetForwardVelocity).map {
       case ((tankSpeed, carSpeed), targetForward) =>
         TwoSided(
