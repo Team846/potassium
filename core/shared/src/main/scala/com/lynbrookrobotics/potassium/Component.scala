@@ -17,7 +17,6 @@ import com.lynbrookrobotics.potassium.streams.{Cancel, NonPeriodic, Stream}
 abstract class Component[T] {
   def defaultController: Stream[T]
   private var currentControllerHandle: Option[Cancel] = None
-  setController(defaultController)
 
   private var lastControlSignal: Option[T] = None
 
