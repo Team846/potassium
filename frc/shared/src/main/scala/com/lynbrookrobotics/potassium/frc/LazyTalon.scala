@@ -104,8 +104,8 @@ class LazyTalon(
   def applyCommand(s: VelocityBangBang): Unit = {
     import s._
     setPeakAndNominalOutputs(
-      peakOutputForward = if (powerWhenBelow) defaultPeakOutputForward else 0,
-      peakOutputReverse = if (powerWhenAbove) defaultPeakOutputReverse else 0
+      peakOutputForward = if (forwardWhenBelow) defaultPeakOutputForward else 0,
+      peakOutputReverse = if (reverseWhenAbove) defaultPeakOutputReverse else 0
     )
     last match {
       case Some(last: VelocityBangBang) =>

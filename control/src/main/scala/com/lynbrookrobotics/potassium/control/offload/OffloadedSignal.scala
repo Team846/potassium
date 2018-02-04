@@ -11,7 +11,7 @@ object OffloadedSignal {
 
   case class PositionPID(gains: NativePositionGains, signal: Dimensionless) extends OffloadedSignal
 
-  case class VelocityBangBang(powerWhenBelow: Boolean, powerWhenAbove: Boolean, signal: Dimensionless) extends OffloadedSignal
+  case class VelocityBangBang(forwardWhenBelow: Boolean, reverseWhenAbove: Boolean, signal: Dimensionless) extends OffloadedSignal
 
   case class PositionBangBang(forwardWhenBelow: Boolean, reverseWhenAbove: Boolean, signal: Dimensionless) extends OffloadedSignal
 
