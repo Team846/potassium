@@ -4,7 +4,7 @@ import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.{TwoSided, TwoSidedDrive}
 import com.lynbrookrobotics.potassium.control.offload.EscConfig._
 import com.lynbrookrobotics.potassium.control.offload.OffloadedSignal
-import com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.{OpenLoop, PositionControl, VelocityControl}
+import com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.{OpenLoop, PositionPID, VelocityPIDF}
 import com.lynbrookrobotics.potassium.streams.Stream
 import squants.space.Length
 import squants.{Dimensionless, Velocity}
@@ -20,10 +20,10 @@ abstract class OffloadedDrive extends TwoSidedDrive {
       implicit val curProps: Properties = props.get
       implicit val c = curProps.escConfig
       TwoSided(
-        VelocityControl(
+        VelocityPIDF(
           forwardToAngularVelocityGains(curProps.leftVelocityGainsFull), ticks(left)
         ),
-        VelocityControl(
+        VelocityPIDF(
           forwardToAngularVelocityGains(curProps.rightVelocityGainsFull), ticks(right)
         )
       )
@@ -36,10 +36,10 @@ abstract class OffloadedDrive extends TwoSidedDrive {
       implicit val curProps: Properties = props.get
       implicit val c = curProps.escConfig
       TwoSided(
-        PositionControl(
+        PositionPID(
           forwardToAngularPositionGains(curProps.forwardPositionGains), ticks(left)
         ),
-        PositionControl(
+        PositionPID(
           forwardToAngularPositionGains(curProps.forwardPositionGains), ticks(right)
         )
       )

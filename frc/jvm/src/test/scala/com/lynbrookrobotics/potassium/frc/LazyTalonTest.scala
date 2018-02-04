@@ -4,7 +4,7 @@ import com.ctre.phoenix.ErrorCode
 import com.ctre.phoenix.motorcontrol.ControlMode
 import com.ctre.phoenix.motorcontrol.can.TalonSRX
 import com.lynbrookrobotics.potassium.control.offload.EscConfig.{NativePositionGains, NativeVelocityGains}
-import com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.{OpenLoop, PositionControl, VelocityControl}
+import com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.{OpenLoop, PositionBangBang, PositionPID, VelocityPIDF}
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers._
 import org.mockito.Mockito.when
@@ -15,7 +15,7 @@ import squants.{Each, Percent}
 class LazyTalonTest extends FunSuite with MockitoSugar {
   test("LazyTalons apply OpenLoop is lazy") {
     val mockedTalon = mock[TalonSRX]
-    val lazyTalon = new LazyTalon(mockedTalon, 0, 0)
+    val lazyTalon = new LazyTalon(mockedTalon, 0, 0, -1, 1)
 
     var percOutCalled = 0
 
@@ -48,9 +48,80 @@ class LazyTalonTest extends FunSuite with MockitoSugar {
     assert(percOutCalled == 3)
   }
 
-  test("LazyTalons apply Position is lazy") {
+  test("LazyTalons apply PositionBangBang is lazy") {
     val mockedTalon = mock[TalonSRX]
-    val lazyTalon = new LazyTalon(mockedTalon, 0, 0)
+    val lazyTalon = new LazyTalon(mockedTalon, 0, 0, -1, 1)
+
+    var cpofCalled = 0
+    var cporCalled = 0
+    var kpSetCalled = 0
+    var posOutCalled = 0
+
+    when(mockedTalon.configPeakOutputForward(anyDouble(), anyInt())).then(_ => {
+      cpofCalled += 1
+      ErrorCode.OK
+    })
+    when(mockedTalon.configPeakOutputReverse(anyDouble(), anyInt())).then(_ => {
+      cporCalled += 1
+      ErrorCode.OK
+    })
+    when(mockedTalon.config_kP(anyInt(), anyDouble(), anyInt())).then(_ => {
+      kpSetCalled += 1
+      ErrorCode.OK
+    })
+    when(mockedTalon.set(ArgumentMatchers.eq(ControlMode.Position), anyDouble())).then(_ => {
+      posOutCalled += 1
+    })
+
+    val pctrl1 = PositionBangBang(forwardWhenBelow = true, reverseWhenAbove = true, Each(1))
+    val pctrl2 = PositionBangBang(forwardWhenBelow = false, reverseWhenAbove = false, Each(2))
+    val pctrl3 = PositionBangBang(forwardWhenBelow = true, reverseWhenAbove = false, Each(3))
+    val pctrl4 = PositionBangBang(forwardWhenBelow = false, reverseWhenAbove = true, Each(4))
+
+    lazyTalon.applyCommand(pctrl1)
+    lazyTalon.applyCommand(pctrl1)
+    lazyTalon.applyCommand(pctrl1)
+    assert(cpofCalled == 0)
+    assert(cporCalled == 0)
+    assert(kpSetCalled == 1)
+    assert(posOutCalled == 1)
+
+    lazyTalon.applyCommand(pctrl2)
+    lazyTalon.applyCommand(pctrl2)
+    lazyTalon.applyCommand(pctrl2)
+    assert(cpofCalled == 1)
+    assert(cporCalled == 1)
+    assert(kpSetCalled == 1)
+    assert(posOutCalled == 2)
+
+    lazyTalon.applyCommand(pctrl1)
+    lazyTalon.applyCommand(pctrl1)
+    lazyTalon.applyCommand(pctrl1)
+    assert(cpofCalled == 2)
+    assert(cporCalled == 2)
+    assert(kpSetCalled == 1)
+    assert(posOutCalled == 3)
+
+    lazyTalon.applyCommand(pctrl3)
+    lazyTalon.applyCommand(pctrl3)
+    lazyTalon.applyCommand(pctrl3)
+    assert(cpofCalled == 2)
+    assert(cporCalled == 3)
+    assert(kpSetCalled == 1)
+    assert(posOutCalled == 4)
+
+    lazyTalon.applyCommand(pctrl4)
+    lazyTalon.applyCommand(pctrl4)
+    lazyTalon.applyCommand(pctrl4)
+    assert(cpofCalled == 3)
+    assert(cporCalled == 4)
+    assert(kpSetCalled == 1)
+    assert(posOutCalled == 5)
+  }
+
+  test("LazyTalons apply PositionPID is lazy") {
+    val mockedTalon = mock[TalonSRX]
+    val lazyTalon = new LazyTalon(mockedTalon, 0, 0, -1, 1)
 
     var posOutCalled = 0
     var kpSetCalled = 0
@@ -77,8 +148,8 @@ class LazyTalonTest extends FunSuite with MockitoSugar {
       ErrorCode.OK
     })
 
-    val pctrl1 = PositionControl(NativePositionGains(1, 2, 3), Each(4))
-    val pctrl2 = PositionControl(NativePositionGains(5, 6, 7), Each(8))
+    val pctrl1 = PositionPID(NativePositionGains(1, 2, 3), Each(4))
+    val pctrl2 = PositionPID(NativePositionGains(5, 6, 7), Each(8))
 
     lazyTalon.applyCommand(pctrl1)
     assert(posOutCalled == 1)
@@ -117,9 +188,9 @@ class LazyTalonTest extends FunSuite with MockitoSugar {
     assert(kdSetCalled == 3)
   }
 
-  test("LazyTalons apply Velocity is lazy") {
+  test("LazyTalons apply VelocityPIDF is lazy") {
     val mockedTalon = mock[TalonSRX]
-    val lazyTalon = new LazyTalon(mockedTalon, 0, 0)
+    val lazyTalon = new LazyTalon(mockedTalon, 0, 0, -1, 1)
 
     var velOutCalled = 0
     var kpSetCalled = 0
@@ -151,8 +222,8 @@ class LazyTalonTest extends FunSuite with MockitoSugar {
       ErrorCode.OK
     })
 
-    val vctrl1 = VelocityControl(NativeVelocityGains(1, 2, 3, 4), Each(5))
-    val vctrl2 = VelocityControl(NativeVelocityGains(6, 7, 8, 9), Each(10))
+    val vctrl1 = VelocityPIDF(NativeVelocityGains(1, 2, 3, 4), Each(5))
+    val vctrl2 = VelocityPIDF(NativeVelocityGains(6, 7, 8, 9), Each(10))
 
     lazyTalon.applyCommand(vctrl1)
     assert(velOutCalled == 1)

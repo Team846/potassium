@@ -3,7 +3,7 @@ package com.lynbrookrobotics.potassium.commons.lift.offloaded
 import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.commons.lift.Lift
 import com.lynbrookrobotics.potassium.control.offload.OffloadedSignal
-import com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.{OpenLoop, PositionControl}
+import com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.{OpenLoop, PositionPID}
 import com.lynbrookrobotics.potassium.streams._
 import squants.Dimensionless
 import squants.space.Length
@@ -24,7 +24,7 @@ abstract class OffloadedLift extends Lift {
     target.map { it =>
       val curProps = properties.get
       implicit val c = curProps.escConfig
-      PositionControl(
+      PositionPID(
         forwardToAngularPositionGains(curProps.positionGains), ticks(it)
       )
     }
