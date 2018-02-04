@@ -62,6 +62,24 @@ abstract class Stream[+T] { self =>
   }
 
   /**
+    * Creates a stream that automatically boots up and never unsubscribes from its parent
+    * @return the new stream
+    */
+  def preserve: Stream[T] = {
+    new Stream[T] {
+      self.foreach(v => this.publishValue(v))
+
+      override def subscribeToParents(): Unit = {}
+      override def unsubscribeFromParents(): Unit = {}
+
+      override def checkRelaunch(): Unit = {}
+
+      override val expectedPeriodicity: ExpectedPeriodicity = self.expectedPeriodicity
+      override val originTimeStream = self.originTimeStream
+    }
+  }
+
+  /**
     * Transforms a stream using a single value function from original stream
     * input to new stream emission
     * @param f the function to use to transform values

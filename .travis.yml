@@ -18,8 +18,7 @@ install:
   - mkdir -p ~/.sbt/0.13/plugins
   - echo 'addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0")' > ~/.sbt/0.13/plugins/build.sbt
 script:
-  - 'sbt clean coverage testAll coverageReport'
-  - 'sbt coverageAggregate'
+  - 'sbt clean coverage testAll coverageReport coverageAggregate'
 jdk: oraclejdk8
 after_success:
   - 'bash <(curl -s https://codecov.io/bash)'
