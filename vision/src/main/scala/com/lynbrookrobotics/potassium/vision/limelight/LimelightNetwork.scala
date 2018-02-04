@@ -1,6 +1,7 @@
 package com.lynbrookrobotics.potassium.vision.limelight
 
 import com.lynbrookrobotics.potassium.clock.Clock
+import com.lynbrookrobotics.potassium.events.ContinuousEvent
 import com.lynbrookrobotics.potassium.streams._
 import edu.wpi.first.networktables.{NetworkTable, NetworkTableInstance}
 import squants.{Dimensionless, Percent}
@@ -23,6 +24,11 @@ class LimelightNetwork(val table: NetworkTable)(implicit clock: Clock) {
 
   private val tvEntry = table.getEntry("tv")
   val hasTarget: Stream[Boolean] = Stream.periodic(Milliseconds(5))(tvEntry.getDouble(0) == 1.0)
+
+  val hasTargetEvent: ContinuousEvent = hasTarget.eventWhen(detected => detected)
+  hasTargetEvent.foreach(() =>{
+
+  })
 }
 
 object LimelightNetwork {
@@ -30,3 +36,5 @@ object LimelightNetwork {
     new LimelightNetwork(NetworkTableInstance.getDefault.getTable("/limelight"))
   }
 }
+
+
