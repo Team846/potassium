@@ -2,7 +2,7 @@ package com.lynbrookrobotics.potassium
 
 import com.lynbrookrobotics.potassium.clock.Clock
 import squants.Time
-import com.lynbrookrobotics.potassium.streams.{NonPeriodic, Stream}
+import com.lynbrookrobotics.potassium.streams.{Cancel, NonPeriodic, Stream}
 
 /**
   * Represents a single robotic component, which translates signal data into action
@@ -16,8 +16,7 @@ import com.lynbrookrobotics.potassium.streams.{NonPeriodic, Stream}
   */
 abstract class Component[T] {
   def defaultController: Stream[T]
-  private var currentControllerHandle: Option[() => Unit] = None
-  setController(defaultController)
+  private var currentControllerHandle: Option[Cancel] = None
 
   private var lastControlSignal: Option[T] = None
 
@@ -32,7 +31,7 @@ abstract class Component[T] {
       throw new IllegalArgumentException("Controller must be periodic")
     }
 
-    currentControllerHandle.foreach(_.apply())
+    currentControllerHandle.foreach(_.cancel())
 
     currentControllerHandle = Some(controller.foreach { value =>
       val shouldUpdate = lastControlSignal.isEmpty ||

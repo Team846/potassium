@@ -1,15 +1,11 @@
 package com.lynbrookrobotics.potassium.streams
 
-import java.util.concurrent.Semaphore
-
 import com.lynbrookrobotics.potassium.clock.Clock
 import squants.Quantity
 import squants.time.{Time, TimeDerivative, TimeIntegral}
 
 import scala.collection.immutable.Queue
-import scala.ref.WeakReference
-import com.lynbrookrobotics.potassium.Platform
-import com.lynbrookrobotics.potassium.events.{ContinuousEvent, ImpulseEvent, ImpulseEventSource, PollingContinuousEvent}
+import com.lynbrookrobotics.potassium.events.{ContinuousEvent, ImpulseEvent, ImpulseEventSource}
 
 import scala.annotation.unchecked.uncheckedVariance
 
@@ -20,9 +16,67 @@ abstract class Stream[+T] { self =>
 
   private[this] var listeners = Vector.empty[T => Unit]
 
+  private var hasShutdown = false
+  def subscribeToParents(): Unit
+  def unsubscribeFromParents(): Unit
+  def checkRelaunch(): Unit = {}
+
   protected def publishValue(value: T @uncheckedVariance): Unit = {
     listeners.foreach(_.apply(value))
     // TODO: more stuff maybe
+  }
+
+  /**
+    * Adds a listener for elements of this stream. Callbacks will be executed
+    * whenever a new value is published in order of when the callbacks were added.
+    * Callbacks added first will be called first and callbacks added last will
+    * be called last.
+    *
+    * @param thunk the listener to be called on each published value
+    * @return a function to call to remove the listener
+    */
+  def foreach(thunk: T => Unit): Cancel = {
+    self.synchronized {
+      listeners = listeners :+ thunk
+      if (listeners.size == 1) {
+        // first listener, boot up!
+        if (hasShutdown) {
+          checkRelaunch()
+        }
+
+        subscribeToParents()
+      }
+    }
+
+    new Cancel {
+      override def cancel(): Unit = self.synchronized {
+        listeners = listeners.filterNot(_ eq thunk)
+
+        if (listeners.isEmpty) {
+          // we are shutting down!
+          unsubscribeFromParents()
+          hasShutdown = true
+        }
+      }
+    }
+  }
+
+  /**
+    * Creates a stream that automatically boots up and never unsubscribes from its parent
+    * @return the new stream
+    */
+  def preserve: Stream[T] = {
+    new Stream[T] {
+      self.foreach(v => this.publishValue(v))
+
+      override def subscribeToParents(): Unit = {}
+      override def unsubscribeFromParents(): Unit = {}
+
+      override def checkRelaunch(): Unit = {}
+
+      override val expectedPeriodicity: ExpectedPeriodicity = self.expectedPeriodicity
+      override val originTimeStream = self.originTimeStream
+    }
   }
 
   /**
@@ -32,26 +86,27 @@ abstract class Stream[+T] { self =>
     * @tparam O the type of values in the new stream
     * @return a stream with values transformed by the given function
     */
-  def map[O](f: T => O): Stream[O] = {
-    val ret = new Stream[O] {
-      private val parent = self
+  def map[O](f: T => O, allowRestart: Boolean = true): Stream[O] = {
+    new Stream[O] {
+      var unsubscribe: Cancel = null
+
+      override def subscribeToParents(): Unit = {
+        unsubscribe = self.foreach(v => this.publishValue(f(v)))
+      }
+
+      override def unsubscribeFromParents(): Unit = {
+        unsubscribe.cancel(); unsubscribe = null
+      }
+
+      override def checkRelaunch(): Unit = {
+        if (!allowRestart) {
+          throw new IllegalStateException("This mapped stream has been marked as non-relaunchable. You may want to use .preserve to prevent stream shutdown.")
+        }
+      }
+
       override val expectedPeriodicity = self.expectedPeriodicity
       override val originTimeStream = self.originTimeStream
     }
-
-    val ptr = WeakReference(ret)
-
-    var cancel: Cancel = null
-    cancel = this.foreach { v =>
-      ptr.get match {
-        case Some(s) =>
-          s.publishValue(f(v))
-        case None =>
-          cancel.apply()
-      }
-    }
-
-    ret
   }
 
   def mapToConstant[O](output: O): Stream[O] = {
@@ -67,13 +122,13 @@ abstract class Stream[+T] { self =>
     */
   def relativize[O](f: (T, T) => O): Stream[O] = {
     var firstValue: Option[T] = None
-    map { v =>
+    map({ v =>
       if (firstValue.isEmpty) {
         firstValue = Some(v)
       }
 
       f(firstValue.get, v)
-    }
+    }, allowRestart = false)
   }
 
   /**
@@ -93,31 +148,7 @@ abstract class Stream[+T] { self =>
     * @return a stream with the values from both streams brought together
     */
   def zip[O](other: Stream[O]): Stream[(T, O)] = {
-    val ret = new ZippedStream[T, O](this, other)
-    val ptr = WeakReference(ret)
-
-    var aCancel: Cancel = null
-    aCancel = this.foreach { a =>
-      ptr.get match {
-        case Some(s) =>
-          s.receiveA(a)
-        case None =>
-          aCancel.apply()
-      }
-    }
-
-    var bCancel: Cancel = null
-
-    bCancel = other.foreach { b =>
-      ptr.get match {
-        case Some(s) =>
-          s.receiveB(b)
-        case None =>
-          bCancel.apply()
-      }
-    }
-
-    ret
+    new ZippedStream[T, O](this, other, skipTimestampCheck = false)
   }
 
   /**
@@ -134,31 +165,7 @@ abstract class Stream[+T] { self =>
       case (Periodic(a), Periodic(b)) if a eq b =>
         zip(other)
       case _ =>
-        val ret = new AsyncZippedStream[T, O](this, other)
-        val ptr = WeakReference(ret)
-
-        var aCancel: Cancel = null
-        aCancel = this.foreach { a =>
-          ptr.get match {
-            case Some(s) =>
-              s.receivePrimary(a)
-            case None =>
-              aCancel.apply()
-          }
-        }
-
-        var bCancel: Cancel = null
-
-        bCancel = other.foreach { b =>
-          ptr.get match {
-            case Some(s) =>
-              s.receiveSecondary(b)
-            case None =>
-              bCancel.apply()
-          }
-        }
-
-        ret
+        new AsyncZippedStream[T, O](this, other)
     }
   }
 
@@ -171,31 +178,7 @@ abstract class Stream[+T] { self =>
     * @return a stream with the values from both streams brought together
     */
   def zipEager[O](other: Stream[O]): Stream[(T, O)] = {
-    val ret = new EagerZippedStream[T, O](this, other)
-    val ptr = WeakReference(ret)
-
-    var aCancel: Cancel = null
-    aCancel = this.foreach { a =>
-      ptr.get match {
-        case Some(s) =>
-          s.receiveA(a)
-        case None =>
-          aCancel.apply()
-      }
-    }
-
-    var bCancel: Cancel = null
-
-    bCancel = other.foreach { b =>
-      ptr.get match {
-        case Some(s) =>
-          s.receiveB(b)
-        case None =>
-          bCancel.apply()
-      }
-    }
-
-    ret
+    new EagerZippedStream[T, O](this, other)
   }
 
   /**
@@ -205,7 +188,7 @@ abstract class Stream[+T] { self =>
     * @return a stream with tuples of emitted values and the time of emission
     */
   def zipWithTime: Stream[(T, Time)] = {
-    zip(originTimeStream.get)
+    new ZippedStream[T, Time](this, originTimeStream.get, skipTimestampCheck = true)
   }
 
   /**
@@ -214,22 +197,12 @@ abstract class Stream[+T] { self =>
     * @return a stream returning complete windows
     */
   def sliding(size: Int): Stream[Queue[T]] = {
-    var last = Queue.empty[T]
+    new Stream[Queue[T]] {
+      var unsubscribe: Cancel = null
+      var last = Queue.empty[T]
 
-    val ret = new Stream[Queue[T]] {
-      private val parent = self
-      override val expectedPeriodicity = self.expectedPeriodicity
-      override val originTimeStream = self.originTimeStream.map { o =>
-        o.sliding(size).map(_.last)
-      }
-    }
-
-    val ptr = WeakReference(ret)
-
-    var cancel: Cancel = null
-    cancel = this.foreach { v =>
-      ptr.get match {
-        case Some(s) =>
+      override def subscribeToParents(): Unit = {
+        unsubscribe = self.foreach { v =>
           if (last.size == size) {
             last = last.tail
           }
@@ -237,14 +210,24 @@ abstract class Stream[+T] { self =>
           last = last :+ v
 
           if (last.size == size) {
-            s.publishValue(last)
+            this.publishValue(last)
           }
-        case None =>
-          cancel.apply()
+        }
+      }
+
+      override def unsubscribeFromParents(): Unit = {
+        unsubscribe.cancel(); unsubscribe = null
+      }
+
+      override def checkRelaunch(): Unit = {
+        throw new IllegalStateException("Sliding streams cannot be relaunched")
+      }
+
+      override val expectedPeriodicity = self.expectedPeriodicity
+      override val originTimeStream = self.originTimeStream.map { o =>
+        o.sliding(size).map(_.last)
       }
     }
-
-    ret
   }
 
   /**
@@ -258,10 +241,10 @@ abstract class Stream[+T] { self =>
   def scanLeft[U](initialValue: U)(f: (U, T) => U): Stream[U] = {
     var latest = initialValue
 
-    map { v =>
+    map({ v =>
       latest = f(latest, v)
       latest
-    }
+    }, allowRestart = false)
   }
 
   /**
@@ -272,37 +255,6 @@ abstract class Stream[+T] { self =>
     zipWithTime.sliding(2).map { q =>
       (q.last._1, q.last._2 - q.head._2)
     }
-  }
-
-  /**
-    * Returns a stream that skips emitting the first n values
-    * @param n the number of values to skip
-    */
-  def drop(n: Int): Stream[T] = {
-    val ret = new Stream[T] {
-      private val parent = self
-      override val expectedPeriodicity = self.expectedPeriodicity
-      override val originTimeStream = self.originTimeStream.map(_.drop(n))
-    }
-
-    val ptr = WeakReference(ret)
-
-    var emittedValues = 0
-
-    var cancel: Cancel = null
-    cancel = this.foreach { v =>
-      ptr.get match {
-        case Some(s) =>
-          emittedValues += 1
-          if (emittedValues > n) {
-            s.publishValue(v)
-          }
-        case None =>
-          cancel.apply()
-      }
-    }
-
-    ret
   }
 
   /**
@@ -379,62 +331,6 @@ abstract class Stream[+T] { self =>
   }
 
   /**
-    * Defers emitted values from this stream to another thread
-    * Note: right now, this only works on the JVM
-    * @return a stream that emits values in the context of a new thread
-    */
-  def defer: Stream[T] = {
-    if (Platform.isJVM) {
-      val ret = new Stream[T] {
-        private val parent = self
-        override val expectedPeriodicity = self.expectedPeriodicity
-        override val originTimeStream = self.originTimeStream
-      }
-
-      val ptr = WeakReference(ret)
-
-      var lastValue: Option[T] = None
-      val semaphore = new Semaphore(0)
-      val thread = new Thread(new Runnable {
-        override def run(): Unit = {
-          var shouldRun = true
-          while (shouldRun) {
-            semaphore.acquire()
-
-            if (lastValue == null) {
-              shouldRun = false
-            } else {
-              lastValue.foreach { v =>
-                ptr.get.foreach(_.publishValue(v))
-              }
-            }
-          }
-        }
-      })
-
-      thread.start()
-
-
-      var cancel: Cancel = null
-      cancel = foreach { v =>
-        ptr.get match {
-          case Some(s) =>
-            lastValue = Some(v)
-            semaphore.release()
-
-          case None =>
-            lastValue = null
-            semaphore.release()
-        }
-      }
-
-      ret
-    } else {
-      this
-    }
-  }
-
-  /**
     * Creates a stream that emits values at the given rate by polling
     * from the original stream
     * @param period the period to poll at
@@ -471,7 +367,21 @@ abstract class Stream[+T] { self =>
     * @return a stream that only emits values that pass the condition
     */
   def filter(condition: T => Boolean): Stream[T] = {
-    val ret = new Stream[T] {
+    new Stream[T] {
+      var unsubscribe: Cancel = null
+
+      override def subscribeToParents(): Unit = {
+        unsubscribe = self.foreach { v =>
+          if (condition(v)) {
+            this.publishValue(v)
+          }
+        }
+      }
+
+      override def unsubscribeFromParents(): Unit = {
+        unsubscribe.cancel(); unsubscribe = null
+      }
+
       private val parent = self
       override val expectedPeriodicity = NonPeriodic
       // TODO: optimize
@@ -479,22 +389,6 @@ abstract class Stream[+T] { self =>
         _.zip(self).filter(t => condition(t._2)).map(_._1)
       )
     }
-
-    val ptr = WeakReference(ret)
-
-    var cancel: Cancel = null
-    cancel = this.foreach { v =>
-      ptr.get match {
-        case Some(s) =>
-          if (condition(v)) {
-            s.publishValue(v)
-          }
-        case None =>
-          cancel.apply()
-      }
-    }
-
-    ret
   }
 
   /**
@@ -508,35 +402,20 @@ abstract class Stream[+T] { self =>
       val cancel = self.foreach(v => updateEventState(condition.apply(v)))
     }
   }
-
-  /**
-    * Adds a listener for elements of this stream. Callbacks will be executed
-    * whenever a new value is published in order of when the callbacks were added.
-    * Callbacks added first will be called first and callbacks added last will
-    * be called last.
-    *
-    * @param thunk the listener to be called on each published value
-    * @return a function to call to remove the listener
-    */
-  def foreach(thunk: T => Unit): Cancel = {
-    self.synchronized {
-      listeners = listeners :+ thunk
-    }
-
-    () => {
-      self.synchronized {
-        listeners = listeners.filterNot(_ eq thunk)
-      }
-    }
-  }
 }
 
 object Stream {
   def periodic[T](period: Time)(value: => T)(implicit clock: Clock): Stream[T] = {
     new Stream[T] { self =>
+      override def subscribeToParents(): Unit = {}
+      override def unsubscribeFromParents(): Unit = {}
+
       override val expectedPeriodicity = Periodic(period)
 
       override val originTimeStream = Some(new Stream[Time] {
+        override def subscribeToParents(): Unit = {}
+        override def unsubscribeFromParents(): Unit = {}
+
         override val expectedPeriodicity = self.expectedPeriodicity
         override val originTimeStream = None
       })
@@ -558,6 +437,9 @@ object Stream {
 
   def manual[T](periodicity: ExpectedPeriodicity): (Stream[T], T => Unit) = {
     val stream = new Stream[T] {
+      override def subscribeToParents(): Unit = {}
+      override def unsubscribeFromParents(): Unit = {}
+
       override val expectedPeriodicity: ExpectedPeriodicity = periodicity
 
       override val originTimeStream = None
@@ -576,9 +458,15 @@ object Stream {
 
   def manualWithTime[T](periodicity: ExpectedPeriodicity)(implicit clock: Clock): (Stream[T], T => Unit) = {
     val stream = new Stream[T] {
+      override def subscribeToParents(): Unit = {}
+      override def unsubscribeFromParents(): Unit = {}
+
       override val expectedPeriodicity: ExpectedPeriodicity = periodicity
 
       override val originTimeStream = Some(new Stream[Time] {
+        override def subscribeToParents(): Unit = {}
+        override def unsubscribeFromParents(): Unit = {}
+
         override val expectedPeriodicity: ExpectedPeriodicity = periodicity
         override val originTimeStream = None
       })

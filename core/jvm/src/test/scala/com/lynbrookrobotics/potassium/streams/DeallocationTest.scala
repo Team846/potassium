@@ -34,7 +34,7 @@ class DeallocationTest extends FunSuite {
     var count = 0
 
     while (value.get.isDefined) {
-      if (count >= 20) {
+      if (count >= 30) {
         assert(false, "Did not deallocate")
       }
 
@@ -44,77 +44,79 @@ class DeallocationTest extends FunSuite {
   }
 
   private def testDoesNotDeallocate[T <: AnyRef](value: WeakReference[T]): Unit = {
-    (1 to 20).foreach(_ => System.gc())
+    (1 to 30).foreach(_ => System.gc())
 
     if (value.get.isEmpty) {
       assert(false, "Did deallocate")
     }
   }
 
-  test("Mapped streams can be deallocated") {
-    val parent = Stream.manual[Int]
-    val ptr = WeakReference(parent._1.map(_ + 1))
-    parent._2(0)
-
-
+  def testStreamDeallocation(getStream: (() => Stream[Int]) => Stream[Int]): Unit = {
+    var inputPublishes = List[Int => Unit]()
+    var returnStream = getStream(() => {
+      val ret = Stream.manual[Int]
+      inputPublishes = ret._2 :: inputPublishes
+      ret._1
+    })
+    var cancel = returnStream.foreach(_ => ())
+    inputPublishes.foreach(_.apply(0))
+    cancel.cancel()
+    cancel = null
+    val ptr = WeakReference(returnStream)
+    returnStream = null
     testDeallocates(ptr)
+  }
+
+  test("Mapped streams can be deallocated") {
+    testStreamDeallocation(newStream => {
+      newStream().map(_ + 1)
+    })
   }
 
   test("Zipped streams can be deallocated") {
-    val parent1 = Stream.manual[Int]
-    val parent2 = Stream.manual[Int]
-    val ptr = WeakReference(parent1._1.zip(parent2._1))
-    parent1._2(0)
-    parent2._2(0)
-
-    testDeallocates(ptr)
+    testStreamDeallocation(newStream => {
+      newStream().zip(newStream()).map(t => t._1 + t._2)
+    })
   }
 
   test("Async zipped streams can be deallocated") {
-    val parent1 = Stream.manual[Int]
-    val parent2 = Stream.manual[Int]
-    val ptr = WeakReference(parent1._1.zipAsync(parent2._1))
-    parent1._2(0)
-    parent2._2(0)
-
-    testDeallocates(ptr)
+    testStreamDeallocation(newStream => {
+      newStream().zipAsync(newStream()).map(t => t._1 + t._2)
+    })
   }
 
   test("Eager streams can be deallocated") {
-    val parent1 = Stream.manual[Int]
-    val parent2 = Stream.manual[Int]
-    val ptr = WeakReference(parent1._1.zipEager(parent2._1))
-    parent1._2(0)
-    parent2._2(0)
-
-    testDeallocates(ptr)
+    testStreamDeallocation(newStream => {
+      newStream().zipEager(newStream()).map(t => t._1 + t._2)
+    })
   }
 
   test("Zipped with time streams can be deallocated") {
     implicit val (clock, update) = ClockMocking.mockedClockTicker
 
     val parent = Stream.manualWithTime[Int]
-    val ptr = WeakReference(parent._1.zipWithTime)
-    parent._2(0)
+
+    var returnStream = parent._1.zipWithTime
+    var cancel = returnStream.foreach(_ => ())
+    parent._2.apply(0)
+    cancel.cancel()
+    cancel = null
+    val ptr = WeakReference(returnStream)
+    returnStream = null
 
     testDeallocates(ptr)
   }
 
   test("Sliding streams can be deallocated") {
-    val parent = Stream.manual[Int]
-    val ptr = WeakReference(parent._1.sliding(2))
-    parent._2(0)
-
-    testDeallocates(ptr)
+    testStreamDeallocation(newStream => {
+      newStream().sliding(2).map(q => q.head + q.last)
+    })
   }
 
   test("Synced streams can be deallocated") {
-    val ref = Stream.manual[Int]
-    val str = Stream.manual[Int]
-    val ptr = WeakReference(str._1.syncTo(ref._1))
-    ref._2(0)
-
-    testDeallocates(ptr)
+    testStreamDeallocation(newStream => {
+      newStream().syncTo(newStream())
+    })
   }
 
   test("Mapped intermediate streams are not deallocated") {

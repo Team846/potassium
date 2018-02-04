@@ -19,14 +19,13 @@ abstract class WrapperTask { self =>
     new FiniteTask with FiniteTaskFinishedListener {
       private var state: WrapperTaskState = WrapperStopped
 
-      inner.addFinishedListener(this)
-
       def onStart(): Unit = {
         state = WaitingForReady
 
         self.onReadyToRunInner = Some(() => {
           if (state == WaitingForReady) {
             state = RunningInner
+            inner.setFinishedListener(this)
             inner.init()
           }
         })

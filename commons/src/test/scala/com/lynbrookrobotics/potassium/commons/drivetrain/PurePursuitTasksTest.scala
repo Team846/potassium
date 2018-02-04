@@ -7,6 +7,7 @@ import com.lynbrookrobotics.potassium.control.PIDConfig
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium._
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleDrive, UnicycleHardware, UnicycleProperties, UnicycleSignal}
 import squants.motion.{AngularVelocity, DegreesPerSecond, MetersPerSecond, MetersPerSecondSquared}
 import squants.motion._
 import squants.space.{Degrees, Meters}
@@ -16,21 +17,21 @@ import org.scalatest.FunSuite
 class PurePursuitTasksTest extends FunSuite {
   class TestDrivetrain extends UnicycleDrive {
     override type DriveSignal = UnicycleSignal
-    override type DriveVelocity = UnicycleSignal
+    override type OpenLoopSignal = UnicycleSignal
 
     override type Hardware = UnicycleHardware
     override type Properties = UnicycleProperties
 
-    override protected def convertUnicycleToDrive(uni: UnicycleSignal): DriveSignal = uni
+    override protected def unicycleToOpenLoopSignal(uni: UnicycleSignal): DriveSignal = uni
 
     override protected def controlMode(implicit hardware: Hardware,
                                        props: Properties): UnicycleControlMode = NoOperation
 
-    override protected def driveClosedLoop(signal: Stream[DriveSignal])
-                                          (implicit hardware: Hardware,
-                                           props: Signal[Properties]): Stream[DriveSignal] = {
-      UnicycleControllers.lowerLevelVelocityControl(signal)
-    }
+    override protected def driveClosedLoop(signal: Stream[UnicycleSignal])
+                                          (implicit hardware: UnicycleHardware,
+                                           props: Signal[UnicycleProperties]): Stream[UnicycleSignal] = signal
+
+    override protected def openLoopToDriveSignal(openLoop: UnicycleSignal): UnicycleSignal = openLoop
 
     override type Drivetrain = Component[DriveSignal]
   }
@@ -43,25 +44,25 @@ class PurePursuitTasksTest extends FunSuite {
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
     override val defaultLookAheadDistance: Length = Feet(0.5)
 
-    override val forwardControlGains = PIDConfig(
+    override val forwardVelocityGains: ForwardVelocityGains = PIDConfig(
       Percent(0) / MetersPerSecond(1),
       Percent(0) / Meters(1),
       Percent(0) / MetersPerSecondSquared(1)
     )
 
-    override val turnControlGains = PIDConfig(
+    override val turnVelocityGains: TurnVelocityGains = PIDConfig(
       Percent(0) / DegreesPerSecond(1),
       Percent(0) / Degrees(1),
       Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1))
     )
 
-    override val forwardPositionControlGains = PIDConfig(
+    override val forwardPositionGains: ForwardPositionGains = PIDConfig(
       Percent(100) / defaultLookAheadDistance,
       Percent(0) / (Meters(1).toGeneric * Seconds(1)),
       Percent(0) / MetersPerSecond(1)
     )
 
-    override val turnPositionControlGains = PIDConfig(
+    override val turnPositionGains: TurnPositionGains = PIDConfig(
       Percent(100) / Degrees(90),
       Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
       Percent(0) / DegreesPerSecond(1)

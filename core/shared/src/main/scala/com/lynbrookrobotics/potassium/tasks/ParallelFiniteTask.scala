@@ -13,10 +13,10 @@ class ParallelFiniteTask private[tasks] (first: FiniteTask, second: FiniteTask)
     }
   }
 
-  first.addFinishedListener(this)
-  second.addFinishedListener(this)
-
   override def onStart(): Unit = {
+    first.setFinishedListener(this)
+    second.setFinishedListener(this)
+
     first.init()
     second.init()
   }

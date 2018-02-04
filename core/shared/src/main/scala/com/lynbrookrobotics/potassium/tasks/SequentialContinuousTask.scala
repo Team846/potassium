@@ -16,10 +16,9 @@ class SequentialContinuousTask private[tasks] (first: FiniteTask, second: Contin
     }
   }
 
-  first.addFinishedListener(this)
-
   override def onStart(): Unit = {
     currentPhase = RunningFirst
+    first.setFinishedListener(this)
     first.init()
   }
 

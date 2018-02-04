@@ -14,7 +14,7 @@ object StreamTesting {
 
     values.foreach(push)
 
-    cancelOutputStream.apply()
+    cancelOutputStream.cancel()
 
     outputQueue.toList
   }
@@ -34,7 +34,7 @@ object StreamTesting {
       tick(dt)
     }
 
-    cancelOutputStream.apply()
+    cancelOutputStream.cancel()
 
     outputQueue.toList
   }

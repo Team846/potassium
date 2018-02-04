@@ -2,7 +2,10 @@ package com.lynbrookrobotics.potassium.model.simulations
 
 import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
-import com.lynbrookrobotics.potassium.commons.drivetrain.{TwoSidedDrive, _}
+import com.lynbrookrobotics.potassium.commons.drivetrain._
+import com.lynbrookrobotics.potassium.commons.drivetrain.onloaded.OnloadedDrive
+import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.{TwoSidedDrive, TwoSidedDriveHardware, TwoSidedDriveProperties}
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.UnicycleProperties
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.Point
 import com.lynbrookrobotics.potassium.{Component, Signal}
@@ -37,12 +40,13 @@ object RobotVelocities {
 case class TwoSidedDriveForce(left: Force, right: Force)
 
 class SimulatedTwoSidedHardware(constantFriction: Force,
-                                override val track: Length,
                                 mass: Mass,
                                 momentOfInertia: MomentOfInertia,
                                 clock: Clock,
                                 period: Time)
                                 (implicit props: TwoSidedDriveProperties) extends TwoSidedDriveHardware {
+  override val track: Length = props.track
+
   val leftMotor = new SimulatedMotor(clock, period)
   val rightMotor = new SimulatedMotor(clock, period)
 
@@ -70,7 +74,7 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
     val newForwardVelocity = forwardVelocity + acceleration * dt
 
     // radius from center, located halfway between wheels
-    val radius = track / 2
+    val radius = props.track / 2
     val netTorque = (netRightForce * radius - netLeftForce * radius).asTorque
 
     // Newton's second law for angular acceleration
@@ -152,7 +156,7 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
   val angleListening: () => Option[Angle] = listenTo(turnPosition)
 }
 
-class TwoSidedDriveContainerSimulator extends TwoSidedDrive { self =>
+class TwoSidedDriveContainerSimulator extends OnloadedDrive { self =>
   override type Hardware = SimulatedTwoSidedHardware
   override type Properties = TwoSidedDriveProperties
 
@@ -164,7 +168,7 @@ class TwoSidedDriveContainerSimulator extends TwoSidedDrive { self =>
     * @param hardware the simulated hardware to output with
     * @param signal   the signal to output
     */
-  override protected def output(hardware: Hardware, signal: TwoSidedSignal): Unit = {
+  override protected def output(hardware: Hardware, signal: DriveSignal): Unit = {
     hardware.leftMotor.set(signal.left)
     hardware.rightMotor.set(signal.right)
   }
@@ -175,10 +179,10 @@ class TwoSidedDriveContainerSimulator extends TwoSidedDrive { self =>
   }
 
   class Drivetrain(implicit hardware: Hardware,
-                   props: Signal[Properties]) extends Component[TwoSidedSignal] {
-    override def defaultController: Stream[TwoSidedSignal] = self.defaultController
+                   props: Signal[Properties]) extends Component[DriveSignal] {
+    override def defaultController: Stream[DriveSignal] = self.defaultController
 
-    override def applySignal(signal: TwoSidedSignal): Unit = {
+    override def applySignal(signal: DriveSignal): Unit = {
       output(hardware, signal)
     }
   }
