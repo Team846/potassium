@@ -49,14 +49,20 @@ abstract class Stream[+T] { self =>
     }
 
     new Cancel {
+      private var hasCancelRun = false
       override def cancel(): Unit = self.synchronized {
-        listeners = listeners.filterNot(_ eq thunk)
+        if (!hasCancelRun) {
+          listeners = listeners.filterNot(_ eq thunk)
 
-        if (listeners.isEmpty) {
-          // we are shutting down!
-          unsubscribeFromParents()
-          println(s"hasShutDown was $hasShutdown nos false")
-          hasShutdown = true
+          if (listeners.isEmpty) {
+            // we are shutting down!
+            unsubscribeFromParents()
+            hasShutdown = true
+          }
+
+          hasCancelRun = true
+        } else {
+          throw new IllegalStateException("Cannot unsubscribe twice")
         }
       }
     }
@@ -73,12 +79,10 @@ abstract class Stream[+T] { self =>
       override def subscribeToParents(): Unit = {}
       override def unsubscribeFromParents(): Unit = {}
 
-      override def checkRelaunch(): Unit = {
-        println("not checking because I'm preserved")
-      }
+      override def checkRelaunch(): Unit = {}
 
       override val expectedPeriodicity: ExpectedPeriodicity = self.expectedPeriodicity
-      override val originTimeStream = self.originTimeStream
+      override val originTimeStream = self.originTimeStream.map(_.preserve)
     }
   }
 
@@ -98,9 +102,7 @@ abstract class Stream[+T] { self =>
       }
 
       override def unsubscribeFromParents(): Unit = {
-        if (unsubscribe != null) {
-          unsubscribe.cancel()
-        }
+        unsubscribe.cancel()
         unsubscribe = null
       }
 

@@ -84,7 +84,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         forwardBackwardMode
       )
 
-      drive.setController(childVelocityControl(speedControl(unicycle.withCheckZipped(error) { e =>
+      val controller = childVelocityControl(speedControl(unicycle.withCheckZipped(error) { e =>
+        println(s"error ${e}")
         if (e.exists(_ < tolerance)) {
           ticksWithinTolerance += 1
 
@@ -94,10 +95,13 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         } else {
           ticksWithinTolerance = 0
         }
-      })))
+      }))
+
+      drive.setController(controller.withCheck(o => println(s"pure out: ${o}")))
     }
 
     override def onEnd(): Unit = {
+      println("finished")
       drive.resetToDefault()
     }
   }

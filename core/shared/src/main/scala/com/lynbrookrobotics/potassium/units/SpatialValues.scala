@@ -143,7 +143,9 @@ case class Segment(start: Point, end: Point) {
       Some(negativeSolution, positiveSolution)
     }
   }
-}case class Line(angleSlope: Angle, yIntercept: Length) {
+}
+
+case class Line(angleSlope: Angle, yIntercept: Length) {
   def xIntercept: Length =
     if (angleSlope == Degrees(0)) {
       Inches(Double.PositiveInfinity)
