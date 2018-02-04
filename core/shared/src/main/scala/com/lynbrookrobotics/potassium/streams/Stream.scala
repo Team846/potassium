@@ -60,6 +60,7 @@ abstract class Stream[+T] { self =>
         if (listeners.isEmpty) {
           // we are shutting down!
           unsubscribeFromParents()
+          println(s"hasShutDown was $hasShutdown nos false")
           hasShutdown = true
         }
       }
@@ -77,7 +78,9 @@ abstract class Stream[+T] { self =>
       override def subscribeToParents(): Unit = {}
       override def unsubscribeFromParents(): Unit = {}
 
-      override def checkRelaunch(): Unit = {}
+      override def checkRelaunch(): Unit = {
+        println("not checking because I'm preserved")
+      }
 
       override val expectedPeriodicity: ExpectedPeriodicity = self.expectedPeriodicity
       override val originTimeStream = self.originTimeStream.map(_.preserve)
@@ -100,7 +103,10 @@ abstract class Stream[+T] { self =>
       }
 
       override def unsubscribeFromParents(): Unit = {
-        unsubscribe.cancel(); unsubscribe = null
+        if (unsubscribe != null) {
+          unsubscribe.cancel()
+        }
+        unsubscribe = null
       }
 
       override def checkRelaunch(): Unit = {
@@ -225,6 +231,12 @@ abstract class Stream[+T] { self =>
       }
 
       override def checkRelaunch(): Unit = {
+        println(s"I was inited here:")
+        myInitStackTrace.foreach { v =>
+          println(s"$v")
+        }
+        println("end init stack ")
+
         throw new IllegalStateException("Sliding streams cannot be relaunched")
       }
 
@@ -407,6 +419,9 @@ abstract class Stream[+T] { self =>
       val cancel = self.foreach(v => updateEventState(condition.apply(v)))
     }
   }
+
+  val myInitStackTrace = Thread.currentThread().getStackTrace
+
 }
 
 object Stream {
@@ -484,4 +499,5 @@ object Stream {
 
     (stream, stream.publishValue)
   }
+
 }
