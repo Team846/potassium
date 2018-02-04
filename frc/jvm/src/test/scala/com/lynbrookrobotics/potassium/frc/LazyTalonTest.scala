@@ -33,17 +33,17 @@ class LazyTalonTest extends FunSuite with MockitoSugar {
     val octrl2 = OpenLoop(Percent(2))
 
     lazyTalon.applyCommand(octrl1)
-    assert(percOutCalled == 1)
     lazyTalon.applyCommand(octrl1)
-    assert(percOutCalled == 1)
     lazyTalon.applyCommand(octrl1)
     assert(percOutCalled == 1)
 
     lazyTalon.applyCommand(octrl2)
-    assert(percOutCalled == 2)
+    lazyTalon.applyCommand(octrl2)
     lazyTalon.applyCommand(octrl2)
     assert(percOutCalled == 2)
 
+    lazyTalon.applyCommand(octrl1)
+    lazyTalon.applyCommand(octrl1)
     lazyTalon.applyCommand(octrl1)
     assert(percOutCalled == 3)
   }
@@ -152,17 +152,7 @@ class LazyTalonTest extends FunSuite with MockitoSugar {
     val pctrl2 = PositionPID(NativePositionGains(5, 6, 7), Each(8))
 
     lazyTalon.applyCommand(pctrl1)
-    assert(posOutCalled == 1)
-    assert(kpSetCalled == 1)
-    assert(kiSetCalled == 1)
-    assert(kdSetCalled == 1)
-
     lazyTalon.applyCommand(pctrl1)
-    assert(posOutCalled == 1)
-    assert(kpSetCalled == 1)
-    assert(kiSetCalled == 1)
-    assert(kdSetCalled == 1)
-
     lazyTalon.applyCommand(pctrl1)
     assert(posOutCalled == 1)
     assert(kpSetCalled == 1)
@@ -170,17 +160,15 @@ class LazyTalonTest extends FunSuite with MockitoSugar {
     assert(kdSetCalled == 1)
 
     lazyTalon.applyCommand(pctrl2)
-    assert(posOutCalled == 2)
-    assert(kpSetCalled == 2)
-    assert(kiSetCalled == 2)
-    assert(kdSetCalled == 2)
-
+    lazyTalon.applyCommand(pctrl2)
     lazyTalon.applyCommand(pctrl2)
     assert(posOutCalled == 2)
     assert(kpSetCalled == 2)
     assert(kiSetCalled == 2)
     assert(kdSetCalled == 2)
 
+    lazyTalon.applyCommand(pctrl1)
+    lazyTalon.applyCommand(pctrl1)
     lazyTalon.applyCommand(pctrl1)
     assert(posOutCalled == 3)
     assert(kpSetCalled == 3) // this will break once/if we implement idx
@@ -226,19 +214,7 @@ class LazyTalonTest extends FunSuite with MockitoSugar {
     val vctrl2 = VelocityPIDF(NativeVelocityGains(6, 7, 8, 9), Each(10))
 
     lazyTalon.applyCommand(vctrl1)
-    assert(velOutCalled == 1)
-    assert(kpSetCalled == 1)
-    assert(kiSetCalled == 1)
-    assert(kdSetCalled == 1)
-    assert(kfSetCalled == 1)
-
     lazyTalon.applyCommand(vctrl1)
-    assert(velOutCalled == 1)
-    assert(kpSetCalled == 1)
-    assert(kiSetCalled == 1)
-    assert(kdSetCalled == 1)
-    assert(kfSetCalled == 1)
-
     lazyTalon.applyCommand(vctrl1)
     assert(velOutCalled == 1)
     assert(kpSetCalled == 1)
@@ -247,12 +223,7 @@ class LazyTalonTest extends FunSuite with MockitoSugar {
     assert(kfSetCalled == 1)
 
     lazyTalon.applyCommand(vctrl2)
-    assert(velOutCalled == 2)
-    assert(kpSetCalled == 2)
-    assert(kiSetCalled == 2)
-    assert(kdSetCalled == 2)
-    assert(kfSetCalled == 2)
-
+    lazyTalon.applyCommand(vctrl2)
     lazyTalon.applyCommand(vctrl2)
     assert(velOutCalled == 2)
     assert(kpSetCalled == 2)
@@ -260,6 +231,8 @@ class LazyTalonTest extends FunSuite with MockitoSugar {
     assert(kdSetCalled == 2)
     assert(kfSetCalled == 2)
 
+    lazyTalon.applyCommand(vctrl1)
+    lazyTalon.applyCommand(vctrl1)
     lazyTalon.applyCommand(vctrl1)
     assert(velOutCalled == 3)
     assert(kpSetCalled == 3) // this will break once/if we implement idx
