@@ -42,16 +42,13 @@ object BlendedDriving {
     tankWeight.toEach * tankSpeed + constantRadiusWeight.toEach * constantRadiusSpeed
   }
 
-  def blendedDrive(tankSpeed: Stream[TwoSided[Velocity]],
+  def blendedDrive(arcadeSpeed: Stream[TwoSided[Velocity]],
                    targetForwardVelocity: Stream[Velocity],
                    curvature: Stream[Ratio[Dimensionless, Length]])
                   (implicit properties: Signal[TwoSidedDriveProperties]): Stream[TwoSided[Velocity]] = {
     val constantRadiusSpeed = driveWithRadius(radiusStream = curvature.map(curvature => curvature.den / curvature.num.toEach), targetForwardVelocity)
-    val constantRadiusSpeed = driveWithRadius(radiusStream = curvature.map(curvature => curvature.den / curvature.num.toEach), targetForwardVelocity)
 
-
-
-    tankSpeed.zip(constantRadiusSpeed).zip(targetForwardVelocity).map {
+    arcadeSpeed.zip(constantRadiusSpeed).zip(targetForwardVelocity).map {
       case ((tankSpeed, carSpeed), targetForward) =>
         TwoSided(
           blend(carSpeed.left, tankSpeed.left, targetForward),
