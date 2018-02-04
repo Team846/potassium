@@ -377,7 +377,11 @@ trait UnicycleCoreTasks {
              implicit val props: Signal[DrivetrainProperties]) extends FiniteTask {
 
     override def onStart(): Unit = {
-      val turnController: Stream[UnicycleSignal] = turnPositionControl(angleToTarget)._1
+      val turnPosition = drivetrainHardware.turnPosition.zipAsync(angleToTarget).map{t =>
+        t._1 + t._2
+      }
+
+      val turnController: Stream[UnicycleSignal] = turnPositionControl(turnPosition)._1
 
       val out = lowerLevelOpenLoop(
         turnController.map{ p =>
