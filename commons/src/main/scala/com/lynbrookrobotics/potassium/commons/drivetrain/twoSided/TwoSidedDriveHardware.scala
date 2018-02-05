@@ -25,6 +25,7 @@ trait TwoSidedDriveHardware extends UnicycleHardware {
     }
   }
 
+
   lazy val forwardPosition: Stream[Length] =
     leftPosition.zip(rightPosition).map(t => (t._1 + t._2) / 2)
 

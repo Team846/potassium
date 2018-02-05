@@ -31,7 +31,9 @@ abstract class Component[T] {
       throw new IllegalArgumentException("Controller must be periodic")
     }
 
-    currentControllerHandle.foreach(_.cancel())
+    currentControllerHandle.foreach{ a =>
+      a.cancel()
+    }
 
     currentControllerHandle = Some(controller.foreach { value =>
       val shouldUpdate = lastControlSignal.isEmpty ||

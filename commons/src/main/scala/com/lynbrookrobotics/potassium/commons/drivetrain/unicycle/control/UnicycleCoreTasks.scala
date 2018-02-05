@@ -1,13 +1,14 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control
 
 import com.lynbrookrobotics.potassium.clock.Clock
+import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.BlendedDriving
 import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitControllers
 import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleSignal, UnicycleVelocity}
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask}
 import com.lynbrookrobotics.potassium.{Component, Signal}
 import squants.motion.{AngularVelocity, DegreesPerSecond}
-import squants.space.{Degrees, Feet}
+import squants.space.{Angle, Degrees, Feet}
 import squants.{Acceleration, Angle, Dimensionless, Length, Percent, Quantity, Time, Velocity}
 
 import scala.collection.immutable.Queue
@@ -19,17 +20,19 @@ trait UnicycleCoreTasks {
 
   import controllers._
 
-  class DriveOpenLoop(forward: Stream[Dimensionless], turn: Stream[Dimensionless])
+  class DriveOpenLoop(forward: Stream[Dimensionless], turn: Stream[Dimensionless], messsage: String = "")
                      (drive: Drivetrain)
                      (implicit hardware: DrivetrainHardware,
                       props: Signal[DrivetrainProperties]) extends ContinuousTask {
     override def onStart(): Unit = {
+      println(s"starting $messsage")
       val combined = forward.zip(turn).map(t => UnicycleSignal(t._1, t._2))
       drive.setController(childOpenLoop(combined))
     }
 
     override def onEnd(): Unit = {
       drive.resetToDefault()
+      println(s"ending $messsage")
     }
   }
 
@@ -83,6 +86,8 @@ trait UnicycleCoreTasks {
       drive.resetToDefault()
     }
   }
+
+
 
   class DriveDistanceWithTrapazoidalProfile(cruisingVelocity: Velocity,
                                             finalVelocity: Velocity,
@@ -385,4 +390,23 @@ trait UnicycleCoreTasks {
     }
   }
 
+//  /**
+//    * drive beyond angle
+//    * @param forwardSpeed
+//    * @param targetAngle
+//    * @param angleTolerance
+//    */
+//  class DriveWithRadius(forwardSpeed: Stream[Velocity],
+//                        radius: Stream[Length],
+//                        targetAngle: Angle,
+//                        angleTolerance: Angle) extends FiniteTask {
+//    override protected def onStart(): Unit = {
+//      val controller = BlendedDriving.driveWithRadius(
+//        radius,
+//        forwardSpeed
+//      )
+//    }
+//
+//    override protected def onEnd(): Unit = ???
+//  }
 }
