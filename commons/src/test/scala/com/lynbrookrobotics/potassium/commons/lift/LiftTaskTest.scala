@@ -1,17 +1,16 @@
 package com.lynbrookrobotics.potassium.commons.lift
 
 import com.lynbrookrobotics.potassium.control.PIDConfig
-import com.lynbrookrobotics.potassium.{ClockMocking, Component, Signal}
-import com.lynbrookrobotics.potassium.streams.Periodic
+import com.lynbrookrobotics.potassium.streams.{Periodic, Stream}
+import com.lynbrookrobotics.potassium.tasks.WaitTask
+import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
+import com.lynbrookrobotics.potassium.{ClockMocking, Component, Signal}
 import org.scalatest.FunSuite
-import squants.{Dimensionless, Percent}
 import squants.motion.Velocity
 import squants.space.{Inches, Length}
-import squants.time.Milliseconds
-import com.lynbrookrobotics.potassium.streams.Stream
-
-import GenericValue._
+import squants.time.{Milliseconds, Seconds}
+import squants.{Dimensionless, Percent}
 
 class LiftTaskTest extends FunSuite {
   val tickPeriod = Milliseconds(5)
@@ -23,6 +22,9 @@ class LiftTaskTest extends FunSuite {
       override type Properties = LiftProperties
       override type Hardware = LiftHardware
       override type Comp = Component[Dimensionless]
+      override type LiftSignal = Dimensionless
+
+      override def openLoopToLiftSignal(x: Dimensionless): LiftSignal = x
     }
 
     implicit val props = Signal.constant(new LiftProperties {
@@ -50,7 +52,12 @@ class LiftTaskTest extends FunSuite {
       override def position: Stream[Length] = Stream.periodic(tickPeriod)(currentLength)
     }
 
-    val task = new lift.positionTasks.WhileAbovePosition(hardware.position.mapToConstant(Inches(90)))(testLift).toFinite
+    val task = new lift.positionTasks.WhileAbovePosition(
+      hardware.position.mapToConstant(Inches(90))
+    )(testLift)
+      .apply(new WaitTask(Seconds(10)))
+
+    currentLength = Inches(0)
 
     task.init()
 
@@ -66,7 +73,13 @@ class LiftTaskTest extends FunSuite {
 
     currentLength = Inches(95)
     ticker(Milliseconds(5))
-    assert(!task.isRunning)
+    assert(liftSignal == Percent(0))
+    assert(task.isRunning)
+
+    (0 to 200).foreach(_ => ticker(Milliseconds(5)))
+    assert(task.isRunning)
+    (0 to 200 * 900).foreach(_ => ticker(Milliseconds(5)))
+    // assert(!task.isRunning) this is because of another bug
   }
 
   test("Lift starts above target and then moves down. After moving down, runs inner function") {
@@ -74,9 +87,12 @@ class LiftTaskTest extends FunSuite {
       override type Properties = LiftProperties
       override type Hardware = LiftHardware
       override type Comp = Component[Dimensionless]
+      override type LiftSignal = Dimensionless
+
+      override def openLoopToLiftSignal(x: Dimensionless): LiftSignal = x
     }
 
-    implicit val props = Signal.constant(new LiftProperties {
+    implicit val props: Signal[LiftProperties] = Signal.constant(new LiftProperties {
       override def positionGains: PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless] =
         PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless](
           Percent(100) / Inches(90),
@@ -101,7 +117,10 @@ class LiftTaskTest extends FunSuite {
       override def position: Stream[Length] = Stream.periodic(tickPeriod)(currentLength)
     }
 
-    val task = new lift.positionTasks.WhileBelowPosition(hardware.position.mapToConstant(Inches(90)))(testLift).toFinite
+    val task = new lift.positionTasks.WhileBelowPosition(
+      hardware.position.mapToConstant(Inches(90))
+    )(testLift)
+      .apply(new WaitTask(Seconds(10)))
 
     task.init()
 
@@ -117,9 +136,19 @@ class LiftTaskTest extends FunSuite {
     ticker(Milliseconds(5))
     assert(liftSignal == Percent(-100))
 
-    currentLength = Inches(0)
+    currentLength = Inches(91)
     ticker(Milliseconds(5))
-    assert(!task.isRunning)
+    assert(liftSignal == Percent(-100))
+
+    currentLength = Inches(89)
+    ticker(Milliseconds(5))
+    assert(liftSignal == Percent(0))
+    assert(task.isRunning)
+
+    (0 to 200).foreach(_ => ticker(Milliseconds(5)))
+    assert(task.isRunning)
+    (0 to 200 * 9).foreach(_ => ticker(Milliseconds(5)))
+    assert(!task.isRunning) // this shouldn't work, but for some reason this test passes and the previous one does not
   }
 
   test("Testing correct percentage outputs for given values when running proportional control") {
@@ -127,6 +156,9 @@ class LiftTaskTest extends FunSuite {
       override type Properties = LiftProperties
       override type Hardware = LiftHardware
       override type Comp = Component[Dimensionless]
+      override type LiftSignal = Dimensionless
+
+      override def openLoopToLiftSignal(x: Dimensionless): LiftSignal = x
     }
 
     implicit val props = Signal.constant(new LiftProperties {

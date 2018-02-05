@@ -30,9 +30,9 @@ abstract class OffloadedLift extends Lift {
     }
   )
 
-  def stayAbove(target: Stream[Length])
-               (implicit properties: Signal[Properties],
-                hardware: Hardware): (Stream[Length], Stream[LiftSignal]) = (
+  override def stayAbove(target: Stream[Length])
+                        (implicit properties: Signal[Properties],
+                         hardware: Hardware): (Stream[Length], Stream[LiftSignal]) = (
     hardware.
       position.
       zipAsync(target)
@@ -47,9 +47,9 @@ abstract class OffloadedLift extends Lift {
     }
   )
 
-  def stayBelow(target: Stream[Length])
-               (implicit properties: Signal[Properties],
-                hardware: Hardware): (Stream[Length], Stream[LiftSignal]) = (
+  override def stayBelow(target: Stream[Length])
+                        (implicit properties: Signal[Properties],
+                         hardware: Hardware): (Stream[Length], Stream[LiftSignal]) = (
     hardware.
       position.
       zipAsync(target)

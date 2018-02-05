@@ -6,7 +6,7 @@ import com.lynbrookrobotics.potassium.tasks.WrapperTask
 import com.lynbrookrobotics.potassium.units.{GenericIntegral, GenericValue}
 import com.lynbrookrobotics.potassium.{Component, Signal}
 import squants.motion.Velocity
-import squants.space.{Feet, Length}
+import squants.space.{Inches, Length}
 import squants.{Dimensionless, Percent}
 
 
@@ -32,9 +32,9 @@ abstract class Lift {
   def positionControl(target: Stream[Length])
                      (implicit properties: Signal[Properties],
                       hardware: Hardware): (Stream[Length], Stream[LiftSignal]) = (
-    hardware.
-      position.
-      zipAsync(target)
+    hardware
+      .position
+      .zipAsync(target)
       .map(t => t._2 - t._1),
 
     PIDF.pid(
@@ -43,6 +43,36 @@ abstract class Lift {
       properties.map(_.positionGains)
     ).map(openLoopToLiftSignal)
   )
+
+  def stayAbove(target: Stream[Length])
+               (implicit properties: Signal[Properties],
+                hardware: Hardware): (Stream[Length], Stream[LiftSignal]) = {
+    val positionAndTarget = hardware
+      .position
+      .zipAsync(target)
+
+    (
+      positionAndTarget.map(t => t._2 - t._1),
+      positionAndTarget
+        .map { case (p, t) => if (p < t) Percent(100) else Percent(0) }
+        .map(openLoopToLiftSignal)
+    )
+  }
+
+  def stayBelow(target: Stream[Length])
+               (implicit properties: Signal[Properties],
+                hardware: Hardware): (Stream[Length], Stream[LiftSignal]) = {
+    val positionAndTarget = hardware
+      .position
+      .zipAsync(target)
+
+    (
+      positionAndTarget.map(t => t._2 - t._1),
+      positionAndTarget
+        .map { case (p, t) => if (p > t) Percent(-100) else Percent(0) }
+        .map(openLoopToLiftSignal)
+    )
+  }
 
   def openLoopToLiftSignal(x: Dimensionless): LiftSignal
 
@@ -70,39 +100,38 @@ abstract class Lift {
 
     //move arm above target using bangbang control. When it is above target, run inner (finite) task.
     class WhileAbovePosition(target: Stream[Length])
-                            (arm: Comp)
+                            (lift: Comp)
                             (implicit properties: Signal[Properties],
                              hardware: Hardware) extends WrapperTask {
       override def onStart(): Unit = {
-        val error = hardware.position.zipAsync(target).map(t => t._2 - t._1)
-        val control = openLoopToLiftSignal(Percent(100))
+        val (error, controller) = stayAbove(target)
 
-        arm.setController(error.mapToConstant(control).withCheckZipped(error) { error: Length =>
-          if (error <= Feet(0)) { //check whether arm is above target. If so, run inner.
+        lift.setController(controller.withCheckZipped(error) { error: Length =>
+          if (error.abs < Inches(0)) { //check whether arm is above target. If so, run inner.
             readyToRunInner()
           }
         })
       }
 
-      override def onEnd(): Unit = arm.resetToDefault()
+      override def onEnd(): Unit = lift.resetToDefault()
     }
 
     //move arm below target using bangbang control. When it is below target, run inner (finite) task.
     class WhileBelowPosition(target: Stream[Length])
-                            (arm: Comp)
+                            (lift: Comp)
                             (implicit properties: Signal[Properties],
                              hardware: Hardware) extends WrapperTask {
       override def onStart(): Unit = {
-        val error = hardware.position.zipAsync(target).map(t => t._2 - t._1)
-        val control = openLoopToLiftSignal(Percent(-100))
-        arm.setController(hardware.position.mapToConstant(control).withCheckZipped(error) { error: Length =>
-          if (error > Feet(0)) { //check whether arm is below target. If so, run inner.
+        val (error, controller) = stayBelow(target)
+
+        lift.setController(controller.withCheckZipped(error) { error: Length =>
+          if (error > Inches(0)) { //check whether arm is below target. If so, run inner.
             readyToRunInner()
           }
         })
       }
 
-      override def onEnd(): Unit = arm.resetToDefault()
+      override def onEnd(): Unit = lift.resetToDefault()
     }
 
   }
