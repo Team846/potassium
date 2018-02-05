@@ -187,15 +187,27 @@
                         </a>
                       </li><li class="current-entities indented6">
                         <span class="separator"></span>
-                        <a class="class" href="OffloadedSignal$$PositionControl.html" title=""></a>
-                        <a href="OffloadedSignal$$PositionControl.html" title="">
-                          PositionControl
+                        <a class="class" href="OffloadedSignal$$PositionBangBang.html" title=""></a>
+                        <a href="OffloadedSignal$$PositionBangBang.html" title="">
+                          PositionBangBang
+                        </a>
+                      </li><li class="current-entities indented6">
+                        <span class="separator"></span>
+                        <a class="class" href="OffloadedSignal$$PositionPID.html" title=""></a>
+                        <a href="OffloadedSignal$$PositionPID.html" title="">
+                          PositionPID
+                        </a>
+                      </li><li class="current-entities indented6">
+                        <span class="separator"></span>
+                        <a class="class" href="OffloadedSignal$$VelocityBangBang.html" title=""></a>
+                        <a href="OffloadedSignal$$VelocityBangBang.html" title="">
+                          VelocityBangBang
                         </a>
                       </li><li class="current-entities indented6">
                         <span class="separator"></span>
                         <a class="class" href="" title=""></a>
                         <a href="" title="">
-                          VelocityControl
+                          VelocityPIDF
                         </a>
                       </li>
               </ul>
@@ -206,8 +218,8 @@
       <div id="definition">
         <div class="big-circle class">c</div>
         <p id="owner"><a href="../../../../index.html" class="extype" name="com">com</a>.<a href="../../../index.html" class="extype" name="com.lynbrookrobotics">lynbrookrobotics</a>.<a href="../../index.html" class="extype" name="com.lynbrookrobotics.potassium">potassium</a>.<a href="../index.html" class="extype" name="com.lynbrookrobotics.potassium.control">control</a>.<a href="index.html" class="extype" name="com.lynbrookrobotics.potassium.control.offload">offload</a>.<a href="OffloadedSignal$.html" class="extype" name="com.lynbrookrobotics.potassium.control.offload.OffloadedSignal">OffloadedSignal</a></p>
-        <h1>VelocityControl<span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html" title="Permalink">
+        <h1>VelocityPIDF<span class="permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -220,7 +232,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">VelocityControl</span><span class="params">(<span name="gains">gains: <a href="EscConfig$$NativeVelocityGains.html" class="extype" name="com.lynbrookrobotics.potassium.control.offload.EscConfig.NativeVelocityGains">NativeVelocityGains</a></span>, <span name="signal">signal: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>)</span><span class="result"> extends <a href="OffloadedSignal.html" class="extype" name="com.lynbrookrobotics.potassium.control.offload.OffloadedSignal">OffloadedSignal</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">VelocityPIDF</span><span class="params">(<span name="gains">gains: <a href="EscConfig$$NativeVelocityGains.html" class="extype" name="com.lynbrookrobotics.potassium.control.offload.EscConfig.NativeVelocityGains">NativeVelocityGains</a></span>, <span name="signal">signal: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>)</span><span class="result"> extends <a href="OffloadedSignal.html" class="extype" name="com.lynbrookrobotics.potassium.control.offload.OffloadedSignal">OffloadedSignal</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -255,7 +267,7 @@
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.VelocityControl"><span>VelocityControl</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="com.lynbrookrobotics.potassium.control.offload.OffloadedSignal"><span>OffloadedSignal</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.VelocityPIDF"><span>VelocityPIDF</span></li><li class="in" name="scala.Serializable"><span>Serializable</span></li><li class="in" name="java.io.Serializable"><span>Serializable</span></li><li class="in" name="scala.Product"><span>Product</span></li><li class="in" name="scala.Equals"><span>Equals</span></li><li class="in" name="com.lynbrookrobotics.potassium.control.offload.OffloadedSignal"><span>OffloadedSignal</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -275,10 +287,10 @@
         <div id="allMembers">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
-              <ol><li name="com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.VelocityControl#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(gains:com.lynbrookrobotics.potassium.control.offload.EscConfig.NativeVelocityGains,signal:squants.Dimensionless):com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.VelocityControl"></a><a id="&lt;init&gt;:VelocityControl"></a>
+              <ol><li name="com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.VelocityPIDF#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="&lt;init&gt;(gains:com.lynbrookrobotics.potassium.control.offload.EscConfig.NativeVelocityGains,signal:squants.Dimensionless):com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.VelocityPIDF"></a><a id="&lt;init&gt;:VelocityPIDF"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#&lt;init&gt;(gains:com.lynbrookrobotics.potassium.control.offload.EscConfig.NativeVelocityGains,signal:squants.Dimensionless):com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.VelocityControl" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#&lt;init&gt;(gains:com.lynbrookrobotics.potassium.control.offload.EscConfig.NativeVelocityGains,signal:squants.Dimensionless):com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.VelocityPIDF" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -287,7 +299,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">VelocityControl</span><span class="params">(<span name="gains">gains: <a href="EscConfig$$NativeVelocityGains.html" class="extype" name="com.lynbrookrobotics.potassium.control.offload.EscConfig.NativeVelocityGains">NativeVelocityGains</a></span>, <span name="signal">signal: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>)</span>
+        <span class="name">VelocityPIDF</span><span class="params">(<span name="gains">gains: <a href="EscConfig$$NativeVelocityGains.html" class="extype" name="com.lynbrookrobotics.potassium.control.offload.EscConfig.NativeVelocityGains">NativeVelocityGains</a></span>, <span name="signal">signal: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>)</span>
       </span>
       
       
@@ -304,7 +316,7 @@
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -320,7 +332,7 @@
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html###():Int" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -336,7 +348,7 @@
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -352,7 +364,7 @@
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -368,7 +380,7 @@
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#clone():Object" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -390,7 +402,7 @@
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -406,7 +418,7 @@
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#finalize():Unit" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -425,10 +437,10 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.VelocityControl#gains" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.VelocityPIDF#gains" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="gains:com.lynbrookrobotics.potassium.control.offload.EscConfig.NativeVelocityGains"></a><a id="gains:NativeVelocityGains"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#gains:com.lynbrookrobotics.potassium.control.offload.EscConfig.NativeVelocityGains" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#gains:com.lynbrookrobotics.potassium.control.offload.EscConfig.NativeVelocityGains" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -444,7 +456,7 @@
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -460,7 +472,7 @@
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -476,7 +488,7 @@
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -492,7 +504,7 @@
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#notify():Unit" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -508,7 +520,7 @@
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -521,10 +533,10 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.VelocityControl#signal" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+    </li><li name="com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.VelocityPIDF#signal" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="signal:squants.Dimensionless"></a><a id="signal:Dimensionless"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#signal:squants.Dimensionless" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#signal:squants.Dimensionless" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -540,7 +552,7 @@
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -556,7 +568,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#wait():Unit" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -578,7 +590,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -600,7 +612,7 @@
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityControl.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/control/offload/OffloadedSignal$$VelocityPIDF.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>

@@ -161,6 +161,24 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="../index.html" class="extype" name="com.lynbrookrobotics.potassium.commons">commons</a></dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.commons.lift.offloaded" visbl="pub" class="indented6 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="offloaded"></a><a id="offloaded:offloaded"></a>
+      <span class="permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/commons/lift/index.html#offloaded" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <a title="" href="offloaded/index.html">
+              <span class="name">offloaded</span>
+            </a>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="com.lynbrookrobotics.potassium.commons.lift">lift</a></dd></dl></div>
     </li><li class="current-entities indented5">
                         <span class="separator"></span>
                         <a class="class" href="" title=""></a>
@@ -212,7 +230,12 @@
             Linear Supertypes
           </span>
           <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
-        </div></div>
+        </div><div class="toggleContainer block">
+            <span class="toggle">
+              Known Subclasses
+            </span>
+            <div class="subClasses hiddenContent"><a href="offloaded/OffloadedLift.html" class="extype" name="com.lynbrookrobotics.potassium.commons.lift.offloaded.OffloadedLift">OffloadedLift</a></div>
+          </div></div>
         
 
       <div id="mbrsel">
@@ -279,9 +302,9 @@
         <div id="types" class="types members">
               <h3>Type Members</h3>
               <ol><li name="com.lynbrookrobotics.potassium.commons.lift.Lift.Comp" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
-      <a id="Comp&lt;:com.lynbrookrobotics.potassium.Component[squants.Dimensionless]"></a><a id="Comp:Comp"></a>
+      <a id="Comp&lt;:com.lynbrookrobotics.potassium.Component[Lift.this.LiftSignal]"></a><a id="Comp:Comp"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/commons/lift/Lift.html#Comp&lt;:com.lynbrookrobotics.potassium.Component[squants.Dimensionless]" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/commons/lift/Lift.html#Comp&lt;:com.lynbrookrobotics.potassium.Component[Lift.this.LiftSignal]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -290,7 +313,7 @@
         <span class="kind">type</span>
       </span>
       <span class="symbol">
-        <span class="name">Comp</span><span class="result"> &lt;: <a href="../../Component.html" class="extype" name="com.lynbrookrobotics.potassium.Component">Component</a>[<span class="extype" name="squants.Dimensionless">Dimensionless</span>]</span>
+        <span class="name">Comp</span><span class="result"> &lt;: <a href="../../Component.html" class="extype" name="com.lynbrookrobotics.potassium.Component">Component</a>[<a href="#LiftSignal" class="extmbr" name="com.lynbrookrobotics.potassium.commons.lift.Lift.LiftSignal">LiftSignal</a>]</span>
       </span>
       
       
@@ -307,6 +330,22 @@
       </span>
       <span class="symbol">
         <span class="name">Hardware</span><span class="result"> &lt;: <a href="LiftHardware.html" class="extype" name="com.lynbrookrobotics.potassium.commons.lift.LiftHardware">LiftHardware</a></span>
+      </span>
+      
+      
+    </li><li name="com.lynbrookrobotics.potassium.commons.lift.Lift.LiftSignal" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="LiftSignal"></a><a id="LiftSignal:LiftSignal"></a>
+      <span class="permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/commons/lift/Lift.html#LiftSignal" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">type</span>
+      </span>
+      <span class="symbol">
+        <span class="name">LiftSignal</span>
       </span>
       
       
@@ -329,10 +368,29 @@
     </li></ol>
             </div>
 
-        
+        <div class="values members">
+              <h3>Abstract Value Members</h3>
+              <ol><li name="com.lynbrookrobotics.potassium.commons.lift.Lift#openLoopToLiftSignal" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="openLoopToLiftSignal(x:squants.Dimensionless):Lift.this.LiftSignal"></a><a id="openLoopToLiftSignal(Dimensionless):LiftSignal"></a>
+      <span class="permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/commons/lift/Lift.html#openLoopToLiftSignal(x:squants.Dimensionless):Lift.this.LiftSignal" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">openLoopToLiftSignal</span><span class="params">(<span name="x">x: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>)</span><span class="result">: <a href="#LiftSignal" class="extmbr" name="com.lynbrookrobotics.potassium.commons.lift.Lift.LiftSignal">LiftSignal</a></span>
+      </span>
+      
+      
+    </li></ol>
+            </div>
 
         <div class="values members">
-              <h3>Value Members</h3>
+              <h3>Concrete Value Members</h3>
               <ol>
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
@@ -571,9 +629,9 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.commons.lift.Lift#positionControl" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="positionControl(target:com.lynbrookrobotics.potassium.streams.Stream[squants.space.Length])(implicitproperties:com.lynbrookrobotics.potassium.Signal[Lift.this.Properties],implicithardware:Lift.this.Hardware):(com.lynbrookrobotics.potassium.streams.Stream[squants.space.Length],com.lynbrookrobotics.potassium.streams.Stream[squants.Dimensionless])"></a><a id="positionControl(Stream[Length])(Signal[Properties],Hardware):(Stream[Length],Stream[Dimensionless])"></a>
+      <a id="positionControl(target:com.lynbrookrobotics.potassium.streams.Stream[squants.space.Length])(implicitproperties:com.lynbrookrobotics.potassium.Signal[Lift.this.Properties],implicithardware:Lift.this.Hardware):(com.lynbrookrobotics.potassium.streams.Stream[squants.space.Length],com.lynbrookrobotics.potassium.streams.Stream[Lift.this.LiftSignal])"></a><a id="positionControl(Stream[Length])(Signal[Properties],Hardware):(Stream[Length],Stream[LiftSignal])"></a>
       <span class="permalink">
-      <a href="../../../../../com/lynbrookrobotics/potassium/commons/lift/Lift.html#positionControl(target:com.lynbrookrobotics.potassium.streams.Stream[squants.space.Length])(implicitproperties:com.lynbrookrobotics.potassium.Signal[Lift.this.Properties],implicithardware:Lift.this.Hardware):(com.lynbrookrobotics.potassium.streams.Stream[squants.space.Length],com.lynbrookrobotics.potassium.streams.Stream[squants.Dimensionless])" title="Permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/commons/lift/Lift.html#positionControl(target:com.lynbrookrobotics.potassium.streams.Stream[squants.space.Length])(implicitproperties:com.lynbrookrobotics.potassium.Signal[Lift.this.Properties],implicithardware:Lift.this.Hardware):(com.lynbrookrobotics.potassium.streams.Stream[squants.space.Length],com.lynbrookrobotics.potassium.streams.Stream[Lift.this.LiftSignal])" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -582,7 +640,39 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">positionControl</span><span class="params">(<span name="target">target: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.space.Length">Length</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="properties">properties: <a href="../../Signal.html" class="extype" name="com.lynbrookrobotics.potassium.Signal">Signal</a>[<a href="#Properties&lt;:com.lynbrookrobotics.potassium.commons.lift.LiftProperties" class="extmbr" name="com.lynbrookrobotics.potassium.commons.lift.Lift.Properties">Properties</a>]</span>, <span name="hardware">hardware: <a href="#Hardware&lt;:com.lynbrookrobotics.potassium.commons.lift.LiftHardware" class="extmbr" name="com.lynbrookrobotics.potassium.commons.lift.Lift.Hardware">Hardware</a></span>)</span><span class="result">: (<a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.space.Length">Length</span>], <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.Dimensionless">Dimensionless</span>])</span>
+        <span class="name">positionControl</span><span class="params">(<span name="target">target: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.space.Length">Length</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="properties">properties: <a href="../../Signal.html" class="extype" name="com.lynbrookrobotics.potassium.Signal">Signal</a>[<a href="#Properties&lt;:com.lynbrookrobotics.potassium.commons.lift.LiftProperties" class="extmbr" name="com.lynbrookrobotics.potassium.commons.lift.Lift.Properties">Properties</a>]</span>, <span name="hardware">hardware: <a href="#Hardware&lt;:com.lynbrookrobotics.potassium.commons.lift.LiftHardware" class="extmbr" name="com.lynbrookrobotics.potassium.commons.lift.Lift.Hardware">Hardware</a></span>)</span><span class="result">: (<a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.space.Length">Length</span>], <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<a href="#LiftSignal" class="extmbr" name="com.lynbrookrobotics.potassium.commons.lift.Lift.LiftSignal">LiftSignal</a>])</span>
+      </span>
+      
+      
+    </li><li name="com.lynbrookrobotics.potassium.commons.lift.Lift#stayAbove" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="stayAbove(target:com.lynbrookrobotics.potassium.streams.Stream[squants.space.Length])(implicitproperties:com.lynbrookrobotics.potassium.Signal[Lift.this.Properties],implicithardware:Lift.this.Hardware):com.lynbrookrobotics.potassium.streams.Stream[Lift.this.LiftSignal]"></a><a id="stayAbove(Stream[Length])(Signal[Properties],Hardware):Stream[LiftSignal]"></a>
+      <span class="permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/commons/lift/Lift.html#stayAbove(target:com.lynbrookrobotics.potassium.streams.Stream[squants.space.Length])(implicitproperties:com.lynbrookrobotics.potassium.Signal[Lift.this.Properties],implicithardware:Lift.this.Hardware):com.lynbrookrobotics.potassium.streams.Stream[Lift.this.LiftSignal]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">stayAbove</span><span class="params">(<span name="target">target: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.space.Length">Length</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="properties">properties: <a href="../../Signal.html" class="extype" name="com.lynbrookrobotics.potassium.Signal">Signal</a>[<a href="#Properties&lt;:com.lynbrookrobotics.potassium.commons.lift.LiftProperties" class="extmbr" name="com.lynbrookrobotics.potassium.commons.lift.Lift.Properties">Properties</a>]</span>, <span name="hardware">hardware: <a href="#Hardware&lt;:com.lynbrookrobotics.potassium.commons.lift.LiftHardware" class="extmbr" name="com.lynbrookrobotics.potassium.commons.lift.Lift.Hardware">Hardware</a></span>)</span><span class="result">: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<a href="#LiftSignal" class="extmbr" name="com.lynbrookrobotics.potassium.commons.lift.Lift.LiftSignal">LiftSignal</a>]</span>
+      </span>
+      
+      
+    </li><li name="com.lynbrookrobotics.potassium.commons.lift.Lift#stayBelow" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="stayBelow(target:com.lynbrookrobotics.potassium.streams.Stream[squants.space.Length])(implicitproperties:com.lynbrookrobotics.potassium.Signal[Lift.this.Properties],implicithardware:Lift.this.Hardware):com.lynbrookrobotics.potassium.streams.Stream[Lift.this.LiftSignal]"></a><a id="stayBelow(Stream[Length])(Signal[Properties],Hardware):Stream[LiftSignal]"></a>
+      <span class="permalink">
+      <a href="../../../../../com/lynbrookrobotics/potassium/commons/lift/Lift.html#stayBelow(target:com.lynbrookrobotics.potassium.streams.Stream[squants.space.Length])(implicitproperties:com.lynbrookrobotics.potassium.Signal[Lift.this.Properties],implicithardware:Lift.this.Hardware):com.lynbrookrobotics.potassium.streams.Stream[Lift.this.LiftSignal]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">stayBelow</span><span class="params">(<span name="target">target: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.space.Length">Length</span>]</span>)</span><span class="params">(<span class="implicit">implicit </span><span name="properties">properties: <a href="../../Signal.html" class="extype" name="com.lynbrookrobotics.potassium.Signal">Signal</a>[<a href="#Properties&lt;:com.lynbrookrobotics.potassium.commons.lift.LiftProperties" class="extmbr" name="com.lynbrookrobotics.potassium.commons.lift.Lift.Properties">Properties</a>]</span>, <span name="hardware">hardware: <a href="#Hardware&lt;:com.lynbrookrobotics.potassium.commons.lift.LiftHardware" class="extmbr" name="com.lynbrookrobotics.potassium.commons.lift.Lift.Hardware">Hardware</a></span>)</span><span class="result">: <a href="../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<a href="#LiftSignal" class="extmbr" name="com.lynbrookrobotics.potassium.commons.lift.Lift.LiftSignal">LiftSignal</a>]</span>
       </span>
       
       
