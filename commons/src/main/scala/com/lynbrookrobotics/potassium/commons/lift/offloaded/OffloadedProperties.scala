@@ -8,5 +8,5 @@ import squants.space.Length
 trait OffloadedProperties extends LiftProperties {
   val escConfig: EscConfig[Length]
   def toNative(height: Length): Dimensionless
-  def fromNative(ticks: Dimensionless): Length
+  def fromNative(native: Dimensionless): Length
 }
