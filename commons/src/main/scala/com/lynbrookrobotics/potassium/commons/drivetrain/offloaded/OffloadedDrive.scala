@@ -11,7 +11,7 @@ import squants.{Dimensionless, Velocity}
 
 abstract class OffloadedDrive extends TwoSidedDrive {
   override type DriveSignal = TwoSided[OffloadedSignal]
-  override type Properties <: OffloadedProperties
+  override type Properties <: OffloadedDriveProperties
 
   override def velocityControl(target: Stream[TwoSided[Velocity]])
                               (implicit hardware: Hardware,

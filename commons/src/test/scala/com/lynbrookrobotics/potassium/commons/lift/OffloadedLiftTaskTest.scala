@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.commons.lift
 
-import com.lynbrookrobotics.potassium.commons.lift.offloaded.{OffloadedLift, OffloadedProperties}
+import com.lynbrookrobotics.potassium.commons.lift.offloaded.{OffloadedLift, OffloadedLiftProperties}
 import com.lynbrookrobotics.potassium.control.PIDConfig
 import com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.{OpenLoop, PositionBangBang}
 import com.lynbrookrobotics.potassium.control.offload.{EscConfig, OffloadedSignal}
@@ -22,14 +22,14 @@ class OffloadedLiftTaskTest extends FunSuite {
 
   test("OffloadedLift starts below target and then moves up. After moving up, runs inner function") {
     val lift = new OffloadedLift {
-      override type Properties = OffloadedProperties
+      override type Properties = OffloadedLiftProperties
       override type Hardware = LiftHardware
       override type Comp = Component[LiftSignal]
 
       override def openLoopToLiftSignal(x: Dimensionless): LiftSignal = null // not supposed to be called
     }
 
-    implicit val props = Signal.constant(new OffloadedProperties {
+    implicit val props = Signal.constant(new OffloadedLiftProperties {
       override def positionGains: PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless] =
         PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless](
           Percent(100) / Inches(100),
@@ -100,14 +100,14 @@ class OffloadedLiftTaskTest extends FunSuite {
 
   test("Lift starts above target and then moves down. After moving down, runs inner function") {
     val lift = new OffloadedLift {
-      override type Properties = OffloadedProperties
+      override type Properties = OffloadedLiftProperties
       override type Hardware = LiftHardware
       override type Comp = Component[LiftSignal]
 
       override def openLoopToLiftSignal(x: Dimensionless): LiftSignal = null // not supposed to be called
     }
 
-    implicit val props = Signal.constant(new OffloadedProperties {
+    implicit val props = Signal.constant(new OffloadedLiftProperties {
       override def positionGains: PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless] =
         PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless](
           Percent(100) / Inches(100),

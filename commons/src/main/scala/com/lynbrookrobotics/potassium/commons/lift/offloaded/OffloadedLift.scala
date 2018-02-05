@@ -11,7 +11,7 @@ import squants.space.Length
 
 abstract class OffloadedLift extends Lift {
   override type LiftSignal = OffloadedSignal
-  override type Properties <: OffloadedProperties
+  override type Properties <: OffloadedLiftProperties
 
   override def positionControl(target: Stream[Length])
                               (implicit properties: Signal[Properties],
