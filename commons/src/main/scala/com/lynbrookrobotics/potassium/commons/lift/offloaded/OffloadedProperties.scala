@@ -2,8 +2,11 @@ package com.lynbrookrobotics.potassium.commons.lift.offloaded
 
 import com.lynbrookrobotics.potassium.commons.lift.LiftProperties
 import com.lynbrookrobotics.potassium.control.offload.EscConfig
+import squants.Dimensionless
 import squants.space.Length
 
 trait OffloadedProperties extends LiftProperties {
   val escConfig: EscConfig[Length]
+  def toNative(height: Length): Dimensionless
+  def fromNative(ticks: Dimensionless): Length
 }

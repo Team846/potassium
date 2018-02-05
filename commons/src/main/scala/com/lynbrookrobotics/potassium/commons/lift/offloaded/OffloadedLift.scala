@@ -2,9 +2,9 @@ package com.lynbrookrobotics.potassium.commons.lift.offloaded
 
 import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.commons.lift.Lift
-import com.lynbrookrobotics.potassium.control.offload.EscConfig._
-import com.lynbrookrobotics.potassium.control.offload.{EscConfig, OffloadedSignal}
+import com.lynbrookrobotics.potassium.control.offload.EscConfig.{forwardToAngularPositionGains}
 import com.lynbrookrobotics.potassium.control.offload.OffloadedSignal.{OpenLoop, PositionBangBang, PositionPID}
+import com.lynbrookrobotics.potassium.control.offload.{EscConfig, OffloadedSignal}
 import com.lynbrookrobotics.potassium.streams._
 import squants.Dimensionless
 import squants.space.Length
@@ -23,30 +23,27 @@ abstract class OffloadedLift extends Lift {
 
     target.map { it =>
       val curProps = properties.get
-      implicit val c = curProps.escConfig
       PositionPID(
-        forwardToAngularPositionGains(curProps.positionGains), ticks(it)
+        forwardToAngularPositionGains(curProps.positionGains)(curProps.escConfig), curProps.toNative(it)
       )
     }
   )
 
   override def stayAbove(target: Stream[Length])
-                        (implicit properties: Signal[Properties],
+                        (implicit p: Signal[Properties],
                          hardware: Hardware): Stream[LiftSignal] = target.map { it =>
-    implicit val c: EscConfig[Length] = properties.get.escConfig
     PositionBangBang(
       forwardWhenBelow = true, reverseWhenAbove = false,
-      signal = ticks(it)
+      signal = p.get.toNative(it)
     )
   }
 
   override def stayBelow(target: Stream[Length])
-                        (implicit properties: Signal[Properties],
+                        (implicit p: Signal[Properties],
                          hardware: Hardware): Stream[LiftSignal] = target.map { it =>
-    implicit val c: EscConfig[Length] = properties.get.escConfig
     PositionBangBang(
       forwardWhenBelow = false, reverseWhenAbove = true,
-      signal = ticks(it)
+      signal = p.get.toNative(it)
     )
   }
 
