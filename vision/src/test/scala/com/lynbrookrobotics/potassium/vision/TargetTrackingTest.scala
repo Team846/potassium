@@ -1,9 +1,9 @@
 package com.lynbrookrobotics.potassium.vision
 
-import com.lynbrookrobotics.potassium.ClockMocking
-import com.lynbrookrobotics.potassium.units.Point
+import com.lynbrookrobotics.potassium.Signal
+import com.lynbrookrobotics.potassium.streams._
 import org.scalatest.FunSuite
-import squants.{Angle, Length}
+import squants.{Angle, Dimensionless, Length, Percent}
 import squants.space.{Degrees, Feet}
 import squants.time.Milliseconds
 
@@ -12,68 +12,38 @@ class TargetTrackingTest extends FunSuite {
   val period = Milliseconds(5)
   val periodsPerSecond: Int = (1 / period.toSeconds).toInt
 
-  test("Cube -- target height : 11 in, camera height : 3 ft 11 in, y offset ang : -45`, no other" +
-    "--> 3 ft ahead") {
-    implicit val (clock, clockTrigger) = ClockMocking.mockedClockTicker
+  test("cube with measured percent area 15.6 results in distance 2.75 feet away") {
+    val (percentArea, pubPercentArea) = Stream.manual[Option[Dimensionless]]
+    val camProps: Signal[VisionProperties] = Signal.constant(VisionProperties(Degrees(0), Feet(10.8645)))
+    val targetDistance: Option[Length] = Some(Feet(2.75))
 
-    val (yAngle, pubYAngle) = Stream.manualWithTime[Angle]//Stream.manualWithTime[Angle](Periodic(period))
-    val (xAngle, pubXAngle) = Stream.manualWithTime[Angle]
+    val distanceToTarget = VisionTargetTracking.distanceToTarget(percentArea, camProps)
 
-    implicit val camProps: CameraProperties = CameraProperties(Degrees(0), Degrees(0), Feet(47.0 / 12.0), Feet(11.0 / 12.0))
+    var lastTargetPosition: Option[Length] = Option(Feet(0))
 
-    val target: Point = Point(Feet(0), Feet(3))
-
-    val cubePosition = new TargetTracking(xAngle.zip(yAngle)).target
-
-    var lastCubePosition = Point(Feet(0), Feet(0))
-
-    cubePosition.foreach(lastCubePosition = _)
-
+    distanceToTarget.foreach(lastTargetPosition = _)
 
     for(_ <- 1 to periodsPerSecond){
-      clockTrigger.apply(period)
-      pubXAngle.apply(Degrees(0))
-      pubYAngle.apply(Degrees(-45))
+      pubPercentArea(Some(Percent(15.6)))
     }
 
-    println(lastCubePosition)
-
-    implicit val tolerance: Length = Feet(0.1)
-    assert(target ~= lastCubePosition)
+    assert(targetDistance.get - lastTargetPosition.get < Feet(0.1))
   }
 
-  test("Cube -- target height : 13 in, camera height : 6 ft 11 in, " +
-    "y offset ang : -42`, x offset ang : 6`, " +
-    "cam x offset ang : 12`, cam y offset ang : -23`" +
-    "--> 0.841 ft 2.587 in ahead") {
-    implicit val (clock, clockTrigger) = ClockMocking.mockedClockTicker
+  test("angle to target measured as 5 degrees for input of 10 degrees and offset of -5 degrees") {
+    val (angle, pubAngle) = Stream.manual[Angle]
+    val camProps: Signal[VisionProperties] = Signal.constant(VisionProperties(Degrees(-5), Feet(10.8645)))
+    val targetAngle: Angle = Degrees(-5)
 
-    val (yAngle, pubYAngle) = Stream.manualWithTime[Angle]//Stream.manualWithTime[Angle](Periodic(period))
-    val (xAngle, pubXAngle) = Stream.manualWithTime[Angle]
+    val angleToTarget = VisionTargetTracking.angleToTarget(angle, camProps)
+    var lastAngle = Degrees(0)
 
-    implicit val camProps: CameraProperties = CameraProperties(Degrees(12), Degrees(-23), Feet(83.0 / 12.0), Feet(13.0 / 12.0))
-
-    val target: Point = Point(Feet(0.841), Feet(2.587))
-
-    val cubePosition = new TargetTracking(xAngle.zip(yAngle)).target
-
-    var lastCubePosition = Point(Feet(0), Feet(0))
-
-    cubePosition.foreach(lastCubePosition = _)
+    angleToTarget.foreach(lastAngle = _)
 
     for(_ <- 1 to periodsPerSecond){
-      clockTrigger.apply(period)
-      pubXAngle.apply(Degrees(6))
-      pubYAngle.apply(Degrees(-42))
+      pubAngle(Degrees(10))
     }
-    println(lastCubePosition)
-    implicit val tolerance: Length = Feet(0.1)
-    assert(target ~= lastCubePosition)
-  }
-}
-    println(lastCubePosition)
 
-    implicit val tolerance: Length = Feet(0.1)
-    assert(target ~= lastCubePosition)
+    assert(targetAngle - lastAngle < Degrees(1))
   }
 }

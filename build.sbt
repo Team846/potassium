@@ -17,7 +17,7 @@ scalaVersion in ThisBuild := "2.12.1"
 
 resolvers += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
 
-lazy val sharedDependencies = if (System.getenv("NATIVE_TARGET") == "ARM32") { 
+lazy val sharedDependencies = if (System.getenv("NATIVE_TARGET") == "ARM32") {
   Def.setting(Seq(
     "org.typelevel"  %%% "squants"  % "1.3.0"
   ))
@@ -119,14 +119,7 @@ lazy val frc = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Ful
   libraryDependencies += "edu.wpi.first" % "ntcore" % wpiVersion,
   libraryDependencies += "com.ctre" % "phoenix" % ctreVersion
 ).nativeSettings(
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
   resolvers += "Funky-Repo" at "http://lynbrookrobotics.com/repo",
->>>>>>> merges and error fixes
-=======
-  resolvers += "Funky-Repo" at "http://lynbrookrobotics.com/repo",
->>>>>>> 222953526af6063d546386b13b14d84b90622a3d
   if (System.getenv("NATIVE_TARGET") == "ARM32") {
     Seq(
       libraryDependencies += "com.lynbrookrobotics" %%% "wpilib-scala-native" % "0.1-SNAPSHOT",
