@@ -17,6 +17,7 @@ class SequentialTask private[tasks] (first: FiniteTask, second: FiniteTask)
   override def onFinished(task: FiniteTask): Unit = {
     if (currentPhase == RunningFirst && task == first) {
       currentPhase = RunningSecond
+      second.setFinishedListener(this)
       second.init()
     } else if (currentPhase == RunningSecond && task == second) {
       finished()
@@ -28,7 +29,6 @@ class SequentialTask private[tasks] (first: FiniteTask, second: FiniteTask)
   override def onStart(): Unit = {
     currentPhase = RunningFirst
     first.setFinishedListener(this)
-    second.setFinishedListener(this)
     first.init()
   }
 
