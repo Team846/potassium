@@ -6,7 +6,7 @@ import com.lynbrookrobotics.potassium.units.Ratio
 import squants.space.{Degrees, Length}
 import squants.{Angle, Dimensionless}
 
-trait OffloadedProperties extends TwoSidedDriveProperties {
+trait OffloadedDriveProperties extends TwoSidedDriveProperties {
   val escConfig: EscConfig[Length]
 
   val wheelDiameter: Length
