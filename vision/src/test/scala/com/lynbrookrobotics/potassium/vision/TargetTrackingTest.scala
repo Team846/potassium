@@ -9,9 +9,6 @@ import squants.time.Milliseconds
 
 class TargetTrackingTest extends FunSuite {
 
-  val period = Milliseconds(5)
-  val periodsPerSecond: Int = (1 / period.toSeconds).toInt
-
   test("cube with measured percent area 15.6 results in distance 2.75 feet away") {
     val (percentArea, pubPercentArea) = Stream.manual[Option[Dimensionless]]
     val camProps: Signal[VisionProperties] = Signal.constant(VisionProperties(Degrees(0), Feet(10.8645)))
@@ -23,9 +20,7 @@ class TargetTrackingTest extends FunSuite {
 
     distanceToTarget.foreach(lastTargetPosition = _)
 
-    for(_ <- 1 to periodsPerSecond){
-      pubPercentArea(Some(Percent(15.6)))
-    }
+    pubPercentArea(Some(Percent(15.6)))
 
     assert(targetDistance.get - lastTargetPosition.get < Feet(0.1))
   }
@@ -40,9 +35,7 @@ class TargetTrackingTest extends FunSuite {
 
     angleToTarget.foreach(lastAngle = _)
 
-    for(_ <- 1 to periodsPerSecond){
-      pubAngle(Degrees(10))
-    }
+    pubAngle(Degrees(10))
 
     assert(targetAngle - lastAngle < Degrees(1))
   }
