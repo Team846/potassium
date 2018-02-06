@@ -405,23 +405,6 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.units.Segment#containsInXY" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="containsInXY(toTest:com.lynbrookrobotics.potassium.units.Point,tolerance:squants.space.Length):Boolean"></a><a id="containsInXY(Point,Length):Boolean"></a>
-      <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/units/Segment.html#containsInXY(toTest:com.lynbrookrobotics.potassium.units.Point,tolerance:squants.space.Length):Boolean" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">containsInXY</span><span class="params">(<span name="toTest">toTest: <a href="Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a></span>, <span name="tolerance">tolerance: <span class="extype" name="squants.space.Length">Length</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      
-      <p class="shortcomment cmt"></p><div class="fullcomment"><div class="comment cmt"></div><dl class="paramcmts block"><dt class="param">toTest</dt><dd class="cmt"><p>to the point to test if contained by this</p></dd><dt>returns</dt><dd class="cmt"><p>whether the given point is contained by this segment IN THE XY
-        plane</p></dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.units.Segment#diff" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="diff:com.lynbrookrobotics.potassium.units.Point"></a><a id="diff:Point"></a>
       <span class="permalink">
@@ -556,6 +539,23 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.units.Segment#intersectionWithCircle" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="intersectionWithCircle(center:com.lynbrookrobotics.potassium.units.Point,radius:squants.space.Length):Option[(com.lynbrookrobotics.potassium.units.Point,com.lynbrookrobotics.potassium.units.Point)]"></a><a id="intersectionWithCircle(Point,Length):Option[(Point,Point)]"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/units/Segment.html#intersectionWithCircle(center:com.lynbrookrobotics.potassium.units.Point,radius:squants.space.Length):Option[(com.lynbrookrobotics.potassium.units.Point,com.lynbrookrobotics.potassium.units.Point)]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">intersectionWithCircle</span><span class="params">(<span name="center">center: <a href="Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a></span>, <span name="radius">radius: <span class="extype" name="squants.space.Length">Length</span></span>)</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[(<a href="Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a>, <a href="Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a>)]</span>
+      </span>
+      
+      <p class="shortcomment cmt">see http://mathworld.wolfram.com/Circle-LineIntersection.html</p><div class="fullcomment"><div class="comment cmt"><p>see http://mathworld.wolfram.com/Circle-LineIntersection.html</p></div><dl class="paramcmts block"><dt class="param">center</dt><dd class="cmt"><p>center of circle to test for intersection</p></dd><dt class="param">radius</dt><dd class="cmt"><p>radius of circle to test for intersection</p></dd><dt>returns</dt><dd class="cmt"><p>on Option of a tuple of points where the
+        infinitely long line and circle intersect</p></dd></dl></div>
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
@@ -636,6 +636,22 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.units.Segment#pointClosestToOnLine" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="pointClosestToOnLine(pt:com.lynbrookrobotics.potassium.units.Point):com.lynbrookrobotics.potassium.units.Point"></a><a id="pointClosestToOnLine(Point):Point"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/units/Segment.html#pointClosestToOnLine(pt:com.lynbrookrobotics.potassium.units.Point):com.lynbrookrobotics.potassium.units.Point" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">pointClosestToOnLine</span><span class="params">(<span name="pt">pt: <a href="Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a></span>)</span><span class="result">: <a href="Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a></span>
+      </span>
+      
+      
     </li><li name="com.lynbrookrobotics.potassium.units.Segment#start" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="start:com.lynbrookrobotics.potassium.units.Point"></a><a id="start:Point"></a>
       <span class="permalink">
@@ -734,22 +750,6 @@
     </span>)</span>
               
         </dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.units.Segment#withInBoundries" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="withInBoundries(toTest:com.lynbrookrobotics.potassium.units.Point):Boolean"></a><a id="withInBoundries(Point):Boolean"></a>
-      <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/units/Segment.html#withInBoundries(toTest:com.lynbrookrobotics.potassium.units.Point):Boolean" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">withInBoundries</span><span class="params">(<span name="toTest">toTest: <a href="Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
-      </span>
-      
-      
     </li><li name="com.lynbrookrobotics.potassium.units.Segment#xySlope" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="xySlope:Double"></a>
       <span class="permalink">

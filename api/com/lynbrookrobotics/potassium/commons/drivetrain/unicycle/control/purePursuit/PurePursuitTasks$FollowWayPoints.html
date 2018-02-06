@@ -348,7 +348,7 @@ TODO: finish adding docs">
         <span class="kind">class</span>
       </span>
       <span class="symbol">
-        <span class="name">FollowWayPoints</span><span class="result"> extends <a href="../../../../../tasks/FiniteTask.html" class="extype" name="com.lynbrookrobotics.potassium.tasks.FiniteTask">FiniteTask</a></span>
+        <span class="name">FollowWayPoints</span><span class="result"> extends <a href="../../../../../tasks/FiniteTask.html" class="extype" name="com.lynbrookrobotics.potassium.tasks.FiniteTask">FiniteTask</a> with <a href="../../../../../tasks/FiniteTaskFinishedListener.html" class="extype" name="com.lynbrookrobotics.potassium.tasks.FiniteTaskFinishedListener">FiniteTaskFinishedListener</a></span>
       </span>
       </h4>
 
@@ -357,7 +357,7 @@ TODO: finish adding docs">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><a href="../../../../../tasks/FiniteTask.html" class="extype" name="com.lynbrookrobotics.potassium.tasks.FiniteTask">FiniteTask</a>, <a href="../../../../../tasks/Task.html" class="extype" name="com.lynbrookrobotics.potassium.tasks.Task">Task</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="../../../../../tasks/FiniteTaskFinishedListener.html" class="extype" name="com.lynbrookrobotics.potassium.tasks.FiniteTaskFinishedListener">FiniteTaskFinishedListener</a>, <a href="../../../../../tasks/FiniteTask.html" class="extype" name="com.lynbrookrobotics.potassium.tasks.FiniteTask">FiniteTask</a>, <a href="../../../../../tasks/Task.html" class="extype" name="com.lynbrookrobotics.potassium.tasks.Task">Task</a>, <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -383,7 +383,7 @@ TODO: finish adding docs">
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitTasks.FollowWayPoints"><span>FollowWayPoints</span></li><li class="in" name="com.lynbrookrobotics.potassium.tasks.FiniteTask"><span>FiniteTask</span></li><li class="in" name="com.lynbrookrobotics.potassium.tasks.Task"><span>Task</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitTasks.FollowWayPoints"><span>FollowWayPoints</span></li><li class="in" name="com.lynbrookrobotics.potassium.tasks.FiniteTaskFinishedListener"><span>FiniteTaskFinishedListener</span></li><li class="in" name="com.lynbrookrobotics.potassium.tasks.FiniteTask"><span>FiniteTask</span></li><li class="in" name="com.lynbrookrobotics.potassium.tasks.Task"><span>Task</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -404,9 +404,9 @@ TODO: finish adding docs">
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitTasks.FollowWayPoints#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(wayPoints:Seq[com.lynbrookrobotics.potassium.units.Point],tolerance:squants.space.Length,steadyOutput:squants.Dimensionless,maxTurnOutput:squants.Dimensionless)(drive:PurePursuitTasks.this.Drivetrain)(implicitproperties:com.lynbrookrobotics.potassium.Signal[PurePursuitTasks.this.controllers.DrivetrainProperties],implicithardware:PurePursuitTasks.this.controllers.DrivetrainHardware):PurePursuitTasks.this.FollowWayPoints"></a><a id="&lt;init&gt;:FollowWayPoints"></a>
+      <a id="&lt;init&gt;(wayPoints:Seq[com.lynbrookrobotics.potassium.units.Point],tolerance:squants.space.Length,maxTurnOutput:squants.Dimensionless,targetTicksWithingTolerance:Int,forwardBackwardMode:com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.ForwardBackwardMode)(drive:PurePursuitTasks.this.Drivetrain)(implicitproperties:com.lynbrookrobotics.potassium.Signal[PurePursuitTasks.this.controllers.DrivetrainProperties],implicithardware:PurePursuitTasks.this.controllers.DrivetrainHardware):PurePursuitTasks.this.FollowWayPoints"></a><a id="&lt;init&gt;:FollowWayPoints"></a>
       <span class="permalink">
-      <a href="../../../../../../../../com/lynbrookrobotics/potassium/commons/drivetrain/unicycle/control/purePursuit/PurePursuitTasks$FollowWayPoints.html#&lt;init&gt;(wayPoints:Seq[com.lynbrookrobotics.potassium.units.Point],tolerance:squants.space.Length,steadyOutput:squants.Dimensionless,maxTurnOutput:squants.Dimensionless)(drive:PurePursuitTasks.this.Drivetrain)(implicitproperties:com.lynbrookrobotics.potassium.Signal[PurePursuitTasks.this.controllers.DrivetrainProperties],implicithardware:PurePursuitTasks.this.controllers.DrivetrainHardware):PurePursuitTasks.this.FollowWayPoints" title="Permalink">
+      <a href="../../../../../../../../com/lynbrookrobotics/potassium/commons/drivetrain/unicycle/control/purePursuit/PurePursuitTasks$FollowWayPoints.html#&lt;init&gt;(wayPoints:Seq[com.lynbrookrobotics.potassium.units.Point],tolerance:squants.space.Length,maxTurnOutput:squants.Dimensionless,targetTicksWithingTolerance:Int,forwardBackwardMode:com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.ForwardBackwardMode)(drive:PurePursuitTasks.this.Drivetrain)(implicitproperties:com.lynbrookrobotics.potassium.Signal[PurePursuitTasks.this.controllers.DrivetrainProperties],implicithardware:PurePursuitTasks.this.controllers.DrivetrainHardware):PurePursuitTasks.this.FollowWayPoints" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -415,7 +415,7 @@ TODO: finish adding docs">
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">FollowWayPoints</span><span class="params">(<span name="wayPoints">wayPoints: <span class="extype" name="scala.Seq">Seq</span>[<a href="../../../../../units/Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a>]</span>, <span name="tolerance">tolerance: <span class="extype" name="squants.space.Length">Length</span></span>, <span name="steadyOutput">steadyOutput: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>, <span name="maxTurnOutput">maxTurnOutput: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>)</span><span class="params">(<span name="drive">drive: <a href="PurePursuitTasks.html#Drivetrain&lt;:com.lynbrookrobotics.potassium.Component[UnicycleCoreTasks.this.controllers.DriveSignal]" class="extmbr" name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitTasks.Drivetrain">PurePursuitTasks.Drivetrain</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="properties">properties: <a href="../../../../../Signal.html" class="extype" name="com.lynbrookrobotics.potassium.Signal">Signal</a>[(<a href="PurePursuitTasks.html#controllers:com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleCoreControllerswithcom.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleMotionProfileControllerswithcom.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitControllers" class="extmbr" name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitTasks#controllers">PurePursuitTasks.controllers</a>)#<span class="extype" name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleCoreControllers.DrivetrainProperties">DrivetrainProperties</span>]</span>, <span name="hardware">hardware: (<a href="PurePursuitTasks.html#controllers:com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleCoreControllerswithcom.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleMotionProfileControllerswithcom.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitControllers" class="extmbr" name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitTasks#controllers">PurePursuitTasks.controllers</a>)#<span class="extype" name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleCoreControllers.DrivetrainHardware">DrivetrainHardware</span></span>)</span>
+        <span class="name">FollowWayPoints</span><span class="params">(<span name="wayPoints">wayPoints: <span class="extype" name="scala.Seq">Seq</span>[<a href="../../../../../units/Point.html" class="extype" name="com.lynbrookrobotics.potassium.units.Point">Point</a>]</span>, <span name="tolerance">tolerance: <span class="extype" name="squants.space.Length">Length</span></span>, <span name="maxTurnOutput">maxTurnOutput: <span class="extype" name="squants.Dimensionless">Dimensionless</span></span>, <span name="targetTicksWithingTolerance">targetTicksWithingTolerance: <span class="extype" name="scala.Int">Int</span> = <span class="symbol">1</span></span>, <span name="forwardBackwardMode">forwardBackwardMode: <a href="ForwardBackwardMode.html" class="extype" name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.ForwardBackwardMode">ForwardBackwardMode</a> = <span class="symbol"><span class="name"><a href="Auto$.html">Auto</a></span></span></span>)</span><span class="params">(<span name="drive">drive: <a href="PurePursuitTasks.html#Drivetrain&lt;:com.lynbrookrobotics.potassium.Component[UnicycleCoreTasks.this.controllers.DriveSignal]" class="extmbr" name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitTasks.Drivetrain">PurePursuitTasks.Drivetrain</a></span>)</span><span class="params">(<span class="implicit">implicit </span><span name="properties">properties: <a href="../../../../../Signal.html" class="extype" name="com.lynbrookrobotics.potassium.Signal">Signal</a>[(<a href="PurePursuitTasks.html#controllers:com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleCoreControllerswithcom.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleMotionProfileControllerswithcom.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitControllers" class="extmbr" name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitTasks#controllers">PurePursuitTasks.controllers</a>)#<span class="extype" name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleCoreControllers.DrivetrainProperties">DrivetrainProperties</span>]</span>, <span name="hardware">hardware: (<a href="PurePursuitTasks.html#controllers:com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleCoreControllerswithcom.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleMotionProfileControllerswithcom.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitControllers" class="extmbr" name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitTasks#controllers">PurePursuitTasks.controllers</a>)#<span class="extype" name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleCoreControllers.DrivetrainHardware">DrivetrainHardware</span></span>)</span>
       </span>
       
       
@@ -779,6 +779,22 @@ of FiniteTask when the task is complete.
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitTasks.FollowWayPoints">FollowWayPoints</a> → <a href="../../../../../tasks/FiniteTask.html" class="extype" name="com.lynbrookrobotics.potassium.tasks.FiniteTask">FiniteTask</a></dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitTasks.FollowWayPoints#onFinished" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="onFinished(task:com.lynbrookrobotics.potassium.tasks.FiniteTask):Unit"></a><a id="onFinished(FiniteTask):Unit"></a>
+      <span class="permalink">
+      <a href="../../../../../../../../com/lynbrookrobotics/potassium/commons/drivetrain/unicycle/control/purePursuit/PurePursuitTasks$FollowWayPoints.html#onFinished(task:com.lynbrookrobotics.potassium.tasks.FiniteTask):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">onFinished</span><span class="params">(<span name="task">task: <a href="../../../../../tasks/FiniteTask.html" class="extype" name="com.lynbrookrobotics.potassium.tasks.FiniteTask">FiniteTask</a></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitTasks.FollowWayPoints">FollowWayPoints</a> → <a href="../../../../../tasks/FiniteTaskFinishedListener.html" class="extype" name="com.lynbrookrobotics.potassium.tasks.FiniteTaskFinishedListener">FiniteTaskFinishedListener</a></dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.PurePursuitTasks.FollowWayPoints#onStart" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="onStart():Unit"></a>
       <span class="permalink">
@@ -983,7 +999,9 @@ of FiniteTask when the task is complete.
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="com.lynbrookrobotics.potassium.tasks.FiniteTask">
+        <div class="parent" name="com.lynbrookrobotics.potassium.tasks.FiniteTaskFinishedListener">
+              <h3>Inherited from <a href="../../../../../tasks/FiniteTaskFinishedListener.html" class="extype" name="com.lynbrookrobotics.potassium.tasks.FiniteTaskFinishedListener">FiniteTaskFinishedListener</a></h3>
+            </div><div class="parent" name="com.lynbrookrobotics.potassium.tasks.FiniteTask">
               <h3>Inherited from <a href="../../../../../tasks/FiniteTask.html" class="extype" name="com.lynbrookrobotics.potassium.tasks.FiniteTask">FiniteTask</a></h3>
             </div><div class="parent" name="com.lynbrookrobotics.potassium.tasks.Task">
               <h3>Inherited from <a href="../../../../../tasks/Task.html" class="extype" name="com.lynbrookrobotics.potassium.tasks.Task">Task</a></h3>
