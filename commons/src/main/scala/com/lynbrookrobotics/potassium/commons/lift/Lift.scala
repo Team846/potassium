@@ -1,13 +1,13 @@
 package com.lynbrookrobotics.potassium.commons.lift
 
-import com.lynbrookrobotics.potassium.{Component, Signal}
-import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.control.{PIDConfig, PIDF}
+import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.WrapperTask
 import com.lynbrookrobotics.potassium.units.{GenericIntegral, GenericValue}
+import com.lynbrookrobotics.potassium.{Component, Signal}
+import squants.motion.Velocity
+import squants.space.Length
 import squants.{Dimensionless, Percent}
-import squants.motion.{Velocity}
-import squants.space.{Feet, Length}
 
 
 trait LiftProperties {
@@ -24,20 +24,43 @@ trait LiftHardware {
 }
 
 abstract class Lift {
+  type LiftSignal
   type Properties <: LiftProperties
   type Hardware <: LiftHardware
-  type Comp <: Component[Dimensionless]
+  type Comp <: Component[LiftSignal]
 
   def positionControl(target: Stream[Length])
                      (implicit properties: Signal[Properties],
-                      hardware: Hardware): (Stream[Length], Stream[Dimensionless]) = {
-    val error = hardware.position.zipAsync(target).map(t => t._2 - t._1)
-    (error, PIDF.pid(
+                      hardware: Hardware): (Stream[Length], Stream[LiftSignal]) = (
+    hardware
+      .position
+      .zipAsync(target)
+      .map(t => t._2 - t._1),
+
+    PIDF.pid(
       hardware.position,
       target,
       properties.map(_.positionGains)
-    ))
-  }
+    ).map(openLoopToLiftSignal)
+  )
+
+  def stayAbove(target: Stream[Length])
+               (implicit properties: Signal[Properties],
+                hardware: Hardware): Stream[LiftSignal] = hardware
+    .position
+    .zipAsync(target)
+    .map { case (p, t) => if (p < t) Percent(100) else Percent(0) }
+    .map(openLoopToLiftSignal)
+
+  def stayBelow(target: Stream[Length])
+               (implicit properties: Signal[Properties],
+                hardware: Hardware): Stream[LiftSignal] = hardware
+    .position
+    .zipAsync(target)
+    .map { case (p, t) => if (p > t) Percent(-100) else Percent(0) }
+    .map(openLoopToLiftSignal)
+
+  def openLoopToLiftSignal(x: Dimensionless): LiftSignal
 
   object positionTasks {
 
@@ -63,35 +86,38 @@ abstract class Lift {
 
     //move arm above target using bangbang control. When it is above target, run inner (finite) task.
     class WhileAbovePosition(target: Stream[Length])
-                            (arm: Comp)
+                            (lift: Comp)
                             (implicit properties: Signal[Properties],
                              hardware: Hardware) extends WrapperTask {
       override def onStart(): Unit = {
-        val (error, control) = (hardware.position.zipAsync(target).map(t => t._2 - t._1), Percent(100))
-
-        arm.setController(error.mapToConstant(control).withCheckZipped(error) { error: Length =>
-          if (error <= Feet(0)) { //check whether arm is above target. If so, run inner.
-            readyToRunInner()
-          }
-        })
+        lift.setController(
+          stayAbove(target)
+            .withCheckZipped(hardware.position.zip(target)) {
+              case (p, t) => if (p > t) readyToRunInner()
+            }
+        )
       }
-      override def onEnd(): Unit = arm.resetToDefault()
+
+      override def onEnd(): Unit = lift.resetToDefault()
     }
 
     //move arm below target using bangbang control. When it is below target, run inner (finite) task.
     class WhileBelowPosition(target: Stream[Length])
-                            (arm: Comp)
+                            (lift: Comp)
                             (implicit properties: Signal[Properties],
                              hardware: Hardware) extends WrapperTask {
       override def onStart(): Unit = {
-        val (error, control) = (hardware.position.zipAsync(target).map(t => t._2 - t._1), Percent(-100))
-        arm.setController(hardware.position.mapToConstant(control).withCheckZipped(error) { error: Length =>
-          if (error > Feet(0)) { //check whether arm is below target. If so, run inner.
-            readyToRunInner()
-          }
-        })
+        lift.setController(
+          stayBelow(target)
+            .withCheckZipped(hardware.position.zip(target)) {
+              case (p, t) => if (p < t) readyToRunInner()
+            }
+        )
       }
-      override def onEnd(): Unit = arm.resetToDefault()
+
+      override def onEnd(): Unit = lift.resetToDefault()
     }
+
   }
+
 }
