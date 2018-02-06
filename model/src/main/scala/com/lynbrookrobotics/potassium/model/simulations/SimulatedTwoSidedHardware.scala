@@ -3,7 +3,8 @@ package com.lynbrookrobotics.potassium.model.simulations
 import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
 import com.lynbrookrobotics.potassium.commons.drivetrain._
-import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.{TwoSidedDrive, TwoSidedDriveHardware, TwoSidedDriveProperties, TwoSidedSignal}
+import com.lynbrookrobotics.potassium.commons.drivetrain.onloaded.OnloadedDrive
+import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.{TwoSidedDrive, TwoSidedDriveHardware, TwoSidedDriveProperties}
 import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.UnicycleProperties
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.Point
@@ -155,7 +156,7 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
   val angleListening: () => Option[Angle] = listenTo(turnPosition)
 }
 
-class TwoSidedDriveContainerSimulator extends TwoSidedDrive { self =>
+class TwoSidedDriveContainerSimulator extends OnloadedDrive { self =>
   override type Hardware = SimulatedTwoSidedHardware
   override type Properties = TwoSidedDriveProperties
 
@@ -167,7 +168,7 @@ class TwoSidedDriveContainerSimulator extends TwoSidedDrive { self =>
     * @param hardware the simulated hardware to output with
     * @param signal   the signal to output
     */
-  override protected def output(hardware: Hardware, signal: TwoSidedSignal): Unit = {
+  override protected def output(hardware: Hardware, signal: DriveSignal): Unit = {
     hardware.leftMotor.set(signal.left)
     hardware.rightMotor.set(signal.right)
   }
@@ -178,10 +179,10 @@ class TwoSidedDriveContainerSimulator extends TwoSidedDrive { self =>
   }
 
   class Drivetrain(implicit hardware: Hardware,
-                   props: Signal[Properties]) extends Component[TwoSidedSignal] {
-    override def defaultController: Stream[TwoSidedSignal] = self.defaultController
+                   props: Signal[Properties]) extends Component[DriveSignal] {
+    override def defaultController: Stream[DriveSignal] = self.defaultController
 
-    override def applySignal(signal: TwoSidedSignal): Unit = {
+    override def applySignal(signal: DriveSignal): Unit = {
       output(hardware, signal)
     }
   }

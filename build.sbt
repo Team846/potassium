@@ -1,6 +1,6 @@
 import sbtcrossproject.{crossProject, CrossType}
 
-enablePlugins(GitVersioning, TravisScalaStylePlugin)
+enablePlugins(GitVersioning)
 
 name := "potassium"
 
@@ -106,29 +106,31 @@ lazy val vision = project.dependsOn(coreJVM).settings(
   libraryDependencies ++= jvmDependencies
 )
 
-lazy val frc = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Full).dependsOn(core, sensors).settings(
+val wpiVersion = "2018.2.2"
+val ctreVersion = "5.2.1.1"
+lazy val frc = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Full).dependsOn(core, sensors, control).settings(
   name := "potassium-frc",
   libraryDependencies ++= sharedDependencies.value
 ).jvmSettings(
   libraryDependencies ++= jvmDependencies,
   resolvers += "WPILib-Maven" at "http://team846.github.io/wpilib-maven",
 
-  libraryDependencies += "edu.wpi.first" % "wpilib" % "2018.1.1",
-  libraryDependencies += "edu.wpi.first" % "ntcore" % "2018.1.1",
-  libraryDependencies += "com.ctre" % "phoenix" % "5.1.3.1"
+  libraryDependencies += "edu.wpi.first" % "wpilib" % wpiVersion,
+  libraryDependencies += "edu.wpi.first" % "ntcore" % wpiVersion,
+  libraryDependencies += "com.ctre" % "phoenix" % ctreVersion
 ).nativeSettings(
   if (System.getenv("NATIVE_TARGET") == "ARM32") {
     Seq(
       libraryDependencies += "com.lynbrookrobotics" %%% "wpilib-scala-native" % "0.1-SNAPSHOT",
-      //  libraryDependencies += "com.lynbrookrobotics" % "ntcore" % "2018.1.1",
+      //  libraryDependencies += "com.lynbrookrobotics" % "ntcore" % wpiVersion,
       libraryDependencies += "com.lynbrookrobotics" %%% "phoenix-scala-native" % "0.1-SNAPSHOT"
     )
   } else Seq(
     resolvers += "WPILib-Maven" at "http://team846.github.io/wpilib-maven",
 
-    libraryDependencies += "edu.wpi.first" % "wpilib" % "2018.1.1",
-    libraryDependencies += "edu.wpi.first" % "ntcore" % "2018.1.1",
-    libraryDependencies += "com.ctre" % "phoenix" % "5.1.3.1",
+    libraryDependencies += "edu.wpi.first" % "wpilib" % wpiVersion,
+    libraryDependencies += "edu.wpi.first" % "ntcore" % wpiVersion,
+    libraryDependencies += "com.ctre" % "phoenix" % ctreVersion,
     test := { (compile in Compile).value }
   ),
   nativeSettings

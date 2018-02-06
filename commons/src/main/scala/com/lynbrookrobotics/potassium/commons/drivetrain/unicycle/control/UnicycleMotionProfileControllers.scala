@@ -1,4 +1,4 @@
-package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle
+package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control
 
 import com.lynbrookrobotics.potassium.streams.Stream
 import squants.motion._
