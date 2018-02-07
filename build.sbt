@@ -15,7 +15,7 @@ git.formattedShaVersion := git.gitHeadCommit.value map { sha =>
 
 scalaVersion in ThisBuild := "2.12.1"
 
-resolvers += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
+resolvers in ThisBuild += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
 
 lazy val sharedDependencies = if (System.getenv("NATIVE_TARGET") == "ARM32") { 
   Def.setting(Seq(
