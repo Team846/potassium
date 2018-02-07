@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain
 
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.Auto
 import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleDrive, UnicycleHardware, UnicycleProperties, UnicycleSignal}
 import com.lynbrookrobotics.potassium.control.PIDConfig
 import com.lynbrookrobotics.potassium.units.GenericValue._
@@ -95,7 +96,9 @@ class PurePursuitControllerTests extends FunSuite {
       hardware.turnPosition.mapToConstant(Degrees(0)),
       position,
       path,
-      unlimitedTurnOutput)._1
+      unlimitedTurnOutput,
+      Auto
+    )._1
 
     var lastOutput = Percent(-10)
     output.foreach(lastOutput = _)
@@ -129,7 +132,8 @@ class PurePursuitControllerTests extends FunSuite {
       hardware.turnPosition.mapToConstant(Degrees(0)),
       position,
       path,
-      unlimitedTurnOutput
+      unlimitedTurnOutput,
+      Auto
     )._1
 
     var out = Percent(-10)
@@ -193,7 +197,8 @@ class PurePursuitControllerTests extends FunSuite {
       hardware.turnPosition.mapToConstant(Degrees(-85)),
       position,
       path,
-      unlimitedTurnOutput
+      unlimitedTurnOutput,
+      Auto
     )._1
 
     var out = Percent(-10)
@@ -224,7 +229,8 @@ class PurePursuitControllerTests extends FunSuite {
       hardware.turnPosition.mapToConstant(Degrees(45)),
       position,
       path,
-      unlimitedTurnOutput
+      unlimitedTurnOutput,
+      Auto
     )._1
 
     var out = Percent(-10)

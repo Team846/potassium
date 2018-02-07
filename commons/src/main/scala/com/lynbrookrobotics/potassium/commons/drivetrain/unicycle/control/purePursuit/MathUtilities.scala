@@ -1,59 +1,10 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit
 
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
-import squants.space.{Degrees, Feet, Length, Radians}
+import squants.space.{Degrees, Length, Radians}
 import squants.{Angle, Dimensionless}
 
-
 object MathUtilities {
-  /**
-    * see http://mathworld.wolfram.com/Circle-LineIntersection.html
-    * @param segment segment defining the infinite line to test for intersection
-    * @param center center of circle to test for intersection
-    * @param radius radius of circle to test for intersection
-    * @return on Option of a tuple of points where the
-    *         infinitely long line and circle intersect
-    */
-  def interSectionCircleLine(segment: Segment,
-                             center: Point,
-                             radius: Length): Option[(Point, Point)] = {
-    import math._
-    val diffEnd   = segment.end - center
-    val diffStart = segment.start - center
-
-    val dr_squared = (segment.length * segment.length).toSquareFeet
-
-    val det = (diffStart.x * diffEnd.y - diffEnd.x * diffStart.y).toSquareFeet
-    val discriminant = dr_squared * radius.toFeet * radius.toFeet - det * det
-
-    if (dr_squared == 0) {
-      throw new IllegalArgumentException("Segment is a point, so no line can be fit through it")
-    }
-
-    if (discriminant < 0) None else {
-      val dy = segment.dy.toFeet
-      val dx = segment.dx.toFeet
-
-      val posX = center.x.toFeet
-      val posY = center.y.toFeet
-
-      val sqrtDiscrim = sqrt(discriminant)
-      val signDy = if (dy < 0) -1D else 1D
-
-      val positiveSolution = Point(
-        Feet((det * dy + signDy * sqrtDiscrim * dx) / dr_squared + posX),
-        Feet((-det * dx + abs(dy) * sqrtDiscrim) / dr_squared + posY)
-      )
-
-      val negativeSolution = Point(
-        Feet((det * dy - signDy * sqrtDiscrim * dx) / dr_squared + posX),
-        Feet((-det * dx - abs(dy) * sqrtDiscrim) / dr_squared + posY)
-      )
-
-      Some(negativeSolution, positiveSolution)
-    }
-  }
-
   /**
     * This finds the point furthest from the start and if that point's angle formed with the start point is
     * the same as the angle of the segment, it returns that point.
@@ -70,32 +21,28 @@ object MathUtilities {
   def intersectionLineCircleFurthestFromStart(segment: Segment,
                                               center: Point,
                                               radius: Length): Option[Point] = {
-    val solutions = interSectionCircleLine(segment, center, radius)
-    solutions.flatMap {case (positive, negative) =>
-        val positiveDiffWithStart = segment.start distanceTo positive
-        val negativeDiffWithStart = segment.start distanceTo negative
+    val solutions = segment.intersectionWithCircle(center, radius)
+    solutions.flatMap { case (positive, negative) =>
+      val positiveDiffWithStart = segment.start distanceTo positive
+      val negativeDiffWithStart = segment.start distanceTo negative
 
-        val furthestFromStart = if ( positiveDiffWithStart > negativeDiffWithStart ) {
-          positive
-        } else {
-          negative
-        }
-        val closerToStart = if ( positiveDiffWithStart <= negativeDiffWithStart ) {
-          positive
-        } else {
-          negative
-        }
-        val tolerance = Radians(0.0001)
+      val (furthestFromStart, closerToStart) = if (positiveDiffWithStart > negativeDiffWithStart) {
+        (positive, negative)
+      } else {
+        (negative, positive)
+      }
 
-        // Pick point such that look ahead point angle to end point is same as angle
-        // of segment, ensuring that we drive toward the correct direction
-        if ((segment.angle - Segment(segment.start, furthestFromStart).angle).abs < tolerance ) {
-          Some(furthestFromStart)
-        } else if ( (segment.angle - Segment(segment.start, closerToStart).angle).abs < tolerance ) {
-          Some(closerToStart)
-        } else {
-          None
-        }
+      val onLine = segment.pointClosestToOnLine(center)
+
+      implicit val tolerance: Angle = Radians(0.0001)
+
+      // Pick point such that angle from the robot location projected on the segment to the end is the same
+      // as the robot location projection to the look ahead point, ensuring that we drive toward the correct direction
+      if (Segment(onLine, segment.end).angle ~= Segment(onLine, furthestFromStart).angle) {
+        Some(furthestFromStart)
+      } else if (Segment(onLine, segment.end).angle ~= Segment(onLine, closerToStart).angle) {
+        Some(closerToStart)
+      } else None
     }
   }
 
@@ -103,11 +50,11 @@ object MathUtilities {
     * swapps a trigometric angle, as used in the mathematics
     * (right is 0 degrees, increasing counter clockwise) to
     * compass angle, forward is 0, increases clockwise, or vice versa
-    * @param trigonemtricAngle
+    * @param trigonometricAngle
     * @return
     */
-  def swapTrigonemtricAndCompass(trigonemtricAngle: Angle): Angle = {
-    Degrees(90) - trigonemtricAngle
+  def convertTrigonometricAngleToCompass(trigonometricAngle: Angle): Angle = {
+    Degrees(90) - trigonometricAngle
   }
 
   def clamp[T](toClamp: Dimensionless, max: Dimensionless): Dimensionless = {

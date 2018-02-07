@@ -70,6 +70,7 @@ class StreamTest extends FunSuite {
   test("Preserving stream has correct behavior") {
     val (str, pub) = Stream.manual[Int]
     var called = false
+    var listenerCalled = false
     val mapped = str.map { _ =>
       called = true
     }
@@ -80,20 +81,26 @@ class StreamTest extends FunSuite {
     assert(called)
 
     called = false
+    listenerCalled = false
 
-    preserved.foreach(_ => {}).cancel() // launch
+    val cancel1 = preserved.foreach(_ => listenerCalled = true) // launch
 
     pub(1)
 
-    assert(called)
+    assert(called && listenerCalled)
+
+    cancel1.cancel()
 
     called = false
+    listenerCalled = false
 
-    preserved.foreach(_ => {}).cancel() // relaunch
+    val cancel2 = preserved.foreach(_ => listenerCalled = true) // relaunch
 
     pub(1)
 
-    assert(called)
+    assert(called && listenerCalled)
+
+    cancel2.cancel()
   }
 
   test("Sliding over a stream produces correct values") {
