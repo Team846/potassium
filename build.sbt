@@ -141,8 +141,7 @@ lazy val frcNative = frc.native
 
 lazy val config = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core).settings(
   name := "potassium-config",
-  libraryDependencies ++= sharedDependencies.value,
-  libraryDependencies ++= jvmDependencies
+  libraryDependencies ++= sharedDependencies.value
 ).nativeSettings(nativeSettings)
 lazy val configJVM = config.jvm
 lazy val configJS = config.js
