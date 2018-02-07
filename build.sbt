@@ -44,7 +44,7 @@ lazy val potassium = project.in(file(".")).
     frcJVM, frcNative,
     remote,
     vision,
-    config,
+    configJVM,configJS, configNative,
     lighting
   ).settings(
   publish := {},
@@ -139,11 +139,14 @@ lazy val frc = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Ful
 lazy val frcJVM = frc.jvm
 lazy val frcNative = frc.native
 
-lazy val config = project.dependsOn(coreJVM).settings(
+lazy val config = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossType(CrossType.Pure).dependsOn(core).settings(
   name := "potassium-config",
   libraryDependencies ++= sharedDependencies.value,
   libraryDependencies ++= jvmDependencies
 )
+lazy val configJVM = config.jvm
+lazy val configJS = config.js
+lazy val configNative = config.native
 
 lazy val lighting = project.dependsOn(coreJVM).settings(
   name := "potassium-lighting",
@@ -178,7 +181,7 @@ lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site t
 lazy val docs = project
   .enablePlugins(ScalaUnidocPlugin)
   .dependsOn(coreJVM, modelJVM, controlJVM,
-    remote, vision, frcJVM, config, sensorsJVM,
+    remote, vision, frcJVM, configJVM, sensorsJVM,
     commonsJVM, lighting)
   .settings(
     autoAPIMappings := true,
@@ -186,7 +189,7 @@ lazy val docs = project
     addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docsMappingsAPIDir),
     unidocProjectFilter in (ScalaUnidoc, unidoc) :=
       inProjects(coreJVM, modelJVM, controlJVM,
-        remote, vision, frcJVM, config, lighting, sensorsJVM, commonsJVM)
+        remote, vision, frcJVM, configJVM, lighting, sensorsJVM, commonsJVM)
   )
 
 publishArtifact := false
