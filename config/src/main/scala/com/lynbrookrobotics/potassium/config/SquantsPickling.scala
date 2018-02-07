@@ -3,7 +3,6 @@ package com.lynbrookrobotics.potassium.config
 import argonaut.Argonaut._
 import argonaut._
 import com.lynbrookrobotics.potassium.units.{GenericDerivative, GenericIntegral}
-import squants.motion.Velocity
 import squants.{Dimension, Quantity}
 
 import scala.language.experimental.macros
@@ -55,16 +54,15 @@ object SquantsPickling {
 
     c.Expr[DecodeJson[GenericDerivative[Q]]](
       q"""
-      new upickle.default.Reader[com.lynbrookrobotics.potassium.units.GenericDerivative[$qExpr]] {
-        override def read0: PartialFunction[upickle.Js.Value, com.lynbrookrobotics.potassium.units.GenericDerivative[$qExpr]] = {
-          case v: upickle.Js.Value =>
-            val dimension = $dimension
-            val (value, uom) = upickle.default.readJs[(Double, String)](v)
-            val unit = dimension.units.find(_.getClass.getSimpleName == uom.dropRight(4)).getOrElse(throw new Exception(uom))
-            new com.lynbrookrobotics.potassium.units.GenericDerivative(value, unit)
+        new argonaut.DecodeJson[com.lynbrookrobotics.potassium.units.GenericDerivative[$qExpr]] {
+          override def decode(c: argonaut.HCursor): argonaut.DecodeResult[com.lynbrookrobotics.potassium.units.GenericDerivative[$qExpr]] = {
+              val dimension = $dimension
+              val (value, uom) = c.jdecode[(Double, String)].getOr(null)
+              val unit = dimension.units.find(_.getClass.getSimpleName == uom.dropRight(4)).getOrElse(throw new Exception(uom))
+              argonaut.DecodeResult.ok(new com.lynbrookrobotics.potassium.units.GenericDerivative(value, unit))
+          }
         }
-      }
-      """
+        """
     )
   }
 
@@ -83,13 +81,12 @@ object SquantsPickling {
 
     c.Expr[DecodeJson[GenericIntegral[Q]]](
       q"""
-      new upickle.default.Reader[com.lynbrookrobotics.potassium.units.GenericIntegral[$qExpr]] {
-        override def read0: PartialFunction[upickle.Js.Value, com.lynbrookrobotics.potassium.units.GenericIntegral[$qExpr]] = {
-          case v: upickle.Js.Value =>
+      new argonaut.DecodeJson[com.lynbrookrobotics.potassium.units.GenericIntegral[$qExpr]] {
+        override def decode(c: argonaut.HCursor): argonaut.DecodeResult[com.lynbrookrobotics.potassium.units.GenericIntegral[$qExpr]] = {
             val dimension = $dimension
-            val (value, uom) = upickle.default.readJs[(Double, String)](v)
+            val (value, uom) = c.jdecode[(Double, String)].getOr(null)
             val unit = dimension.units.find(_.getClass.getSimpleName == uom.dropRight(4)).getOrElse(throw new Exception(uom))
-            new com.lynbrookrobotics.potassium.units.GenericIntegral(value, unit)
+            argonaut.DecodeResult.ok(new com.lynbrookrobotics.potassium.units.GenericIntegral(value, unit))
         }
       }
       """
