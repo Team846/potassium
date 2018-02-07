@@ -143,7 +143,7 @@ lazy val config = crossProject(JSPlatform, JVMPlatform, NativePlatform).crossTyp
   name := "potassium-config",
   libraryDependencies ++= sharedDependencies.value,
   libraryDependencies ++= jvmDependencies
-)
+).nativeSettings(nativeSettings)
 lazy val configJVM = config.jvm
 lazy val configJS = config.js
 lazy val configNative = config.native
