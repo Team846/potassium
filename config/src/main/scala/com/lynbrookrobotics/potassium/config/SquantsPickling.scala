@@ -10,7 +10,7 @@ import scala.reflect.macros.blackbox
 
 object SquantsPickling {
   implicit def quantityWriter[Q <: Quantity[Q]]: EncodeJson[Q] = (q: Q) => {
-    (q.value, q.unit.getClass.getSimpleName).jencode
+    (q.value, q.unit.getClass.getSimpleName.replace("$","")).jencode
   }
 
   def dimension_impl[Q <: Quantity[Q] : c.WeakTypeTag](c: blackbox.Context): c.Expr[Dimension[Q]] = {
@@ -32,7 +32,7 @@ object SquantsPickling {
         override def decode(c: argonaut.HCursor): DecodeResult[$qExpr] = {
           val dimension = $dimension
           val (value, uom) = c.jdecode[(Double, String)].getOr(null)
-          val unit = dimension.units.find(_.getClass.getSimpleName == uom).getOrElse(throw new Exception(uom))
+          val unit = dimension.units.find(_.getClass.getSimpleName.replace("$$","") == uom).getOrElse(throw new Exception(uom))
           argonaut.DecodeResult.ok(unit(value))
         }
       }
@@ -43,7 +43,7 @@ object SquantsPickling {
   implicit def quantityReader[Q <: Quantity[Q]]: DecodeJson[Q] = macro quantityReader_impl[Q]
 
   implicit def genericDerivativeWriter[Q <: Quantity[Q]]: EncodeJson[GenericDerivative[Q]] =
-    (q: GenericDerivative[Q]) => (q.value, q.uom.getClass.getSimpleName + " / s").jencode
+    (q: GenericDerivative[Q]) => (q.value, q.uom.getClass.getSimpleName.replace("$","") + " / s").jencode
 
   def genericDerivativeReader_impl[Q <: Quantity[Q] : c.WeakTypeTag]
   (c: blackbox.Context): c.Expr[DecodeJson[GenericDerivative[Q]]] = {
@@ -58,7 +58,7 @@ object SquantsPickling {
           override def decode(c: argonaut.HCursor): argonaut.DecodeResult[com.lynbrookrobotics.potassium.units.GenericDerivative[$qExpr]] = {
               val dimension = $dimension
               val (value, uom) = c.jdecode[(Double, String)].getOr(null)
-              val unit = dimension.units.find(_.getClass.getSimpleName == uom.dropRight(4)).getOrElse(throw new Exception(uom))
+              val unit = dimension.units.find(_.getClass.getSimpleName.replace("$$","") == uom.dropRight(4)).getOrElse(throw new Exception(uom))
               argonaut.DecodeResult.ok(new com.lynbrookrobotics.potassium.units.GenericDerivative(value, unit))
           }
         }
@@ -70,7 +70,7 @@ object SquantsPickling {
   macro genericDerivativeReader_impl[Q]
 
   implicit def genericIntegralWriter[Q <: Quantity[Q]]: EncodeJson[GenericIntegral[Q]] =
-    (q: GenericIntegral[Q]) => (q.value, q.uom.getClass.getSimpleName + " * s").jencode
+    (q: GenericIntegral[Q]) => (q.value, q.uom.getClass.getSimpleName.replace("$","") + " * s").jencode
 
   def genericIntegralReader_impl[Q <: Quantity[Q] : c.WeakTypeTag]
   (c: blackbox.Context): c.Expr[DecodeJson[GenericIntegral[Q]]] = {
@@ -85,7 +85,7 @@ object SquantsPickling {
         override def decode(c: argonaut.HCursor): argonaut.DecodeResult[com.lynbrookrobotics.potassium.units.GenericIntegral[$qExpr]] = {
             val dimension = $dimension
             val (value, uom) = c.jdecode[(Double, String)].getOr(null)
-            val unit = dimension.units.find(_.getClass.getSimpleName == uom.dropRight(4)).getOrElse(throw new Exception(uom))
+            val unit = dimension.units.find(_.getClass.getSimpleName.replace("$$","") == uom.dropRight(4)).getOrElse(throw new Exception(uom))
             argonaut.DecodeResult.ok(new com.lynbrookrobotics.potassium.units.GenericIntegral(value, unit))
         }
       }
