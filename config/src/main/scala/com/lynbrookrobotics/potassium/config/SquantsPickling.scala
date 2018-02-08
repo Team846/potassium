@@ -1,18 +1,16 @@
 package com.lynbrookrobotics.potassium.config
 
+import argonaut.Argonaut._
+import argonaut._
 import com.lynbrookrobotics.potassium.units.{GenericDerivative, GenericIntegral}
 import squants.{Dimension, Quantity}
-import upickle.Js.Value
-import upickle.default.{Reader, Writer}
 
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
 object SquantsPickling {
-  implicit def quantityWriter[Q <: Quantity[Q]]: Writer[Q] = new Writer[Q] {
-    override def write0: (Q) => Value = {
-      (q: Q) => upickle.default.writeJs((q.value, q.unit.getClass.getSimpleName))
-    }
+  implicit def quantityWriter[Q <: Quantity[Q]] = new EncodeJson[Q]() {
+    override def encode(q: Q): Json = (q.value, q.unit.getClass.getSimpleName.replace("$", "")).jencode
   }
 
   def dimension_impl[Q <: Quantity[Q] : c.WeakTypeTag](c: blackbox.Context): c.Expr[Dimension[Q]] = {
@@ -22,88 +20,82 @@ object SquantsPickling {
   }
 
   def quantityReader_impl[Q <: Quantity[Q] : c.WeakTypeTag]
-    (c: blackbox.Context): c.Expr[Reader[Q]] = {
+  (c: blackbox.Context): c.Expr[DecodeJson[Q]] = {
     import c.universe._
 
     val dimension = dimension_impl[Q](c)
     val qExpr = weakTypeTag[Q].tpe.typeSymbol
 
-    c.Expr[Reader[Q]](
+    c.Expr[DecodeJson[Q]](
       q"""
-      new upickle.default.Reader[$qExpr] {
-        override def read0: PartialFunction[upickle.Js.Value, $qExpr] = {
-          case v: upickle.Js.Value =>
-            val dimension = $dimension
-            val (value, uom) = upickle.default.readJs[(Double, String)](v)
-            val unit = dimension.units.find(_.getClass.getSimpleName == uom).getOrElse(throw new Exception(uom))
-            unit(value)
+      new argonaut.DecodeJson[$qExpr] {
+        override def decode(c: argonaut.HCursor): DecodeResult[$qExpr] = {
+          val dimension = $dimension
+          val (value, uom) = c.jdecode[(Double, String)].getOr(null)
+          val unit = dimension.units.find(_.getClass.getSimpleName.replace("$$","") == uom).getOrElse(throw new Exception(uom))
+          argonaut.DecodeResult.ok(unit(value))
         }
       }
       """
     )
   }
 
-  implicit def quantityReader[Q <: Quantity[Q]]: Reader[Q] = macro quantityReader_impl[Q]
+  implicit def quantityReader[Q <: Quantity[Q]]: DecodeJson[Q] = macro quantityReader_impl[Q]
 
-  implicit def genericDerivativeWriter[Q <: Quantity[Q]]: Writer[GenericDerivative[Q]] = new Writer[GenericDerivative[Q]] {
-    override def write0: (GenericDerivative[Q]) => Value = {
-      (q: GenericDerivative[Q]) => upickle.default.writeJs((q.value, q.uom.getClass.getSimpleName + " / s"))
-    }
+  implicit def genericDerivativeWriter[Q <: Quantity[Q]] = new EncodeJson[GenericDerivative[Q]]() {
+    override def encode(q: GenericDerivative[Q]): Json =
+      (q.value, q.uom.getClass.getSimpleName.replace("$", "") + " / s").jencode
   }
 
   def genericDerivativeReader_impl[Q <: Quantity[Q] : c.WeakTypeTag]
-    (c: blackbox.Context): c.Expr[Reader[GenericDerivative[Q]]] = {
+  (c: blackbox.Context): c.Expr[DecodeJson[GenericDerivative[Q]]] = {
     import c.universe._
 
     val dimension = dimension_impl[Q](c)
     val qExpr = weakTypeTag[Q].tpe.typeSymbol
 
-    c.Expr[Reader[GenericDerivative[Q]]](
+    c.Expr[DecodeJson[GenericDerivative[Q]]](
       q"""
-      new upickle.default.Reader[com.lynbrookrobotics.potassium.units.GenericDerivative[$qExpr]] {
-        override def read0: PartialFunction[upickle.Js.Value, com.lynbrookrobotics.potassium.units.GenericDerivative[$qExpr]] = {
-          case v: upickle.Js.Value =>
-            val dimension = $dimension
-            val (value, uom) = upickle.default.readJs[(Double, String)](v)
-            val unit = dimension.units.find(_.getClass.getSimpleName == uom.dropRight(4)).getOrElse(throw new Exception(uom))
-            new com.lynbrookrobotics.potassium.units.GenericDerivative(value, unit)
+        new argonaut.DecodeJson[com.lynbrookrobotics.potassium.units.GenericDerivative[$qExpr]] {
+          override def decode(c: argonaut.HCursor): argonaut.DecodeResult[com.lynbrookrobotics.potassium.units.GenericDerivative[$qExpr]] = {
+              val dimension = $dimension
+              val (value, uom) = c.jdecode[(Double, String)].getOr(null)
+              val unit = dimension.units.find(_.getClass.getSimpleName.replace("$$","") == uom.dropRight(4)).getOrElse(throw new Exception(uom))
+              argonaut.DecodeResult.ok(new com.lynbrookrobotics.potassium.units.GenericDerivative(value, unit))
+          }
         }
-      }
-      """
+        """
     )
   }
 
-  implicit def genericDerivativeReader[Q <: Quantity[Q]]: Reader[GenericDerivative[Q]] =
-    macro genericDerivativeReader_impl[Q]
+  implicit def genericDerivativeReader[Q <: Quantity[Q]]: DecodeJson[GenericDerivative[Q]] =
+  macro genericDerivativeReader_impl[Q]
 
-  implicit def genericIntegralWriter[Q <: Quantity[Q]]: Writer[GenericIntegral[Q]] = new Writer[GenericIntegral[Q]] {
-    override def write0: (GenericIntegral[Q]) => Value = {
-      (q: GenericIntegral[Q]) => upickle.default.writeJs((q.value, q.uom.getClass.getSimpleName + " * s"))
-    }
+  implicit def genericIntegralWriter[Q <: Quantity[Q]] = new EncodeJson[GenericIntegral[Q]]() {
+    override def encode(q: GenericIntegral[Q]): Json = (q.value, q.uom.getClass.getSimpleName.replace("$", "") + " * s").jencode
   }
 
   def genericIntegralReader_impl[Q <: Quantity[Q] : c.WeakTypeTag]
-    (c: blackbox.Context): c.Expr[Reader[GenericIntegral[Q]]] = {
+  (c: blackbox.Context): c.Expr[DecodeJson[GenericIntegral[Q]]] = {
     import c.universe._
 
     val dimension = dimension_impl[Q](c)
     val qExpr = weakTypeTag[Q].tpe.typeSymbol
 
-    c.Expr[Reader[GenericIntegral[Q]]](
+    c.Expr[DecodeJson[GenericIntegral[Q]]](
       q"""
-      new upickle.default.Reader[com.lynbrookrobotics.potassium.units.GenericIntegral[$qExpr]] {
-        override def read0: PartialFunction[upickle.Js.Value, com.lynbrookrobotics.potassium.units.GenericIntegral[$qExpr]] = {
-          case v: upickle.Js.Value =>
+      new argonaut.DecodeJson[com.lynbrookrobotics.potassium.units.GenericIntegral[$qExpr]] {
+        override def decode(c: argonaut.HCursor): argonaut.DecodeResult[com.lynbrookrobotics.potassium.units.GenericIntegral[$qExpr]] = {
             val dimension = $dimension
-            val (value, uom) = upickle.default.readJs[(Double, String)](v)
-            val unit = dimension.units.find(_.getClass.getSimpleName == uom.dropRight(4)).getOrElse(throw new Exception(uom))
-            new com.lynbrookrobotics.potassium.units.GenericIntegral(value, unit)
+            val (value, uom) = c.jdecode[(Double, String)].getOr(null)
+            val unit = dimension.units.find(_.getClass.getSimpleName.replace("$$","") == uom.dropRight(4)).getOrElse(throw new Exception(uom))
+            argonaut.DecodeResult.ok(new com.lynbrookrobotics.potassium.units.GenericIntegral(value, unit))
         }
       }
       """
     )
   }
 
-  implicit def genericIntegralReader[Q <: Quantity[Q]]: Reader[GenericIntegral[Q]] =
-    macro genericIntegralReader_impl[Q]
+  implicit def genericIntegralReader[Q <: Quantity[Q]]: DecodeJson[GenericIntegral[Q]] =
+  macro genericIntegralReader_impl[Q]
 }
