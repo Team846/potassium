@@ -9,8 +9,8 @@ import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
 object SquantsPickling {
-  implicit def quantityWriter[Q <: Quantity[Q]]: EncodeJson[Q] = (q: Q) => {
-    (q.value, q.unit.getClass.getSimpleName.replace("$","")).jencode
+  implicit def quantityWriter[Q <: Quantity[Q]] = new EncodeJson[Q]() {
+    override def encode(q: Q): Json = (q.value, q.unit.getClass.getSimpleName.replace("$", "")).jencode
   }
 
   def dimension_impl[Q <: Quantity[Q] : c.WeakTypeTag](c: blackbox.Context): c.Expr[Dimension[Q]] = {
@@ -42,8 +42,10 @@ object SquantsPickling {
 
   implicit def quantityReader[Q <: Quantity[Q]]: DecodeJson[Q] = macro quantityReader_impl[Q]
 
-  implicit def genericDerivativeWriter[Q <: Quantity[Q]]: EncodeJson[GenericDerivative[Q]] =
-    (q: GenericDerivative[Q]) => (q.value, q.uom.getClass.getSimpleName.replace("$","") + " / s").jencode
+  implicit def genericDerivativeWriter[Q <: Quantity[Q]] = new EncodeJson[GenericDerivative[Q]]() {
+    override def encode(q: GenericDerivative[Q]): Json =
+      (q.value, q.uom.getClass.getSimpleName.replace("$", "") + " / s").jencode
+  }
 
   def genericDerivativeReader_impl[Q <: Quantity[Q] : c.WeakTypeTag]
   (c: blackbox.Context): c.Expr[DecodeJson[GenericDerivative[Q]]] = {
@@ -69,8 +71,9 @@ object SquantsPickling {
   implicit def genericDerivativeReader[Q <: Quantity[Q]]: DecodeJson[GenericDerivative[Q]] =
   macro genericDerivativeReader_impl[Q]
 
-  implicit def genericIntegralWriter[Q <: Quantity[Q]]: EncodeJson[GenericIntegral[Q]] =
-    (q: GenericIntegral[Q]) => (q.value, q.uom.getClass.getSimpleName.replace("$","") + " * s").jencode
+  implicit def genericIntegralWriter[Q <: Quantity[Q]] = new EncodeJson[GenericIntegral[Q]]() {
+    override def encode(q: GenericIntegral[Q]): Json = (q.value, q.uom.getClass.getSimpleName.replace("$", "") + " * s").jencode
+  }
 
   def genericIntegralReader_impl[Q <: Quantity[Q] : c.WeakTypeTag]
   (c: blackbox.Context): c.Expr[DecodeJson[GenericIntegral[Q]]] = {
