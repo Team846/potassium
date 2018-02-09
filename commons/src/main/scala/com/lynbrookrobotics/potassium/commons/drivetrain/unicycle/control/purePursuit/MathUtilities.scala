@@ -37,10 +37,14 @@ object MathUtilities {
       implicit val tolerance: Angle = Radians(0.0001)
 
       // Pick point such that angle from the robot location projected on the segment to the end is the same
-      // as the robot location projection to the look ahead point, ensuring that we drive toward the correct direction
-      if (Segment(onLine, segment.end).angle ~= Segment(onLine, furthestFromStart).angle) {
+      // as the robot location projection to the look ahead point, ensuring that we drive toward the correct direction.
+      // We also make sure the angle from the start to end equals the angle from start to look ahead point, ensuring
+      // that we don't extrapolate behind the start.
+      if ((Segment(onLine, segment.end).angle ~= Segment(onLine, furthestFromStart).angle) &&
+          (segment.angle ~= Segment(segment.start, furthestFromStart).angle)) {
         Some(furthestFromStart)
-      } else if (Segment(onLine, segment.end).angle ~= Segment(onLine, closerToStart).angle) {
+      } else if ((Segment(onLine, segment.end).angle ~= Segment(onLine, closerToStart).angle) &&
+                 (segment.angle ~= Segment(segment.start, closerToStart).angle)) {
         Some(closerToStart)
       } else None
     }
