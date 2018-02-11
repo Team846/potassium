@@ -86,9 +86,9 @@ case class Segment(start: Point, end: Point) {
   val dx = end.x - start.x
 
   def between0and2Pi(angle: Angle): Angle = {
-    if (angle >= Radians(2 * math.Pi)) {
+    if (angle >= Degrees(360)) {
       between0and2Pi(angle - Degrees(360))
-    } else if (angle < Radians(0)) {
+    } else if (angle < Degrees(0)) {
       between0and2Pi(angle + Degrees(360))
     } else {
       angle

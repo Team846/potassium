@@ -157,7 +157,6 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       val angleRobotProjectionToEnd = Segment(biSegmentPath._1.pointClosestToOnLine(currPosition), biSegmentPath._1.end).angle
       (laPoint, !(angleRobotProjectionToEnd ~= biSegmentPath._1.angle))
     } else {
-      println(s"expanding look ahead distance. Pose: ${currPosition} biseg: $biSegmentPath")
       getExtrapolatedLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
     }
   }

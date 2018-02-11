@@ -6,16 +6,6 @@ import squants.{Angle, Dimensionless}
 
 object MathUtilities {
 
-  def between0and2Pi(angle: Angle): Angle = {
-    if (angle >= Radians(2 * math.Pi)) {
-      between0and2Pi(angle - Degrees(360))
-    } else if (angle < Radians(0)) {
-      between0and2Pi(angle + Degrees(360))
-    } else {
-      angle
-    }
-  }
-
   /**
     * This finds the point furthest from the start and if that point's angle formed with the start point is
     * the same as the angle of the segment, it returns that point.
@@ -34,10 +24,6 @@ object MathUtilities {
                                              radius: Length): Option[Point] = {
     val solutions = segment.intersectionWithCircle(center, radius)
 
-    if (solutions.isEmpty) {
-      println(s"no intersections found. segment $segment center $center radius $radius")
-    }
-
     solutions.flatMap { case (positive, negative) =>
       val positiveDiffWithStart = segment.start distanceTo positive
       val negativeDiffWithStart = segment.start distanceTo negative
@@ -52,19 +38,20 @@ object MathUtilities {
 
       implicit val tolerance: Angle = Degrees(45)//Radians(0.0001)
 
+      val angleRobotProjectionToEnd = Segment(onLine, segment.end).angle
+      val hasOvershot = !(angleRobotProjectionToEnd ~= segment.angle)
+
       // Pick point such that angle from the robot location projected on the segment to the end is the same
       // as the robot location projection to the look ahead point, ensuring that we drive toward the correct direction.
       // We also make sure the angle from the start to end equals the angle from start to look ahead point, ensuring
       // that we don't extrapolate behind the start.
-      if ((Segment(onLine, segment.end).angle ~= Segment(onLine, furthestFromStart).angle) &&
+      if ((angleRobotProjectionToEnd ~= Segment(onLine, furthestFromStart).angle) &&
           (segment.angle ~= Segment(segment.start, furthestFromStart).angle)) {
         Some(furthestFromStart)
-      } else if ((Segment(onLine, segment.end).angle ~= Segment(onLine, closerToStart).angle) &&
-                 (segment.angle ~= Segment(segment.start, closerToStart).angle)) {
+      } else if ((angleRobotProjectionToEnd ~= Segment(onLine, closerToStart).angle) &&
+                 ((segment.angle ~= Segment(segment.start, closerToStart).angle) || hasOvershot)) {
         Some(closerToStart)
       } else {
-        println(s"projected Point $onLine segment $segment oneline to segment to end ${Segment(onLine, segment.end).angle.toDegrees} angle further to start ${Segment(onLine, furthestFromStart).angle.toDegrees}")
-        println(s"closet to start to online ${Segment(onLine, closerToStart).angle}")
         None
       }
     }
