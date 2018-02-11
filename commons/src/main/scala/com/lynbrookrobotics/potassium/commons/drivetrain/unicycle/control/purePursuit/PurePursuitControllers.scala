@@ -133,13 +133,13 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
   final def getExtrapolatedLookAheadPoint(biSegmentPath: (Segment, Option[Segment]),
                                     currPosition: Point,
                                     lookAheadDistance: Length): (Point, Boolean) = {
-    val lookAheadOnCurrentSegment = intersectionLineCircleFurthestFromStart(
+    val lookAheadOnCurrentSegment = intersectionRayCircleFurthestFromStart(
       biSegmentPath._1,
       currPosition,
       lookAheadDistance)
 
     val lookAheadOnNextSegment = biSegmentPath._2.flatMap { s =>
-      intersectionLineCircleFurthestFromStart(s, currPosition, lookAheadDistance)
+      intersectionRayCircleFurthestFromStart(s, currPosition, lookAheadDistance)
     }
 
     implicit val tolerance: Angle = Radians(0.00001)
@@ -157,6 +157,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       val angleRobotProjectionToEnd = Segment(biSegmentPath._1.pointClosestToOnLine(currPosition), biSegmentPath._1.end).angle
       (laPoint, !(angleRobotProjectionToEnd ~= biSegmentPath._1.angle))
     } else {
+      println(s"expanding look ahead distance. Pose: ${currPosition} biseg: $biSegmentPath")
       getExtrapolatedLookAheadPoint(biSegmentPath, currPosition, 1.1 * lookAheadDistance)
     }
   }
@@ -182,7 +183,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
 
     val selectedPath = position.map { currPos =>
       if (biSegmentPaths.hasNext &&
-          currPath._2.exists(s => intersectionLineCircleFurthestFromStart(s, currPos, props.get.defaultLookAheadDistance).isDefined)) {
+          currPath._2.exists(s => intersectionRayCircleFurthestFromStart(s, currPos, props.get.defaultLookAheadDistance).isDefined)) {
         println("********** Advancing pure pursuit path ***********")
         currPath = biSegmentPaths.next()
       }

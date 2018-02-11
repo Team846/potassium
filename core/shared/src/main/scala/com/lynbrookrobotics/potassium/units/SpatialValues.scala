@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.units
 
+import squants.Angle
 import squants.space._
 
 class Point(override val x: Length,
@@ -84,8 +85,18 @@ case class Segment(start: Point, end: Point) {
   val dy = end.y - start.y
   val dx = end.x - start.x
 
+  def between0and2Pi(angle: Angle): Angle = {
+    if (angle >= Radians(2 * math.Pi)) {
+      between0and2Pi(angle - Degrees(360))
+    } else if (angle < Radians(0)) {
+      between0and2Pi(angle + Degrees(360))
+    } else {
+      angle
+    }
+  }
+
   def angle: Angle = {
-    Radians(math.atan2(dy.toFeet, dx.toFeet))
+    between0and2Pi(Radians(math.atan2(dy.toFeet, dx.toFeet)))
   }
 
   def pointClosestToOnLine(pt: Point): Point = {
