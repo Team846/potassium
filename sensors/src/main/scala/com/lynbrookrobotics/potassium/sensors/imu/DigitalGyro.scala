@@ -10,8 +10,9 @@ import scala.collection.mutable
 /**
   * Calibration, calculation for velocity
   * @param tickPeriod tick period of robot
+  * @param maxDriftDeviation maximum value the difference between drift and chunks that is allowed
   */
-abstract class DigitalGyro(tickPeriod: Time) {
+abstract class DigitalGyro(tickPeriod: Time, maxDriftDeviation: Value3D[AngularVelocity]) {
   // Tick Period of the robot
   var currentDrift: Value3D[AngularVelocity] = null
 
@@ -37,9 +38,7 @@ abstract class DigitalGyro(tickPeriod: Time) {
       val sum = calibrationVelocities.reduceLeft { (acc, cur) =>
         acc + cur
       }
-
-      currentDrift = sum.times(1D / calibrationVelocities.size)
-
+      currentDrift = sum * (1D / calibrationVelocities.size)
       calibrating = false
     }
   }
@@ -48,11 +47,36 @@ abstract class DigitalGyro(tickPeriod: Time) {
     if (calibrating) {
       calibrationVelocities.enqueue(retrieveVelocity)
 
-      if (calibrationVelocities.size > 200) calibrationVelocities.dequeue()
+      if (calibrationVelocities.size > 1000) calibrationVelocities.dequeue()
 
       Value3D(DegreesPerSecond(0), DegreesPerSecond(0), DegreesPerSecond(0))
     } else {
       retrieveVelocity - currentDrift
     }
+  }
+
+  def checkCalibrationValid: Boolean = {
+    val chunks: List[List[Value3D[AngularVelocity]]] = {
+      val part1 = calibrationVelocities.splitAt(calibrationVelocities.size / 5)
+      val part2 = part1._2.splitAt(calibrationVelocities.size / 5)
+      val part3 = part2._2.splitAt(calibrationVelocities.size / 5)
+      val part4 = part3._2.splitAt(calibrationVelocities.size / 5)
+      List(part1._1.toList, part2._1.toList, part3._1.toList, part4._1.toList, part4._2.toList)
+    }
+    chunks.forall({case chunk: List[Value3D[AngularVelocity]] =>
+      val sumChunk = chunk.reduceLeft{ (acc, cur) =>
+        acc + cur
+      }
+      val average = sumChunk * (1D / chunk.size)
+      if((average.x - currentDrift.x).abs > maxDriftDeviation.x){
+        false
+      }else if((average.y - currentDrift.y).abs > maxDriftDeviation.y){
+        false
+      }else if((average.z - currentDrift.z).abs > maxDriftDeviation.z){
+        false
+      } else {
+        true
+      }
+    }) && calibrationVelocities.size() == 1000
   }
 }
