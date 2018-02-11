@@ -223,5 +223,42 @@ class PurePursuitTasksTest extends FunSuite {
 
     assert(lastAppliedSignal.turn.abs <= Percent(1), s"Turn was ${lastAppliedSignal.turn.toPercent} %")
   }
+
+  test("Test that task finishes with 2ft tolerance when 1ft from target") {
+    var lastAppliedSignal = zeroSignal
+    val testDrivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
+
+    val target = new Point(Feet(0), Feet(3))
+
+    implicit val hardware = new UnicycleHardware {
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecond(0))
+
+      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
+
+      override val forwardPosition: Stream[Length] = Stream.periodic(period)(Feet(0))
+      override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(0))
+    }
+
+    val position = hardware.turnPosition.mapToConstant(Point(Feet(1), Feet(4)))
+
+    val task = new drive.unicycleTasks.FollowWayPointsWithPosition(
+      Seq(Point.origin, target),
+      Feet(2),
+      position,
+      hardware.turnPosition,
+      unlimitedTurnOutput
+    )(testDrivetrainComp)
+
+    task.init()
+
+    ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
+
+    assert(!task.isRunning)
+
+    // assert turn output is correct
+  }
 }
 

@@ -242,4 +242,38 @@ class PurePursuitControllerTests extends FunSuite {
     implicit val Tolerance = Percent(0.001)
     assert(out ~= Percent(0))
   }
+
+  test("Test for correct turn output after overshooting"){
+    val testDrivetrain = new TestDrivetrain
+    implicit val hardware = new UnicycleHardware {
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
+
+      override val forwardPosition: Stream[Length] = null
+      override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(0))
+    }
+    val controllers = testDrivetrain.UnicycleControllers
+
+    val target = Point(Feet(0), Feet(3))
+    val position = hardware.turnPosition.mapToConstant(Point(Feet(0), Feet(4)))
+    val path = hardware.turnPosition.mapToConstant((Segment(origin, target), None))
+
+    val turnOutput = controllers.purePursuitControllerTurn(
+      hardware.turnPosition.mapToConstant(Degrees(0)),
+      position,
+      path,
+      unlimitedTurnOutput,
+      Auto
+    )._1
+
+    var out = Percent(-10)
+    turnOutput.foreach(out = _)
+
+    triggerClock.apply(period)
+    triggerClock.apply(period)
+
+    implicit val Tolerance = Percent(0.01)
+    println(s"turn output: $out")
+    assert(out ~= Percent(0))
+  }
 }
