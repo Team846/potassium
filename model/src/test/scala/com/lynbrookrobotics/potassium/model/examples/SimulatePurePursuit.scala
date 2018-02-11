@@ -85,18 +85,18 @@ class SimulatePurePursuit extends FunSuite {
     if (log) {
       val logName = s"simlog-${wayPoints.mkString.split("Value3D").mkString(",")}"
       val writer = new PrintWriter(new FileWriter(new java.io.File(logName)))
-      writer.println(s"Time\tx\ty\tvelocity\tangle\tturnSpeed")
+      writer.println(s"Time(s)\tx(ft)\ty(ft)\tvelocity(ft/s)\tangle(deg)\tturnSpeed(deg/s)")
 
       var i = 0
       val handle = hardware.robotStateStream.foreach{ e =>
         if(i % 10 == 0) {
           writer.println(
-            s"${e.time}\t" +
-            s"${e.position.x}\t" +
-            s"${e.position.y}\t" +
-            s"${e.forwardVelocity}\t" +
-            s"${e.angle}\t",
-            s"${e.turnSpeed}"
+            s"${e.time.toSeconds}\t" +
+            s"${e.position.x.toFeet}\t" +
+            s"${e.position.y.toFeet}\t" +
+            s"${e.forwardVelocity.toFeetPerSecond}\t" +
+            s"${e.angle.toDegrees}\t" +
+            s"${e.turnSpeed.toDegreesPerSecond}"
           )
         }
         i = i + 1
