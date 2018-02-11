@@ -4,7 +4,7 @@ import java.awt.{BorderLayout, Dimension}
 import java.io.File
 import java.util
 import java.util.Scanner
-import javax.swing.event.{ChangeEvent, ChangeListener}
+import javax.swing.event.ChangeEvent
 import javax.swing.{JFrame, JSlider}
 
 import com.lynbrookrobotics.potassium.units.Point
@@ -19,7 +19,7 @@ class SimulatorGUI(val fieldWidth: Length,
   /**
     * This is the frame size, in pixels
     */
-  val frameSize = new Dimension(
+    val frameSize = new Dimension(
     Math.min(fieldWidth.toFeet.toInt * boxSize, maxSize.width),
     Math.min(fieldHeight.toFeet.toInt * boxSize, maxSize.height))
 
@@ -32,9 +32,12 @@ class SimulatorGUI(val fieldWidth: Length,
     * This is the frame for our simulator
     */
   val frame = new JFrame("Simulator")
+  frame.setLayout(new BorderLayout())
+  frame.add(canvas)
 
   private val timeSlider = new JSlider()
   private val layout = new BorderLayout()
+  frame.add(timeSlider)
 
   /**
     * This contains the data read from a log file
@@ -49,11 +52,9 @@ class SimulatorGUI(val fieldWidth: Length,
 
   timeSlider.setMinimum(0)
   timeSlider.setValue(0)
-  timeSlider.addChangeListener(new ChangeListener {
-    override def stateChanged(e: ChangeEvent): Unit = {
-      val (_, dataChunk) = data.get(timeSlider.getValue)
-      update(dataChunk.point, dataChunk.angle)
-    }
+  timeSlider.addChangeListener((e: ChangeEvent) => {
+    val (_, dataChunk) = data.get(timeSlider.getValue)
+    update(dataChunk.point, dataChunk.angle)
   })
   timeSlider.setToolTipText("Time")
 
@@ -71,9 +72,12 @@ class SimulatorGUI(val fieldWidth: Length,
         Degrees(line(4).toDouble))
       times.add((dataChunk.time.toSeconds, dataChunk))
     }
+    var hadData = false
     if (data != null) {
-      timeSlider.setMaximum(times.size)
+      hadData = true
     }
+    data = times
+    timeSlider.setMaximum(data.size)
   }
 
   def pointToPixels(p: Point): (Int, Int) = {
