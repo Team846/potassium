@@ -99,12 +99,12 @@ class PurePursuitTasksTest extends FunSuite {
     val task = new drive.unicycleTasks.FollowWayPoints(
       Seq(Point.origin, target),
       Feet(1),
-      Percent(70),
       unlimitedTurnOutput
     )(drivetrainComp)
 
     task.init()
 
+    ticker(Milliseconds(5))
     ticker(Milliseconds(5))
     ticker(Milliseconds(5))
     ticker(Milliseconds(5))
@@ -119,7 +119,7 @@ class PurePursuitTasksTest extends FunSuite {
     val target = new Point(Feet(0), Feet(1))
 
     implicit val hardware = new UnicycleHardware {
-      override val forwardVelocity: Stream[Velocity] = null
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecond(0))
 
       override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
 
@@ -130,7 +130,6 @@ class PurePursuitTasksTest extends FunSuite {
     val task = new drive.unicycleTasks.FollowWayPoints(
       Seq(Point.origin, target),
       Feet(0.1),
-      Percent(70),
       unlimitedTurnOutput
     )(testDrivetrainComp)
 
@@ -139,11 +138,12 @@ class PurePursuitTasksTest extends FunSuite {
     ticker(Milliseconds(5))
     ticker(Milliseconds(5))
     ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
 
     assert(lastAppliedSignal.turn.toPercent == 0, s"Turn was ${lastAppliedSignal.turn.toPercent} %")
 
     implicit val tolerance = Each(0.01)
-    assert(lastAppliedSignal.forward ~= Percent(70), s"actual forward ${lastAppliedSignal.forward.toPercent}%")
+    assert(lastAppliedSignal.forward ~= Percent(100), s"actual forward ${lastAppliedSignal.forward.toPercent}%")
   }
 
   test("Test that going left and back 1 foot does not result in full turn"){
@@ -174,11 +174,14 @@ class PurePursuitTasksTest extends FunSuite {
     val task = new drive.unicycleTasks.FollowWayPoints(
       Seq(Point.origin, target),
       Feet(1),
-      Percent(70),
       unlimitedTurnOutput
     )(drivetrainComp)
 
     task.init()
+
+    ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
     ticker(Milliseconds(5))
 
     implicit val tolerance = Percent(0.01)
@@ -195,7 +198,7 @@ class PurePursuitTasksTest extends FunSuite {
     val target = new Point(Feet(0), Feet(1))
 
     implicit val hardware = new UnicycleHardware {
-      override val forwardVelocity: Stream[Velocity] = null
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecond(0))
 
       override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
 
@@ -207,12 +210,15 @@ class PurePursuitTasksTest extends FunSuite {
       Seq(Point.origin, target),
       Feet(0.1),
       hardware.forwardPosition.mapToConstant(Point(Feet(0.001), Feet(0.999999))),
-      hardware.turnPosition.mapToConstant(Degrees(0)), Percent(70),
+      hardware.turnPosition.mapToConstant(Degrees(0)),
       unlimitedTurnOutput
     )(testDrivetrainComp)
 
     task.init()
 
+    ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
     ticker(Milliseconds(5))
 
     assert(lastAppliedSignal.turn.abs <= Percent(1), s"Turn was ${lastAppliedSignal.turn.toPercent} %")
