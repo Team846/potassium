@@ -385,25 +385,31 @@ trait UnicycleCoreTasks {
     }
   }
 
-  class DriveToTarget(drivetrainComponent: Drivetrain, distanceToTarget: Stream[Option[Length]], angleToTarget: Stream[Angle])
-                    (implicit val drivetrainHardware: DrivetrainHardware,
-                      implicit val props: Signal[DrivetrainProperties]) extends FiniteTask {
+  class DriveToTargetWithConstantSpeed(drivetrainComponent: Drivetrain,
+                                       distanceToTarget: Stream[Option[Length]],
+                                       angleToTarget: Stream[Angle],
+                                       forwardVelocity: Dimensionless,
+                                       maxTurnVelocity: Dimensionless,
+                                       minDistance: Length)
+                                      (implicit drivetrainHardware: DrivetrainHardware,
+                                       props: Signal[DrivetrainProperties]) extends FiniteTask {
 
     override def onStart(): Unit = {
-      val turnPosition = drivetrainHardware.turnPosition.zipAsync(angleToTarget).map{t =>
+      val absoluteTargetAngle = drivetrainHardware.turnPosition.zipAsync(angleToTarget).map{t =>
         t._1 + t._2
       }
 
-      val turnController: Stream[UnicycleSignal] = turnPositionControl(turnPosition)._1
+      val turnController = turnPositionControl(absoluteTargetAngle)._1
 
-      val out = childOpenLoop(
-        turnController.map { p =>
-          UnicycleSignal(Percent(-15), p.turn max Percent(-20) min Percent(20))
+      val out = childVelocityControl(
+        turnController.map{p =>
+          UnicycleSignal(forwardVelocity, p.turn min maxTurnVelocity max -maxTurnVelocity)
         }
       )
+
       drivetrainComponent.setController(out.withCheck(_ =>
         distanceToTarget.foreach(p =>
-          if (!p.exists(_ >= Feet(2))) {
+          if (!p.exists(_ > minDistance)) {
             finished()
           }
       )))
@@ -412,7 +418,5 @@ trait UnicycleCoreTasks {
     override def onEnd(): Unit = {
       drivetrainComponent.resetToDefault()
     }
-
   }
-
 }

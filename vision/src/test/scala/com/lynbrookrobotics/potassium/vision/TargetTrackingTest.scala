@@ -8,33 +8,27 @@ import squants.space.{Degrees, Feet}
 import squants.time.Milliseconds
 
 class TargetTrackingTest extends FunSuite {
-
-  test("cube with measured percent area 15.6 results in distance 2.75 feet away") {
+  test("Cube with measured percent area 15.6 results in distance 2.75 feet away") {
     val (percentArea, pubPercentArea) = Stream.manual[Option[Dimensionless]]
     val camProps: Signal[VisionProperties] = Signal.constant(VisionProperties(Degrees(0), Feet(10.8645)))
     val targetDistance: Option[Length] = Some(Feet(2.75))
-
     val distanceToTarget = VisionTargetTracking.distanceToTarget(percentArea, camProps)
-
     var lastTargetPosition: Option[Length] = Option(Feet(0))
 
     distanceToTarget.foreach(lastTargetPosition = _)
-
     pubPercentArea(Some(Percent(15.6)))
 
     assert(targetDistance.get - lastTargetPosition.get < Feet(0.1))
   }
 
-  test("angle to target measured as 5 degrees for input of 10 degrees and offset of -5 degrees") {
+  test("Angle to target measured as 5 degrees for input of 10 degrees and offset of -5 degrees") {
     val (angle, pubAngle) = Stream.manual[Angle]
     val camProps: Signal[VisionProperties] = Signal.constant(VisionProperties(Degrees(-5), Feet(10.8645)))
     val targetAngle: Angle = Degrees(-5)
-
     val angleToTarget = VisionTargetTracking.angleToTarget(angle, camProps)
     var lastAngle = Degrees(0)
 
     angleToTarget.foreach(lastAngle = _)
-
     pubAngle(Degrees(10))
 
     assert(targetAngle - lastAngle < Degrees(1))
