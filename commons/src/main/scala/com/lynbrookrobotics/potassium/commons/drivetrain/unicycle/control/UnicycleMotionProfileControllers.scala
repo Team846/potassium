@@ -1,7 +1,7 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control
 
 import com.lynbrookrobotics.potassium.streams.Stream
-import squants.Length
+import squants.{Length, Time}
 import squants.motion._
 import squants.space.Feet
 
@@ -28,23 +28,26 @@ trait UnicycleMotionProfileControllers extends UnicycleCoreControllers {
                               position: Stream[Length],
                               targetPosition: Stream[Length],
                               velocity: Stream[Velocity]): (Stream[Velocity], Stream[Length]) = {
-    val error            = targetPosition.minus(position)
-    val signError        = error.map(error => Math.signum(error.toFeet))
+    val error          = targetPosition.minus(position)
+    val signError      = error.map(error => Math.signum(error.toFeet))
     val LengthTraveled = position.minus(position.currentValue)
 
     // Travel at 0.1 ft/s for the first 0.25 feet
     val KickstartLength = Feet(0.25)
-    val KickStartVelocity = FeetPerSecond(10)
+
+    val timeFromStart = position.originTimeStream.get.relativize { (startTime, currentTime) =>
+      currentTime - startTime
+    }
 
     /**
       * Calculate the magnitude of ideal velocity assuming constant acceleration
       * as function of current position using equation V^2 = V0^2 + 2a(x-x_0).
       * Direction of ideal velocity is decided later.
       */
-    val velocityAccel = LengthTraveled.zip(velocity.currentValue).map { case (traveled, initVelocity) =>
+    val velocityAccel = LengthTraveled.zip(velocity.currentValue).zip(timeFromStart).map { case ((traveled, initVelocity), timeFromStart) =>
       // otherwise additional output is zero and nothing happens
       if (traveled.abs <= KickstartLength) {
-        KickStartVelocity
+        initVelocity + acceleration * timeFromStart
       } else {
         val V0Squared             = Math.pow(initVelocity.toFeetPerSecond, 2)
         val accelerationValue     = acceleration.toFeetPerSecondSquared
