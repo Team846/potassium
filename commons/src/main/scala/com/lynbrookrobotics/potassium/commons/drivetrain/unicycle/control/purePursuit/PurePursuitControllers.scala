@@ -2,13 +2,15 @@ package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.pureP
 
 import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleCoreControllers
-import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleHardware, UnicycleProperties, UnicycleSignal}
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleHardware, UnicycleProperties, UnicycleSignal, UnicycleVelocity}
 import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
-import squants.Dimensionless
+import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleMotionProfileControllers
+import squants.{Dimensionless, Each}
 import squants.space._
 import MathUtilities._
+import squants.motion._
 
 import scala.annotation.tailrec
 
@@ -17,7 +19,7 @@ case object Auto extends ForwardBackwardMode
 case object ForwardsOnly extends ForwardBackwardMode
 case object BackwardsOnly extends ForwardBackwardMode
 
-trait PurePursuitControllers extends UnicycleCoreControllers {
+trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotionProfileControllers {
   /**
     * use pid control on the distance from the target point
     * @param target the target point to reach
@@ -26,17 +28,25 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
     * @return dimensionless, forward output value and distance to target
     */
   def pointDistanceControl(position: Stream[Point],
-                           target: Stream[Point])
-                          (implicit properties: Signal[UnicycleProperties],
-                           hardware: UnicycleHardware): Stream[Dimensionless] = {
+                           target: Stream[Point],
+                           maxVelocity: Velocity,
+                           acceleration: Acceleration)
+                          (implicit properties: Signal[DrivetrainProperties],
+                           hardware: DrivetrainHardware): Stream[Dimensionless] = {
     val distanceToTarget = position.zip(target).map { p =>
       p._1.distanceTo(p._2)
     }
 
-    PIDF.pid(
+    val targetVelocity = trapezoidalDriveControl(
+      maxVelocity,
+      FeetPerSecond(0),
+      acceleration,
       distanceToTarget.mapToConstant(Feet(0)),
       distanceToTarget,
-      properties.map(_.forwardPositionGains))
+      hardware.forwardVelocity)._1
+
+
+    targetVelocity.map(v => Each(v / properties.get.maxForwardVelocity))
   }
 
   def headingToPoint(start: Point, end: Point): Angle = {
@@ -165,6 +175,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
                                 position: Stream[Point],
                                 turnPosition: Stream[Angle],
                                 maxTurnOutput: Dimensionless,
+                                cruisingVelocity: Velocity,
                                 forwardBackwardMode: ForwardBackwardMode)
                                 (implicit hardware: DrivetrainHardware,
                                  props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
@@ -198,9 +209,16 @@ trait PurePursuitControllers extends UnicycleCoreControllers {
       forwardBackwardMode
     )
 
+//    cruisingVelocity: Velocity,
+//    finalVelocity: Velocity,
+//    acceleration: Acceleration,
+//    targetForwardTravel: Distance,
+//    velocity: Stream[Velocity]
     val forwardOutput = pointDistanceControl(
       position,
-      selectedPath.map(p => p._2.getOrElse(p._1).end)
+      selectedPath.map(p => p._2.getOrElse(p._1).end),
+      cruisingVelocity,
+      props.get.maxAcceleration / 2
     )
 
     val distanceToLast = position.map { pose =>

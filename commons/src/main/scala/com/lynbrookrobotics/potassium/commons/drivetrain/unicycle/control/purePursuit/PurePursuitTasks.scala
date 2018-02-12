@@ -6,7 +6,7 @@ import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.Unicyc
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.{FiniteTask, FiniteTaskFinishedListener}
 import com.lynbrookrobotics.potassium.units.Point
-import squants.Dimensionless
+import squants.{Dimensionless, Velocity}
 import squants.space.{Angle, Degrees, Length}
 
 
@@ -20,6 +20,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
   class FollowWayPoints(wayPoints: Seq[Point],
                         tolerance: Length,
                         maxTurnOutput: Dimensionless,
+                        cruisingVelocity: Velocity,
                         targetTicksWithingTolerance: Int = 1,
                         forwardBackwardMode: ForwardBackwardMode = Auto)
                        (drive: Drivetrain)
@@ -46,6 +47,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         position,
         turnPosition,
         maxTurnOutput,
+        cruisingVelocity,
         targetTicksWithingTolerance,
         forwardBackwardMode
       )(drive)
@@ -68,6 +70,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                                     position: Stream[Point],
                                     turnPosition: Stream[Angle],
                                     maxTurnOutput: Dimensionless,
+                                    cruisingVelocity: Velocity,
                                     targetTicksWithingTolerance: Int = 1,
                                     forwardBackwardMode: ForwardBackwardMode = Auto)
                                    (drive: Drivetrain)
@@ -81,6 +84,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         position,
         turnPosition,
         maxTurnOutput,
+        cruisingVelocity,
         forwardBackwardMode
       )
 

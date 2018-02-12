@@ -99,7 +99,8 @@ class PurePursuitTasksTest extends FunSuite {
     val task = new drive.unicycleTasks.FollowWayPoints(
       Seq(Point.origin, target),
       Feet(1),
-      unlimitedTurnOutput
+      unlimitedTurnOutput,
+      FeetPerSecond(10)
     )(drivetrainComp)
 
     task.init()
@@ -130,7 +131,8 @@ class PurePursuitTasksTest extends FunSuite {
     val task = new drive.unicycleTasks.FollowWayPoints(
       Seq(Point.origin, target),
       Feet(0.1),
-      unlimitedTurnOutput
+      unlimitedTurnOutput,
+      FeetPerSecond(10)
     )(testDrivetrainComp)
 
     task.init()
@@ -143,6 +145,7 @@ class PurePursuitTasksTest extends FunSuite {
     assert(lastAppliedSignal.turn.toPercent == 0, s"Turn was ${lastAppliedSignal.turn.toPercent} %")
 
     implicit val tolerance = Each(0.01)
+
     assert(lastAppliedSignal.forward ~= Percent(100), s"actual forward ${lastAppliedSignal.forward.toPercent}%")
   }
 
@@ -174,7 +177,8 @@ class PurePursuitTasksTest extends FunSuite {
     val task = new drive.unicycleTasks.FollowWayPoints(
       Seq(Point.origin, target),
       Feet(1),
-      unlimitedTurnOutput
+      unlimitedTurnOutput,
+      FeetPerSecond(10)
     )(drivetrainComp)
 
     task.init()
@@ -211,7 +215,8 @@ class PurePursuitTasksTest extends FunSuite {
       Feet(0.1),
       hardware.forwardPosition.mapToConstant(Point(Feet(0.001), Feet(0.999999))),
       hardware.turnPosition.mapToConstant(Degrees(0)),
-      unlimitedTurnOutput
+      unlimitedTurnOutput,
+      cruisingVelocity = FeetPerSecond(10)
     )(testDrivetrainComp)
 
     task.init()

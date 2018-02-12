@@ -78,6 +78,7 @@ class SimulatePurePursuit extends FunSuite {
       wayPoints,
       Inches(3),
       Percent(30),
+      FeetPerSecond(10),
       20,
       forwardBackwardMode
     )(drivetrain)
@@ -137,7 +138,8 @@ class SimulatePurePursuit extends FunSuite {
   test("Reach destination with path from (0,0) to (-5, 5)") {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(-5), Feet(5))),
-      timeOut = Seconds(8)
+      timeOut = Seconds(8),
+      log = true
     )
   }
 
@@ -180,7 +182,8 @@ class SimulatePurePursuit extends FunSuite {
   test("Reach destination with path from (0,0) to (0, 5)") {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(0), Feet(5))),
-      timeOut = Seconds(5)
+      timeOut = Seconds(5),
+      log = true
     )
   }
 
