@@ -75,14 +75,17 @@ class SimulatorGUI(val fieldWidth: Length,
       t.schedule(new TimerTask {
         override def run(): Unit = {
           moveFunction()
+          if(timeSlider.getValue == timeSlider.getMaximum){
+            t.cancel()
+          }
+
+
         }
-      }, 0, 500)
+      }, 0, 10)
 
 
     }
   })
-
-
 
   /**
     * This contains the data read from a log file
