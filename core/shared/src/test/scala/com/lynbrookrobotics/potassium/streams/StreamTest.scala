@@ -67,6 +67,42 @@ class StreamTest extends FunSuite {
     assert(lastValue == 1)
   }
 
+  test("Preserving stream has correct behavior") {
+    val (str, pub) = Stream.manual[Int]
+    var called = false
+    var listenerCalled = false
+    val mapped = str.map { _ =>
+      called = true
+    }
+    val preserved = mapped.preserve
+
+    pub(0)
+
+    assert(called)
+
+    called = false
+    listenerCalled = false
+
+    val cancel1 = preserved.foreach(_ => listenerCalled = true) // launch
+
+    pub(1)
+
+    assert(called && listenerCalled)
+
+    cancel1.cancel()
+
+    called = false
+    listenerCalled = false
+
+    val cancel2 = preserved.foreach(_ => listenerCalled = true) // relaunch
+
+    pub(1)
+
+    assert(called && listenerCalled)
+
+    cancel2.cancel()
+  }
+
   test("Sliding over a stream produces correct values") {
     val (str, pub) = Stream.manual[Int]
     var lastValue: Queue[Int] = null

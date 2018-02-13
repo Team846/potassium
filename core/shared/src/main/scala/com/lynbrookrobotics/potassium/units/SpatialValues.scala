@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.units
 
+import squants.Angle
 import squants.space._
 
 class Point(override val x: Length,
@@ -84,28 +85,70 @@ case class Segment(start: Point, end: Point) {
   val dy = end.y - start.y
   val dx = end.x - start.x
 
-  def withInBoundries(toTest: Point): Boolean = {
-    val minX = (start.x min end.x) - Feet(0.01)
-    val maxX = (start.x max end.x) + Feet(0.01)
-
-    val minY = (start.y min end.y) - Feet(0.01)
-    val maxY = (start.y max end.y) + Feet(0.01)
-
-    toTest.x >= minX && toTest.x <= maxX &&
-      toTest.y >= minY && toTest.y <= maxY
-  }
-
-  /**
-    *
-    * @param toTest to the point to test if contained by this
-    * @return whether the given point is contained by this segment IN THE XY
-    *         plane
-    */
-  def containsInXY(toTest: Point, tolerance: Length): Boolean = {
-    withInBoundries(toTest) && toTest.onLine(this, tolerance)
+  def between0and2Pi(angle: Angle): Angle = {
+    if (angle >= Degrees(360)) {
+      between0and2Pi(angle - Degrees(360))
+    } else if (angle < Degrees(0)) {
+      between0and2Pi(angle + Degrees(360))
+    } else {
+      angle
+    }
   }
 
   def angle: Angle = {
-    Radians(math.atan2(dy.toFeet, dx.toFeet))
+    between0and2Pi(Radians(math.atan2(dy.toFeet, dx.toFeet)))
+  }
+
+  def pointClosestToOnLine(pt: Point): Point = {
+    val lengthSquared = length.squared
+    val apDiff = pt - start
+    val interpolation = diff.dot(apDiff) / lengthSquared
+    start + ((end - start) * interpolation)
+  }
+
+  /**
+    * see http://mathworld.wolfram.com/Circle-LineIntersection.html
+    * @param center center of circle to test for intersection
+    * @param radius radius of circle to test for intersection
+    * @return on Option of a tuple of points where the
+    *         infinitely long line and circle intersect
+    */
+  def intersectionWithCircle(center: Point,
+                             radius: Length): Option[(Point, Point)] = {
+    import math._
+    val diffEnd   = end - center
+    val diffStart = start - center
+
+    val dr_squared = (length * length).toSquareFeet
+
+    val det = (diffStart.x * diffEnd.y - diffEnd.x * diffStart.y).toSquareFeet
+    val discriminant = dr_squared * radius.toFeet * radius.toFeet - det * det
+
+    if (dr_squared == 0) {
+      throw new IllegalArgumentException("Segment is a point, so no line can be fit through it")
+    }
+
+    if (discriminant < 0) None else {
+      val dy = this.dy.toFeet
+      val dx = this.dx.toFeet
+
+      val posX = center.x.toFeet
+      val posY = center.y.toFeet
+
+      val sqrtDiscrim = sqrt(discriminant)
+      val signDy = if (dy < 0) -1D else 1D
+
+      val positiveSolution = Point(
+        Feet((det * dy + signDy * sqrtDiscrim * dx) / dr_squared + posX),
+        Feet((-det * dx + abs(dy) * sqrtDiscrim) / dr_squared + posY)
+      )
+
+      val negativeSolution = Point(
+        Feet((det * dy - signDy * sqrtDiscrim * dx) / dr_squared + posX),
+        Feet((-det * dx - abs(dy) * sqrtDiscrim) / dr_squared + posY)
+      )
+
+      Some(negativeSolution, positiveSolution)
+    }
   }
 }
