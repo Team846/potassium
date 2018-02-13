@@ -81,7 +81,7 @@ class SimulatorGUI(val fieldWidth: Length,
 
 
         }
-      }, 0, 10)
+      }, 0, 100)
 
 
     }
