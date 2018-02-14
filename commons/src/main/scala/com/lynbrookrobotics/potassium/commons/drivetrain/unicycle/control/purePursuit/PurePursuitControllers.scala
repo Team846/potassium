@@ -213,7 +213,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
       position,
       selectedPath.map(p => p._2.getOrElse(p._1).end),
       cruisingVelocity,
-      props.get.maxAcceleration / 2
+      props.get.maxAcceleration
     )
 
     val distanceToLast = position.map { pose =>

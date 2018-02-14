@@ -82,9 +82,9 @@ trait UnicycleMotionProfileControllers extends UnicycleCoreControllers {
 
     // Ensure that motion is in the direction of the error
     val velocityOutput = velocityDeccel.zip(velocityAccel).zip(signError).map {
-      case ((velDec, velAcc), sign) => {
+      case ((velDec, velAcc), sign) =>
         sign * velDec min cruisingVelocity min velAcc
-      }
+
     }
 
     (velocityOutput, error)
