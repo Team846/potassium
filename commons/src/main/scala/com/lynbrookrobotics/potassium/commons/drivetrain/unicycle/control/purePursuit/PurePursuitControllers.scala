@@ -209,11 +209,6 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
       forwardBackwardMode
     )
 
-//    cruisingVelocity: Velocity,
-//    finalVelocity: Velocity,
-//    acceleration: Acceleration,
-//    targetForwardTravel: Distance,
-//    velocity: Stream[Velocity]
     val forwardOutput = pointDistanceControl(
       position,
       selectedPath.map(p => p._2.getOrElse(p._1).end),
