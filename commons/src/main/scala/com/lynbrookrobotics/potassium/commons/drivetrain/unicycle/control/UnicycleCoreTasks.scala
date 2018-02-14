@@ -395,24 +395,25 @@ trait UnicycleCoreTasks {
                                        props: Signal[DrivetrainProperties]) extends FiniteTask {
 
     override def onStart(): Unit = {
-      val absoluteTargetAngle = drivetrainHardware.turnPosition.zipAsync(angleToTarget).map{t =>
+      val absoluteTargetAngle = drivetrainHardware.turnPosition.zipAsync(angleToTarget).map {t =>
         t._1 + t._2
       }
 
       val turnController = turnPositionControl(absoluteTargetAngle)._1
 
       val out = childVelocityControl(
-        turnController.map{p =>
+        turnController.map { p =>
           UnicycleSignal(forwardVelocity, p.turn min maxTurnVelocity max -maxTurnVelocity)
         }
       )
 
-      drivetrainComponent.setController(out.withCheck(_ =>
-        distanceToTarget.foreach(p =>
-          if (!p.exists(_ > minDistance)) {
+      drivetrainComponent.setController(out.withCheckZipped(distanceToTarget){
+        distanceToTarget => {
+          if (!distanceToTarget.exists(_ > minDistance)) {
             finished()
           }
-      )))
+        }
+      })
     }
 
     override def onEnd(): Unit = {
