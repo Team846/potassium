@@ -88,7 +88,9 @@ object SimulateDrivetrain extends App {
   val task = new drivetrainContainer.unicycleTasks.FollowWayPoints(
     wayPoints,
     Inches(5),
-    Percent(70)
+    Percent(70),
+    FeetPerSecond(10),
+    10
   )(simulatedComponent)
 //  val task = new drivetrainContainer.unicycleTasks.RotateToAngle(
 //    Degrees(1e200),
