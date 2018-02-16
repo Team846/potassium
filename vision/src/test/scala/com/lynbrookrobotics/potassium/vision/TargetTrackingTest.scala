@@ -19,7 +19,7 @@ class TargetTrackingTest extends FunSuite {
     distanceToTarget.foreach(lastTargetPosition = _)
     pubPercentArea(Some(Percent(15.6)))
 
-    implicit val tolerance: Option[Length] = Some(Feet(0.1))
+    implicit val tolerance: Length = Feet(0.1)
     assert(targetDistance.get ~= lastTargetPosition.get)
   }
 
