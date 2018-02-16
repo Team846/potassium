@@ -83,35 +83,35 @@ class PurePursuitTasksTest extends FunSuite {
   }
 
   val unlimitedTurnOutput = Percent(Double.MaxValue)
-//  test("If target is initally within tolerance, stop immediately") {
-//    var lastAppliedSignal = zeroSignal
-//    val drivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
-//
-//    implicit val hardware = new UnicycleHardware {
-//      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
-//      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
-//
-//      override val forwardPosition: Stream[Length] = Stream.periodic(period)(Feet(0))
-//      override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(0))
-//    }
-//
-//    val target = new Point(Feet(0), Feet(0.5))
-//    val task = new drive.unicycleTasks.FollowWayPoints(
-//      Seq(Point.origin, target),
-//      Feet(1),
-//      unlimitedTurnOutput,
-//      FeetPerSecond(10)
-//    )(drivetrainComp)
-//
-//    task.init()
-//
-//    ticker(Milliseconds(5))
-//    ticker(Milliseconds(5))
-//    ticker(Milliseconds(5))
-//    ticker(Milliseconds(5))
-//
-//    assert(!task.isRunning)
-//  }
+  test("If target is initally within tolerance, stop immediately") {
+    var lastAppliedSignal = zeroSignal
+    val drivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
+
+    implicit val hardware = new UnicycleHardware {
+      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
+
+      override val forwardPosition: Stream[Length] = Stream.periodic(period)(Feet(0))
+      override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(0))
+    }
+
+    val target = new Point(Feet(0), Feet(0.5))
+    val task = new drive.unicycleTasks.FollowWayPoints(
+      Seq(Point.origin, target),
+      Feet(1),
+      unlimitedTurnOutput,
+      FeetPerSecond(10)
+    )(drivetrainComp)
+
+    task.init()
+
+    ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
+
+    assert(!task.isRunning)
+  }
 
   test("Test that having 1 way point directly ahead results in not turning") {
     var lastAppliedSignal = zeroSignal
