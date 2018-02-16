@@ -407,7 +407,7 @@ trait UnicycleCoreTasks {
 
       drivetrainComponent.setController(out.withCheckZipped(distanceToTarget){
         distanceToTarget => {
-          if (!distanceToTarget.exists(_ > minDistance)) {
+          if (distanceToTarget.exists(_ <= minDistance)) {
             finished()
           }
         }
