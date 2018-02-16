@@ -39,7 +39,7 @@ class PurePursuitTasksTest extends FunSuite {
   val zeroSignal = UnicycleSignal(Each(0), Each(0))
 
   implicit val props = Signal.constant(new UnicycleProperties {
-    override val maxForwardVelocity: Velocity = MetersPerSecond(10)
+    override val maxForwardVelocity: Velocity = FeetPerSecond(10)
     override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
     override val defaultLookAheadDistance: Length = Feet(0.5)
@@ -99,7 +99,8 @@ class PurePursuitTasksTest extends FunSuite {
     val task = new drive.unicycleTasks.FollowWayPoints(
       Seq(Point.origin, target),
       Feet(1),
-      unlimitedTurnOutput
+      unlimitedTurnOutput,
+      FeetPerSecond(10)
     )(drivetrainComp)
 
     task.init()
@@ -116,7 +117,7 @@ class PurePursuitTasksTest extends FunSuite {
     var lastAppliedSignal = zeroSignal
     val testDrivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
 
-    val target = new Point(Feet(0), Feet(1))
+    val target = new Point(Feet(0), Feet(10))
 
     implicit val hardware = new UnicycleHardware {
       override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecond(0))
@@ -130,7 +131,8 @@ class PurePursuitTasksTest extends FunSuite {
     val task = new drive.unicycleTasks.FollowWayPoints(
       Seq(Point.origin, target),
       Feet(0.1),
-      unlimitedTurnOutput
+      unlimitedTurnOutput,
+      FeetPerSecond(20)
     )(testDrivetrainComp)
 
     task.init()
@@ -138,11 +140,12 @@ class PurePursuitTasksTest extends FunSuite {
     ticker(Milliseconds(5))
     ticker(Milliseconds(5))
     ticker(Milliseconds(5))
-    ticker(Milliseconds(5))
+    ticker(Seconds(1))
 
     assert(lastAppliedSignal.turn.toPercent == 0, s"Turn was ${lastAppliedSignal.turn.toPercent} %")
 
     implicit val tolerance = Each(0.01)
+
     assert(lastAppliedSignal.forward ~= Percent(100), s"actual forward ${lastAppliedSignal.forward.toPercent}%")
   }
 
@@ -174,7 +177,8 @@ class PurePursuitTasksTest extends FunSuite {
     val task = new drive.unicycleTasks.FollowWayPoints(
       Seq(Point.origin, target),
       Feet(1),
-      unlimitedTurnOutput
+      unlimitedTurnOutput,
+      FeetPerSecond(10)
     )(drivetrainComp)
 
     task.init()
@@ -211,7 +215,8 @@ class PurePursuitTasksTest extends FunSuite {
       Feet(0.1),
       hardware.forwardPosition.mapToConstant(Point(Feet(0.001), Feet(0.999999))),
       hardware.turnPosition.mapToConstant(Degrees(0)),
-      unlimitedTurnOutput
+      unlimitedTurnOutput,
+      cruisingVelocity = FeetPerSecond(10)
     )(testDrivetrainComp)
 
     task.init()

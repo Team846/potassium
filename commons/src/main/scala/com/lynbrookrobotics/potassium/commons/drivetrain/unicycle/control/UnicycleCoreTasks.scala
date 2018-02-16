@@ -84,11 +84,10 @@ trait UnicycleCoreTasks {
     }
   }
 
-  class DriveDistanceWithTrapazoidalProfile(cruisingVelocity: Velocity,
+  class DriveDistanceWithTrapezoidalProfile(cruisingVelocity: Velocity,
                                             finalVelocity: Velocity,
                                             acceleration: Acceleration,
                                             targetDistance: Length,
-                                            position: Stream[Length],
                                             tolerance: Length,
                                             toleranceAngle: Angle)
                                            (drive: Drivetrain)
@@ -105,8 +104,8 @@ trait UnicycleCoreTasks {
           cruisingVelocity = cruisingVelocity,
           finalVelocity = finalVelocity,
           acceleration = acceleration,
-          targetForwardTravel = targetDistance,
-          position = position,
+          targetPosition = hardware.forwardPosition.currentValue.map(_ + targetDistance),
+          position = hardware.forwardPosition,
           velocity = hardware.forwardVelocity)
 
       val absoluteAngleTarget = hardware.turnPosition.currentValue
@@ -142,12 +141,11 @@ trait UnicycleCoreTasks {
                            (drive: Drivetrain)
                            (implicit hardware: DrivetrainHardware,
                             properties: Signal[DrivetrainProperties])
-    extends DriveDistanceWithTrapazoidalProfile(
+    extends DriveDistanceWithTrapezoidalProfile(
       0.5 * properties.get.maxForwardVelocity,
       finalVelocity,
       properties.get.maxAcceleration,
       targetForwardDistance,
-      hardware.forwardPosition,
       Feet(.1),
       Degrees(5)
     )(drive)
