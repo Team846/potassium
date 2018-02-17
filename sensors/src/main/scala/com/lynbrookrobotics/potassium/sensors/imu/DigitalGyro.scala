@@ -63,6 +63,7 @@ abstract class DigitalGyro(tickPeriod: Time, maxDriftDeviation: Value3D[AngularV
       val part4 = part3._2.splitAt(calibrationVelocities.size / 5)
       Seq(part1._1.toList, part2._1.toList, part3._1.toList, part4._1.toList, part4._2.toList)
     }
+    
     chunks.forall { chunk =>
       val sumChunk = chunk.reduceLeft{ (acc, cur) =>
         acc + cur
@@ -72,5 +73,6 @@ abstract class DigitalGyro(tickPeriod: Time, maxDriftDeviation: Value3D[AngularV
         ((average.y - currentDrift.y).abs <= maxDriftDeviation.y) &&
         ((average.z - currentDrift.z).abs <= maxDriftDeviation.z) &&
         (calibrationVelocities.size() == 1000)
+    }
   }
 }
