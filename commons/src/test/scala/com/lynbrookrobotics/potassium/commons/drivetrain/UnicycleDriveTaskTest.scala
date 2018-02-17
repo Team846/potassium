@@ -397,7 +397,7 @@ class UnicycleDriveTaskTest extends FunSuite {
     assert(!task.isRunning)
   }
 
-  test("Driving to a given polar target results in target position") {
+  test("Task finishes when robot is within tolerance distance") {
     val drive = new TestDrivetrain
 
     val props = Signal.constant(new UnicycleProperties {
