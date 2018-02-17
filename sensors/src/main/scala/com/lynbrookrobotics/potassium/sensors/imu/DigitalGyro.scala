@@ -72,7 +72,7 @@ abstract class DigitalGyro(tickPeriod: Time, maxDriftDeviation: Value3D[AngularV
       ((average.x - currentDrift.x).abs <= maxDriftDeviation.x) &&
         ((average.y - currentDrift.y).abs <= maxDriftDeviation.y) &&
         ((average.z - currentDrift.z).abs <= maxDriftDeviation.z) &&
-        (calibrationVelocities.size() == 1000)
+        (calibrationVelocities.size == 1000)
     }
   }
 }
