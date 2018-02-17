@@ -3,7 +3,7 @@ package com.lynbrookrobotics.potassium.vision
 import com.lynbrookrobotics.potassium.ClockMocking
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.Point
-import com.lynbrookrobotics.potassium.vision.limelight.CameraProperties
+import com.lynbrookrobotics.potassium.vision.limelight.VisionProperties
 import org.scalatest.FunSuite
 import squants.space.{Angle, Degrees, Feet, Length}
 import squants.time.Milliseconds
@@ -20,7 +20,7 @@ class TargetTrackingTest extends FunSuite {
     val (yAngle, pubYAngle) = Stream.manualWithTime[Angle]//Stream.manualWithTime[Angle](Periodic(period))
     val (xAngle, pubXAngle) = Stream.manualWithTime[Angle]
 
-    implicit val camProps: CameraProperties = CameraProperties(Degrees(0), Degrees(0), Feet(47.0 / 12.0), Feet(11.0 / 12.0))
+    implicit val camProps: VisionProperties = VisionProperties(Degrees(0), Degrees(0), Feet(47.0 / 12.0), Feet(11.0 / 12.0))
 
     val target: Point = Point(Feet(0), Feet(3))
 
@@ -50,7 +50,7 @@ class TargetTrackingTest extends FunSuite {
     val (yAngle, pubYAngle) = Stream.manualWithTime[Angle]//Stream.manualWithTime[Angle](Periodic(period))
     val (xAngle, pubXAngle) = Stream.manualWithTime[Angle]
 
-    implicit val camProps: CameraProperties = CameraProperties(Degrees(12), Degrees(-23), Feet(83.0 / 12.0), Feet(13.0 / 12.0))
+    implicit val camProps: VisionProperties = VisionProperties(Degrees(12), Degrees(-23), Feet(83.0 / 12.0), Feet(13.0 / 12.0))
 
     val target: Point = Point(Feet(0.841), Feet(2.587))
 
