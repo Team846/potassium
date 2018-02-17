@@ -10,7 +10,6 @@ import squants.time.Milliseconds
 class TargetTrackingTest extends FunSuite {
   test("Cube with measured percent area 15.6 results in distance 2.75 feet away") {
     val (percentArea, pubPercentArea) = Stream.manual[Option[Dimensionless]]
-    val camProps: Signal[VisionProperties] = Signal.constant(VisionProperties(Degrees(0), Feet(10.8645)))
     val targetDistance: Option[Length] = Some(Feet(2.75))
     val targeter: VisionTargetTracking = new VisionTargetTracking(Signal.constant(Degrees(0)), Signal.constant(Feet(10.8645)))
     val distanceToTarget = targeter.distanceToTarget(percentArea)
