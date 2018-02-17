@@ -6,11 +6,10 @@ import com.lynbrookrobotics.potassium.streams.{Periodic, Stream}
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units._
 import com.lynbrookrobotics.potassium._
-import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleDrive, UnicycleHardware, UnicycleProperties, UnicycleSignal}
 import squants.motion.{AngularVelocity, DegreesPerSecond, MetersPerSecond, MetersPerSecondSquared}
 import squants.motion._
-import squants.space.{Degrees, Meters}
+import squants.space.{Degrees, Feet, Meters}
 import squants.time.{Milliseconds, Seconds}
 import squants.{Acceleration, Angle, Length, Percent, Time, Velocity}
 import org.scalatest.FunSuite
@@ -392,6 +391,94 @@ class UnicycleDriveTaskTest extends FunSuite {
     assert(lastAppliedSignal.turn.toPercent == 25)
 
     currentPosition = Degrees(10)
+
+    ticker(Milliseconds(5))
+
+    assert(!task.isRunning)
+  }
+
+  test("Task finishes when robot is within tolerance distance") {
+    val drive = new TestDrivetrain
+
+    val props = Signal.constant(new UnicycleProperties {
+      override val maxForwardVelocity: Velocity = MetersPerSecond(10)
+      override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
+      override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
+      override val defaultLookAheadDistance: Length = null
+
+      override val forwardVelocityGains: ForwardVelocityGains = PIDConfig(
+        Percent(0) / MetersPerSecond(1),
+        Percent(0) / Meters(1),
+        Percent(0) / MetersPerSecondSquared(1)
+      )
+
+      override val turnVelocityGains: TurnVelocityGains = PIDConfig(
+        Percent(0) / DegreesPerSecond(1),
+        Percent(0) / Degrees(1),
+        Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1))
+      )
+
+      override val forwardPositionGains: ForwardPositionGains = null
+
+      override val turnPositionGains: TurnPositionGains = PIDConfig(
+        Percent(100) / Degrees(50),
+        Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
+        Percent(0) / DegreesPerSecond(1)
+      )
+    })
+
+    var lastAppliedSignal: UnicycleSignal = null
+
+    val drivetrain = new Component[UnicycleSignal] {
+      override def defaultController: Stream[UnicycleSignal] =
+        Stream.periodic(tickPeriod)(UnicycleSignal(Percent(0), Percent(0)))
+
+      override def applySignal(signal: UnicycleSignal): Unit = {
+        lastAppliedSignal = signal
+      }
+    }
+
+    var currentPosition = Meters(0)
+    var currentAngle = Degrees(0)
+
+    val hardware: UnicycleHardware = new UnicycleHardware {
+      override val turnPosition: Stream[Angle] = Stream.periodic(tickPeriod)(currentAngle)
+      override val turnVelocity: Stream[AngularVelocity] = turnPosition.derivative
+
+      override val forwardPosition: Stream[Length] = Stream.periodic(tickPeriod)(currentPosition)
+      override val forwardVelocity: Stream[Velocity] = forwardPosition.derivative
+    }
+
+    val distanceToTarget = hardware.forwardPosition.map(p => Some(Meters(2) - p))
+    val angleToTarget = hardware.turnPosition.map(p => Degrees(90) - p)
+
+    val task = new drive.unicycleTasks.DriveToTargetWithConstantSpeed(
+      drivetrain,
+      distanceToTarget,
+      angleToTarget,
+      Percent(15),
+      Percent(20),
+      Meters(1)
+    ) (hardware, props)
+
+    task.init()
+
+    ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
+    ticker(Milliseconds(5))
+
+    assert(lastAppliedSignal.forward == Percent(15))
+    assert(lastAppliedSignal.turn == Percent(20))
+
+    currentPosition = Meters(0.5)
+    currentAngle = Degrees(90)
+
+    ticker(Milliseconds(5))
+
+    assert(lastAppliedSignal.forward == Percent(15))
+    assert(lastAppliedSignal.turn == Percent(0))
+
+    currentPosition = Meters(1.0)
 
     ticker(Milliseconds(5))
 
