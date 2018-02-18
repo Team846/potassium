@@ -4,6 +4,7 @@ import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.streams._
 import com.lynbrookrobotics.potassium.units.Ratio
 import squants.motion.RadiansPerSecond
+import squants.space.Angle
 import squants.{Dimensionless, Each, Length, Percent, Velocity}
 
 object BlendedDriving {
@@ -48,6 +49,19 @@ object BlendedDriving {
                   (implicit properties: Signal[TwoSidedDriveProperties]): Stream[TwoSided[Velocity]] = {
     val constantRadiusSpeed = driveWithRadius(radiusStream = curvature.map(curvature => curvature.den / curvature.num.toEach), targetForwardVelocity)
 
+    arcadeSpeed.zip(constantRadiusSpeed).zip(targetForwardVelocity).map {
+      case ((tankSpeed, carSpeed), targetForward) =>
+        TwoSided(
+          blend(carSpeed.left, tankSpeed.left, targetForward),
+          blend(carSpeed.right, tankSpeed.right, targetForward))
+    }
+  }
+
+  def blendedBusDrive(arcadeSpeed: Stream[TwoSided[Velocity]],
+                      targetForwardVelocity: Stream[Velocity],
+                      radius: Stream[Length])
+                     (implicit properties: Signal[TwoSidedDriveProperties]): Stream[TwoSided[Velocity]] = {
+    val constantRadiusSpeed = driveWithRadius(radius, targetForwardVelocity)
     arcadeSpeed.zip(constantRadiusSpeed).zip(targetForwardVelocity).map {
       case ((tankSpeed, carSpeed), targetForward) =>
         TwoSided(
