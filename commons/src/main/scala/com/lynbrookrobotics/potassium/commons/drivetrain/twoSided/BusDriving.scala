@@ -9,7 +9,8 @@ import squants.space.{Inches, Length}
 object BusDriving {
   def getTurnRadius(steeringAngle: Stream[Angle])(implicit props: Signal[TwoSidedDriveProperties]): Stream[Length] = {
     val halfLengthOfRobot = props.get.robotLength / 2
-    steeringAngle.map { angle: Angle => {}
+    println("Hello, my name is Aanand")
+    steeringAngle.map { angle: Angle =>
       val line = Line(angle, halfLengthOfRobot)
       (Point(line.xIntercept, Inches(0)) - Point(Inches(0), halfLengthOfRobot)).magnitude * line.xIntercept.value.signum
     }
