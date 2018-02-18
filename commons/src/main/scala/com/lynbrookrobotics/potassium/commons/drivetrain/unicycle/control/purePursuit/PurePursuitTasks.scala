@@ -6,6 +6,7 @@ import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.Unicyc
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.{FiniteTask, FiniteTaskFinishedListener}
 import com.lynbrookrobotics.potassium.units.Point
+import squants.motion.Acceleration
 import squants.{Dimensionless, Velocity}
 import squants.space.{Angle, Degrees, Length}
 
@@ -22,7 +23,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                         maxTurnOutput: Dimensionless,
                         cruisingVelocity: Velocity,
                         targetTicksWithingTolerance: Int = 1,
-                        forwardBackwardMode: ForwardBackwardMode = Auto)
+                        forwardBackwardMode: ForwardBackwardMode = Auto,
+                        maxAcceleration: Acceleration)
                        (drive: Drivetrain)
                        (implicit properties: Signal[controllers.DrivetrainProperties],
                         hardware: controllers.DrivetrainHardware) extends FiniteTask with FiniteTaskFinishedListener {
@@ -49,7 +51,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         maxTurnOutput,
         cruisingVelocity,
         targetTicksWithingTolerance,
-        forwardBackwardMode
+        forwardBackwardMode,
+        maxAcceleration
       )(drive)
 
       absoluteFollow.setFinishedListener(this)
@@ -72,7 +75,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                                     maxTurnOutput: Dimensionless,
                                     cruisingVelocity: Velocity,
                                     targetTicksWithingTolerance: Int = 1,
-                                    forwardBackwardMode: ForwardBackwardMode = Auto)
+                                    forwardBackwardMode: ForwardBackwardMode = Auto,
+                                    maxAcceleration: Acceleration)
                                    (drive: Drivetrain)
                                    (implicit properties: Signal[DrivetrainProperties],
                                     hardware: DrivetrainHardware) extends FiniteTask {
@@ -85,7 +89,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         turnPosition,
         maxTurnOutput,
         cruisingVelocity,
-        forwardBackwardMode
+        forwardBackwardMode,
+        maxAcceleration
       )
 
       drive.setController(childVelocityControl(speedControl(unicycle.withCheckZipped(error) { e =>

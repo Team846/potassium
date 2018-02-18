@@ -80,7 +80,8 @@ class SimulatePurePursuit extends FunSuite {
       Percent(30),
       FeetPerSecond(10),
       20,
-      forwardBackwardMode
+      forwardBackwardMode,
+      maxAcceleration = props.get.maxAcceleration
     )(drivetrain)
 
     task.init()

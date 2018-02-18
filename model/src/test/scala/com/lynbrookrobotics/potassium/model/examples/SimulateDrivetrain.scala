@@ -90,7 +90,8 @@ object SimulateDrivetrain extends App {
     Inches(5),
     Percent(70),
     FeetPerSecond(10),
-    10
+    10,
+    maxAcceleration = props.get.maxAcceleration
   )(simulatedComponent)
 //  val task = new drivetrainContainer.unicycleTasks.RotateToAngle(
 //    Degrees(1e200),
