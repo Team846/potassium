@@ -1,8 +1,7 @@
 package com.lynbrookrobotics.potassium.units
 
-import squants.time.{Milliseconds, Time}
-import java.util.function.DoubleConsumer
-import java.io._
+import squants.time.Time
+
 
 import com.team846.frc2015.logging.AsyncLogger
 

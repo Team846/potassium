@@ -34,15 +34,17 @@ abstract class Component[T] (printsOnOverflow: Boolean = false) {
     if (controller.expectedPeriodicity == NonPeriodic) {
       throw new IllegalArgumentException("Controller must be periodic")
     }
-    currentTimingHandle.foreach(_.cancel())
-    currentTimingHandle = Some(
-      controller.zipWithDt.foreach{ case (_, dt: Time) =>
-        histogram.apply(dt)
-        if (controller.expectedPeriodicity.asInstanceOf[Periodic].period > 2 * dt ) {
-          histogram.printStatus
+    if (printsOnOverflow) {
+      currentTimingHandle.foreach(_.cancel())
+      currentTimingHandle = Some(
+        controller.zipWithDt.foreach{ case (_, dt: Time) =>
+          histogram.apply(dt)
+          if (controller.expectedPeriodicity.asInstanceOf[Periodic].period > 2 * dt ) {
+            histogram.printStatus
+          }
         }
-     }
-    )
+      )
+    }
 
 
 
@@ -71,7 +73,7 @@ abstract class Component[T] (printsOnOverflow: Boolean = false) {
 
   /**
     * Applies the latest control signal value.
-    * @param signal the signal value to act on
+    * @param signal the signal valuef to act on
     */
   def applySignal(signal: T): Unit
 }
