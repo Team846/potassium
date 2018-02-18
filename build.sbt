@@ -107,29 +107,19 @@ lazy val vision = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.
 ).jvmSettings(
   libraryDependencies ++= jvmDependencies,
   resolvers += "WPILib-Maven" at "http://team846.github.io/wpilib-maven",
-  resolvers += "opencv-maven" at "https://github.com/WPIRoboticsProjects/opencv-maven/raw/mvn-repo",
 
-  libraryDependencies += "edu.wpi.first" % "cscore" % "2018.1.1",
-  libraryDependencies += "org.opencv" % "opencv-java" % "3.1.0",
   libraryDependencies += "edu.wpi.first" % "ntcore" % wpiVersion
 ).nativeSettings(
   if (System.getenv("NATIVE_TARGET") == "ARM32") {
     Seq(
       libraryDependencies += "com.lynbrookrobotics" %%% "wpilib-scala-native" % "0.1-SNAPSHOT",
-      libraryDependencies += "edu.wpi.first" % "cscore" % "2018.1.1",
-      libraryDependencies += "org.opencv" % "opencv-java" % "3.1.0",
       libraryDependencies += "com.lynbrookrobotics" %%% "ntcore-scala-native" % "0.1.0+4-f5af12c9",
-      libraryDependencies += "com.lynbrookrobotics" %%% "phoenix-scala-native" % "0.1-SNAPSHOT"
     )
   } else Seq(
     resolvers += "WPILib-Maven" at "http://team846.github.io/wpilib-maven",
 
-    libraryDependencies += "org.opencv" % "opencv-java" % "3.1.0",
-    libraryDependencies += "edu.wpi.first" % "cscore" % "2018.1.1",
     libraryDependencies += "edu.wpi.first" % "wpilib" % wpiVersion,
     libraryDependencies += "edu.wpi.first" % "ntcore" % wpiVersion,
-    libraryDependencies += "com.ctre" % "phoenix" % ctreVersion,
-    libraryDependencies += "com.lynbrookrobotics" % "ntcore-scala-native" % "0.1.0+4-f5af12c9",
     test := { (compile in Compile).value }
   ),
   nativeSettings
@@ -220,7 +210,7 @@ lazy val docsMappingsAPIDir = settingKey[String]("Name of subdirectory in site t
 lazy val docs = project
   .enablePlugins(ScalaUnidocPlugin)
   .dependsOn(coreJVM, modelJVM, controlJVM,
-    remote, visionJVM, visionNative, frcJVM, configJVM, sensorsJVM,
+    remote, visionJVM, frcJVM, configJVM, sensorsJVM,
     commonsJVM, lighting)
   .settings(
     autoAPIMappings := true,
@@ -228,7 +218,7 @@ lazy val docs = project
     addMappingsToSiteDir(mappings in (ScalaUnidoc, packageDoc), docsMappingsAPIDir),
     unidocProjectFilter in (ScalaUnidoc, unidoc) :=
       inProjects(coreJVM, modelJVM, controlJVM,
-        remote, visionJVM, visionNative, frcJVM, configJVM, lighting, sensorsJVM, commonsJVM)
+        remote, visionJVM, frcJVM, configJVM, lighting, sensorsJVM, commonsJVM)
   )
 
 publishArtifact := false
