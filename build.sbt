@@ -121,9 +121,9 @@ lazy val frc = crossProject(JVMPlatform, NativePlatform).crossType(CrossType.Ful
 ).nativeSettings(
   if (System.getenv("NATIVE_TARGET") == "ARM32") {
     Seq(
-      libraryDependencies += "com.lynbrookrobotics" %%% "wpilib-scala-native" % "0.1-SNAPSHOT",
-      //  libraryDependencies += "com.lynbrookrobotics" % "ntcore" % wpiVersion,
-      libraryDependencies += "com.lynbrookrobotics" %%% "phoenix-scala-native" % "0.1-SNAPSHOT"
+      libraryDependencies += "com.lynbrookrobotics" %%% "wpilib-scala-native" % "0.1.0+3-2fa07712",
+      libraryDependencies += "com.lynbrookrobotics" %%% "ntcore-scala-native" % "0.1.0+3-2fa07712",
+      libraryDependencies += "com.lynbrookrobotics" %%% "phoenix-scala-native" % "0.1.0+3-2fa07712"
     )
   } else Seq(
     resolvers += "WPILib-Maven" at "http://team846.github.io/wpilib-maven",
