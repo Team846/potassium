@@ -4,7 +4,6 @@ import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.streams._
 import com.lynbrookrobotics.potassium.units.Ratio
 import squants.motion.RadiansPerSecond
-import squants.space.Angle
 import squants.{Dimensionless, Each, Length, Percent, Velocity}
 
 object BlendedDriving {
