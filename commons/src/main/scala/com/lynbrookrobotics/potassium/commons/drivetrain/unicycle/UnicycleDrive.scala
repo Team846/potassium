@@ -54,7 +54,7 @@ trait UnicycleDrive extends Drive {
 
   object unicycleTasks extends UnicycleCoreTasks with PurePursuitTasks {
     type Drivetrain = self.Drivetrain
-    override val controllers = UnicycleControllers
+    override val controllers: UnicycleControllers.type = UnicycleControllers
   }
 
   protected def controlMode(implicit hardware: Hardware,

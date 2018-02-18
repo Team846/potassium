@@ -29,6 +29,7 @@ class OffloadedTests extends FunSuite {
       override val blendExponent: Double = 0
       override val track: Length = null
 
+      override val robotLength = Inches(27)
 
 
       /**
