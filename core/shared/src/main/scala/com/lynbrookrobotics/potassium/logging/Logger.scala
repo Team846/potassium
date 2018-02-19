@@ -1,7 +1,6 @@
-package com.team846.frc2015.logging
+package com.lynbrookrobotics.potassium.logging
 
 import java.io.PrintStream
-
 
 object Logger {
   private val originalOut = Console.out

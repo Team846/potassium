@@ -1,14 +1,9 @@
-package com.lynbrookrobotics.potassium.units
+package com.lynbrookrobotics.potassium.logging
 
 import squants.time.Time
 
 
-import com.team846.frc2015.logging.AsyncLogger
-
-/**
-  * Created by the-magical-llamicorn on 4/19/17.
-  */
-class Histogram(min: Time, max: Time, binCount: Int) {
+class Histogram(min: Time, max: Time, binCount: Int, asyncLogger: AsyncLogger) {
   val interval = (max - min) / binCount
 
   // bins and "less than min" and "greater than max"
@@ -25,13 +20,13 @@ class Histogram(min: Time, max: Time, binCount: Int) {
   }
 
   def printStatus(): Unit =  {
-    AsyncLogger.info(s"< $min : ${bins(0)} \n")
+    asyncLogger.info(s"< $min : ${bins(0)} \n")
 
     for  (i <- 1 until binCount) {
-        AsyncLogger.info(s"${bins(i)} to ${min + (interval * (i -  1))} : " +
+        asyncLogger.info(s"${bins(i)} to ${min + (interval * (i -  1))} : " +
                 s"${min + (interval * i)}")
     }
 
-    AsyncLogger.info(s"> $max : ${bins(binCount + 1)}")
+    asyncLogger.info(s"> $max : ${bins(binCount + 1)}")
   }
 }

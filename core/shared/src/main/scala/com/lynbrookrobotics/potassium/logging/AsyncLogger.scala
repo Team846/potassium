@@ -1,12 +1,13 @@
-package com.team846.frc2015.logging
+package com.lynbrookrobotics.potassium.logging
 
-import java.util
-import java.util.Timer
-import java.util.TimerTask
-import java.util.concurrent.ConcurrentLinkedQueue
+import com.lynbrookrobotics.potassium.clock.Clock
+import squants.time.Milliseconds
 
+import scala.collection.mutable
 
-object AsyncLogger {
+trait AsyncLogger {
+  val clock: Clock
+
   abstract private class Loggable {
     def log(): Unit
   }
@@ -35,34 +36,29 @@ object AsyncLogger {
     }
   }
 
-  private val gapBetweenFlush = 20 // ms
+  private val gapBetweenFlush = Milliseconds(20)
 
-  private val toLog = new ConcurrentLinkedQueue[Loggable]()
+  private val toLog = new mutable.SynchronizedQueue[Loggable]()
 
   def debug(msg: String): Unit = {
-    toLog.add(new DebugLog(msg))
+    toLog.+=(new DebugLog(msg))
   }
 
   def warn(msg: String): Unit = {
-    toLog.add(new WarningLog(msg))
+    toLog.+=(new WarningLog(msg))
   }
 
   def error(msg: String): Unit = {
-    toLog.add(new ErrorLog(msg))
+    toLog.+=(new ErrorLog(msg))
   }
 
   def info(msg: String): Unit = {
-    toLog.add(new InfoLog(msg))
+    toLog.+=(new InfoLog(msg))
   }
 
-  val timer = new Timer
-  timer.scheduleAtFixedRate(new TimerTask() {
-    override def run(): Unit = {
-      while ( {
-        !toLog.isEmpty
-      }) {
-        toLog.remove().log()
-      }
+  clock.apply(gapBetweenFlush)( _ =>
+    while (toLog.nonEmpty) {
+      toLog.dequeue().log()
     }
-  }, 0, gapBetweenFlush)
+  )
 }
