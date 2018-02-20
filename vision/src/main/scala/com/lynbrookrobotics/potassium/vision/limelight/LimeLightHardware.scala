@@ -3,9 +3,9 @@ package com.lynbrookrobotics.potassium.vision.limelight
 import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.streams._
-import com.lynbrookrobotics.potassium.vision.VisionTargetTracking
+import com.lynbrookrobotics.potassium.vision.{VisionProperties, VisionTargetTracking}
 import edu.wpi.first.networktables.NetworkTableInstance
-import squants.space.{Angle, Degrees, Feet, Length}
+import squants.space.{Degrees, Feet}
 
 
 class LimeLightHardware(implicit clock: Clock) {
@@ -15,8 +15,7 @@ class LimeLightHardware(implicit clock: Clock) {
 
   val limelightInterface = LimelightNetwork(clock)
   val tracker = new VisionTargetTracking(
-    cameraAngleRelativeToFront = Signal.constant(Degrees(0)),
-    reciprocalRootAreaToDistanceConversion = Signal.constant(Feet(10.8645)))
+    Signal.constant(VisionProperties(Degrees(0), Feet(10.8645))))
 
   val distanceToTarget = tracker.distanceToTarget(limelightInterface.percentArea)
   val angleToTarget = tracker.compassAngleToTarget(limelightInterface.xOffsetAngle)
