@@ -163,6 +163,12 @@
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="index.html" class="extype" name="com.lynbrookrobotics.potassium.vision">vision</a></dd></dl></div>
     </li><li class="current-entities indented4">
                         <span class="separator"></span>
+                        <a class="class" href="VisionProperties.html" title=""></a>
+                        <a href="VisionProperties.html" title="">
+                          VisionProperties
+                        </a>
+                      </li><li class="current-entities indented4">
+                        <span class="separator"></span>
                         <a class="class" href="" title=""></a>
                         <a href="" title="">
                           VisionTargetTracking
@@ -246,9 +252,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.lynbrookrobotics.potassium.vision.VisionTargetTracking#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(cameraHorizontalOffset:com.lynbrookrobotics.potassium.Signal[squants.space.Angle],distanceConstant:com.lynbrookrobotics.potassium.Signal[squants.space.Length]):com.lynbrookrobotics.potassium.vision.VisionTargetTracking"></a><a id="&lt;init&gt;:VisionTargetTracking"></a>
+      <a id="&lt;init&gt;(props:com.lynbrookrobotics.potassium.Signal[com.lynbrookrobotics.potassium.vision.VisionProperties]):com.lynbrookrobotics.potassium.vision.VisionTargetTracking"></a><a id="&lt;init&gt;:VisionTargetTracking"></a>
       <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/vision/VisionTargetTracking.html#&lt;init&gt;(cameraHorizontalOffset:com.lynbrookrobotics.potassium.Signal[squants.space.Angle],distanceConstant:com.lynbrookrobotics.potassium.Signal[squants.space.Length]):com.lynbrookrobotics.potassium.vision.VisionTargetTracking" title="Permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/vision/VisionTargetTracking.html#&lt;init&gt;(props:com.lynbrookrobotics.potassium.Signal[com.lynbrookrobotics.potassium.vision.VisionProperties]):com.lynbrookrobotics.potassium.vision.VisionTargetTracking" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -257,7 +263,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">VisionTargetTracking</span><span class="params">(<span name="cameraHorizontalOffset">cameraHorizontalOffset: <a href="../Signal.html" class="extype" name="com.lynbrookrobotics.potassium.Signal">Signal</a>[<span class="extype" name="squants.space.Angle">Angle</span>]</span>, <span name="distanceConstant">distanceConstant: <a href="../Signal.html" class="extype" name="com.lynbrookrobotics.potassium.Signal">Signal</a>[<span class="extype" name="squants.space.Length">Length</span>]</span>)</span>
+        <span class="name">VisionTargetTracking</span><span class="params">(<span name="props">props: <a href="../Signal.html" class="extype" name="com.lynbrookrobotics.potassium.Signal">Signal</a>[<a href="VisionProperties.html" class="extype" name="com.lynbrookrobotics.potassium.vision.VisionProperties">VisionProperties</a>]</span>)</span>
       </span>
       
       
@@ -319,22 +325,6 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.vision.VisionTargetTracking#angleToTarget" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="angleToTarget(xOffset:com.lynbrookrobotics.potassium.streams.Stream[squants.space.Angle]):com.lynbrookrobotics.potassium.streams.Stream[squants.space.Angle]"></a><a id="angleToTarget(Stream[Angle]):Stream[Angle]"></a>
-      <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/vision/VisionTargetTracking.html#angleToTarget(xOffset:com.lynbrookrobotics.potassium.streams.Stream[squants.space.Angle]):com.lynbrookrobotics.potassium.streams.Stream[squants.space.Angle]" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier"></span>
-        <span class="kind">def</span>
-      </span>
-      <span class="symbol">
-        <span class="name">angleToTarget</span><span class="params">(<span name="xOffset">xOffset: <a href="../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.space.Angle">Angle</span>]</span>)</span><span class="result">: <a href="../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.space.Angle">Angle</span>]</span>
-      </span>
-      
-      
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
@@ -373,6 +363,22 @@
     </span>)</span>
               
         </dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.vision.VisionTargetTracking#compassAngleToTarget" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="compassAngleToTarget(xOffset:com.lynbrookrobotics.potassium.streams.Stream[squants.space.Angle]):com.lynbrookrobotics.potassium.streams.Stream[squants.space.Angle]"></a><a id="compassAngleToTarget(Stream[Angle]):Stream[Angle]"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/vision/VisionTargetTracking.html#compassAngleToTarget(xOffset:com.lynbrookrobotics.potassium.streams.Stream[squants.space.Angle]):com.lynbrookrobotics.potassium.streams.Stream[squants.space.Angle]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">compassAngleToTarget</span><span class="params">(<span name="xOffset">xOffset: <a href="../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.space.Angle">Angle</span>]</span>)</span><span class="result">: <a href="../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.space.Angle">Angle</span>]</span>
+      </span>
+      
+      
     </li><li name="com.lynbrookrobotics.potassium.vision.VisionTargetTracking#distanceToTarget" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="distanceToTarget(percentArea:com.lynbrookrobotics.potassium.streams.Stream[Option[squants.Dimensionless]]):com.lynbrookrobotics.potassium.streams.Stream[Option[squants.space.Length]]"></a><a id="distanceToTarget(Stream[Option[Dimensionless]]):Stream[Option[Length]]"></a>
       <span class="permalink">
