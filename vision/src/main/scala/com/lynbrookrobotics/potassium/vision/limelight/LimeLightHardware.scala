@@ -12,7 +12,7 @@ import squants.space.{Degrees, Feet}
 class LimeLightHardware(maxInitializationTime: Time)(implicit clock: Clock) {
   val initialTime = clock.currentTime
   while (!NetworkTableInstance.getDefault.getTable("/limelight").getEntry("tv").exists()
-          & clock.currentTime < initialTime) {
+          && clock.currentTime - initialTime < maxInitializationTime) {
     // busy wait until network table is initialized
   }
 
