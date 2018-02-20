@@ -12,7 +12,7 @@ import scala.collection.mutable
   * @param tickPeriod tick period of robot
   * @param maxDriftDeviation maximum value the difference between drift and chunks that is allowed
   */
-abstract class DigitalGyro(tickPeriod: Time, maxDriftDeviation: Value3D[AngularVelocity]) {
+abstract class DigitalGyro(tickPeriod: Time) {
   // Tick Period of the robot
   var currentDrift: Value3D[AngularVelocity] = null
 
@@ -55,7 +55,7 @@ abstract class DigitalGyro(tickPeriod: Time, maxDriftDeviation: Value3D[AngularV
     }
   }
 
-  def checkCalibrationValid: Boolean = {
+  def checkCalibrationValid(maxDriftDeviation: Value3D[AngularVelocity]): Boolean = {
     val chunks: Seq[Seq[Value3D[AngularVelocity]]] = {
       val part1 = calibrationVelocities.splitAt(calibrationVelocities.size / 5)
       val part2 = part1._2.splitAt(calibrationVelocities.size / 5)

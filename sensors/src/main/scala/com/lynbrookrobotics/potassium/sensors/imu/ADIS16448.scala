@@ -9,7 +9,7 @@ import squants.motion.{AngularVelocity, DegreesPerSecond}
 /**
   * An interface for communicating with the ADIS16448 IMU.
   */
-class ADIS16448(spi: SPITrait, updatePeriod: Time, maxDriftDeviation: Value3D[AngularVelocity]) extends DigitalGyro(updatePeriod, maxDriftDeviation) {
+class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePeriod) {
   // List of register addresses on the IMU
   private object Registers {
     // Sample period
