@@ -5,11 +5,14 @@ import com.lynbrookrobotics.potassium.clock.Clock
 import com.lynbrookrobotics.potassium.streams._
 import com.lynbrookrobotics.potassium.vision.{VisionProperties, VisionTargetTracking}
 import edu.wpi.first.networktables.NetworkTableInstance
+import squants.Time
 import squants.space.{Degrees, Feet}
 
 
-class LimeLightHardware(implicit clock: Clock) {
-  while (!NetworkTableInstance.getDefault.getTable("/limelight").getEntry("tv").exists()) {
+class LimeLightHardware(maxInitializationTime: Time)(implicit clock: Clock) {
+  val initialTime = clock.currentTime
+  while (!NetworkTableInstance.getDefault.getTable("/limelight").getEntry("tv").exists()
+          & clock.currentTime < initialTime) {
     // busy wait until network table is initialized
   }
 
