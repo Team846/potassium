@@ -468,7 +468,7 @@ class UnicycleDriveTaskTest extends FunSuite {
     ticker(Milliseconds(5))
 
     assert(lastAppliedSignal.forward == Percent(15))
-    assert(lastAppliedSignal.turn == -Percent(20))
+    assert(lastAppliedSignal.turn == Percent(20))
 
     currentPosition = Meters(0.5)
     currentAngle = Degrees(90)
