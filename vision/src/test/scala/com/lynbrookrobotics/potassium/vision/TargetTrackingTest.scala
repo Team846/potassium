@@ -26,7 +26,7 @@ class TargetTrackingTest extends FunSuite {
     val (angle, pubAngle) = Stream.manual[Angle]
     val targetAngle: Angle = Degrees(-5)
     val targeter: VisionTargetTracking = new VisionTargetTracking(Signal.constant(Degrees(-5)), Signal.constant(Feet(10.8645)))
-    val angleToTarget = targeter.angleToTarget(angle)
+    val angleToTarget = targeter.compassAngleToTarget(angle)
     var lastAngle = Degrees(0)
 
     angleToTarget.foreach(lastAngle = _)

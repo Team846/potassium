@@ -14,7 +14,7 @@ class VisionTargetTracking(cameraHorizontalOffset: Signal[Angle], distanceConsta
     )
   }
 
-  def angleToTarget(xOffset: Stream[Angle]): Stream[Angle] = {
-    xOffset.map(p => -(p + cameraHorizontalOffset.get))
+  def compassAngleToTarget(xOffset: Stream[Angle]): Stream[Angle] = {
+    xOffset.map(p => p + cameraHorizontalOffset.get)
   }
 }
