@@ -179,6 +179,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
                                 forwardBackwardMode: ForwardBackwardMode)
                                 (implicit hardware: DrivetrainHardware,
                                  props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
+    println("in follow way points controller")
     val biSegmentPaths = wayPoints.sliding(2).map { points =>
       Segment(
         points.head,
@@ -210,11 +211,13 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
     )
 
     val forwardOutput = pointDistanceControl(
-      position,
-      selectedPath.map(p => p._2.getOrElse(p._1).end),
+      position.withCheck(p => println(s"pose: $p")),
+      selectedPath.map(p => p._2.getOrElse(p._1).end).withCheck(p => println(s"target $p")),
       cruisingVelocity,
       props.get.maxAcceleration
-    )
+    ).withCheck{ f =>
+      println(s"forward out ${f.toEach}")
+    }
 
     val distanceToLast = position.map { pose =>
       pose.distanceTo(wayPoints.last)
