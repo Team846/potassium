@@ -4,7 +4,7 @@ import com.lynbrookrobotics.potassium.streams.Stream
 import squants.electro.{ElectricCurrent, ElectricPotential}
 import squants.motion.Velocity
 import squants.time.TimeDerivative
-import squants.{Dimensionless, Each, Percent, Quantity, Time}
+import squants.{Dimensionless, Each, Percent, Time}
 
 object CurrentLimiting {
   def slewRate(lastMotorCommand: Dimensionless,
@@ -44,18 +44,12 @@ object CurrentLimiting {
   }
 
   def limitCurrentOutput(
-                    target: Velocity, maxVolts: ElectricPotential,
-                    limit: ElectricCurrent, stall: ElectricCurrent,
-                    currentSpeed: Velocity, maxSpeed: Velocity
-                  ): Velocity = {
-    val r = maxVolts / stall
-    val emf = (currentSpeed / maxSpeed) * maxVolts
-    val targetVoltage = (target / maxSpeed) * maxVolts
-    val current = (targetVoltage - emf) / r
-    val limitedTarget = (limit * r + emf) / maxVolts * maxSpeed
-
-    if (current > limit) limitedTarget
-    else if (current < -limit) -limitedTarget
-    else target
-  }
+                          target: Velocity,
+                          currentSpeed: Velocity, maxSpeed: Velocity,
+                          forwardCurrentLimit: Dimensionless,
+                          backwardsCurrentLimit: Dimensionless
+                        ): Velocity =
+    maxSpeed * limitCurrentOutput(
+      Each(target / maxSpeed), Each(currentSpeed / maxSpeed), forwardCurrentLimit, backwardsCurrentLimit
+    ).toEach
 }
