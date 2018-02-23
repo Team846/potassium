@@ -104,7 +104,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
     val errorToTarget = headingToTarget.map(convertTrigonometricAngleToCompass).zip(turnPosition).map { case (target, current) =>
       target - current
     }
-    val compassHeadingToLookAheadAndReversed = errorToTarget
+
+    val compassHeadingToLookAheadAndReversed: Stream[(Angle, Boolean)] = errorToTarget
       .map(h => limitToPlusMinus90(h))
       .zip(lookAheadPoint.map(_._2)).map { case ((angle, autoReversed), purposefullyReversed) =>
       if ((forwardBackwardMode == Auto) ||
@@ -113,7 +114,15 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
           purposefullyReversed /* we are doing the opposite of what is requested due to overshoot */) {
         (angle, autoReversed)
       } else {
-        (if (angle > Degrees(0)) angle - Degrees(180) else angle + Degrees(180), forwardBackwardMode == BackwardsOnly)
+//        println("else")
+        (
+          if (angle > Degrees(0)) {
+            angle - Degrees(180)
+          } else {
+            angle + Degrees(180)
+          },
+          forwardBackwardMode == BackwardsOnly
+        )
       }
     }
 
@@ -211,26 +220,19 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
     )
 
     val forwardOutput = pointDistanceControl(
-      position.withCheck(p => println(s"pose: $p")),
-      selectedPath.map(p => p._2.getOrElse(p._1).end).withCheck(p => println(s"target $p")),
+      position/*.withCheck(p => println(s"pose: $p"))*/,
+      selectedPath.map(p => p._2.getOrElse(p._1).end)/*.withCheck(p => println(s"target $p"))*/,
       cruisingVelocity,
       props.get.maxAcceleration
     ).withCheck{ f =>
-      println(s"forward out ${f.toEach}")
+//      println(s"forward out ${f.toEach}")
     }
 
     val distanceToLast = position.map { pose =>
       pose.distanceTo(wayPoints.last)
     }
 
-    val limitedAndReversedForward = forwardOutput.map { s =>
-      val steadyOutput = props.get.forwardPositionGains.kp * props.get.defaultLookAheadDistance
-      if (!biSegmentPaths.hasNext) {
-        s min steadyOutput
-      } else {
-        steadyOutput
-      }
-    }.zip(multiplier).map(t => t._1 * t._2)
+    val limitedAndReversedForward = forwardOutput.zip(multiplier).map(t => t._1 * t._2)
 
     val errorToLast = distanceToLast.map { d =>
       // error does not exist if we are not on our last segment

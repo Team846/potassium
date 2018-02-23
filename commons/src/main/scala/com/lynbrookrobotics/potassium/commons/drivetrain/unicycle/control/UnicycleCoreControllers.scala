@@ -4,6 +4,7 @@ import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleHardware, UnicycleProperties, UnicycleSignal, UnicycleVelocity}
 import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.streams.Stream
+import squants.space.Degrees
 import squants.{Angle, Length, Percent}
 
 trait UnicycleCoreControllers {
@@ -90,10 +91,24 @@ trait UnicycleCoreControllers {
     (control, error)
   }
 
+  def limitToPlusMinus180(angle: Angle): Angle = {
+    if (angle > Degrees(180)) {
+      limitToPlusMinus180(angle - Degrees(360))
+    } else if (angle < Degrees(180)) {
+      limitToPlusMinus180(angle + Degrees(360))
+    } else {
+      angle
+    }
+  }
+
   def turnPositionControl(targetAbsolute: Angle)
-    (implicit hardware: DrivetrainHardware,
+                        (implicit hardware: DrivetrainHardware,
       props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Angle]) = {
     val error = hardware.turnPosition.map(targetAbsolute - _)
+
+    val target = hardware.turnPosition.map{ pose =>
+      limitToPlusMinus180(targetAbsolute - pose)
+    }
 
     val control = PIDF.pid(
       hardware.turnPosition,
