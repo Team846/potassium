@@ -13,19 +13,19 @@ import squants.time.Milliseconds
 
 class CANifierTest extends FunSuite with MockitoSugar{
 
-  test("Test custom color class"){
+  test("Custom color class stores RGB values"){
     val color = Color.rgb(255, 255, 255)
     assert(color.red == 255 && color.blue == 255 && color.green == 255)
   }
 
-  test("Test color not within 0 to 255"){
+  test("Custom color class does not allow RGB values outside of valid range"){
     val lowerColor = Color.rgb(-10, -10, -10)
     assert(lowerColor == Color.rgb(0, 0, 0))
     val higherColor = Color.rgb(300, 300, 300)
     assert(higherColor == Color.rgb(255, 255, 255))
   }
 
-  test("Test HSV conversion"){
+  test("HSV to RGB conversion works correctly"){
     val color0 = Color.hsv(0, 1, 1)
     val color60 = Color.hsv(60, 1, 1)
     val color120 = Color.hsv(120, 1, 1)
@@ -42,7 +42,7 @@ class CANifierTest extends FunSuite with MockitoSugar{
     assert(color359 == Color.rgb(255, 0, 4))
   }
 
-  test("Test component"){
+  test("Setting LEDs to specific color outputs results in correct status"){
     val period = Milliseconds(10)
     implicit val (mockedClock, trigger) = ClockMocking.mockedClockTicker
     val mockedCanifier = mock[CANifier]
