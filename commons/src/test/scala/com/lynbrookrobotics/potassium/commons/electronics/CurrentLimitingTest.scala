@@ -3,6 +3,8 @@ package com.lynbrookrobotics.potassium.commons.electronics
 import org.scalatest.FunSuite
 import com.lynbrookrobotics.potassium.streams.StreamTesting._
 import squants.Percent
+import squants.electro.{Amperes, ElectricCurrent, ElectricPotential, Volts}
+import squants.motion.{FeetPerSecond, Velocity}
 import squants.time.{Milliseconds, Seconds}
 
 class CurrentLimitingTest extends FunSuite {
