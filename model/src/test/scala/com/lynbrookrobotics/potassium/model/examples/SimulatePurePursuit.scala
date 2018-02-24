@@ -24,12 +24,12 @@ class SimulatePurePursuit extends FunSuite {
   val container = new TwoSidedDriveContainerSimulator
 
   implicit val propsVal: TwoSidedDriveProperties = new TwoSidedDriveProperties {
-    override val maxLeftVelocity: Velocity = FeetPerSecond(17)
-    override val maxRightVelocity: Velocity = FeetPerSecond(17)
+    override val maxLeftVelocity: Velocity = FeetPerSecond(21.9)
+    override val maxRightVelocity: Velocity = FeetPerSecond(23.1)
 
     override val maxTurnVelocity: AngularVelocity = RadiansPerSecond((((maxLeftVelocity + maxRightVelocity) * Seconds(1)) / Inches(21.75)) / 2)
-    override val maxAcceleration: Acceleration = FeetPerSecondSquared(16.5)
-    override val defaultLookAheadDistance: Length = Feet(2)
+    override val maxAcceleration: Acceleration = FeetPerSecondSquared(8)
+    override val defaultLookAheadDistance: Length = Feet(2.5)
 
     override val turnVelocityGains: TurnVelocityGains = PIDConfig(
       Percent(50) / DegreesPerSecond(360),
@@ -47,7 +47,7 @@ class SimulatePurePursuit extends FunSuite {
       kd = Percent(0.5) / DegreesPerSecond(1))
 
     override val leftVelocityGains: ForwardVelocityGains = PIDConfig(
-      Percent(60) / FeetPerSecond(5),
+      Percent(90) / FeetPerSecond(5),
       Percent(0) / Meters(1),
       Percent(0) / MetersPerSecondSquared(1))
 
@@ -65,10 +65,11 @@ class SimulatePurePursuit extends FunSuite {
                                         angleTolerance: Angle = Degrees(8),
                                         forwardBackwardMode: ForwardBackwardMode = Auto): Unit = {
     implicit val (clock, triggerClock) = mockedClockTicker
+    val robotMass = Pounds(88)
     implicit val hardware = new SimulatedTwoSidedHardware(
-      Pounds(88) * MetersPerSecondSquared(1) / 2,
-      Pounds(88),
-      KilogramsMetersSquared(3.909),
+      0.1 * robotMass * props.get.maxAcceleration,
+      robotMass,
+      KilogramsMetersSquared(3.909) / 2,
       clock,
       period)
 
@@ -139,7 +140,7 @@ class SimulatePurePursuit extends FunSuite {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(-5), Feet(5))),
       timeOut = Seconds(8),
-      log = true
+      log = false
     )
   }
 
@@ -183,7 +184,7 @@ class SimulatePurePursuit extends FunSuite {
     testPurePursuitReachesDestination(
       Seq(Point.origin, Point(Feet(0), Feet(5))),
       timeOut = Seconds(5),
-      log = true
+      log = false
     )
   }
 
@@ -260,6 +261,25 @@ class SimulatePurePursuit extends FunSuite {
         Point(
           Feet(-3),
           Feet(5)
+        )
+      ),
+      timeOut = Seconds(15),
+      log = false,
+      forwardBackwardMode = BackwardsOnly
+    )
+  }
+
+  test("Backs out right then directly right") {
+    testPurePursuitReachesDestination(
+      Seq(
+        Point.origin,
+        Point(
+          Inches(20),
+          -Inches(20)
+        ),
+        Point(
+          Inches(20 + 10),
+          -Inches(20)
         )
       ),
       timeOut = Seconds(15),

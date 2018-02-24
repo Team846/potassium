@@ -7,7 +7,7 @@ import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleMotionProfileControllers
-import squants.{Dimensionless, Each}
+import squants.{Dimensionless, Each, Percent}
 import squants.space._
 import MathUtilities._
 import squants.motion._
@@ -86,7 +86,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
                                 position: Stream[Point],
                                 biSegmentPath: Stream[(Segment, Option[Segment])],
                                 maxTurnOutput: Dimensionless,
-                                forwardBackwardMode: ForwardBackwardMode)
+                                forwardBackwardMode: ForwardBackwardMode,
+                                angleTolerance: Angle /*I used 0.1 Degrees for the angleTolerance everywhere, but change it if it should be different*/)
                                (implicit props: Signal[DrivetrainProperties],
                                 hardware: DrivetrainHardware): (Stream[Dimensionless], Stream[Double]) = {
     val lookAheadPoint = position.zip(biSegmentPath).map { case (pose, path) =>
@@ -133,6 +134,14 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
       compassHeadingToLookAhead,
       props.map(_.turnPositionGains)
     ).map(clamp(_, maxTurnOutput))
+
+    limitedTurn.zip(errorToTarget).map{ case(turn, error) =>
+      if (error >= angleTolerance) {
+        Percent(0)
+      } else {
+        turn
+      }
+    }
 
     val reversed = compassHeadingToLookAheadAndReversed.map(_._2)
     val forwardMultiplier = reversed.map(b => if (b) -1D else 1)
@@ -216,7 +225,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
       position,
       selectedPath,
       maxTurnOutput,
-      forwardBackwardMode
+      forwardBackwardMode,
+      angleTolerance = Degrees(0.1)
     )
 
     val forwardOutput = pointDistanceControl(
