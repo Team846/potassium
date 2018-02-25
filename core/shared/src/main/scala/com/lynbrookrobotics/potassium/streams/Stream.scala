@@ -60,7 +60,6 @@ abstract class Stream[+T] { self =>
         if (listeners.isEmpty) {
           // we are shutting down!
           unsubscribeFromParents()
-          println(s"hasShutDown was $hasShutdown nos false")
           hasShutdown = true
         }
       }
