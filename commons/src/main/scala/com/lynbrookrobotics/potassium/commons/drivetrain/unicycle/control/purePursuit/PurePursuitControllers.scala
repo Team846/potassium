@@ -87,7 +87,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
                                 biSegmentPath: Stream[(Segment, Option[Segment])],
                                 maxTurnOutput: Dimensionless,
                                 forwardBackwardMode: ForwardBackwardMode,
-                                angleTolerance: Angle /*I used 0.1 Degrees for the angleTolerance everywhere, but change it if it should be different*/)
+                                angleDeadband: Angle = Degrees(0))
                                (implicit props: Signal[DrivetrainProperties],
                                 hardware: DrivetrainHardware): (Stream[Dimensionless], Stream[Double]) = {
     val lookAheadPoint = position.zip(biSegmentPath).map { case (pose, path) =>
@@ -115,7 +115,6 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
           purposefullyReversed /* we are doing the opposite of what is requested due to overshoot */) {
         (angle, autoReversed)
       } else {
-//        println("else")
         (
           if (angle > Degrees(0)) {
             angle - Degrees(180)
@@ -135,8 +134,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
       props.map(_.turnPositionGains)
     ).map(clamp(_, maxTurnOutput))
 
-    limitedTurn.zip(errorToTarget).map{ case(turn, error) =>
-      if (error >= angleTolerance) {
+    val limitedAndWithinDeadband = limitedTurn.zip(errorToTarget).map{ case(turn, error) =>
+      if (error.abs <= angleDeadband) {
         Percent(0)
       } else {
         turn
@@ -146,7 +145,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
     val reversed = compassHeadingToLookAheadAndReversed.map(_._2)
     val forwardMultiplier = reversed.map(b => if (b) -1D else 1)
 
-    (limitedTurn, forwardMultiplier)
+    (limitedAndWithinDeadband, forwardMultiplier)
   }
 
 
@@ -194,7 +193,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
                                 turnPosition: Stream[Angle],
                                 maxTurnOutput: Dimensionless,
                                 cruisingVelocity: Velocity,
-                                forwardBackwardMode: ForwardBackwardMode)
+                                forwardBackwardMode: ForwardBackwardMode,
+                                angleDeadband: Angle = Degrees(0))
                                 (implicit hardware: DrivetrainHardware,
                                  props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
     println("in follow way points controller")
@@ -226,7 +226,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
       selectedPath,
       maxTurnOutput,
       forwardBackwardMode,
-      angleTolerance = Degrees(0.1)
+      angleDeadband
     )
 
     val forwardOutput = pointDistanceControl(
