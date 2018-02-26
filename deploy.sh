@@ -28,7 +28,7 @@ git config --global user.email "robot@lynbrookrobotics.com"
 # The first and only commit to this new Git repo contains all the
 # files present with the commit message "Deploy to GitHub Pages".
 git add .
-git commit -m "Automated deploy to GitHub Pages"
+git commit -m "(potassium): automated deploy to GitHub Pages"
 
 # Force push from the current repo's master branch to the remote
 # repo's gh-pages branch. (All previous history on the gh-pages branch

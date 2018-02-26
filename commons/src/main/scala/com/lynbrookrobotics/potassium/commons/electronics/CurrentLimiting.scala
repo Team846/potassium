@@ -1,8 +1,10 @@
 package com.lynbrookrobotics.potassium.commons.electronics
 
 import com.lynbrookrobotics.potassium.streams.Stream
+import squants.electro.{ElectricCurrent, ElectricPotential}
+import squants.motion.Velocity
+import squants.time.TimeDerivative
 import squants.{Dimensionless, Each, Percent, Time}
-import squants.time.{Milliseconds, TimeDerivative}
 
 object CurrentLimiting {
   def slewRate(lastMotorCommand: Dimensionless,
@@ -33,11 +35,21 @@ object CurrentLimiting {
       -limitCurrentOutput(-targetPower, -normalizedVelocity, forwardCurrentLimit, backwardsCurrentLimit)
     } else if (targetPower > normalizedVelocity) {
       targetPower min (normalizedVelocity + forwardCurrentLimit)
-    } else if (targetPower < Each(0)){
+    } else if (targetPower < Each(0)) {
       val limitedInput = Each(-backwardsCurrentLimit / (Each(1) + normalizedVelocity))
       limitedInput max targetPower
     } else {
       targetPower
     }
   }
+
+  def limitCurrentOutput(
+                          target: Velocity,
+                          currentSpeed: Velocity, maxSpeed: Velocity,
+                          forwardCurrentLimit: Dimensionless,
+                          backwardsCurrentLimit: Dimensionless
+                        ): Velocity =
+    maxSpeed * limitCurrentOutput(
+      Each(target / maxSpeed), Each(currentSpeed / maxSpeed), forwardCurrentLimit, backwardsCurrentLimit
+    ).toEach
 }
