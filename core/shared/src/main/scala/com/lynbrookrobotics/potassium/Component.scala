@@ -1,8 +1,10 @@
 package com.lynbrookrobotics.potassium
 
 import com.lynbrookrobotics.potassium.clock.Clock
-import squants.Time
-import com.lynbrookrobotics.potassium.streams.{Cancel, NonPeriodic, Stream}
+import com.lynbrookrobotics.potassium.logging.{AsyncLogger, Histogram}
+import com.lynbrookrobotics.potassium.streams.{Cancel, NonPeriodic, Periodic, Stream}
+import squants.time.{Milliseconds, Time}
+
 
 /**
   * Represents a single robotic component, which translates signal data into action
