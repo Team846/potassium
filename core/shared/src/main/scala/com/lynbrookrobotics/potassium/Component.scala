@@ -21,6 +21,7 @@ abstract class Component[T] {
   private var currentControllerHandle: Option[Cancel] = None
 
   private var lastControlSignal: Option[T] = None
+  protected def getLastControlSignal(): Option[T] = lastControlSignal
 
   def shouldComponentUpdate(previousSignal: T, newSignal: T): Boolean = true
 
