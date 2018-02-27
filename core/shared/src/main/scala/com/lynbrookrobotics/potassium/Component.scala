@@ -17,17 +17,12 @@ import squants.time.{Milliseconds, Time}
   * @tparam T the type of values produced by signals for the component
   */
 abstract class Component[T] {
-
   def defaultController: Stream[T]
   private var currentControllerHandle: Option[Cancel] = None
-
-  private var currentTimingHandle: Option[Cancel] = None
 
   private var lastControlSignal: Option[T] = None
 
   def shouldComponentUpdate(previousSignal: T, newSignal: T): Boolean = true
-
-  val printOnOverflowAsyncLogger: Option[AsyncLogger] = None
 
   /**
     * Sets the controller to be used by the component during updates.
@@ -37,30 +32,8 @@ abstract class Component[T] {
     if (controller.expectedPeriodicity == NonPeriodic) {
       throw new IllegalArgumentException("Controller must be periodic")
     }
-    printOnOverflowAsyncLogger.foreach { logger =>
-      val streamPeriodicity = controller.expectedPeriodicity.asInstanceOf[Periodic].period
-      val histogram = new Histogram(
-        min = 0.8 * streamPeriodicity,
-        max = 1.2 * streamPeriodicity,
-        binCount = 10,
-        asyncLogger = logger)
-
-      currentTimingHandle.foreach(_.cancel())
-      currentTimingHandle = Some(
-        controller.zipWithDt.foreach { case (_, dt) =>
-          histogram.apply(dt)
-          if (controller.expectedPeriodicity.asInstanceOf[Periodic].period > 2 * dt ) {
-            histogram.printStatus()
-          }
-        }
-      )
-    }
-
-
 
     currentControllerHandle.foreach(_.cancel())
-    currentTimingHandle.foreach(_.cancel())
-
 
     currentControllerHandle = Some(controller.foreach { value =>
       val shouldUpdate = lastControlSignal.isEmpty ||
@@ -83,7 +56,7 @@ abstract class Component[T] {
 
   /**
     * Applies the latest control signal value.
-    * @param signal the signal valuef to act on
+    * @param signal the signal value to act on
     */
   def applySignal(signal: T): Unit
 }
