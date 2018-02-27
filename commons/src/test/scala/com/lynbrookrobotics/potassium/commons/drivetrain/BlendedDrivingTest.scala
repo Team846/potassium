@@ -59,6 +59,7 @@ class BlendedDrivingTest extends FunSuite {
       )
       override val track: Length = Feet(1)
       override val blendExponent: Double = blendExp
+      override val robotLength = Inches(27)
     })
   }
 

@@ -4,13 +4,14 @@ import com.lynbrookrobotics.potassium.Signal
 import com.lynbrookrobotics.potassium.streams._
 import com.lynbrookrobotics.potassium.units.Ratio
 import squants.motion.RadiansPerSecond
+import squants.space.Angle
 import squants.{Dimensionless, Each, Length, Percent, Velocity}
 
 object BlendedDriving {
-  def driveWithRadius(radius: Stream[Length],
-                      velocity: Stream[Velocity])
+  def driveWithRadius(radiusStream: Stream[Length],
+                      velocityStream: Stream[Velocity])
                      (implicit props: Signal[TwoSidedDriveProperties]): Stream[TwoSided[Velocity]] = {
-    velocity.zip(radius).map { case (velocity, radius) =>
+    velocityStream.zip(radiusStream).map { case (velocity, radius) =>
       if (radius.value == Double.PositiveInfinity || radius.value == Double.NegativeInfinity || radius.value == Double.NaN) {
         TwoSided(velocity, velocity)
       } else {
@@ -42,13 +43,26 @@ object BlendedDriving {
     tankWeight.toEach * tankSpeed + constantRadiusWeight.toEach * constantRadiusSpeed
   }
 
-  def blendedDrive(tankSpeed: Stream[TwoSided[Velocity]],
+  def blendedDrive(arcadeSpeed: Stream[TwoSided[Velocity]],
                    targetForwardVelocity: Stream[Velocity],
                    curvature: Stream[Ratio[Dimensionless, Length]])
                   (implicit properties: Signal[TwoSidedDriveProperties]): Stream[TwoSided[Velocity]] = {
-    val constantRadiusSpeed = driveWithRadius(radius = curvature.map(curvature => curvature.den / curvature.num.toEach), targetForwardVelocity)
+    val constantRadiusSpeed = driveWithRadius(radiusStream = curvature.map(curvature => curvature.den / curvature.num.toEach), targetForwardVelocity)
 
-    tankSpeed.zip(constantRadiusSpeed).zip(targetForwardVelocity).map {
+    arcadeSpeed.zip(constantRadiusSpeed).zip(targetForwardVelocity).map {
+      case ((tankSpeed, carSpeed), targetForward) =>
+        TwoSided(
+          blend(carSpeed.left, tankSpeed.left, targetForward),
+          blend(carSpeed.right, tankSpeed.right, targetForward))
+    }
+  }
+
+  def blendedBusDrive(arcadeSpeed: Stream[TwoSided[Velocity]],
+                      targetForwardVelocity: Stream[Velocity],
+                      radius: Stream[Length])
+                     (implicit properties: Signal[TwoSidedDriveProperties]): Stream[TwoSided[Velocity]] = {
+    val constantRadiusSpeed = driveWithRadius(radius, targetForwardVelocity)
+    arcadeSpeed.zip(constantRadiusSpeed).zip(targetForwardVelocity).map {
       case ((tankSpeed, carSpeed), targetForward) =>
         TwoSided(
           blend(carSpeed.left, tankSpeed.left, targetForward),

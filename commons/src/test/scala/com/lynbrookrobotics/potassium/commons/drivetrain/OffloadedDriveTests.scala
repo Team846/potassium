@@ -28,6 +28,7 @@ class OffloadedDriveTests extends FunSuite {
       override val maxAcceleration: Acceleration = null
       override val blendExponent: Double = 0
       override val track: Length = null
+      override val robotLength: Length = Inches(27)
 
 
 
