@@ -433,8 +433,8 @@
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="object" href="" title=""></a>
-                        <a href="" title="">
+                        <a class="object" href="Platform$.html" title=""></a>
+                        <a href="Platform$.html" title="">
                           Platform
                         </a>
                       </li><li class="current-entities indented3">
@@ -453,10 +453,10 @@ can be calculated on demand.">
                         </a>
                       </li><li class="current-entities indented3">
                         <span class="separator"></span>
-                        <a class="trait" href="TimingLoggingComponent.html" title="By exteding this trait, a component will print a message with histogram
+                        <a class="trait" href="" title="By exteding this trait, a component will print a message with histogram
 statistics about timing data if the controller stream &quot;misses a cycle&quot;
 Aka."></a>
-                        <a href="TimingLoggingComponent.html" title="By exteding this trait, a component will print a message with histogram
+                        <a href="" title="By exteding this trait, a component will print a message with histogram
 statistics about timing data if the controller stream &quot;misses a cycle&quot;
 Aka.">
                           TimingLoggingComponent
@@ -466,12 +466,12 @@ Aka.">
             </div>
           </div>
           <div id="content">
-            <body class="object value">
+            <body class="trait type">
       <div id="definition">
-        <div class="big-circle object">o</div>
+        <div class="big-circle trait">t</div>
         <p id="owner"><a href="../../index.html" class="extype" name="com">com</a>.<a href="../index.html" class="extype" name="com.lynbrookrobotics">lynbrookrobotics</a>.<a href="index.html" class="extype" name="com.lynbrookrobotics.potassium">potassium</a></p>
-        <h1>Platform<span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html" title="Permalink">
+        <h1>TimingLoggingComponent<span class="permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span></h1>
@@ -481,19 +481,22 @@ Aka.">
       <h4 id="signature" class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
-        <span class="kind">object</span>
+        <span class="kind">trait</span>
       </span>
       <span class="symbol">
-        <span class="name">Platform</span>
+        <span class="name">TimingLoggingComponent</span><span class="tparams">[<span name="T">T</span>]</span><span class="result"> extends <a href="Component.html" class="extype" name="com.lynbrookrobotics.potassium.Component">Component</a>[<span class="extype" name="com.lynbrookrobotics.potassium.TimingLoggingComponent.T">T</span>]</span>
       </span>
       </h4>
 
       
-          <div id="comment" class="fullcommenttop"><div class="toggleContainer block">
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>By exteding this trait, a component will print a message with histogram
+statistics about timing data if the controller stream &quot;misses a cycle&quot;
+Aka. updates with a period longer than 2 times the expected periodicity
+</p></div><div class="toggleContainer block">
           <span class="toggle">
             Linear Supertypes
           </span>
-          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+          <div class="superTypes hiddenContent"><a href="Component.html" class="extype" name="com.lynbrookrobotics.potassium.Component">Component</a>[<span class="extype" name="com.lynbrookrobotics.potassium.TimingLoggingComponent.T">T</span>], <span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
         </div></div>
         
 
@@ -519,7 +522,7 @@ Aka.">
                   <span class="filtertype">Inherited<br />
                   </span>
                   <ol id="linearization">
-                    <li class="in" name="com.lynbrookrobotics.potassium.Platform"><span>Platform</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                    <li class="in" name="com.lynbrookrobotics.potassium.TimingLoggingComponent"><span>TimingLoggingComponent</span></li><li class="in" name="com.lynbrookrobotics.potassium.Component"><span>Component</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
                   </ol>
                 </div><div class="ancestors">
               <span class="filtertype"></span>
@@ -541,15 +544,66 @@ Aka.">
 
         
 
-        
+        <div class="values members">
+              <h3>Abstract Value Members</h3>
+              <ol><li name="com.lynbrookrobotics.potassium.Component#applySignal" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="applySignal(signal:T):Unit"></a><a id="applySignal(T):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#applySignal(signal:T):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">applySignal</span><span class="params">(<span name="signal">signal: <span class="extype" name="com.lynbrookrobotics.potassium.TimingLoggingComponent.T">T</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Applies the latest control signal value.</p><div class="fullcomment"><div class="comment cmt"><p>Applies the latest control signal value.</p></div><dl class="paramcmts block"><dt class="param">signal</dt><dd class="cmt"><p>the signal value to act on</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Component.html" class="extype" name="com.lynbrookrobotics.potassium.Component">Component</a></dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.Component#defaultController" visbl="pub" class="indented0 " data-isabs="true" fullComment="yes" group="Ungrouped">
+      <a id="defaultController:com.lynbrookrobotics.potassium.streams.Stream[T]"></a><a id="defaultController:Stream[T]"></a>
+      <span class="permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#defaultController:com.lynbrookrobotics.potassium.streams.Stream[T]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">defaultController</span><span class="result">: <a href="streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.TimingLoggingComponent.T">T</span>]</span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Component.html" class="extype" name="com.lynbrookrobotics.potassium.Component">Component</a></dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.TimingLoggingComponent#logger" visbl="pub" class="indented0 " data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="logger:com.lynbrookrobotics.potassium.logging.AsyncLogger"></a><a id="logger:AsyncLogger"></a>
+      <span class="permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#logger:com.lynbrookrobotics.potassium.logging.AsyncLogger" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">logger</span><span class="result">: <a href="logging/AsyncLogger.html" class="extype" name="com.lynbrookrobotics.potassium.logging.AsyncLogger">AsyncLogger</a></span>
+      </span>
+      
+      
+    </li></ol>
+            </div>
 
         <div class="values members">
-              <h3>Value Members</h3>
+              <h3>Concrete Value Members</h3>
               <ol>
                 <li name="scala.AnyRef#!=" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="!=(x$1:Any):Boolean"></a><a id="!=(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#!=(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#!=(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -565,7 +619,7 @@ Aka.">
     </li><li name="scala.AnyRef###" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="##():Int"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html###():Int" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html###():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -581,7 +635,7 @@ Aka.">
     </li><li name="scala.AnyRef#==" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="==(x$1:Any):Boolean"></a><a id="==(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#==(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#==(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -597,7 +651,7 @@ Aka.">
     </li><li name="scala.Any#asInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#asInstanceOf[T0]:T0" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#asInstanceOf[T0]:T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -613,7 +667,7 @@ Aka.">
     </li><li name="scala.AnyRef#clone" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="clone():Object"></a><a id="clone():AnyRef"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#clone():Object" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#clone():Object" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -635,7 +689,7 @@ Aka.">
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#eq(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#eq(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -651,7 +705,7 @@ Aka.">
     </li><li name="scala.AnyRef#equals" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="equals(x$1:Any):Boolean"></a><a id="equals(Any):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#equals(x$1:Any):Boolean" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#equals(x$1:Any):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -667,7 +721,7 @@ Aka.">
     </li><li name="scala.AnyRef#finalize" visbl="prt" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="finalize():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#finalize():Unit" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#finalize():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -689,7 +743,7 @@ Aka.">
     </li><li name="scala.AnyRef#getClass" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="getClass():Class[_]"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#getClass():Class[_]" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#getClass():Class[_]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -705,7 +759,7 @@ Aka.">
     </li><li name="scala.AnyRef#hashCode" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="hashCode():Int"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#hashCode():Int" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#hashCode():Int" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -721,7 +775,7 @@ Aka.">
     </li><li name="scala.Any#isInstanceOf" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="isInstanceOf[T0]:Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#isInstanceOf[T0]:Boolean" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#isInstanceOf[T0]:Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -734,26 +788,10 @@ Aka.">
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
-    </li><li name="com.lynbrookrobotics.potassium.Platform#isJVM" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="isJVM:Boolean(true)"></a>
-      <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#isJVM:Boolean(true)" title="Permalink">
-        <i class="material-icons"></i>
-      </a>
-    </span>
-      <span class="modifier_kind">
-        <span class="modifier">final </span>
-        <span class="kind">val</span>
-      </span>
-      <span class="symbol">
-        <span class="name">isJVM</span><span class="result">: Boolean(true)</span>
-      </span>
-      
-      
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#ne(x$1:AnyRef):Boolean" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#ne(x$1:AnyRef):Boolean" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -769,7 +807,7 @@ Aka.">
     </li><li name="scala.AnyRef#notify" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notify():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#notify():Unit" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#notify():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -785,7 +823,7 @@ Aka.">
     </li><li name="scala.AnyRef#notifyAll" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="notifyAll():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#notifyAll():Unit" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#notifyAll():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -798,10 +836,59 @@ Aka.">
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.Component#resetToDefault" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="resetToDefault():Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#resetToDefault():Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">resetToDefault</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Resets the component to use its default controller.</p><div class="fullcomment"><div class="comment cmt"><p>Resets the component to use its default controller.
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Component.html" class="extype" name="com.lynbrookrobotics.potassium.Component">Component</a></dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.TimingLoggingComponent#setController" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="setController(controller:com.lynbrookrobotics.potassium.streams.Stream[T]):Unit"></a><a id="setController(Stream[T]):Unit"></a>
+      <span class="permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#setController(controller:com.lynbrookrobotics.potassium.streams.Stream[T]):Unit" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">setController</span><span class="params">(<span name="controller">controller: <a href="streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.TimingLoggingComponent.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      
+      <p class="shortcomment cmt">Sets the controller to be used by the component during updates.</p><div class="fullcomment"><div class="comment cmt"><p>Sets the controller to be used by the component during updates.</p></div><dl class="paramcmts block"><dt class="param">controller</dt><dd class="cmt"><p>the new controller to use</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.lynbrookrobotics.potassium.TimingLoggingComponent">TimingLoggingComponent</a> → <a href="Component.html" class="extype" name="com.lynbrookrobotics.potassium.Component">Component</a></dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.Component#shouldComponentUpdate" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="shouldComponentUpdate(previousSignal:T,newSignal:T):Boolean"></a><a id="shouldComponentUpdate(T,T):Boolean"></a>
+      <span class="permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#shouldComponentUpdate(previousSignal:T,newSignal:T):Boolean" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">shouldComponentUpdate</span><span class="params">(<span name="previousSignal">previousSignal: <span class="extype" name="com.lynbrookrobotics.potassium.TimingLoggingComponent.T">T</span></span>, <span name="newSignal">newSignal: <span class="extype" name="com.lynbrookrobotics.potassium.TimingLoggingComponent.T">T</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Component.html" class="extype" name="com.lynbrookrobotics.potassium.Component">Component</a></dd></dl></div>
     </li><li name="scala.AnyRef#synchronized" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="synchronized[T0](x$1:=&gt;T0):T0"></a><a id="synchronized[T0](⇒T0):T0"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#synchronized[T0](x$1:=&gt;T0):T0" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -817,7 +904,7 @@ Aka.">
     </li><li name="scala.AnyRef#toString" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="toString():String"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#toString():String" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#toString():String" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -833,7 +920,7 @@ Aka.">
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait():Unit"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#wait():Unit" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#wait():Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -855,7 +942,7 @@ Aka.">
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long,x$2:Int):Unit"></a><a id="wait(Long,Int):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#wait(x$1:Long,x$2:Int):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -877,7 +964,7 @@ Aka.">
     </li><li name="scala.AnyRef#wait" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="wait(x$1:Long):Unit"></a><a id="wait(Long):Unit"></a>
       <span class="permalink">
-      <a href="../../../com/lynbrookrobotics/potassium/Platform$.html#wait(x$1:Long):Unit" title="Permalink">
+      <a href="../../../com/lynbrookrobotics/potassium/TimingLoggingComponent.html#wait(x$1:Long):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -906,7 +993,9 @@ Aka.">
         </div>
 
         <div id="inheritedMembers">
-        <div class="parent" name="scala.AnyRef">
+        <div class="parent" name="com.lynbrookrobotics.potassium.Component">
+              <h3>Inherited from <a href="Component.html" class="extype" name="com.lynbrookrobotics.potassium.Component">Component</a>[<span class="extype" name="com.lynbrookrobotics.potassium.TimingLoggingComponent.T">T</span>]</h3>
+            </div><div class="parent" name="scala.AnyRef">
               <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
             </div><div class="parent" name="scala.Any">
               <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
