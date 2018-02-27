@@ -29,7 +29,14 @@ abstract class Component[T] {
 
   val printOnOverflowAsyncLogger: Option[AsyncLogger] = None
 
-  def logStuff(controller: Stream[T]): Unit = {
+  /**
+    * Sets the controller to be used by the component during updates.
+    * @param controller the new controller to use
+    */
+  def setController(controller: Stream[T]): Unit = {
+    if (controller.expectedPeriodicity == NonPeriodic) {
+      throw new IllegalArgumentException("Controller must be periodic")
+    }
     printOnOverflowAsyncLogger.foreach { logger =>
       val streamPeriodicity = controller.expectedPeriodicity.asInstanceOf[Periodic].period
       val histogram = new Histogram(
@@ -48,18 +55,8 @@ abstract class Component[T] {
         }
       )
     }
-  }
 
-  /**
-    * Sets the controller to be used by the component during updates.
-    * @param controller the new controller to use
-    */
-  def setController(controller: Stream[T]): Unit = {
-    if (controller.expectedPeriodicity == NonPeriodic) {
-      throw new IllegalArgumentException("Controller must be periodic")
-    }
 
-    logStuff(controller)
 
     currentControllerHandle.foreach(_.cancel())
     currentTimingHandle.foreach(_.cancel())
@@ -77,7 +74,6 @@ abstract class Component[T] {
     })
   }
 
-
   /**
     * Resets the component to use its default controller.
     */
@@ -87,8 +83,7 @@ abstract class Component[T] {
 
   /**
     * Applies the latest control signal value.
-    * @param signal the signal values to act on
+    * @param signal the signal valuef to act on
     */
   def applySignal(signal: T): Unit
-
 }
