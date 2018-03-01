@@ -48,11 +48,13 @@ class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B], skipTimestampCh
   private[this] var bSlot: Option[(B, Time)] = None
 
   def attemptPublish(): Unit = {
-    aSlot.zip(bSlot).foreach { case (a, b) =>
-      if (a._2 == b._2 || expectedPeriodicity == NonPeriodic) {
-        publishValue((a._1, b._1))
-        aSlot = None
-        bSlot = None
+    synchronized(this) {
+      aSlot.zip(bSlot).foreach { case (a, b) =>
+        if (a._2 == b._2 || expectedPeriodicity == NonPeriodic) {
+          publishValue((a._1, b._1))
+          aSlot = None
+          bSlot = None
+        }
       }
     }
   }
