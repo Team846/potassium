@@ -13,6 +13,7 @@ class LazyTalon(
                  val defaultPeakOutputForward: Double
                ) {
   private var last: Option[OffloadedSignal] = None
+  def getLastCommand: Option[OffloadedSignal] = last
 
   def applyCommand(s: OffloadedSignal): Unit = s match {
     case it: OpenLoop => applyCommand(it)
