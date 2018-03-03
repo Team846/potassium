@@ -28,3 +28,11 @@ options:
        url: core/tasks/finite.html
      - title: Continuous Tasks
        url: core/tasks/continuous.html
+
+  - title: Events
+    url: core/events/
+    menu_type: core
+    menu_section: events
+    nested_options:
+     - title: Continuous Events
+       url: core/events/continuous.html

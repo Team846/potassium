@@ -71,17 +71,8 @@ abstract class Stream[+T] { self =>
     * @return the new stream
     */
   def preserve: Stream[T] = {
-    new Stream[T] {
-      self.foreach(v => this.publishValue(v))
-
-      override def subscribeToParents(): Unit = {}
-      override def unsubscribeFromParents(): Unit = {}
-
-      override def checkRelaunch(): Unit = {}
-
-      override val expectedPeriodicity: ExpectedPeriodicity = self.expectedPeriodicity
-      override val originTimeStream = self.originTimeStream.map(_.preserve)
-    }
+    this.foreach(_ => {})
+    this
   }
 
   /**

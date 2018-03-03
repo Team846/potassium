@@ -7,12 +7,13 @@ import com.lynbrookrobotics.potassium.control.offload.OffloadedSignal._
 
 class LazyTalon(
                  val t: TalonSRX,
-                 val idx: Int,
-                 val timeout: Int,
-                 val defaultPeakOutputReverse: Double,
-                 val defaultPeakOutputForward: Double
+                 val idx: Int = 0,
+                 val timeout: Int = 0,
+                 val defaultPeakOutputReverse: Double = -1,
+                 val defaultPeakOutputForward: Double = 1
                ) {
   private var last: Option[OffloadedSignal] = None
+  def getLastCommand: Option[OffloadedSignal] = last
 
   def applyCommand(s: OffloadedSignal): Unit = s match {
     case it: OpenLoop => applyCommand(it)
