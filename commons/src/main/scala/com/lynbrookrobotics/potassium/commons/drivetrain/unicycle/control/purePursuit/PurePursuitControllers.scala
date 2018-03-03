@@ -143,7 +143,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
     }
 
     val reversed = compassHeadingToLookAheadAndReversed.map(_._2)
-    val forwardMultiplier = reversed.map(b => if (b) -1D else 1)
+    val forwardMultiplier = reversed.map(b => if (b) -1D else 1).withCheck(e => println(s"forward multiplier is $e"))
 
     (limitedAndWithinDeadband, forwardMultiplier)
   }
@@ -230,13 +230,11 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
     )
 
     val forwardOutput = pointDistanceControl(
-      position/*.withCheck(p => println(s"pose: $p"))*/,
-      selectedPath.map(p => p._2.getOrElse(p._1).end)/*.withCheck(p => println(s"target $p"))*/,
+      position,
+      selectedPath.map(p => p._2.getOrElse(p._1).end),
       cruisingVelocity,
       props.get.maxAcceleration
-    ).withCheck{ f =>
-//      println(s"forward out ${f.toEach}")
-    }
+    )
 
     val distanceToLast = position.map { pose =>
       pose.distanceTo(wayPoints.last)
@@ -254,7 +252,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
     }
 
     (
-      limitedAndReversedForward.zip(turnOutput).map { case (forward, turn) =>
+      limitedAndReversedForward.zip(turnOutput).withCheck(z => println(s"zipped is $z")).map { case (forward, turn) =>
         UnicycleSignal(forward, turn)
       },
       errorToLast

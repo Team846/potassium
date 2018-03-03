@@ -104,17 +104,17 @@ trait UnicycleCoreControllers {
   def turnPositionControl(targetAbsolute: Angle)
                         (implicit hardware: DrivetrainHardware,
       props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Angle]) = {
-    val error = hardware.turnPosition.map(targetAbsolute - _)
+    val error = hardware.turnPosition.map(targetAbsolute - _).withCheck(e => println(s"turn error is $e"))
 
     val target = hardware.turnPosition.map{ pose =>
       limitToPlusMinus180(targetAbsolute - pose)
-    }
+    }.withCheck(e => println(s"target is $e"))
 
     val control = PIDF.pid(
       hardware.turnPosition,
       hardware.turnPosition.mapToConstant(targetAbsolute),
       props.map(_.turnPositionGains)
-    ).map(s => UnicycleSignal(Percent(0), s))
+    ).map(s => UnicycleSignal(Percent(0), s)).withCheck(e => println(s"control is $e"))
 
     (control, error)
   }
