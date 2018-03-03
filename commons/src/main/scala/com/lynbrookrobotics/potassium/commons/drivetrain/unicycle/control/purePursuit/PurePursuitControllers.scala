@@ -176,7 +176,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
                                 turnPosition: Stream[Angle],
                                 maxTurnOutput: Dimensionless,
                                 cruisingVelocity: Velocity,
-                                forwardBackwardMode: ForwardBackwardMode)
+                                forwardBackwardMode: ForwardBackwardMode,
+                                maxAcceleration: Acceleration)
                                 (implicit hardware: DrivetrainHardware,
                                  props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
     val biSegmentPaths = wayPoints.sliding(2).map { points =>
@@ -213,7 +214,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
       position,
       selectedPath.map(p => p._2.getOrElse(p._1).end),
       cruisingVelocity,
-      props.get.maxAcceleration
+      maxAcceleration
     )
 
     val distanceToLast = position.map { pose =>
