@@ -93,6 +93,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
       )
 
       drive.setController(childVelocityControl(speedControl(unicycle.withCheckZipped(error) { e =>
+        println(s"withChecked zipped error is")
         if (e.exists(_ < tolerance)) {
           ticksWithinTolerance += 1
 
@@ -102,7 +103,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         } else {
           ticksWithinTolerance = 0
         }
-      })))
+      }).withCheck(s => println(s" speed control is"))).withCheck(s => println(s"child velocity control is")))
     }
 
     override def onEnd(): Unit = {

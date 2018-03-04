@@ -237,7 +237,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
     )
 
     val distanceToLast = position.map { pose =>
-      pose.distanceTo(wayPoints.last)
+      Segment(wayPoints.init.last, wayPoints.last).pointClosestToOnLine(pose).distanceTo(wayPoints.last)
     }
 
     val limitedAndReversedForward = forwardOutput.zip(multiplier).map(t => t._1 * t._2)
@@ -252,7 +252,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
     }
 
     (
-      limitedAndReversedForward.zip(turnOutput).withCheck(z => println(s"zipped is $z")).map { case (forward, turn) =>
+      limitedAndReversedForward.zip(turnOutput).withCheck(z => println(s"zipped is")).map { case (forward, turn) =>
         UnicycleSignal(forward, turn)
       },
       errorToLast

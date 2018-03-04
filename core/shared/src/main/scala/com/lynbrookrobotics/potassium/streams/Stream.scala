@@ -357,10 +357,9 @@ abstract class Stream[+T] { self =>
   }
 
   def withCheckZipped[O](checkingStream: Stream[O])(check: O => Unit): Stream[T] = {
-    zipAsync(checkingStream).map{ case (v, checkedValue) =>
+    zip(checkingStream).withCheck { case (v, checkedValue) =>
       check(checkedValue)
-      v
-    }
+    }.map(_._1)
   }
 
   /**
