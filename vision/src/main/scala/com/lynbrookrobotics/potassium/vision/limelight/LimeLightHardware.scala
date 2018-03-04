@@ -11,7 +11,8 @@ import squants.space.{Degrees, Feet}
 
 class LimeLightHardware(maxInitializationTime: Time,
                         upright: Boolean)
-                       (implicit clock: Clock, props: Signal[VisionProperties]) {
+                       (implicit clock: Clock,
+                        props: Signal[VisionProperties]) {
   val initialTime = clock.currentTime
   while (!NetworkTableInstance.getDefault.getTable("/limelight").getEntry("tv").exists()
           && clock.currentTime - initialTime < maxInitializationTime) {
