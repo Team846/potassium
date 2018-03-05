@@ -36,7 +36,7 @@ trait UnicycleCoreControllers {
       props.map(_.turnVelocityGainsFull)
     )
 
-    forwardControl.withCheck(_ => println("forward control")).zip(turnControl.withCheck(_ => println("turn control"))).map { s =>
+    forwardControl.zip(turnControl.withCheck(_ => println("turn control"))).withCheck(_ => println("after zip")).map { s =>
       UnicycleSignal(s._1, s._2)
     }.withCheck(_ => println("zipped forward reverse"))
   }

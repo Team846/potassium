@@ -30,7 +30,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
   def pointDistanceControl(position: Stream[Point],
                            target: Stream[Point],
                            maxVelocity: Velocity,
-                           acceleration: Acceleration)
+                           acceleration: Acceleration,
+                           deceleration: Acceleration)
                           (implicit properties: Signal[DrivetrainProperties],
                            hardware: DrivetrainHardware): Stream[Dimensionless] = {
     val distanceToTarget = position.zip(target).map { p =>
@@ -41,6 +42,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
       maxVelocity,
       FeetPerSecond(0),
       acceleration,
+      deceleration,
       distanceToTarget.mapToConstant(Feet(0)),
       distanceToTarget,
       hardware.forwardVelocity)._1
@@ -233,7 +235,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
       position,
       selectedPath.map(p => p._2.getOrElse(p._1).end),
       cruisingVelocity,
-      props.get.maxAcceleration
+      props.get.maxAcceleration,
+      props.get.maxDeceleration
     )
 
     val distanceToLast = position.map { pose =>

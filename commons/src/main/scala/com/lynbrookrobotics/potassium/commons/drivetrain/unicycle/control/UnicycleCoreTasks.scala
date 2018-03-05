@@ -87,6 +87,7 @@ trait UnicycleCoreTasks {
   class DriveDistanceWithTrapezoidalProfile(cruisingVelocity: Velocity,
                                             finalVelocity: Velocity,
                                             acceleration: Acceleration,
+                                            deceleration: Acceleration,
                                             targetDistance: Length,
                                             tolerance: Length,
                                             toleranceAngle: Angle)
@@ -101,12 +102,13 @@ trait UnicycleCoreTasks {
 
     override final def onStart(): Unit = {
       val (idealVelocity, forwardError) = trapezoidalDriveControl(
-          cruisingVelocity = cruisingVelocity,
-          finalVelocity = finalVelocity,
-          acceleration = acceleration,
-          targetPosition = hardware.forwardPosition.currentValue.map(_ + targetDistance),
-          position = hardware.forwardPosition,
-          velocity = hardware.forwardVelocity)
+          cruisingVelocity,
+          finalVelocity,
+          acceleration,
+          deceleration,
+          hardware.forwardPosition,
+          hardware.forwardPosition.currentValue.map(_ + targetDistance),
+          hardware.forwardVelocity)
 
       val absoluteAngleTarget = hardware.turnPosition.currentValue
       val (turnController, turnError) = turnPositionControl(absoluteAngleTarget)
@@ -145,6 +147,7 @@ trait UnicycleCoreTasks {
       0.5 * properties.get.maxForwardVelocity,
       finalVelocity,
       properties.get.maxAcceleration,
+      properties.get.maxDeceleration,
       targetForwardDistance,
       Feet(.1),
       Degrees(5)
