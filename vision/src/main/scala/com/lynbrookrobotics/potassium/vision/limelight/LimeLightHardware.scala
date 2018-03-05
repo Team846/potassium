@@ -9,16 +9,9 @@ import squants.Time
 import squants.space.{Degrees, Feet}
 
 
-class LimeLightHardware(maxInitializationTime: Time,
-                        upright: Boolean)
+class LimeLightHardware(upright: Boolean)
                        (implicit clock: Clock,
                         props: Signal[VisionProperties]) {
-  val initialTime = clock.currentTime
-  while (!NetworkTableInstance.getDefault.getTable("/limelight").getEntry("tv").exists()
-          && clock.currentTime - initialTime < maxInitializationTime) {
-    // busy wait until network table is initialized
-  }
-
   val limelightInterface = LimelightNetwork(clock)
   val tracker = new VisionTargetTracking(props)
 
