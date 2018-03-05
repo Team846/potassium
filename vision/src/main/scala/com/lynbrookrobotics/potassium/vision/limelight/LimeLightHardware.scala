@@ -9,19 +9,20 @@ import squants.Time
 import squants.space.{Degrees, Feet}
 
 
-class LimeLightHardware(maxInitializationTime: Time)(implicit clock: Clock) {
-  val initialTime = clock.currentTime
-  while (!NetworkTableInstance.getDefault.getTable("/limelight").getEntry("tv").exists()
-          && clock.currentTime - initialTime < maxInitializationTime) {
-    // busy wait until network table is initialized
-  }
-
+class LimeLightHardware(upright: Boolean)
+                       (implicit clock: Clock,
+                        props: Signal[VisionProperties]) {
   val limelightInterface = LimelightNetwork(clock)
-  val tracker = new VisionTargetTracking(
-    Signal.constant(VisionProperties(Degrees(0), Feet(10.8645))))
+  val tracker = new VisionTargetTracking(props)
 
   val distanceToTarget = tracker.distanceToTarget(limelightInterface.percentArea)
-  val angleToTarget = tracker.compassAngleToTarget(limelightInterface.xOffsetAngle)
+
+  val angleToTarget = if (upright) {
+    tracker.compassAngleToTarget(limelightInterface.xOffsetAngle)
+  } else {
+    tracker.compassAngleToTarget(limelightInterface.yOffsetAngle)
+  }
+
   val hasTarget = limelightInterface.hasTarget
 
   limelightInterface.table.getEntry("ledMode").setDouble(1)
