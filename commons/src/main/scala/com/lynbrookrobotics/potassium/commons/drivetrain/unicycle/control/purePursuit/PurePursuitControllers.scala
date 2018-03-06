@@ -145,7 +145,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
     }
 
     val reversed = compassHeadingToLookAheadAndReversed.map(_._2)
-    val forwardMultiplier = reversed.map(b => if (b) -1D else 1).withCheck(e => println(s"forward multiplier is $e"))
+    val forwardMultiplier = reversed.map(b => if (b) -1D else 1)
 
     (limitedAndWithinDeadband, forwardMultiplier)
   }
@@ -255,7 +255,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
     }
 
     (
-      limitedAndReversedForward.zip(turnOutput).withCheck(z => println(s"zipped is")).map { case (forward, turn) =>
+      limitedAndReversedForward.zip(turnOutput).map { case (forward, turn) =>
         UnicycleSignal(forward, turn)
       },
       errorToLast

@@ -19,6 +19,7 @@ class BlendedDrivingTest extends FunSuite {
       lazy override val maxForwardVelocity: Velocity = maxForward
       override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
+      override val maxDeceleration: Acceleration = FeetPerSecondSquared(10)
       override val defaultLookAheadDistance: Length = Feet(0.5)
 
       override val forwardVelocityGains: ForwardVelocityGains = PIDConfig(

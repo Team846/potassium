@@ -18,6 +18,7 @@ class PurePursuitControllerTests extends FunSuite {
     override val maxForwardVelocity: Velocity = FeetPerSecond(10)
     override val maxTurnVelocity: AngularVelocity = RadiansPerSecond(10)
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(15)
+    override val maxDeceleration: Acceleration = FeetPerSecondSquared(15)
     override val defaultLookAheadDistance: Length = Feet(1)
 
     override val forwardVelocityGains: ForwardVelocityGains = PIDConfig(
@@ -163,6 +164,7 @@ class PurePursuitControllerTests extends FunSuite {
       override val maxForwardVelocity: Velocity = FeetPerSecond(10)
       override val maxTurnVelocity: AngularVelocity = RadiansPerSecond(10)
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(15)
+      override val maxDeceleration: Acceleration = FeetPerSecondSquared(15)
       override val defaultLookAheadDistance: Length = Feet(1)
 
       override val forwardVelocityGains: ForwardVelocityGains = PIDConfig(
