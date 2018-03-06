@@ -5,7 +5,7 @@ import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.{UnicycleDrive
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units._
 import squants.space.Length
-import squants.{Dimensionless, Velocity}
+import squants.{Dimensionless, Percent, Velocity}
 
 
 /**
@@ -67,9 +67,31 @@ abstract class TwoSidedDrive
     )
   }
 
-  override protected def unicycleToOpenLoopSignal(uni: UnicycleSignal): TwoSided[Dimensionless] =
+  override protected def unicycleToOpenLoopSignal(uni: UnicycleSignal): TwoSided[Dimensionless] = {
+    val left = uni.forward + uni.turn
+    val right = uni.forward - uni.turn
     TwoSided(
-      uni.forward + uni.turn,
-      uni.forward - uni.turn
+      left,
+      right
     )
+//    if (left.abs > Percent(100) && right.abs <= Percent(100)) {
+//      TwoSided(
+//        Percent(100),
+//        Percent(100) + (right - left)
+//      )
+//    } else if(right.abs > Percent(100) && left.abs <= Percent(100)) {
+//      TwoSided(
+//        Percent(100) + (left - right),
+//        Percent(100)
+//      )
+//    } else if (left.abs > Percent(100) && right.abs > Percent(100)){
+//      // default to left at 100%
+//      TwoSided(
+//        Percent(100),
+//        Percent(100) + (right - left)
+//      )
+//    } else {
+//      TwoSided(left, right)
+//    }
+  }
 }

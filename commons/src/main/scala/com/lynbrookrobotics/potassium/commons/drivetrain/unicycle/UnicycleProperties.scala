@@ -9,6 +9,7 @@ trait UnicycleProperties {
   val maxForwardVelocity: Velocity
   val maxTurnVelocity: AngularVelocity
   val maxAcceleration: Acceleration
+  val maxDeceleration: Acceleration
   val defaultLookAheadDistance: Length
 
   val forwardVelocityGains: ForwardVelocityGains

@@ -7,7 +7,7 @@ import com.lynbrookrobotics.potassium.control.PIDF
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.units.{Point, Segment}
 import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleMotionProfileControllers
-import squants.{Dimensionless, Each}
+import squants.{Dimensionless, Each, Percent}
 import squants.space._
 import MathUtilities._
 import squants.motion._
@@ -30,7 +30,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
   def pointDistanceControl(position: Stream[Point],
                            target: Stream[Point],
                            maxVelocity: Velocity,
-                           acceleration: Acceleration)
+                           acceleration: Acceleration,
+                           deceleration: Acceleration)
                           (implicit properties: Signal[DrivetrainProperties],
                            hardware: DrivetrainHardware): Stream[Dimensionless] = {
     val distanceToTarget = position.zip(target).map { p =>
@@ -41,6 +42,7 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
       maxVelocity,
       FeetPerSecond(0),
       acceleration,
+      deceleration,
       distanceToTarget.mapToConstant(Feet(0)),
       distanceToTarget,
       hardware.forwardVelocity)._1
@@ -86,7 +88,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
                                 position: Stream[Point],
                                 biSegmentPath: Stream[(Segment, Option[Segment])],
                                 maxTurnOutput: Dimensionless,
-                                forwardBackwardMode: ForwardBackwardMode)
+                                forwardBackwardMode: ForwardBackwardMode,
+                                angleDeadband: Angle = Degrees(0))
                                (implicit props: Signal[DrivetrainProperties],
                                 hardware: DrivetrainHardware): (Stream[Dimensionless], Stream[Double]) = {
     val lookAheadPoint = position.zip(biSegmentPath).map { case (pose, path) =>
@@ -104,7 +107,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
     val errorToTarget = headingToTarget.map(convertTrigonometricAngleToCompass).zip(turnPosition).map { case (target, current) =>
       target - current
     }
-    val compassHeadingToLookAheadAndReversed = errorToTarget
+
+    val compassHeadingToLookAheadAndReversed: Stream[(Angle, Boolean)] = errorToTarget
       .map(h => limitToPlusMinus90(h))
       .zip(lookAheadPoint.map(_._2)).map { case ((angle, autoReversed), purposefullyReversed) =>
       if ((forwardBackwardMode == Auto) ||
@@ -113,7 +117,14 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
           purposefullyReversed /* we are doing the opposite of what is requested due to overshoot */) {
         (angle, autoReversed)
       } else {
-        (if (angle > Degrees(0)) angle - Degrees(180) else angle + Degrees(180), forwardBackwardMode == BackwardsOnly)
+        (
+          if (angle > Degrees(0)) {
+            angle - Degrees(180)
+          } else {
+            angle + Degrees(180)
+          },
+          forwardBackwardMode == BackwardsOnly
+        )
       }
     }
 
@@ -125,10 +136,18 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
       props.map(_.turnPositionGains)
     ).map(clamp(_, maxTurnOutput))
 
+    val limitedAndWithinDeadband = limitedTurn.zip(errorToTarget).map{ case(turn, error) =>
+      if (error.abs <= angleDeadband) {
+        Percent(0)
+      } else {
+        turn
+      }
+    }
+
     val reversed = compassHeadingToLookAheadAndReversed.map(_._2)
     val forwardMultiplier = reversed.map(b => if (b) -1D else 1)
 
-    (limitedTurn, forwardMultiplier)
+    (limitedAndWithinDeadband, forwardMultiplier)
   }
 
 
@@ -176,9 +195,11 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
                                 turnPosition: Stream[Angle],
                                 maxTurnOutput: Dimensionless,
                                 cruisingVelocity: Velocity,
-                                forwardBackwardMode: ForwardBackwardMode)
+                                forwardBackwardMode: ForwardBackwardMode,
+                                angleDeadband: Angle = Degrees(0))
                                 (implicit hardware: DrivetrainHardware,
                                  props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Option[Length]]) = {
+    println("in follow way points controller")
     val biSegmentPaths = wayPoints.sliding(2).map { points =>
       Segment(
         points.head,
@@ -206,28 +227,23 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
       position,
       selectedPath,
       maxTurnOutput,
-      forwardBackwardMode
+      forwardBackwardMode,
+      angleDeadband
     )
 
     val forwardOutput = pointDistanceControl(
       position,
       selectedPath.map(p => p._2.getOrElse(p._1).end),
       cruisingVelocity,
-      props.get.maxAcceleration
+      props.get.maxAcceleration,
+      props.get.maxDeceleration
     )
 
     val distanceToLast = position.map { pose =>
-      pose.distanceTo(wayPoints.last)
+      Segment(wayPoints.init.last, wayPoints.last).pointClosestToOnLine(pose).distanceTo(wayPoints.last)
     }
 
-    val limitedAndReversedForward = forwardOutput.map { s =>
-      val steadyOutput = props.get.forwardPositionGains.kp * props.get.defaultLookAheadDistance
-      if (!biSegmentPaths.hasNext) {
-        s min steadyOutput
-      } else {
-        steadyOutput
-      }
-    }.zip(multiplier).map(t => t._1 * t._2)
+    val limitedAndReversedForward = forwardOutput.zip(multiplier).map(t => t._1 * t._2)
 
     val errorToLast = distanceToLast.map { d =>
       // error does not exist if we are not on our last segment

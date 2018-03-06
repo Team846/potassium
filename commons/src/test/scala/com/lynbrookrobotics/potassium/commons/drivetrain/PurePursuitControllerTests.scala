@@ -18,6 +18,7 @@ class PurePursuitControllerTests extends FunSuite {
     override val maxForwardVelocity: Velocity = FeetPerSecond(10)
     override val maxTurnVelocity: AngularVelocity = RadiansPerSecond(10)
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(15)
+    override val maxDeceleration: Acceleration = FeetPerSecondSquared(15)
     override val defaultLookAheadDistance: Length = Feet(1)
 
     override val forwardVelocityGains: ForwardVelocityGains = PIDConfig(
@@ -70,6 +71,7 @@ class PurePursuitControllerTests extends FunSuite {
   val origin = Point.origin
   val period = Milliseconds(5)
   implicit val (clock, triggerClock) = ClockMocking.mockedClockTicker
+  val angleTolerance = Degrees(0.1)
 
   val unlimitedTurnOutput = Percent(Double.MaxValue)
   test("Test if facing target while at start results in driving straight") {
@@ -97,7 +99,8 @@ class PurePursuitControllerTests extends FunSuite {
       position,
       path,
       unlimitedTurnOutput,
-      Auto
+      Auto,
+      angleTolerance
     )._1
 
     var lastOutput = Percent(-10)
@@ -133,7 +136,8 @@ class PurePursuitControllerTests extends FunSuite {
       position,
       path,
       unlimitedTurnOutput,
-      Auto
+      Auto,
+      angleTolerance
     )._1
 
     var out = Percent(-10)
@@ -160,6 +164,7 @@ class PurePursuitControllerTests extends FunSuite {
       override val maxForwardVelocity: Velocity = FeetPerSecond(10)
       override val maxTurnVelocity: AngularVelocity = RadiansPerSecond(10)
       override val maxAcceleration: Acceleration = FeetPerSecondSquared(15)
+      override val maxDeceleration: Acceleration = FeetPerSecondSquared(15)
       override val defaultLookAheadDistance: Length = Feet(1)
 
       override val forwardVelocityGains: ForwardVelocityGains = PIDConfig(
@@ -198,7 +203,8 @@ class PurePursuitControllerTests extends FunSuite {
       position,
       path,
       unlimitedTurnOutput,
-      Auto
+      Auto,
+      angleTolerance
     )._1
 
     var out = Percent(-10)
@@ -230,7 +236,8 @@ class PurePursuitControllerTests extends FunSuite {
       position,
       path,
       unlimitedTurnOutput,
-      Auto
+      Auto,
+      angleTolerance
     )._1
 
     var out = Percent(-10)

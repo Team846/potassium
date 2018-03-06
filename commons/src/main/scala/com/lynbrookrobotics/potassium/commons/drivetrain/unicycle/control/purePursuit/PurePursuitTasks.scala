@@ -21,6 +21,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                         tolerance: Length,
                         maxTurnOutput: Dimensionless,
                         cruisingVelocity: Velocity,
+                        angleDeadband: Angle = Degrees(0),
                         targetTicksWithingTolerance: Int = 1,
                         forwardBackwardMode: ForwardBackwardMode = Auto)
                        (drive: Drivetrain)
@@ -48,6 +49,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         turnPosition,
         maxTurnOutput,
         cruisingVelocity,
+        angleDeadband,
         targetTicksWithingTolerance,
         forwardBackwardMode
       )(drive)
@@ -71,6 +73,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                                     turnPosition: Stream[Angle],
                                     maxTurnOutput: Dimensionless,
                                     cruisingVelocity: Velocity,
+                                    angleDeadband: Angle = Degrees(0),
                                     targetTicksWithingTolerance: Int = 1,
                                     forwardBackwardMode: ForwardBackwardMode = Auto)
                                    (drive: Drivetrain)
@@ -85,7 +88,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         turnPosition,
         maxTurnOutput,
         cruisingVelocity,
-        forwardBackwardMode
+        forwardBackwardMode,
+        angleDeadband
       )
 
       drive.setController(childVelocityControl(speedControl(unicycle.withCheckZipped(error) { e =>

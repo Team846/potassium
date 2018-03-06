@@ -29,6 +29,7 @@ class SimulatePurePursuit extends FunSuite {
 
     override val maxTurnVelocity: AngularVelocity = RadiansPerSecond((((maxLeftVelocity + maxRightVelocity) * Seconds(1)) / Inches(21.75)) / 2)
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(16.5)
+    override val maxDeceleration: Acceleration = FeetPerSecondSquared(16.5)
     override val defaultLookAheadDistance: Length = Feet(2)
 
     override val turnVelocityGains: TurnVelocityGains = PIDConfig(
@@ -79,8 +80,8 @@ class SimulatePurePursuit extends FunSuite {
       Inches(3),
       Percent(30),
       FeetPerSecond(10),
-      20,
-      forwardBackwardMode
+      targetTicksWithingTolerance = 20,
+      forwardBackwardMode = forwardBackwardMode
     )(drivetrain)
 
     task.init()

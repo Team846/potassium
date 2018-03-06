@@ -42,6 +42,7 @@ class PurePursuitTasksTest extends FunSuite {
     override val maxForwardVelocity: Velocity = FeetPerSecond(10)
     override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(10)
+    override val maxDeceleration: Acceleration = FeetPerSecondSquared(10)
     override val defaultLookAheadDistance: Length = Feet(0.5)
 
     override val forwardVelocityGains: ForwardVelocityGains = PIDConfig(

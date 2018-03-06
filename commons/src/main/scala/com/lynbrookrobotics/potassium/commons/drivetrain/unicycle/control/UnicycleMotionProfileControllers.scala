@@ -25,6 +25,7 @@ trait UnicycleMotionProfileControllers extends UnicycleCoreControllers {
   def trapezoidalDriveControl(cruisingVelocity: Velocity,
                               finalVelocity: Velocity,
                               acceleration: Acceleration,
+                              decceleration: Acceleration,
                               position: Stream[Length],
                               targetPosition: Stream[Length],
                               velocity: Stream[Velocity]): (Stream[Velocity], Stream[Length]) = {
@@ -72,7 +73,7 @@ trait UnicycleMotionProfileControllers extends UnicycleCoreControllers {
     val velocityDeccel = error.map { toTarget =>
       val finalVelocitySquared = math.pow(finalVelocity.toFeetPerSecond, 2)
       val errorValue = toTarget.abs.toFeet
-      val accelerationValue = acceleration.toFeetPerSecondSquared
+      val accelerationValue = decceleration.toFeetPerSecondSquared
 
       FeetPerSecond(
         math.sqrt(
@@ -82,8 +83,10 @@ trait UnicycleMotionProfileControllers extends UnicycleCoreControllers {
 
     // Ensure that motion is in the direction of the error
     val velocityOutput = velocityDeccel.zip(velocityAccel).zip(signError).map {
-      case ((velDec, velAcc), sign) =>
-        sign * velDec min cruisingVelocity min velAcc
+      case ((velDec, velAcc), sign) => {
+        val minVelocity = velDec.abs min cruisingVelocity.abs min velAcc.abs
+        sign * minVelocity
+      }
 
     }
 

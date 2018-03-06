@@ -26,6 +26,7 @@ class OffloadedTests extends FunSuite {
       override val maxTurnVelocity: AngularVelocity = null
       override val turnVelocityGains: TurnVelocityGains = null
       override val maxAcceleration: Acceleration = null
+      override val maxDeceleration: Acceleration = null
       override val blendExponent: Double = 0
       override val track: Length = null
 

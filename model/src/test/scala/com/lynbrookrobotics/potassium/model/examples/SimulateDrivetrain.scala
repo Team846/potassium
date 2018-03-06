@@ -27,6 +27,7 @@ object SimulateDrivetrain extends App {
 
     override val maxTurnVelocity: AngularVelocity = DegreesPerSecond(10)
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(16.5)
+    override val maxDeceleration: Acceleration = FeetPerSecondSquared(16.5)
     override val defaultLookAheadDistance: Length = Feet(1)
 
     override val turnVelocityGains: TurnVelocityGains = PIDConfig(
@@ -90,7 +91,7 @@ object SimulateDrivetrain extends App {
     Inches(5),
     Percent(70),
     FeetPerSecond(10),
-    10
+    targetTicksWithingTolerance = 10
   )(simulatedComponent)
 //  val task = new drivetrainContainer.unicycleTasks.RotateToAngle(
 //    Degrees(1e200),
