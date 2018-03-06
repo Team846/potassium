@@ -661,6 +661,22 @@
       </span>
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleCoreControllers#limitToPlusMinus180" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="limitToPlusMinus180(angle:squants.Angle):squants.Angle"></a><a id="limitToPlusMinus180(Angle):Angle"></a>
+      <span class="permalink">
+      <a href="../../../../../../../com/lynbrookrobotics/potassium/commons/drivetrain/unicycle/control/UnicycleMotionProfileControllers.html#limitToPlusMinus180(angle:squants.Angle):squants.Angle" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">limitToPlusMinus180</span><span class="params">(<span name="angle">angle: <span class="extype" name="squants.Angle">Angle</span></span>)</span><span class="result">: <span class="extype" name="squants.Angle">Angle</span></span>
+      </span>
+      
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="UnicycleCoreControllers.html" class="extype" name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleCoreControllers">UnicycleCoreControllers</a></dd></dl></div>
     </li><li name="scala.AnyRef#ne" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="ne(x$1:AnyRef):Boolean"></a><a id="ne(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -758,9 +774,9 @@
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleMotionProfileControllers#trapezoidalDriveControl" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="trapezoidalDriveControl(cruisingVelocity:squants.motion.Velocity,finalVelocity:squants.motion.Velocity,acceleration:squants.motion.Acceleration,position:com.lynbrookrobotics.potassium.streams.Stream[squants.Length],targetPosition:com.lynbrookrobotics.potassium.streams.Stream[squants.Length],velocity:com.lynbrookrobotics.potassium.streams.Stream[squants.motion.Velocity]):(com.lynbrookrobotics.potassium.streams.Stream[squants.motion.Velocity],com.lynbrookrobotics.potassium.streams.Stream[squants.Length])"></a><a id="trapezoidalDriveControl(Velocity,Velocity,Acceleration,Stream[Length],Stream[Length],Stream[Velocity]):(Stream[Velocity],Stream[Length])"></a>
+      <a id="trapezoidalDriveControl(cruisingVelocity:squants.motion.Velocity,finalVelocity:squants.motion.Velocity,acceleration:squants.motion.Acceleration,decceleration:squants.motion.Acceleration,position:com.lynbrookrobotics.potassium.streams.Stream[squants.Length],targetPosition:com.lynbrookrobotics.potassium.streams.Stream[squants.Length],velocity:com.lynbrookrobotics.potassium.streams.Stream[squants.motion.Velocity]):(com.lynbrookrobotics.potassium.streams.Stream[squants.motion.Velocity],com.lynbrookrobotics.potassium.streams.Stream[squants.Length])"></a><a id="trapezoidalDriveControl(Velocity,Velocity,Acceleration,Acceleration,Stream[Length],Stream[Length],Stream[Velocity]):(Stream[Velocity],Stream[Length])"></a>
       <span class="permalink">
-      <a href="../../../../../../../com/lynbrookrobotics/potassium/commons/drivetrain/unicycle/control/UnicycleMotionProfileControllers.html#trapezoidalDriveControl(cruisingVelocity:squants.motion.Velocity,finalVelocity:squants.motion.Velocity,acceleration:squants.motion.Acceleration,position:com.lynbrookrobotics.potassium.streams.Stream[squants.Length],targetPosition:com.lynbrookrobotics.potassium.streams.Stream[squants.Length],velocity:com.lynbrookrobotics.potassium.streams.Stream[squants.motion.Velocity]):(com.lynbrookrobotics.potassium.streams.Stream[squants.motion.Velocity],com.lynbrookrobotics.potassium.streams.Stream[squants.Length])" title="Permalink">
+      <a href="../../../../../../../com/lynbrookrobotics/potassium/commons/drivetrain/unicycle/control/UnicycleMotionProfileControllers.html#trapezoidalDriveControl(cruisingVelocity:squants.motion.Velocity,finalVelocity:squants.motion.Velocity,acceleration:squants.motion.Acceleration,decceleration:squants.motion.Acceleration,position:com.lynbrookrobotics.potassium.streams.Stream[squants.Length],targetPosition:com.lynbrookrobotics.potassium.streams.Stream[squants.Length],velocity:com.lynbrookrobotics.potassium.streams.Stream[squants.motion.Velocity]):(com.lynbrookrobotics.potassium.streams.Stream[squants.motion.Velocity],com.lynbrookrobotics.potassium.streams.Stream[squants.Length])" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -769,7 +785,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">trapezoidalDriveControl</span><span class="params">(<span name="cruisingVelocity">cruisingVelocity: <span class="extype" name="squants.motion.Velocity">Velocity</span></span>, <span name="finalVelocity">finalVelocity: <span class="extype" name="squants.motion.Velocity">Velocity</span></span>, <span name="acceleration">acceleration: <span class="extype" name="squants.motion.Acceleration">Acceleration</span></span>, <span name="position">position: <a href="../../../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.Length">Length</span>]</span>, <span name="targetPosition">targetPosition: <a href="../../../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.Length">Length</span>]</span>, <span name="velocity">velocity: <a href="../../../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.motion.Velocity">Velocity</span>]</span>)</span><span class="result">: (<a href="../../../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.motion.Velocity">Velocity</span>], <a href="../../../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.Length">Length</span>])</span>
+        <span class="name">trapezoidalDriveControl</span><span class="params">(<span name="cruisingVelocity">cruisingVelocity: <span class="extype" name="squants.motion.Velocity">Velocity</span></span>, <span name="finalVelocity">finalVelocity: <span class="extype" name="squants.motion.Velocity">Velocity</span></span>, <span name="acceleration">acceleration: <span class="extype" name="squants.motion.Acceleration">Acceleration</span></span>, <span name="decceleration">decceleration: <span class="extype" name="squants.motion.Acceleration">Acceleration</span></span>, <span name="position">position: <a href="../../../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.Length">Length</span>]</span>, <span name="targetPosition">targetPosition: <a href="../../../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.Length">Length</span>]</span>, <span name="velocity">velocity: <a href="../../../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.motion.Velocity">Velocity</span>]</span>)</span><span class="result">: (<a href="../../../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.motion.Velocity">Velocity</span>], <a href="../../../../streams/Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="squants.Length">Length</span>])</span>
       </span>
       
       <p class="shortcomment cmt">Uses a control loop that results in constant acceleration,
