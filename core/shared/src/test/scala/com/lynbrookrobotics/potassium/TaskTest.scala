@@ -24,11 +24,11 @@ class TaskTest extends FunSuite with BeforeAndAfter {
 
     assert(!started && !aborted)
 
-    Task.executeTask(task)
+    task.init()
 
     assert(started && !aborted)
 
-    Task.abortCurrentTask()
+    task.abort()
 
     assert(started && aborted)
   }
@@ -77,7 +77,7 @@ class TaskTest extends FunSuite with BeforeAndAfter {
   test("FiniteTask.empty immediately finishes"){
     val task = FiniteTask.empty
 
-    Task.executeTask(task)
+    task.init()
 
     assert(!task.isRunning)
   }

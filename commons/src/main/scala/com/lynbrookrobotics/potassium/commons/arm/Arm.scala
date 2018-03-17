@@ -20,7 +20,7 @@ trait ArmProperties {
 }
 
 trait ArmHardware {
-  def angle: Stream[Angle]
+  val angle: Stream[Angle]
 }
 
 abstract class Arm {

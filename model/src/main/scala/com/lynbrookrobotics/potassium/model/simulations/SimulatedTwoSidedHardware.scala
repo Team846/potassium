@@ -47,8 +47,9 @@ class SimulatedTwoSidedHardware(constantFriction: Force,
                                 (implicit props: TwoSidedDriveProperties) extends TwoSidedDriveHardware {
   override val track: Length = props.track
 
-  val leftMotor = new SimulatedMotor(clock, period)
-  val rightMotor = new SimulatedMotor(clock, period)
+  val rootStream = Stream.periodic(period)(())(clock)
+  val leftMotor = new SimulatedMotor(rootStream)
+  val rightMotor = new SimulatedMotor(rootStream)
 
   private val maxMotorForce = mass * props.maxAcceleration / 2
   private val leftForceOutput = leftMotor.outputStream.map(_.toEach * maxMotorForce)

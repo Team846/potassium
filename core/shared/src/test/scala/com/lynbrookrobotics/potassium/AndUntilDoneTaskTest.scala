@@ -3,11 +3,7 @@ package com.lynbrookrobotics.potassium
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask, Task}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
-class AndUntilDoneTaskTest extends FunSuite with BeforeAndAfter {
-  after {
-    Task.abortCurrentTask()
-  }
-
+class AndUntilDoneTaskTest extends FunSuite {
   test("AndUntilDone task goes through correct flow") {
     var task1FinishTrigger: Option[() => Unit] = None
 
@@ -43,7 +39,7 @@ class AndUntilDoneTaskTest extends FunSuite with BeforeAndAfter {
 
     assert(!task1Started && !task1Ended && !task2Started && !task2Ended)
 
-    Task.executeTask(andUntilDone)
+    andUntilDone.init()
 
     assert(task1Started && !task1Ended && task2Started && !task2Ended)
 
@@ -84,7 +80,7 @@ class AndUntilDoneTaskTest extends FunSuite with BeforeAndAfter {
 
     assert(!task1Started && !task1Ended && !task2Started && !task2Ended)
 
-    Task.executeTask(andUntilDone)
+    andUntilDone.init()
 
     assert(task1Started && !task1Ended && task2Started && !task2Ended)
 

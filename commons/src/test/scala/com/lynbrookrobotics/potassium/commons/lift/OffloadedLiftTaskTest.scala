@@ -17,7 +17,6 @@ import squants.{Dimensionless, Each, Percent}
 
 class OffloadedLiftTaskTest extends FunSuite {
   val tickPeriod = Milliseconds(5)
-  val periodicity = Periodic(tickPeriod)
   implicit val (clock, ticker) = ClockMocking.mockedClockTicker
 
   test("OffloadedLift starts below target and then moves up. After moving up, runs inner function") {
@@ -57,7 +56,7 @@ class OffloadedLiftTaskTest extends FunSuite {
     }
 
     implicit val hardware: LiftHardware = new LiftHardware {
-      override def position: Stream[Length] = Stream.periodic(tickPeriod)(currentLength)
+      override val position: Stream[Length] = Stream.periodic(tickPeriod)(currentLength)
     }
 
     var innerCalled = false
@@ -135,7 +134,7 @@ class OffloadedLiftTaskTest extends FunSuite {
     }
 
     implicit val hardware: LiftHardware = new LiftHardware {
-      override def position: Stream[Length] = Stream.periodic(tickPeriod)(currentLength)
+      override val position: Stream[Length] = Stream.periodic(tickPeriod)(currentLength)
     }
 
     var innerCalled = false

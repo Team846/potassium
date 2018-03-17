@@ -4,7 +4,6 @@ import org.scalatest.FunSuite
 import com.lynbrookrobotics.potassium.events.ImpulseEventSource
 import com.lynbrookrobotics.potassium.tasks.ContinuousTask
 import com.lynbrookrobotics.potassium.streams._
-import com.lynbrookrobotics.potassium.streams
 
 class ContinuousEventTest extends FunSuite {
   val eventUpdateSource = new ImpulseEventSource
