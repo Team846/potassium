@@ -28,11 +28,11 @@ object Slipping {
     }
 
     val leftIsSlipping = leftCalculatedAcceleration.zip(leftEncoderVelocity.derivative).map{ case(calculatedAcc, actualAcc) =>
-      (calculatedAcc - actualAcc).abs < allowedAccelerationDeviation
+      (calculatedAcc - actualAcc).abs > allowedAccelerationDeviation
     }
 
     val rightIsSlipping = rightCalculatedAcceleration.zip(rightEncoderVelocity.derivative).map{ case(calculatedAcc, actualAcc) =>
-      (calculatedAcc - actualAcc).abs < allowedAccelerationDeviation
+      (calculatedAcc - actualAcc).abs > allowedAccelerationDeviation
     }
 
     leftIsSlipping.zip(rightIsSlipping)

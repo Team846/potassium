@@ -23,11 +23,7 @@ abstract class Stream[+T] { self =>
 
   protected def publishValue(value: T @uncheckedVariance): Unit = {
     listeners.foreach { l =>
-      try {
-        l.apply(value)
-      } catch {
-        case e: Throwable => e.printStackTrace()
-      }
+      l.apply(value)
     }
     // TODO: more stuff maybe
   }
