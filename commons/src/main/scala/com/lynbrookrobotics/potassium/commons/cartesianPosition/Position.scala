@@ -1,9 +1,9 @@
-package com.lynbrookrobotics.potassium.commons.position
+package com.lynbrookrobotics.potassium.commons.cartesianPosition
 
-import com.lynbrookrobotics.potassium.{Component, Signal}
-import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.control.{PIDF, PIDFConfig}
+import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask}
+import com.lynbrookrobotics.potassium.{Component, Signal}
 import squants.Quantity
 import squants.time.{TimeDerivative, TimeIntegral}
 
