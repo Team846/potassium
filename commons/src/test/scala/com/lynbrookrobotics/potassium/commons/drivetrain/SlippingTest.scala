@@ -4,25 +4,26 @@ import com.lynbrookrobotics.potassium.ClockMocking
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.commons.position.Slipping
 import org.scalatest.FunSuite
-import squants.Velocity
 import squants.motion._
 import squants.space.{Feet, Length}
 import squants.time.Milliseconds
 
 class SlippingTest extends FunSuite {
 
-  implicit val (clock, triggerClock) = ClockMocking.mockedClockTicker
-  val period = Milliseconds(5)
 
-  test("left and right slipping") {
-    val angularVelocity: Stream[AngularVelocity] = Stream.periodic(period)(RadiansPerSecondSquared(5)).integral
-    val linearAcceleration: Stream[Acceleration] = Stream.periodic(period)(FeetPerSecondSquared(5))
-    val leftEncoderVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecondSquared(2)).integral
-    val rightEncoderVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecondSquared(9.5)).integral
-    val distanceFromAccelerometerLeft: Length = Feet(0.5) // calc = 2.5
-    val distanceFromAccelerometerRight: Length = Feet(1) // calc = 10
-    val allowedAccelerationDeviation: Acceleration = MetersPerSecondSquared(1)
+  val period = Milliseconds(1000)
 
+  test("Test that if robot is not turning and moving there is no slipping") {
+    implicit val (clock, triggerClock) = ClockMocking.mockedClockTicker
+    val angularVelocity: Stream[AngularVelocity] = Stream.periodic(period)(RadiansPerSecondSquared(0)).integral
+    val linearAcceleration: Stream[Acceleration] = Stream.periodic(period)(FeetPerSecondSquared(0))
+    val leftEncoderVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecondSquared(0)).integral
+    val rightEncoderVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecondSquared(0)).integral
+    val distanceFromAccelerometerLeft: Length = Feet(1)
+    val distanceFromAccelerometerRight: Length = Feet(1)
+    val allowedAccelerationDeviation: Acceleration = MetersPerSecondSquared(0.1)
+
+    var updated = false
     val isSlipping = Slipping.slippingDetection(angularVelocity,
       linearAcceleration,
       leftEncoderVelocity,
@@ -30,23 +31,27 @@ class SlippingTest extends FunSuite {
       distanceFromAccelerometerLeft,
       distanceFromAccelerometerRight,
       allowedAccelerationDeviation)
-    isSlipping.foreach(x => assert(!x._1 && !x._2))
+    isSlipping.foreach { x =>
+      updated = true
+      assert(!x._1 && !x._2)
+    }
 
     triggerClock.apply(period)
     triggerClock.apply(period)
     triggerClock.apply(period)
-    triggerClock.apply(period)
-    triggerClock.apply(period)
-    triggerClock.apply(period)
+
+    assert(updated)
+
   }
 
-  test("left and right not slipping") {
-    val angularVelocity: Stream[AngularVelocity] = Stream.periodic(period)(RadiansPerSecondSquared(5)).integral
-    val linearAcceleration: Stream[Acceleration] = Stream.periodic(period)(FeetPerSecondSquared(5))
-    val leftEncoderVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecondSquared(2)).integral
-    val rightEncoderVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecondSquared(9.5)).integral
-    val distanceFromAccelerometerLeft: Length = Feet(0.5) // calc = 2.5
-    val distanceFromAccelerometerRight: Length = Feet(1) // calc = 10
+  test("Test that if robot is not turning there is no slipping") {
+    implicit val (clock, triggerClock) = ClockMocking.mockedClockTicker
+    val angularVelocity: Stream[AngularVelocity] = Stream.periodic(period)(RadiansPerSecondSquared(0)).integral
+    val linearAcceleration: Stream[Acceleration] = Stream.periodic(period)(FeetPerSecondSquared(1))
+    val leftEncoderVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecondSquared(1)).integral
+    val rightEncoderVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecondSquared(1)).integral
+    val distanceFromAccelerometerLeft: Length = Feet(1)
+    val distanceFromAccelerometerRight: Length = Feet(1)
     val allowedAccelerationDeviation: Acceleration = MetersPerSecondSquared(0.1)
 
     val isSlipping = Slipping.slippingDetection(angularVelocity,
@@ -56,25 +61,25 @@ class SlippingTest extends FunSuite {
       distanceFromAccelerometerLeft,
       distanceFromAccelerometerRight,
       allowedAccelerationDeviation)
+    isSlipping.foreach {
+      x => assert(!x._1 && !x._2)
+    }
 
-    isSlipping.foreach(x => assert(x._1 && x._2))
+    triggerClock.apply(period)
+    triggerClock.apply(period)
+    triggerClock.apply(period)
 
-    triggerClock.apply(period)
-    triggerClock.apply(period)
-    triggerClock.apply(period)
-    triggerClock.apply(period)
-    triggerClock.apply(period)
-    triggerClock.apply(period)
   }
 
-  test("right slipping only") {
-    val angularVelocity: Stream[AngularVelocity] = Stream.periodic(period)(RadiansPerSecondSquared(5)).integral
-    val linearAcceleration: Stream[Acceleration] = Stream.periodic(period)(FeetPerSecondSquared(5))
-    val leftEncoderVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecondSquared(2)).integral
-    val rightEncoderVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecondSquared(30)).integral
-    val distanceFromAccelerometerLeft: Length = Feet(0.5) // calc = 2.5
-    val distanceFromAccelerometerRight: Length = Feet(1) // calc = 10
-    val allowedAccelerationDeviation: Acceleration = MetersPerSecondSquared(1)
+  test("Test that robot detects slipping when right and left wheel turn at different rates") {
+    implicit val (clock, triggerClock) = ClockMocking.mockedClockTicker
+    val angularVelocity: Stream[AngularVelocity] = Stream.periodic(period)(RadiansPerSecondSquared(1)).integral
+    val linearAcceleration: Stream[Acceleration] = Stream.periodic(period)(FeetPerSecondSquared(1))
+    val leftEncoderVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecondSquared(0)).integral
+    val rightEncoderVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecondSquared(5)).integral
+    val distanceFromAccelerometerLeft: Length = Feet(1)
+    val distanceFromAccelerometerRight: Length = Feet(1)
+    val allowedAccelerationDeviation: Acceleration = MetersPerSecondSquared(0.1)
 
     val isSlipping = Slipping.slippingDetection(angularVelocity,
       linearAcceleration,
@@ -83,41 +88,56 @@ class SlippingTest extends FunSuite {
       distanceFromAccelerometerLeft,
       distanceFromAccelerometerRight,
       allowedAccelerationDeviation)
+    isSlipping.foreach {
+      x => assert(!x._1 && x._2)
+    }
 
-    isSlipping.foreach(x => assert(!x._1 && x._2))
+    triggerClock.apply(period)
+    triggerClock.apply(period)
+    triggerClock.apply(period)
 
-    triggerClock.apply(period)
-    triggerClock.apply(period)
-    triggerClock.apply(period)
-    triggerClock.apply(period)
-    triggerClock.apply(period)
-    triggerClock.apply(period)
   }
 
-  test("left slipping only") {
-    val angularVelocity: Stream[AngularVelocity] = Stream.periodic(period)(RadiansPerSecondSquared(5)).integral
-    val linearAcceleration: Stream[Acceleration] = Stream.periodic(period)(FeetPerSecondSquared(5))
-    val leftEncoderVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecondSquared(30)).integral
-    val rightEncoderVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecondSquared(9.5)).integral
-    val distanceFromAccelerometerLeft: Length = Feet(0.5) // calc = 2.5
-    val distanceFromAccelerometerRight: Length = Feet(1) // calc = 10
-    val allowedAccelerationDeviation: Acceleration = MetersPerSecondSquared(1)
+  test("Test that robot is slipping if it is not moving but the left and right encoders say it is") {
+    implicit val (clock, triggerClock) = ClockMocking.mockedClockTicker
 
-    val isSlipping = Slipping.slippingDetection(angularVelocity,
-      linearAcceleration,
-      leftEncoderVelocity,
-      rightEncoderVelocity,
-      distanceFromAccelerometerLeft,
-      distanceFromAccelerometerRight,
-      allowedAccelerationDeviation)
+    //is not slipping
+    val checkNotSlipping = Slipping.slippingDetection(
+      angularVelocity = Stream.periodic(period)(RadiansPerSecondSquared(0)).integral,
+      linearAcceleration = Stream.periodic(period)(FeetPerSecondSquared(0)),
+      leftEncoderVelocity = Stream.periodic(period)(FeetPerSecondSquared(1)).integral,
+      rightEncoderVelocity = Stream.periodic(period)(FeetPerSecondSquared(1)).integral,
+      distanceFromAccelerometerLeft = Feet(0),
+      distanceFromAccelerometerRight = Feet(0),
+      allowedAccelerationDeviation = MetersPerSecondSquared(0.1))
 
-    isSlipping.foreach(x => assert(x._1 && !x._2))
+    checkNotSlipping.foreach(x => assert(x._1 && x._2))
 
     triggerClock.apply(period)
     triggerClock.apply(period)
     triggerClock.apply(period)
-    triggerClock.apply(period)
-    triggerClock.apply(period)
-    triggerClock.apply(period)
+
   }
+
+  test("Test that robot is not slipping") {
+    implicit val (clock, triggerClock) = ClockMocking.mockedClockTicker
+
+    //is not slipping
+    val checkNotSlipping = Slipping.slippingDetection(
+      angularVelocity = Stream.periodic(period)(RadiansPerSecondSquared(1)).integral,
+      linearAcceleration = Stream.periodic(period)(FeetPerSecondSquared(1)),
+      leftEncoderVelocity = Stream.periodic(period)(FeetPerSecondSquared(1)).integral,
+      rightEncoderVelocity = Stream.periodic(period)(FeetPerSecondSquared(1)).integral,
+      distanceFromAccelerometerLeft = Feet(0),
+      distanceFromAccelerometerRight = Feet(0),
+      allowedAccelerationDeviation = MetersPerSecondSquared(0.1))
+
+    checkNotSlipping.foreach(x => assert(!x._1 && !x._2))
+
+    triggerClock.apply(period)
+    triggerClock.apply(period)
+    triggerClock.apply(period)
+
+  }
+
 }
