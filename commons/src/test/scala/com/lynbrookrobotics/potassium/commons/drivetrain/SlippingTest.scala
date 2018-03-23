@@ -100,8 +100,6 @@ class SlippingTest extends FunSuite {
 
   test("Test that robot is slipping if it is not moving but the left and right encoders say it is") {
     implicit val (clock, triggerClock) = ClockMocking.mockedClockTicker
-
-    //is not slipping
     val checkNotSlipping = Slipping.slippingDetection(
       angularVelocity = Stream.periodic(period)(RadiansPerSecondSquared(0)).integral,
       linearAcceleration = Stream.periodic(period)(FeetPerSecondSquared(0)),
@@ -121,8 +119,6 @@ class SlippingTest extends FunSuite {
 
   test("Test that robot is not slipping") {
     implicit val (clock, triggerClock) = ClockMocking.mockedClockTicker
-
-    //is not slipping
     val checkNotSlipping = Slipping.slippingDetection(
       angularVelocity = Stream.periodic(period)(RadiansPerSecondSquared(1)).integral,
       linearAcceleration = Stream.periodic(period)(FeetPerSecondSquared(1)),
