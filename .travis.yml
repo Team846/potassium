@@ -4,7 +4,7 @@ branches:
   only:
     - master
 before_install:
-  - curl https://raw.githubusercontent.com/scala-native/scala-native/v0.3.6/bin/travis_setup.sh | bash -x
+  - curl https://raw.githubusercontent.com/scala-native/scala-native/master/scripts/travis_setup.sh | bash -x
 install:
   - . $HOME/.nvm/nvm.sh
   - nvm install stable
