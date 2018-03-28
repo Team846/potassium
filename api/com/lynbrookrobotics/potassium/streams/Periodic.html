@@ -220,7 +220,7 @@
         <span class="kind">case class</span>
       </span>
       <span class="symbol">
-        <span class="name">Periodic</span><span class="params">(<span name="period">period: <span class="extype" name="squants.time.Time">Time</span></span>)</span><span class="result"> extends <a href="ExpectedPeriodicity.html" class="extype" name="com.lynbrookrobotics.potassium.streams.ExpectedPeriodicity">ExpectedPeriodicity</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+        <span class="name">Periodic</span><span class="params">(<span name="period">period: <span class="extype" name="squants.time.Time">Time</span></span>, <span name="rootStream">rootStream: <a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[_]</span>)</span><span class="result"> extends <a href="ExpectedPeriodicity.html" class="extype" name="com.lynbrookrobotics.potassium.streams.ExpectedPeriodicity">ExpectedPeriodicity</a> with <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
       </span>
       </h4>
 
@@ -276,9 +276,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.lynbrookrobotics.potassium.streams.Periodic#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(period:squants.time.Time):com.lynbrookrobotics.potassium.streams.Periodic"></a><a id="&lt;init&gt;:Periodic"></a>
+      <a id="&lt;init&gt;(period:squants.time.Time,rootStream:com.lynbrookrobotics.potassium.streams.Stream[_]):com.lynbrookrobotics.potassium.streams.Periodic"></a><a id="&lt;init&gt;:Periodic"></a>
       <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/streams/Periodic.html#&lt;init&gt;(period:squants.time.Time):com.lynbrookrobotics.potassium.streams.Periodic" title="Permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/Periodic.html#&lt;init&gt;(period:squants.time.Time,rootStream:com.lynbrookrobotics.potassium.streams.Stream[_]):com.lynbrookrobotics.potassium.streams.Periodic" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -287,7 +287,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">Periodic</span><span class="params">(<span name="period">period: <span class="extype" name="squants.time.Time">Time</span></span>)</span>
+        <span class="name">Periodic</span><span class="params">(<span name="period">period: <span class="extype" name="squants.time.Time">Time</span></span>, <span name="rootStream">rootStream: <a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[_]</span>)</span>
       </span>
       
       
@@ -518,6 +518,22 @@
       </span>
       <span class="symbol">
         <span class="name">period</span><span class="result">: <span class="extype" name="squants.time.Time">Time</span></span>
+      </span>
+      
+      
+    </li><li name="com.lynbrookrobotics.potassium.streams.Periodic#rootStream" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="rootStream:com.lynbrookrobotics.potassium.streams.Stream[_]"></a><a id="rootStream:Stream[_]"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/Periodic.html#rootStream:com.lynbrookrobotics.potassium.streams.Stream[_]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">val</span>
+      </span>
+      <span class="symbol">
+        <span class="name">rootStream</span><span class="result">: <a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[_]</span>
       </span>
       
       
