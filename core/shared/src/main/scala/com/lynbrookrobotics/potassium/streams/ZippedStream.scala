@@ -23,9 +23,9 @@ class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B], skipTimestampCh
   }
 
   override val expectedPeriodicity: ExpectedPeriodicity = (parentA.expectedPeriodicity, parentB.expectedPeriodicity) match {
-    case (Periodic(a), Periodic(b)) =>
-      if (a eq b) {
-        Periodic(a)
+    case (Periodic(a, s1), Periodic(b, s2)) =>
+      if (a == b && s1 == s2) {
+        Periodic(a, s1)
       } else {
         NonPeriodic
       }
@@ -34,8 +34,8 @@ class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B], skipTimestampCh
   }
 
   override val originTimeStream = (parentA.expectedPeriodicity, parentB.expectedPeriodicity) match {
-    case (Periodic(a), Periodic(b)) =>
-      if (a eq b) {
+    case (Periodic(a, s1), Periodic(b, s2)) =>
+      if (a == b && s1 == s2) {
         parentA.originTimeStream
       } else {
         None // TODO: alternatives?

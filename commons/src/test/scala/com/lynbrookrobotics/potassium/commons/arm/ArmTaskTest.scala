@@ -14,7 +14,6 @@ import GenericValue._
 
 class ArmTaskTest extends FunSuite {
   val tickPeriod = Milliseconds(5)
-  val periodicity = Periodic(tickPeriod)
   implicit val (clock, ticker) = ClockMocking.mockedClockTicker
 
   test("Arm starts below target and then moves up. After moving up, runs inner function") {
@@ -46,7 +45,7 @@ class ArmTaskTest extends FunSuite {
     }
 
     implicit val hardware: ArmHardware = new ArmHardware {
-      override def angle: Stream[Angle] = Stream.periodic(tickPeriod)(currentAngle)
+      override val angle: Stream[Angle] = Stream.periodic(tickPeriod)(currentAngle)
     }
 
     val task = new arm.positionTasks.WhileAbovePosition(hardware.angle.mapToConstant(Degrees(90)))(testArm).toFinite
@@ -97,7 +96,7 @@ class ArmTaskTest extends FunSuite {
     }
 
     implicit val hardware: ArmHardware = new ArmHardware {
-      override def angle: Stream[Angle] = Stream.periodic(tickPeriod)(currentAngle)
+      override val angle: Stream[Angle] = Stream.periodic(tickPeriod)(currentAngle)
     }
 
     val task = new arm.positionTasks.WhileBelowPosition(hardware.angle.mapToConstant(Degrees(90)))(testArm).toFinite
@@ -150,7 +149,7 @@ class ArmTaskTest extends FunSuite {
     }
 
     implicit val hardware: ArmHardware = new ArmHardware {
-      override def angle: Stream[Angle] = Stream.periodic(tickPeriod)(currentAngle)
+      override val angle: Stream[Angle] = Stream.periodic(tickPeriod)(currentAngle)
     }
 
     val task = new arm.positionTasks.WhileAtPosition(hardware.angle.mapToConstant(Degrees(90)), Degrees(5))(testArm).toFinite

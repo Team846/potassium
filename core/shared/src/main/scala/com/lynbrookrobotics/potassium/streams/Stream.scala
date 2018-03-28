@@ -164,7 +164,7 @@ abstract class Stream[+T] { self =>
     */
   def zipAsync[O](other: Stream[O]): Stream[(T, O)] = {
     (this.expectedPeriodicity, other.expectedPeriodicity) match {
-      case (Periodic(a), Periodic(b)) if a eq b =>
+      case (Periodic(a, s1), Periodic(b, s2)) if a == b && s1 == s2 =>
         zip(other)
       case _ =>
         new AsyncZippedStream[T, O](this, other)
@@ -324,7 +324,7 @@ abstract class Stream[+T] { self =>
     */
   def syncTo(o: Stream[_]): Stream[T] = {
     (expectedPeriodicity, o.expectedPeriodicity) match {
-      case (Periodic(a), Periodic(b)) if a eq b =>
+      case (Periodic(a, s1), Periodic(b, s2)) if a == b && s1 == s2 =>
         this
 
       case _ =>
@@ -357,7 +357,7 @@ abstract class Stream[+T] { self =>
   }
 
   def withCheckZipped[O](checkingStream: Stream[O])(check: O => Unit): Stream[T] = {
-    zip(checkingStream).withCheck { case (v, checkedValue) =>
+    zipAsync(checkingStream).withCheck { case (v, checkedValue) =>
       check(checkedValue)
     }.map(_._1)
   }
@@ -411,7 +411,7 @@ object Stream {
       override def subscribeToParents(): Unit = {}
       override def unsubscribeFromParents(): Unit = {}
 
-      override val expectedPeriodicity = Periodic(period)
+      override val expectedPeriodicity = Periodic(period, this)
 
       override val originTimeStream = Some(new Stream[Time] {
         override def subscribeToParents(): Unit = {}
@@ -454,21 +454,41 @@ object Stream {
   }
 
   def manualWithTime[T](implicit clock: Clock): (Stream[T], T => Unit) = {
-    manualWithTime(NonPeriodic)
-  }
-
-  def manualWithTime[T](periodicity: ExpectedPeriodicity)(implicit clock: Clock): (Stream[T], T => Unit) = {
     val stream = new Stream[T] {
       override def subscribeToParents(): Unit = {}
       override def unsubscribeFromParents(): Unit = {}
 
-      override val expectedPeriodicity: ExpectedPeriodicity = periodicity
+      override val expectedPeriodicity: ExpectedPeriodicity = NonPeriodic
 
       override val originTimeStream = Some(new Stream[Time] {
         override def subscribeToParents(): Unit = {}
         override def unsubscribeFromParents(): Unit = {}
 
-        override val expectedPeriodicity: ExpectedPeriodicity = periodicity
+        override val expectedPeriodicity: ExpectedPeriodicity = NonPeriodic
+        override val originTimeStream = None
+      })
+
+      override def publishValue(value: T): Unit = {
+        originTimeStream.get.publishValue(clock.currentTime)
+        super.publishValue(value)
+      }
+    }
+
+    (stream, stream.publishValue)
+  }
+
+  def manualWithTime[T](period: Time)(implicit clock: Clock): (Stream[T], T => Unit) = {
+    val stream = new Stream[T] { self =>
+      override def subscribeToParents(): Unit = {}
+      override def unsubscribeFromParents(): Unit = {}
+
+      override val expectedPeriodicity: ExpectedPeriodicity = Periodic(period, this)
+
+      override val originTimeStream = Some(new Stream[Time] {
+        override def subscribeToParents(): Unit = {}
+        override def unsubscribeFromParents(): Unit = {}
+
+        override val expectedPeriodicity: ExpectedPeriodicity = Periodic(period, self)
         override val originTimeStream = None
       })
 

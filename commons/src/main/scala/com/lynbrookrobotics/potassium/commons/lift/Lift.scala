@@ -20,7 +20,7 @@ trait LiftProperties {
 }
 
 trait LiftHardware {
-  def position: Stream[Length]
+  val position: Stream[Length]
 }
 
 abstract class Lift {

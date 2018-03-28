@@ -89,11 +89,12 @@ class PurePursuitTasksTest extends FunSuite {
     val drivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
 
     implicit val hardware = new UnicycleHardware {
-      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
-      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
+      val rootStream = Stream.periodic(period)(())
+      override val forwardVelocity: Stream[Velocity] = rootStream.mapToConstant(MetersPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = rootStream.mapToConstant(DegreesPerSecond(0))
 
-      override val forwardPosition: Stream[Length] = Stream.periodic(period)(Feet(0))
-      override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(0))
+      override val forwardPosition: Stream[Length] = rootStream.mapToConstant(Feet(0))
+      override val turnPosition: Stream[Angle] = rootStream.mapToConstant(Degrees(0))
     }
 
     val target = new Point(Feet(0), Feet(0.5))
@@ -121,12 +122,13 @@ class PurePursuitTasksTest extends FunSuite {
     val target = new Point(Feet(0), Feet(10))
 
     implicit val hardware = new UnicycleHardware {
-      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecond(0))
+      val rootStream = Stream.periodic(period)(())
+      override val forwardVelocity: Stream[Velocity] = rootStream.mapToConstant(FeetPerSecond(0))
 
-      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = rootStream.mapToConstant(DegreesPerSecond(0))
 
-      override val forwardPosition: Stream[Length] = Stream.periodic(period)(Feet(0))
-      override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(0))
+      override val forwardPosition: Stream[Length] = rootStream.mapToConstant(Feet(0))
+      override val turnPosition: Stream[Angle] = rootStream.mapToConstant(Degrees(0))
     }
 
     val task = new drive.unicycleTasks.FollowWayPoints(
@@ -155,16 +157,17 @@ class PurePursuitTasksTest extends FunSuite {
     val drivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
 
     implicit val hardware = new UnicycleHardware {
-      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
-      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
+      val rootStream = Stream.periodic(period)(())
+      override val forwardVelocity: Stream[Velocity] = rootStream.mapToConstant(MetersPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = rootStream.mapToConstant(DegreesPerSecond(0))
       var askedForInitPosition = false
 
-      override val forwardPosition: Stream[Length] = Stream.periodic(period)(Feet(0))
+      override val forwardPosition: Stream[Length] = rootStream.mapToConstant(Feet(0))
       var checked = false
 
       // turn position in follow way points is relativised, so this is a work around
       // to simulate the robot later being at 45 degrees from the initial angle of 0
-      override val turnPosition: Stream[Angle] = Stream.periodic(period){
+      override val turnPosition: Stream[Angle] = rootStream.map { _ =>
         if (!checked) {
           checked = true
           Degrees(0)
@@ -203,12 +206,13 @@ class PurePursuitTasksTest extends FunSuite {
     val target = new Point(Feet(0), Feet(1))
 
     implicit val hardware = new UnicycleHardware {
-      override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(FeetPerSecond(0))
+      val rootStream = Stream.periodic(period)(())
+      override val forwardVelocity: Stream[Velocity] = rootStream.mapToConstant(FeetPerSecond(0))
 
-      override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))
+      override val turnVelocity: Stream[AngularVelocity] = rootStream.mapToConstant(DegreesPerSecond(0))
 
-      override val forwardPosition: Stream[Length] = Stream.periodic(period)(Feet(0))
-      override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(0))
+      override val forwardPosition: Stream[Length] = rootStream.mapToConstant(Feet(0))
+      override val turnPosition: Stream[Angle] = rootStream.mapToConstant(Degrees(0))
     }
 
     val task = new drive.unicycleTasks.FollowWayPointsWithPosition(
