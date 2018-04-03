@@ -5,13 +5,14 @@ import com.lynbrookrobotics.potassium.model.simulations.SimulatedMotor
 import org.scalatest.FunSuite
 import squants.Percent
 import squants.time.{Milliseconds, Seconds}
+import com.lynbrookrobotics.potassium.streams.Stream
 
 class SimulatedMotorTest extends FunSuite {
   val period = Milliseconds(5)
 
   test("Simulated motor updates when clock is triggered") {
     implicit val (clock, triggerClock) = ClockMocking.mockedClockTicker
-    val simulatedMotor = new SimulatedMotor(clock, period)
+    val simulatedMotor = new SimulatedMotor(Stream.periodic(period)(()))
 
     var lastOut = Percent(-10)
     simulatedMotor.outputStream.foreach(lastOut = _)
@@ -23,7 +24,7 @@ class SimulatedMotorTest extends FunSuite {
 
   test("Simulated motor publishes value from set method") {
     implicit val (clock, triggerClock) = ClockMocking.mockedClockTicker
-    val simulatedMotor = new SimulatedMotor(clock, period)
+    val simulatedMotor = new SimulatedMotor(Stream.periodic(period)(()))
 
     var lastOut = Percent(-10)
     simulatedMotor.outputStream.foreach(lastOut = _)

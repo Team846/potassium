@@ -12,9 +12,10 @@ import squants.{Dimensionless, Percent, Time}
 class PIDFTest extends FunSuite {
   val period: Time = Seconds(0.005)
 
-  test("test P with error 1 foot and gain 50%/foot = 50%"){
-    val (target, pubTarget) = Stream.manual[Length](Periodic(period))
-    val (current, pubCurr) = Stream.manual[Length](Periodic(period))
+  test("test P with error 1 foot and gain 50%/foot = 50%") {
+    val (targetCurrent, pubTargetCurrent) = Stream.manual[(Length, Length)](Periodic(period, null))
+    val target = targetCurrent.map(_._1)
+    val current = targetCurrent.map(_._2)
 
     val gain = Signal(Ratio(Percent(50), Feet(1)))
 
@@ -23,8 +24,7 @@ class PIDFTest extends FunSuite {
     var lastOutput: Dimensionless = Percent(-10)
     pControl.foreach(lastOutput = _)
 
-    pubCurr(Feet(0))
-    pubTarget(Feet(1))
+    pubTargetCurrent(Feet(1), Feet(0))
 
     implicit val tolerance = Percent(0.1)
     assert(lastOutput ~= Percent(50))
@@ -33,7 +33,7 @@ class PIDFTest extends FunSuite {
   test("test I control with error 1 foot/s and gain 50%/((foot/sec)/s)"){
     implicit val (mockedClock, triggerClock) = ClockMocking.mockedClockTicker
 
-    val (targetAndCurrent, pubTargetAndCurrent) = Stream.manualWithTime[(Velocity, Velocity)](Periodic(period))
+    val (targetAndCurrent, pubTargetAndCurrent) = Stream.manualWithTime[(Velocity, Velocity)](period)
     val target = targetAndCurrent.map(_._1)
     val current = targetAndCurrent.map(_._2)
 
@@ -69,8 +69,9 @@ class PIDFTest extends FunSuite {
   test("test D control with derivative error 1 ft/s and gain 50%/(foot/s) gets -50%") {
     implicit val (mockedClock, triggerClock) = ClockMocking.mockedClockTicker
 
-    val (target, pubTarget) = Stream.manualWithTime[Length](Periodic(period))
-    val (current, pubCurr) = Stream.manualWithTime[Length](Periodic(period))
+    val (targetCurrent, pubTargetCurrent) = Stream.manualWithTime[(Length, Length)](period)
+    val target = targetCurrent.map(_._1)
+    val current = targetCurrent.map(_._2)
 
     val gain = Signal(Ratio(Percent(50), FeetPerSecond(1)))
 
@@ -79,14 +80,12 @@ class PIDFTest extends FunSuite {
     var lastOutput: Dimensionless = Percent(-10)
     dControl.foreach(lastOutput = _)
 
-    pubTarget(Feet(1))
-    pubCurr(Feet(0))
+    pubTargetCurrent(Feet(1), Feet(0))
 
     // error will change from 1 to 0, divided by 1 second, getting 1ft/s
     triggerClock.apply(Seconds(1))
 
-    pubTarget(Feet(1))
-    pubCurr(Feet(1))
+    pubTargetCurrent((Feet(1), Feet(1)))
 
     implicit val tolerance = Percent(0.1)
     assert(lastOutput ~= Percent(-50))

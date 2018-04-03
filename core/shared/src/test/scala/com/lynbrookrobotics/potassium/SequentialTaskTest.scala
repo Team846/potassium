@@ -3,11 +3,7 @@ package com.lynbrookrobotics.potassium
 import com.lynbrookrobotics.potassium.tasks._
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
-class SequentialTaskTest extends FunSuite with BeforeAndAfter {
-  after {
-    Task.abortCurrentTask()
-  }
-
+class SequentialTaskTest extends FunSuite {
   test("Sequential task goes through correct flow") {
     var task1FinishTrigger: Option[() => Unit] = None
     var task2FinishTrigger: Option[() => Unit] = None
@@ -46,7 +42,7 @@ class SequentialTaskTest extends FunSuite with BeforeAndAfter {
 
     assert(!task1Started && !task1Ended && !task2Started && !task2Ended)
 
-    Task.executeTask(sequential)
+    sequential.init()
 
     assert(task1Started && !task1Ended && !task2Started && !task2Ended)
 
@@ -91,7 +87,7 @@ class SequentialTaskTest extends FunSuite with BeforeAndAfter {
 
     assert(!task1Started && !task1Ended && !task2Started && !task2Ended)
 
-    Task.executeTask(sequential)
+    sequential.init()
 
     assert(task1Started && !task1Ended && !task2Started && !task2Ended)
 
@@ -137,7 +133,7 @@ class SequentialTaskTest extends FunSuite with BeforeAndAfter {
 
     assert(!task1Started && !task1Ended && !task2Started && !task2Ended)
 
-    Task.executeTask(sequential)
+    sequential.init()
 
     assert(task1Started && !task1Ended && !task2Started && !task2Ended)
 
@@ -187,7 +183,7 @@ class SequentialTaskTest extends FunSuite with BeforeAndAfter {
 
     assert(!task1Started && !task1Ended && !task2Started && !task2Ended)
 
-    Task.executeTask(sequential)
+    sequential.init()
 
     assert(task1Started && !task1Ended && !task2Started && !task2Ended)
 
@@ -231,7 +227,7 @@ class SequentialTaskTest extends FunSuite with BeforeAndAfter {
 
     assert(!task1Started && !task1Ended && !task2Started && !task2Ended)
 
-    Task.executeTask(sequential)
+    sequential.init()
 
     assert(task1Started && !task1Ended && !task2Started && !task2Ended)
 

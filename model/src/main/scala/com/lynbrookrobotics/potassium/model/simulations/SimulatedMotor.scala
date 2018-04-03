@@ -5,11 +5,11 @@ import com.lynbrookrobotics.potassium.streams._
 import squants.time.Time
 import squants.{Dimensionless, Percent}
 
-class SimulatedMotor(clock: Clock, period: Time) {
+class SimulatedMotor(rootStream: Stream[Unit]) {
   val initialOutput = Percent(0)
 
   private var lastOutput = initialOutput
-  val outputStream = Stream.periodic(period)(lastOutput)(clock)
+  val outputStream = rootStream.map(_ => lastOutput)
 
   private def capAt100Percent(input: Dimensionless): Dimensionless = {
     input min Percent(100) max Percent(-100)
