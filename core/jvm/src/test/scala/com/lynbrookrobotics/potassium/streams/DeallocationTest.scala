@@ -25,7 +25,7 @@ class DeallocationTest extends FunSuite {
       * @param delay the initial delay before running the function
       * @param thunk the function to execute after the delay
       */
-    override def singleExecution(delay: Time)(thunk: => Unit): Unit = ???
+    override def singleExecution(delay: Time)(thunk: => Unit): Cancel = ???
 
     override def currentTime: Time = Seconds(0)
   }
@@ -35,7 +35,7 @@ class DeallocationTest extends FunSuite {
 
     while (value.get.isDefined) {
       if (count >= 30) {
-        assert(false, "Did not deallocate")
+        assert(condition = false, "Did not deallocate")
       }
 
       System.gc()
