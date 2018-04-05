@@ -35,7 +35,7 @@ class DeallocationTest extends FunSuite {
 
     while (value.get.isDefined) {
       if (count >= 30) {
-        assert(condition = false, "Did not deallocate")
+        assert(false, "Did not deallocate")
       }
 
       System.gc()
