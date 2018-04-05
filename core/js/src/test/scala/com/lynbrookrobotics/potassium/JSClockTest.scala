@@ -20,7 +20,7 @@ class JSClockTest extends AsyncFunSuite {
     cancel = Some(JSClock(Milliseconds(5)) { _ =>
       count += 1
       if (count == 100) {
-        cancel.foreach(_())
+        cancel.foreach(_ ())
 
         val timeTaken = System.currentTimeMillis() - start
         testDonePromise.success(math.abs(timeTaken - 500))
@@ -49,9 +49,9 @@ class JSClockTest extends AsyncFunSuite {
     var executed = false
 
     JSClock.singleExecution(Milliseconds(500)) {
-      executed = true
-    }
+      throw new IllegalStateException("This code should not have run")
+    }()
 
-    future.map(t => assert(!executed))
+    future.map { _ => assert(true) }
   }
 }
