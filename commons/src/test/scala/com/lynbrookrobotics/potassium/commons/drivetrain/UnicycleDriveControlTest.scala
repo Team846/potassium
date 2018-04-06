@@ -97,6 +97,7 @@ class UnicycleDriveControlTest extends FunSuite {
 
       trigggerClock.apply(period)
       trigggerClock.apply(period)
+      trigggerClock.apply(period)
 
       (math.abs(forwardOut.toEach - (fwd.toMetersPerSecond / 10)) <= 0.01) &&
         (math.abs(turnOut.toEach - (turn.toDegreesPerSecond / 10)) <= 0.01)

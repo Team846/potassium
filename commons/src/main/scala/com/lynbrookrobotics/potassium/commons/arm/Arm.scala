@@ -49,7 +49,7 @@ abstract class Arm {
       override def onStart(): Unit = {
         val (error, control) = positionControl(target)
 
-        arm.setController(control.withCheckZipped(error) { error =>
+        arm.setController(control.withCheckZipped(error.drop(1)) { error =>
           if (error.abs < tolerance) { //check whether arm is close enough to target. If so, run inner.
             readyToRunInner()
           }

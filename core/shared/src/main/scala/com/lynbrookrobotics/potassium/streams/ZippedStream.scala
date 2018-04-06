@@ -1,20 +1,12 @@
 package com.lynbrookrobotics.potassium.streams
 
-import squants.time.Time
-
-class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B], skipTimestampCheck: Boolean) extends Stream[(A, B)] {
+class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B]) extends Stream[(A, B)] {
   private[this] var parentAUnsubscribe: Cancel = null
   private[this] var parentBUnsubscribe: Cancel = null
 
   override def subscribeToParents(): Unit = {
-    if (skipTimestampCheck || expectedPeriodicity == NonPeriodic
-      || parentA.originTimeStream.isEmpty || parentB.originTimeStream.isEmpty) {
-      parentAUnsubscribe = parentA.foreach(t => this.receiveA(t, null))
-      parentBUnsubscribe = parentB.foreach(t => this.receiveB(t, null))
-    } else {
-      parentAUnsubscribe = parentA.zipWithTime.foreach(t => this.receiveA(t._1, t._2))
-      parentBUnsubscribe = parentB.zipWithTime.foreach(t => this.receiveB(t._1, t._2))
-    }
+    parentAUnsubscribe = parentA.foreach(this.receiveA)
+    parentBUnsubscribe = parentB.foreach(this.receiveB)
   }
 
   override def unsubscribeFromParents(): Unit = {
@@ -44,26 +36,24 @@ class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B], skipTimestampCh
     case _ => None
   }
 
-  private[this] var aSlot: Option[(A, Time)] = None
-  private[this] var bSlot: Option[(B, Time)] = None
+  private[this] var aSlot: Option[A] = None
+  private[this] var bSlot: Option[B] = None
 
   def attemptPublish(): Unit = {
     aSlot.zip(bSlot).foreach { case (a, b) =>
-      if (a._2 == b._2 || expectedPeriodicity == NonPeriodic) {
-        publishValue((a._1, b._1))
-        aSlot = None
-        bSlot = None
-      }
+      publishValue((a, b))
+      aSlot = None
+      bSlot = None
     }
   }
 
-  def receiveA(aValue: A, timestamp: Time): Unit = {
-    aSlot = Some((aValue, timestamp))
+  def receiveA(aValue: A): Unit = {
+    aSlot = Some(aValue)
     attemptPublish()
   }
 
-  def receiveB(bValue: B, timestamp: Time): Unit = {
-    bSlot = Some((bValue, timestamp))
+  def receiveB(bValue: B): Unit = {
+    bSlot = Some(bValue)
     attemptPublish()
   }
 }

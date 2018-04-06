@@ -111,6 +111,37 @@ abstract class Stream[+T] { self =>
     }
   }
 
+  /**
+    * Drops the first n values of a stream, used to synchronize delayed streams
+    */
+  def drop(n: Int): Stream[T] = {
+    new Stream[T] {
+      var unsubscribe: Cancel = null
+      var remainingToDrop = n
+
+      override def subscribeToParents(): Unit = {
+        unsubscribe = self.foreach(v => {
+          if (remainingToDrop == 0) {
+            this.publishValue(v)
+          } else {
+            remainingToDrop -= 1
+          }
+        })
+      }
+
+      override def unsubscribeFromParents(): Unit = {
+        unsubscribe.cancel(); unsubscribe = null
+      }
+
+      override def checkRelaunch(): Unit = {
+        throw new IllegalStateException("Dropped streams are non-relaunchable. You may want to use .preserve to prevent stream shutdown.")
+      }
+
+      override val expectedPeriodicity = self.expectedPeriodicity
+      override val originTimeStream = self.originTimeStream.map(_.drop(n))
+    }
+  }
+
   def mapToConstant[O](output: O): Stream[O] = {
     map(_ => output)
   }
@@ -150,7 +181,7 @@ abstract class Stream[+T] { self =>
     * @return a stream with the values from both streams brought together
     */
   def zip[O](other: Stream[O]): Stream[(T, O)] = {
-    new ZippedStream[T, O](this, other, skipTimestampCheck = false)
+    new ZippedStream[T, O](this, other)
   }
 
   /**
@@ -190,7 +221,7 @@ abstract class Stream[+T] { self =>
     * @return a stream with tuples of emitted values and the time of emission
     */
   def zipWithTime: Stream[(T, Time)] = {
-    new ZippedStream[T, Time](this, originTimeStream.get, skipTimestampCheck = true)
+    new ZippedStream[T, Time](this, originTimeStream.get)
   }
 
   /**
