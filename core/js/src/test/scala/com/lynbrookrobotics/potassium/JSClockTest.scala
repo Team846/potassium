@@ -44,7 +44,7 @@ class JSClockTest extends AsyncFunSuite {
   }
 
   test("Single execution can be canceled") {
-    val testDonePromise = Promise[Long]()
+    val testDonePromise = Promise[Unit]()
     val future = testDonePromise.future
     var executed = false
 
@@ -52,6 +52,7 @@ class JSClockTest extends AsyncFunSuite {
       throw new IllegalStateException("This code should not have run")
     }()
 
+    testDonePromise.success(Unit)
     future.map { _ => assert(true) }
   }
 }
