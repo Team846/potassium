@@ -108,4 +108,8 @@ class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePer
   override def retrieveVelocity: Value3D[AngularVelocity] = {
     currentData.gyro
   }
+
+  override def retrieveAcceleration: Value3D[Acceleration] = {
+    currentData.accel
+  }
 }
