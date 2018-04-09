@@ -42,4 +42,18 @@ class JSClockTest extends AsyncFunSuite {
 
     future.map(t => assert(t <= 250))
   }
+
+  test("Single execution can be canceled") {
+    val promise = Promise[Boolean]
+
+    JSClock.singleExecution(Milliseconds(0)) {
+      promise.success(false)
+    }()
+
+    JSClock.singleExecution(Milliseconds(250)) {
+      promise.success(true)
+    }
+
+    promise.future.map { v => assert(v) }
+  }
 }
