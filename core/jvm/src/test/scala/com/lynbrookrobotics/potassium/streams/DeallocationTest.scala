@@ -9,6 +9,7 @@ import squants.time.Seconds
 import scala.ref.WeakReference
 
 class DeallocationTest extends FunSuite {
+  type Cancel = () => Unit
   implicit val clock = new Clock {
     /**
       * Schedules a periodic execution
