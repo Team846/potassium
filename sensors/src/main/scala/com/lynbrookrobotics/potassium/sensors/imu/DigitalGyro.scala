@@ -56,4 +56,8 @@ abstract class DigitalGyro(tickPeriod: Time) {
       retrieveVelocity - currentDrift
     }
   }
+
+  def getAccelerations: Value3D[Acceleration] = {
+    retrieveAcceleration
+  }
 }
