@@ -547,9 +547,9 @@
       
       <p class="shortcomment cmt">Creates an impulse event that fires at a fixed rate</p><div class="fullcomment"><div class="comment cmt"><p>Creates an impulse event that fires at a fixed rate</p></div><dl class="paramcmts block"><dt class="param">period</dt><dd class="cmt"><p>the period to fire the event at</p></dd><dt>returns</dt><dd class="cmt"><p>an event that fires at the given rate</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a></dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.clock.JavaClock#singleExecution" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="singleExecution(delay:squants.Time)(thunk:=&gt;Unit):Unit"></a><a id="singleExecution(Time)(⇒Unit):Unit"></a>
+      <a id="singleExecution(delay:squants.Time)(thunk:=&gt;Unit):com.lynbrookrobotics.potassium.clock.JavaClock.Cancel"></a><a id="singleExecution(Time)(⇒Unit):Cancel"></a>
       <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/clock/JavaClock$.html#singleExecution(delay:squants.Time)(thunk:=&gt;Unit):Unit" title="Permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/clock/JavaClock$.html#singleExecution(delay:squants.Time)(thunk:=&gt;Unit):com.lynbrookrobotics.potassium.clock.JavaClock.Cancel" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -558,7 +558,7 @@
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">singleExecution</span><span class="params">(<span name="delay">delay: <span class="extype" name="squants.Time">Time</span></span>)</span><span class="params">(<span name="thunk">thunk: ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">singleExecution</span><span class="params">(<span name="delay">delay: <span class="extype" name="squants.Time">Time</span></span>)</span><span class="params">(<span name="thunk">thunk: ⇒ <span class="extype" name="scala.Unit">Unit</span></span>)</span><span class="result">: <a href="#Cancel=()=&gt;Unit" class="extmbr" name="com.lynbrookrobotics.potassium.clock.JavaClock.Cancel">Cancel</a></span>
       </span>
       
       <p class="shortcomment cmt">Schedules a single execution of a function</p><div class="fullcomment"><div class="comment cmt"><p>Schedules a single execution of a function</p></div><dl class="paramcmts block"><dt class="param">delay</dt><dd class="cmt"><p>the initial delay before running the function</p></dd><dt class="param">thunk</dt><dd class="cmt"><p>the function to execute after the delay</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="" class="extype" name="com.lynbrookrobotics.potassium.clock.JavaClock">JavaClock</a> → <a href="Clock.html" class="extype" name="com.lynbrookrobotics.potassium.clock.Clock">Clock</a></dd></dl></div>
