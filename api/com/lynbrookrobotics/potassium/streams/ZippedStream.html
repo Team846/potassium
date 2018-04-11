@@ -276,9 +276,9 @@
         <div id="constructors" class="members">
               <h3>Instance Constructors</h3>
               <ol><li name="com.lynbrookrobotics.potassium.streams.ZippedStream#&lt;init&gt;" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="&lt;init&gt;(parentA:com.lynbrookrobotics.potassium.streams.Stream[A],parentB:com.lynbrookrobotics.potassium.streams.Stream[B],skipTimestampCheck:Boolean):com.lynbrookrobotics.potassium.streams.ZippedStream[A,B]"></a><a id="&lt;init&gt;:ZippedStream[A,B]"></a>
+      <a id="&lt;init&gt;(parentA:com.lynbrookrobotics.potassium.streams.Stream[A],parentB:com.lynbrookrobotics.potassium.streams.Stream[B]):com.lynbrookrobotics.potassium.streams.ZippedStream[A,B]"></a><a id="&lt;init&gt;:ZippedStream[A,B]"></a>
       <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/streams/ZippedStream.html#&lt;init&gt;(parentA:com.lynbrookrobotics.potassium.streams.Stream[A],parentB:com.lynbrookrobotics.potassium.streams.Stream[B],skipTimestampCheck:Boolean):com.lynbrookrobotics.potassium.streams.ZippedStream[A,B]" title="Permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/ZippedStream.html#&lt;init&gt;(parentA:com.lynbrookrobotics.potassium.streams.Stream[A],parentB:com.lynbrookrobotics.potassium.streams.Stream[B]):com.lynbrookrobotics.potassium.streams.ZippedStream[A,B]" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -287,7 +287,7 @@
         <span class="kind">new</span>
       </span>
       <span class="symbol">
-        <span class="name">ZippedStream</span><span class="params">(<span name="parentA">parentA: <a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.ZippedStream.A">A</span>]</span>, <span name="parentB">parentB: <a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.ZippedStream.B">B</span>]</span>, <span name="skipTimestampCheck">skipTimestampCheck: <span class="extype" name="scala.Boolean">Boolean</span></span>)</span>
+        <span class="name">ZippedStream</span><span class="params">(<span name="parentA">parentA: <a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.ZippedStream.A">A</span>]</span>, <span name="parentB">parentB: <a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[<span class="extype" name="com.lynbrookrobotics.potassium.streams.ZippedStream.B">B</span>]</span>)</span>
       </span>
       
       
@@ -454,6 +454,24 @@
       <p class="shortcomment cmt">Calculates the derivative of the stream, producing units of
 the derivative of the stream's units</p><div class="fullcomment"><div class="comment cmt"><p>Calculates the derivative of the stream, producing units of
 the derivative of the stream's units</p></div><dl class="paramcmts block"><dt>returns</dt><dd class="cmt"><p>a stream producing values that are the derivative of the stream</p></dd></dl><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a></dd></dl></div>
+    </li><li name="com.lynbrookrobotics.potassium.streams.Stream#drop" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="drop(n:Int):com.lynbrookrobotics.potassium.streams.Stream[T]"></a><a id="drop(Int):Stream[(A,B)]"></a>
+      <span class="permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/ZippedStream.html#drop(n:Int):com.lynbrookrobotics.potassium.streams.Stream[T]" title="Permalink">
+        <i class="material-icons"></i>
+      </a>
+    </span>
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">drop</span><span class="params">(<span name="n">n: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a>[(<span class="extype" name="com.lynbrookrobotics.potassium.streams.ZippedStream.A">A</span>, <span class="extype" name="com.lynbrookrobotics.potassium.streams.ZippedStream.B">B</span>)]</span>
+      </span>
+      
+      <p class="shortcomment cmt">Drops the first n values of a stream, used to synchronize delayed streams
+</p><div class="fullcomment"><div class="comment cmt"><p>Drops the first n values of a stream, used to synchronize delayed streams
+</p></div><dl class="attributes block"> <dt>Definition Classes</dt><dd><a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a></dd></dl></div>
     </li><li name="scala.AnyRef#eq" visbl="pub" class="indented0 " data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="eq(x$1:AnyRef):Boolean"></a><a id="eq(AnyRef):Boolean"></a>
       <span class="permalink">
@@ -809,9 +827,9 @@ from the original stream</p></div><dl class="paramcmts block"><dt class="param">
       
       <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected </dd><dt>Definition Classes</dt><dd><a href="Stream.html" class="extype" name="com.lynbrookrobotics.potassium.streams.Stream">Stream</a></dd></dl></div>
     </li><li name="com.lynbrookrobotics.potassium.streams.ZippedStream#receiveA" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="receiveA(aValue:A,timestamp:squants.time.Time):Unit"></a><a id="receiveA(A,Time):Unit"></a>
+      <a id="receiveA(aValue:A):Unit"></a><a id="receiveA(A):Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/streams/ZippedStream.html#receiveA(aValue:A,timestamp:squants.time.Time):Unit" title="Permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/ZippedStream.html#receiveA(aValue:A):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -820,14 +838,14 @@ from the original stream</p></div><dl class="paramcmts block"><dt class="param">
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">receiveA</span><span class="params">(<span name="aValue">aValue: <span class="extype" name="com.lynbrookrobotics.potassium.streams.ZippedStream.A">A</span></span>, <span name="timestamp">timestamp: <span class="extype" name="squants.time.Time">Time</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">receiveA</span><span class="params">(<span name="aValue">aValue: <span class="extype" name="com.lynbrookrobotics.potassium.streams.ZippedStream.A">A</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
       
     </li><li name="com.lynbrookrobotics.potassium.streams.ZippedStream#receiveB" visbl="pub" class="indented0 " data-isabs="false" fullComment="no" group="Ungrouped">
-      <a id="receiveB(bValue:B,timestamp:squants.time.Time):Unit"></a><a id="receiveB(B,Time):Unit"></a>
+      <a id="receiveB(bValue:B):Unit"></a><a id="receiveB(B):Unit"></a>
       <span class="permalink">
-      <a href="../../../../com/lynbrookrobotics/potassium/streams/ZippedStream.html#receiveB(bValue:B,timestamp:squants.time.Time):Unit" title="Permalink">
+      <a href="../../../../com/lynbrookrobotics/potassium/streams/ZippedStream.html#receiveB(bValue:B):Unit" title="Permalink">
         <i class="material-icons"></i>
       </a>
     </span>
@@ -836,7 +854,7 @@ from the original stream</p></div><dl class="paramcmts block"><dt class="param">
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">receiveB</span><span class="params">(<span name="bValue">bValue: <span class="extype" name="com.lynbrookrobotics.potassium.streams.ZippedStream.B">B</span></span>, <span name="timestamp">timestamp: <span class="extype" name="squants.time.Time">Time</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+        <span class="name">receiveB</span><span class="params">(<span name="bValue">bValue: <span class="extype" name="com.lynbrookrobotics.potassium.streams.ZippedStream.B">B</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
       </span>
       
       
