@@ -39,14 +39,14 @@ private[frc] class WPIClockShared(stopOnException: Boolean) extends Clock {
     () => notifier.stop()
   }
 
-  override def singleExecution(delay: Time)(thunk: => Unit): Unit = {
+  override def singleExecution(delay: Time)(thunk: => Unit): Cancel = {
     val notifier = new Notifier(new Runnable {
       override def run(): Unit = {
         thunk
       }
     })
-
     notifier.startSingle(delay.to(Seconds))
+    () => notifier.stop()
   }
 
   override def currentTime: Time = Microseconds(Utility.getFPGATime)

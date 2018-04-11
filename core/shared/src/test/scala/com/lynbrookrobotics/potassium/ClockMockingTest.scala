@@ -5,67 +5,81 @@ import squants.time.{Milliseconds, Seconds}
 import org.scalatest.FunSuite
 
 class ClockMockingTest extends FunSuite {
- test("Single execution of periodic statement") {
-   var periodicRun: Boolean = false
+  test("Single execution of periodic statement") {
+    var periodicRun: Boolean = false
 
-   val (mockedClock, trigger) = ClockMocking.mockedClockTicker
+    val (mockedClock, trigger) = ClockMocking.mockedClockTicker
 
-   mockedClock(Milliseconds(5)) { _ =>
-     periodicRun = true
-   }
+    mockedClock(Milliseconds(5)) { _ =>
+      periodicRun = true
+    }
 
-   trigger(Milliseconds(5))
+    trigger(Milliseconds(5))
 
-   assert(periodicRun)
- }
+    assert(periodicRun)
+  }
 
- test("Cancelled periodic statement does not run") {
-   var periodicRun: Boolean = false
+  test("Cancelled periodic statement does not run") {
+    var periodicRun: Boolean = false
 
-   val (mockedClock, trigger) = ClockMocking.mockedClockTicker
+    val (mockedClock, trigger) = ClockMocking.mockedClockTicker
 
-   val cancel = mockedClock(Milliseconds(5)) { _ =>
-     periodicRun = true
-   }
+    val cancel = mockedClock(Milliseconds(5)) { _ =>
+      periodicRun = true
+    }
 
-   cancel()
+    cancel()
 
-   trigger(Milliseconds(5))
+    trigger(Milliseconds(5))
 
-   assert(!periodicRun)
- }
+    assert(!periodicRun)
+  }
 
- test("Single tick produces correct dt") {
-   val (mockedClock, trigger) = ClockMocking.mockedClockTicker
+  test("Single tick produces correct dt") {
+    val (mockedClock, trigger) = ClockMocking.mockedClockTicker
 
-   var dtProduced: Option[Time] = None
+    var dtProduced: Option[Time] = None
 
-   mockedClock(Milliseconds(5)) { dt =>
-     dtProduced = Some(dt)
-   }
+    mockedClock(Milliseconds(5)) { dt =>
+      dtProduced = Some(dt)
+    }
 
-   trigger(Milliseconds(5))
+    trigger(Milliseconds(5))
 
-   assert(dtProduced.contains(Milliseconds(5)))
- }
+    assert(dtProduced.contains(Milliseconds(5)))
+  }
 
- test("Single execution is correctly executed") {
-   val (mockedClock, trigger) = ClockMocking.mockedClockTicker
+  test("Single execution is correctly executed") {
+    val (mockedClock, trigger) = ClockMocking.mockedClockTicker
 
-   var executed = false
+    var executed = false
 
-   mockedClock.singleExecution(Milliseconds(5)) {
-     executed = true
-   }
+    mockedClock.singleExecution(Milliseconds(5)) {
+      executed = true
+    }
 
-   trigger(Milliseconds(1))
+    trigger(Milliseconds(1))
 
-   assert(!executed)
+    assert(!executed)
 
-   trigger(Milliseconds(5))
+    trigger(Milliseconds(5))
 
-   assert(executed)
- }
+    assert(executed)
+  }
+
+  test("Single execution can be canceled correctly") {
+    val (mockedClock, trigger) = ClockMocking.mockedClockTicker
+
+    var executed = false
+    val cancelExecution = mockedClock.singleExecution(Milliseconds(5)) {
+      executed = true
+    }
+    trigger(Milliseconds(1))
+    assert(!executed)
+    cancelExecution()
+    trigger(Milliseconds(5))
+    assert(!executed)
+  }
 
   test("Periodic update does in fact update periodically") {
     val (mockedClock, trigger) = ClockMocking.mockedClockTicker
