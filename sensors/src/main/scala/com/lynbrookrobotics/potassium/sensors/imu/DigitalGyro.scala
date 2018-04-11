@@ -1,8 +1,7 @@
 package com.lynbrookrobotics.potassium.sensors.imu
 
 import com.lynbrookrobotics.potassium.units.Value3D
-
-import squants.motion.{AngularVelocity, DegreesPerSecond}
+import squants.motion.{Acceleration, AngularVelocity, DegreesPerSecond}
 import squants.Time
 
 import scala.collection.mutable
@@ -29,6 +28,8 @@ abstract class DigitalGyro(tickPeriod: Time) {
     */
   def retrieveVelocity: Value3D[AngularVelocity]
 
+  def retrieveAcceleration: Value3D[Acceleration]
+
   /**
     * End the collection of values used to calibrate
     */
@@ -54,5 +55,9 @@ abstract class DigitalGyro(tickPeriod: Time) {
     } else {
       retrieveVelocity - currentDrift
     }
+  }
+
+  def getAccelerations: Value3D[Acceleration] = {
+    retrieveAcceleration
   }
 }

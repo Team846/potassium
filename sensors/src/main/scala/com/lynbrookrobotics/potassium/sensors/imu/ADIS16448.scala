@@ -5,7 +5,7 @@ import java.nio.ByteBuffer
 import com.lynbrookrobotics.potassium.sensors.SPITrait
 import com.lynbrookrobotics.potassium.units.Value3D
 import squants.Time
-import squants.motion.{AngularVelocity, DegreesPerSecond}
+import squants.motion.{Acceleration, AngularVelocity, DegreesPerSecond, MetersPerSecondSquared}
 /**
   * An interface for communicating with the ADIS16448 IMU.
   */
@@ -27,6 +27,9 @@ class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePer
     val X_GYRO_REG: Byte = 0x04
     val Y_GYRO_REG: Byte = 0x06
     val Z_GYRO_REG: Byte = 0x08
+    val X_ACC_REG: Byte = 0x1E.toByte
+    val Y_ACC_REG: Byte = 0x22
+    val Z_ACC_REG: Byte = 0x26
   }
 
   // Private object used to substitute for private values in Java
@@ -91,7 +94,12 @@ class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePer
       DegreesPerSecond(readGyroRegister(ADIS16448Protocol.Y_GYRO_REG)),
       DegreesPerSecond(readGyroRegister(ADIS16448Protocol.Z_GYRO_REG))
     ).times(Constants.DegreePerSecondPerLSB)
-    IMUValue(gyro, null, null)
+    val accelerometer: Value3D[Acceleration] = Value3D[Acceleration](
+      MetersPerSecondSquared(readGyroRegister(ADIS16448Protocol.X_ACC_REG)),
+      MetersPerSecondSquared(readGyroRegister(ADIS16448Protocol.Y_ACC_REG)),
+      MetersPerSecondSquared(readGyroRegister(ADIS16448Protocol.Z_ACC_REG))
+    )
+    IMUValue(gyro, accelerometer, null)
   }
 
   /**
@@ -99,5 +107,9 @@ class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePer
     */
   override def retrieveVelocity: Value3D[AngularVelocity] = {
     currentData.gyro
+  }
+
+  override def retrieveAcceleration: Value3D[Acceleration] = {
+    currentData.accel
   }
 }
