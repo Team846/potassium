@@ -30,12 +30,15 @@ object JavaClock extends Clock {
     }
   }
 
-  override def singleExecution(delay: Time)(thunk: => Unit): Unit = {
-    scheduler.schedule(new Runnable {
+  override def singleExecution(delay: Time)(thunk: => Unit): Cancel = {
+    val scheduledEvent = scheduler.schedule(new Runnable {
       override def run(): Unit = {
         thunk
       }
     }, delay.to(Milliseconds).toLong, TimeUnit.MILLISECONDS)
+    () => {
+      scheduledEvent.cancel(false)
+    }
   }
 
   override def currentTime: Time = Milliseconds(System.currentTimeMillis())

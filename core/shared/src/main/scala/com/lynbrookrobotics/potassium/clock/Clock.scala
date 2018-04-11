@@ -22,7 +22,7 @@ trait Clock {
     * @param delay the initial delay before running the function
     * @param thunk the function to execute after the delay
     */
-  def singleExecution(delay: Time)(thunk: => Unit): Unit
+  def singleExecution(delay: Time)(thunk: => Unit): Cancel
 
   /**
     * Creates an impulse event that fires at a fixed rate
