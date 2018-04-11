@@ -9,6 +9,7 @@ import squants.time.Seconds
 import scala.ref.WeakReference
 
 class DeallocationTest extends FunSuite {
+  type Cancel = () => Unit
   implicit val clock = new Clock {
     /**
       * Schedules a periodic execution
@@ -25,7 +26,7 @@ class DeallocationTest extends FunSuite {
       * @param delay the initial delay before running the function
       * @param thunk the function to execute after the delay
       */
-    override def singleExecution(delay: Time)(thunk: => Unit): Unit = ???
+    override def singleExecution(delay: Time)(thunk: => Unit): Cancel = ???
 
     override def currentTime: Time = Seconds(0)
   }

@@ -1,13 +1,13 @@
 package com.lynbrookrobotics.potassium
 
 import org.scalatest.FunSuite
-import com.lynbrookrobotics.potassium.events.ImpulseEventSource
+import com.lynbrookrobotics.potassium.events.{ImpulseEvent, ImpulseEventSource}
 import com.lynbrookrobotics.potassium.tasks.ContinuousTask
 import com.lynbrookrobotics.potassium.streams._
 
 class ContinuousEventTest extends FunSuite {
   val eventUpdateSource = new ImpulseEventSource
-  implicit val eventUpdateEvent = eventUpdateSource.event
+  implicit val eventUpdateEvent: ImpulseEvent = eventUpdateSource.event
 
   test("Start and end impulse Stream events are fired correctly") {
     val (streamOfCondition, publishCondition) = Stream.manual[Boolean]

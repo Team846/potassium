@@ -26,10 +26,13 @@ object JSClock extends Clock {
     }
   }
 
-  override def singleExecution(delay: Time)(thunk: => Unit): Unit = {
-    dom.window.setTimeout(() => {
+  override def singleExecution(delay: Time)(thunk: => Unit): Cancel = {
+    val taskToken = dom.window.setTimeout(() => {
       thunk
     }, delay.toMilliseconds)
+    () => {
+      dom.window.clearTimeout(taskToken)
+    }
   }
 
   override def currentTime: Time = Milliseconds(System.currentTimeMillis())

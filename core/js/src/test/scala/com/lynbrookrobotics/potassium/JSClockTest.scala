@@ -20,7 +20,7 @@ class JSClockTest extends AsyncFunSuite {
     cancel = Some(JSClock(Milliseconds(5)) { _ =>
       count += 1
       if (count == 100) {
-        cancel.foreach(_())
+        cancel.foreach(_.apply())
 
         val timeTaken = System.currentTimeMillis() - start
         testDonePromise.success(math.abs(timeTaken - 500))
@@ -41,5 +41,19 @@ class JSClockTest extends AsyncFunSuite {
     }
 
     future.map(t => assert(t <= 250))
+  }
+
+  test("Single execution can be canceled") {
+    val promise = Promise[Boolean]
+
+    JSClock.singleExecution(Milliseconds(0)) {
+      promise.success(false)
+    }()
+
+    JSClock.singleExecution(Milliseconds(250)) {
+      promise.success(true)
+    }
+
+    promise.future.map { v => assert(v) }
   }
 }
