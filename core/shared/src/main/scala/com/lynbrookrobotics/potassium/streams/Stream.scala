@@ -545,6 +545,12 @@ object Stream {
       }
     }
 
-    recurse()
+    recurse(stream).map { str =>
+      println(s"------ DETECTED LOST DATA, last publish was ${str.lastPublishTime} but we were looking for data after ${timestamp} -------")
+      str.streamCreationTrace.printStackTrace()
+      println(s"------ DETECTED LOST DATA, last publish was ${str.lastPublishTime} but we were looking for data after ${timestamp} -------")
+    }.getOrElse {
+      println(s"------ COULD NOT TRACE LOST DATA TO A STREAM -------")
+    }
   }
 }
