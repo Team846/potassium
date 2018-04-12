@@ -70,7 +70,7 @@ trait UnicycleCoreTasks {
       val absoluteDistance = hardware.forwardPosition.currentValue.map(_ + distance)
       val (controller, error) = forwardPositionControl(absoluteDistance)
 
-      val checkedController = controller.withCheckZipped(error.drop(1)) { error =>
+      val checkedController = controller.withCheckZipped(error) { error =>
         if (error.abs < tolerance) {
           finished()
         }
@@ -177,7 +177,7 @@ trait UnicycleCoreTasks {
       val combinedController = limitedForward.zip(turnController).map(t => t._1 + t._2)
 
       val zippedError = forwardError.zip(turnError)
-      val checkedController = combinedController.withCheckZipped(zippedError.drop(1)) {
+      val checkedController = combinedController.withCheckZipped(zippedError) {
         case  (forwardError, turnError) =>
           if (forwardError.abs < toleranceForward && turnError.abs < toleranceAngle) {
             stableTicks += 1
@@ -221,7 +221,7 @@ trait UnicycleCoreTasks {
       val combinedController = limitedForward.zip(turnController).map(t => t._1 + t._2)
 
       val zippedError = forwardError.zip(turnError)
-      val checkedController = combinedController.withCheckZipped(zippedError.drop(1)) {
+      val checkedController = combinedController.withCheckZipped(zippedError) {
         case  (forwardError, turnError) =>
           if (forwardError.abs < toleranceForward && turnError.abs < toleranceAngle) {
             finished()
@@ -301,11 +301,12 @@ trait UnicycleCoreTasks {
     override def onStart(): Unit = {
       val absoluteAngle = hardware.turnPosition.currentValue.map(_ + relativeAngle)
 
+//      val absoluteAngle = hardware.turnPosition.get + relativeAngle
       val (controller, error) = turnPositionControl(absoluteAngle)
 
       var ticksWithinTolerance = 0
 
-      val checkedController = controller.withCheckZipped(error.drop(1)) { error =>
+      val checkedController = controller.withCheckZipped(error) { error =>
         if (error.abs < tolerance) {
           ticksWithinTolerance += 1
         } else {
@@ -407,7 +408,7 @@ trait UnicycleCoreTasks {
         }
       )
 
-      drivetrainComponent.setController(out.withCheckZipped(distanceToTarget.drop(1)){
+      drivetrainComponent.setController(out.withCheckZipped(distanceToTarget){
         distanceToTarget => {
           if (distanceToTarget.exists(_ <= minDistance)) {
             finished()
