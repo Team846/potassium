@@ -102,7 +102,9 @@ class PurePursuitTasksTest extends FunSuite {
       Seq(Point.origin, target),
       Feet(1),
       unlimitedTurnOutput,
-      FeetPerSecond(10)
+      FeetPerSecond(10),
+      props.get.maxAcceleration,
+      props.get.maxDeceleration
     )(drivetrainComp)
 
     task.init()
@@ -135,7 +137,9 @@ class PurePursuitTasksTest extends FunSuite {
       Seq(Point.origin, target),
       Feet(0.1),
       unlimitedTurnOutput,
-      FeetPerSecond(20)
+      FeetPerSecond(20),
+      props.get.maxAcceleration,
+      props.get.maxDeceleration
     )(testDrivetrainComp)
 
     task.init()
@@ -182,7 +186,9 @@ class PurePursuitTasksTest extends FunSuite {
       Seq(Point.origin, target),
       Feet(1),
       unlimitedTurnOutput,
-      FeetPerSecond(10)
+      FeetPerSecond(10),
+      props.get.maxAcceleration,
+      props.get.maxDeceleration
     )(drivetrainComp)
 
     task.init()
@@ -221,7 +227,9 @@ class PurePursuitTasksTest extends FunSuite {
       hardware.forwardPosition.mapToConstant(Point(Feet(0.001), Feet(0.999999))),
       hardware.turnPosition.mapToConstant(Degrees(0)),
       unlimitedTurnOutput,
-      cruisingVelocity = FeetPerSecond(10)
+      FeetPerSecond(10),
+      props.get.maxAcceleration,
+      props.get.maxDeceleration
     )(testDrivetrainComp)
 
     task.init()

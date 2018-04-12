@@ -6,7 +6,7 @@ import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.Unicyc
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.{FiniteTask, FiniteTaskFinishedListener}
 import com.lynbrookrobotics.potassium.units.Point
-import squants.{Dimensionless, Velocity}
+import squants.{Acceleration, Dimensionless, Velocity}
 import squants.space.{Angle, Degrees, Length}
 
 
@@ -21,12 +21,15 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                         tolerance: Length,
                         maxTurnOutput: Dimensionless,
                         cruisingVelocity: Velocity,
+                        maxAcceleration: Acceleration,
+                        maxDeceleration: Acceleration,
                         angleDeadband: Angle = Degrees(0),
                         targetTicksWithingTolerance: Int = 1,
                         forwardBackwardMode: ForwardBackwardMode = Auto)
                        (drive: Drivetrain)
                        (implicit properties: Signal[controllers.DrivetrainProperties],
                         hardware: controllers.DrivetrainHardware) extends FiniteTask with FiniteTaskFinishedListener {
+
     private var absoluteFollow: FollowWayPointsWithPosition = _
 
     override def onFinished(task: FiniteTask): Unit = {
@@ -49,6 +52,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         turnPosition,
         maxTurnOutput,
         cruisingVelocity,
+        maxAcceleration,
+        maxDeceleration,
         angleDeadband,
         targetTicksWithingTolerance,
         forwardBackwardMode
@@ -73,6 +78,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
                                     turnPosition: Stream[Angle],
                                     maxTurnOutput: Dimensionless,
                                     cruisingVelocity: Velocity,
+                                    maxAcceleration: Acceleration,
+                                    maxDeceleration: Acceleration,
                                     angleDeadband: Angle = Degrees(0),
                                     targetTicksWithingTolerance: Int = 1,
                                     forwardBackwardMode: ForwardBackwardMode = Auto)
@@ -88,6 +95,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         turnPosition,
         maxTurnOutput,
         cruisingVelocity,
+        maxAcceleration,
+        maxDeceleration,
         forwardBackwardMode,
         angleDeadband
       )
