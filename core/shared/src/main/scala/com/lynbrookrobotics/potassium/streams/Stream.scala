@@ -5,11 +5,22 @@ import squants.Quantity
 import squants.time.{Time, TimeDerivative, TimeIntegral}
 
 import scala.collection.immutable.Queue
-import com.lynbrookrobotics.potassium.events.{ContinuousEvent, ImpulseEvent, ImpulseEventSource}
+import com.lynbrookrobotics.potassium.events.ContinuousEvent
 
 import scala.annotation.unchecked.uncheckedVariance
 
 abstract class Stream[+T] { self =>
+  private[potassium] var lastPublishTime = 0L
+
+  private[potassium] val parents: Seq[Stream[_]]
+
+  private[potassium] val streamCreationTrace: Throwable = try {
+    throw new Exception("Stream creation trace")
+    null
+  } catch {
+    case t: Throwable => t
+  }
+
   val expectedPeriodicity: ExpectedPeriodicity
 
   val originTimeStream: Option[Stream[Time]]
@@ -22,6 +33,7 @@ abstract class Stream[+T] { self =>
   def checkRelaunch(): Unit = {}
 
   protected def publishValue(value: T @uncheckedVariance): Unit = {
+    lastPublishTime = System.currentTimeMillis()
     listeners.foreach { l =>
       try {
         l.apply(value)
@@ -90,6 +102,8 @@ abstract class Stream[+T] { self =>
     */
   def map[O](f: T => O, allowRestart: Boolean = true): Stream[O] = {
     new Stream[O] {
+      override private[potassium] val parents = Seq(self)
+
       var unsubscribe: Cancel = null
 
       override def subscribeToParents(): Unit = {
@@ -200,6 +214,8 @@ abstract class Stream[+T] { self =>
     */
   def sliding(size: Int): Stream[Queue[T]] = {
     new Stream[Queue[T]] {
+      override private[potassium] val parents = Seq(self)
+
       var unsubscribe: Cancel = null
       var last = Queue.empty[T]
 
@@ -369,6 +385,8 @@ abstract class Stream[+T] { self =>
     */
   def filter(condition: T => Boolean): Stream[T] = {
     new Stream[T] {
+      override private[potassium] val parents = Seq(self)
+
       var unsubscribe: Cancel = null
 
       override def subscribeToParents(): Unit = {
@@ -408,12 +426,16 @@ abstract class Stream[+T] { self =>
 object Stream {
   def periodic[T](period: Time)(value: => T)(implicit clock: Clock): Stream[T] = {
     new Stream[T] { self =>
+      override private[potassium] val parents = Seq.empty
+
       override def subscribeToParents(): Unit = {}
       override def unsubscribeFromParents(): Unit = {}
 
       override val expectedPeriodicity = Periodic(period, this)
 
       override val originTimeStream = Some(new Stream[Time] {
+        override private[potassium] val parents = Seq()
+
         override def subscribeToParents(): Unit = {}
         override def unsubscribeFromParents(): Unit = {}
 
@@ -438,6 +460,8 @@ object Stream {
 
   def manual[T](periodicity: ExpectedPeriodicity): (Stream[T], T => Unit) = {
     val stream = new Stream[T] {
+      override private[potassium] val parents = Seq.empty
+
       override def subscribeToParents(): Unit = {}
       override def unsubscribeFromParents(): Unit = {}
 
@@ -455,12 +479,16 @@ object Stream {
 
   def manualWithTime[T](implicit clock: Clock): (Stream[T], T => Unit) = {
     val stream = new Stream[T] {
+      override private[potassium] val parents = Seq.empty
+
       override def subscribeToParents(): Unit = {}
       override def unsubscribeFromParents(): Unit = {}
 
       override val expectedPeriodicity: ExpectedPeriodicity = NonPeriodic
 
       override val originTimeStream = Some(new Stream[Time] {
+        override private[potassium] val parents = Seq.empty
+
         override def subscribeToParents(): Unit = {}
         override def unsubscribeFromParents(): Unit = {}
 
@@ -479,12 +507,16 @@ object Stream {
 
   def manualWithTime[T](period: Time)(implicit clock: Clock): (Stream[T], T => Unit) = {
     val stream = new Stream[T] { self =>
+      override private[potassium] val parents = Seq.empty
+
       override def subscribeToParents(): Unit = {}
       override def unsubscribeFromParents(): Unit = {}
 
       override val expectedPeriodicity: ExpectedPeriodicity = Periodic(period, this)
 
       override val originTimeStream = Some(new Stream[Time] {
+        override private[potassium] val parents = Seq.empty
+
         override def subscribeToParents(): Unit = {}
         override def unsubscribeFromParents(): Unit = {}
 
@@ -499,5 +531,20 @@ object Stream {
     }
 
     (stream, stream.publishValue)
+  }
+
+  def traceNoDataSince(timestamp: Long, stream: Stream[_]): Unit = {
+    def recurse(currentStream: Stream[_]): Option[Stream[_]] = {
+      if (currentStream.lastPublishTime >= timestamp) {
+        None // we got data more recently so this isn't the source of lost data
+      } else if (currentStream.parents.nonEmpty) {
+        Some(currentStream)
+      } else {
+        // if our parents also have lost data we pick the first parent, otherwise it's us
+        currentStream.parents.flatMap(recurse).headOption.orElse(Some(currentStream))
+      }
+    }
+
+    recurse()
   }
 }
