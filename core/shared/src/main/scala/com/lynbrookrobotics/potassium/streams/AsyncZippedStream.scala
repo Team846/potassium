@@ -3,6 +3,8 @@ package com.lynbrookrobotics.potassium.streams
 import com.lynbrookrobotics.potassium.clock.Clock
 
 class AsyncZippedStream[A, B](parentA: Stream[A], parentB: Stream[B]) extends Stream[(A, B)] {
+  override private[potassium] val parents = Seq(parentA, parentB)
+
   private[this] var parentAUnsubscribe: Cancel = null
   private[this] var parentBUnsubscribe: Cancel = null
 

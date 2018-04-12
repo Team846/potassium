@@ -72,7 +72,7 @@ abstract class Lift {
       override def onStart(): Unit = {
         val (error, control) = positionControl(target)
 
-        lift.setController(control.withCheckZipped(error.drop(1)) { error =>
+        lift.setController(control.withCheckZipped(error) { error =>
           if (error.abs < tolerance) { //check whether lift is close enough to target. If so, run inner.
             readyToRunInner()
           }
