@@ -35,51 +35,6 @@ class TaskTest extends FunSuite with BeforeAndAfter {
     assert(started && aborted)
   }
 
-  test("Single task execute, replace, then abort") {
-    var firstStarted = false
-    var firstAborted = false
-    var secondStarted = false
-    var secondAborted = false
-
-    val first = new Task {
-      override def init(): Unit = {
-        firstStarted = true
-      }
-
-      override def abort(): Unit = {
-        firstAborted = true
-      }
-
-      override val dependencies: Set[Component[_]] = Set()
-    }
-
-    val second = new Task {
-      override def init(): Unit = {
-        secondStarted = true
-      }
-
-      override def abort(): Unit = {
-        secondAborted = true
-      }
-
-      override val dependencies: Set[Component[_]] = Set()
-    }
-
-    assert(!firstStarted && !firstAborted && !secondStarted && !secondAborted)
-
-    Task.executeTask(first)
-
-    assert(firstStarted && !firstAborted && !secondStarted && !secondAborted)
-
-    Task.executeTask(second)
-
-    assert(firstStarted && firstAborted && secondStarted && !secondAborted)
-
-    Task.abortCurrentTasks()
-
-    assert(firstStarted && firstAborted && secondStarted && secondAborted)
-  }
-
   test("FiniteTask.empty immediately finishes"){
     val task = FiniteTask.empty
 

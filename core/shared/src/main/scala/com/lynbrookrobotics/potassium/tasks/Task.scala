@@ -20,7 +20,7 @@ object Task {
     */
   def executeTask(newTask: Task): Unit = {
     currentTasks
-      .filter(running => (running.dependencies intersect newTask.dependencies).isEmpty)
+      .filter(running => (running.dependencies intersect newTask.dependencies).nonEmpty)
       .foreach(_.abort())
 
     currentTasks += newTask
