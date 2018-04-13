@@ -1,6 +1,6 @@
 resolvers += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
 
-addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.0")
+addSbtPlugin("io.get-coursier" % "sbt-coursier" % "1.0.1")
 
 addSbtPlugin("org.scoverage" % "sbt-scoverage" % "1.5.1")
 
@@ -23,3 +23,5 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.9.3")
 addSbtPlugin("com.47deg"  % "sbt-microsites" % "0.7.15")
 
 addSbtPlugin("com.eed3si9n" % "sbt-unidoc" % "0.4.1")
+
+addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.5.10")
