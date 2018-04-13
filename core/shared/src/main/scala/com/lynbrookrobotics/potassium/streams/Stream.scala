@@ -99,35 +99,11 @@ abstract class Stream[+T] { self =>
     * @tparam O the type of values in the new stream
     * @return a stream with values transformed by the given function
     */
-  def map[O](f: T => O, allowRestart: Boolean = true): Stream[O] = {
-    new Stream[O] {
-      override private[potassium] val parents = Seq(self)
-      override private[potassium] val streamType = "map"
-
-      var unsubscribe: Cancel = null
-
-      override def tryFix() = {
-        val newSub = self.foreach(v => this.publishValue(f(v)))
-        unsubscribe.cancel()
-        unsubscribe = newSub
+  def map[O](f: T => O): Stream[O] = {
+    new MappedStream[T, O](this) {
+      override def applyTransform(in: T): O = {
+        f(in)
       }
-
-      override def subscribeToParents(): Unit = {
-        unsubscribe = self.foreach(v => this.publishValue(f(v)))
-      }
-
-      override def unsubscribeFromParents(): Unit = {
-        unsubscribe.cancel(); unsubscribe = null
-      }
-
-      override def checkRelaunch(): Unit = {
-        if (!allowRestart) {
-          throw new IllegalStateException("This mapped stream has been marked as non-relaunchable. You may want to use .preserve to prevent stream shutdown.")
-        }
-      }
-
-      override val expectedPeriodicity = self.expectedPeriodicity
-      override val originTimeStream = self.originTimeStream
     }
   }
 
@@ -143,14 +119,21 @@ abstract class Stream[+T] { self =>
     * @return a new stream with values relativized against the next value from this stream
     */
   def relativize[O](f: (T, T) => O): Stream[O] = {
-    var firstValue: Option[T] = None
-    map({ v =>
-      if (firstValue.isEmpty) {
-        firstValue = Some(v)
+    new MappedStream[T, O](this) {
+      var firstValue: Option[T] = None
+
+      override def applyTransform(in: T): O = {
+        if (firstValue.isEmpty) {
+          firstValue = Some(in)
+        }
+
+        f(firstValue.get, in)
       }
 
-      f(firstValue.get, v)
-    }, allowRestart = false)
+      override def checkRelaunch(): Unit = {
+        throw new IllegalStateException("Relativized streams cannot be relaunched")
+      }
+    }
   }
 
   /**
@@ -264,12 +247,18 @@ abstract class Stream[+T] { self =>
     * @return a stream accumulating according to the given function
     */
   def scanLeft[U](initialValue: U)(f: (U, T) => U): Stream[U] = {
-    var latest = initialValue
+    new MappedStream[T, U](this) {
+      var latest = initialValue
 
-    map({ v =>
-      latest = f(latest, v)
-      latest
-    }, allowRestart = false)
+      override def applyTransform(in: T): U = {
+        latest = f(latest, in)
+        latest
+      }
+
+      override def checkRelaunch(): Unit = {
+        throw new IllegalStateException("Scanleft streams cannot be relaunched")
+      }
+    }
   }
 
   /**
