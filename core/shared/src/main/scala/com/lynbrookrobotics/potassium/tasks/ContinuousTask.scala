@@ -8,6 +8,8 @@ import squants.Time
   * Represents a task that can only be stopped by an external impulse.
   */
 abstract class ContinuousTask extends Task {
+  private var running = false
+  def isRunning: Boolean = running
   protected def onStart(): Unit
   protected def onEnd(): Unit
 
@@ -23,12 +25,22 @@ abstract class ContinuousTask extends Task {
   /**
     * Starts the continuous task.
     */
-  override def init(): Unit = onStart()
+  override def init(): Unit = {
+    if (!running) {
+      running = true
+      onStart()
+    }
+  }
 
   /**
     * Stops the continuous task.
     */
-  override def abort(): Unit = onEnd()
+  override def abort(): Unit = {
+    if (running) {
+      onEnd()
+      running = false
+    }
+  }
 
   /**
     * Returns a FiniteTask of this ContinuousTask running for the given duration
