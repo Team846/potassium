@@ -4,6 +4,7 @@ import squants.time.Time
 
 class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B], skipTimestampCheck: Boolean) extends Stream[(A, B)] {
   override private[potassium] val parents = Seq(parentA, parentB)
+  override private[potassium] val streamType = "zip"
 
   private[this] var parentAUnsubscribe: Cancel = null
   private[this] var parentBUnsubscribe: Cancel = null
