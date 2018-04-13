@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium
 
-import com.lynbrookrobotics.potassium.tasks.{FiniteTask, Task}
+import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask, Task}
 import org.scalatest.{BeforeAndAfter, FunSuite}
 import squants.radio.Irradiance
 import squants.thermal.ThermalCapacity
@@ -35,18 +35,24 @@ class TaskDepsTest extends FunSuite with BeforeAndAfter {
 
   test("Tasks with overlapping dependencies abort each other") {
 
-    def genTask(a: Int*) = new FiniteTask {
+    def genTaskF(a: Int*) = new FiniteTask {
       override def onStart() = Unit
       override def onEnd() = Unit
       override val dependencies: Set[Component[_]] = a.map(dummyComps(_)).toSet
     }
 
-    val a = genTask(0)
+    def genTaskC(a: Int*) = new ContinuousTask {
+      override def onStart() = Unit
+      override def onEnd() = Unit
+      override val dependencies: Set[Component[_]] = a.map(dummyComps(_)).toSet
+    }
+
+    val a = genTaskF(0)
     assert(!a.isRunning)
     Task.executeTask(a)
     assert(a.isRunning)
 
-    val b = genTask(0)
+    val b = genTaskC(0)
     assert(a.isRunning)
     assert(!b.isRunning)
     Task.executeTask(b)
@@ -57,12 +63,12 @@ class TaskDepsTest extends FunSuite with BeforeAndAfter {
     assert(!a.isRunning)
     assert(!b.isRunning)
 
-    val c = genTask(0, 1)
+    val c = genTaskC(0, 1)
     assert(!c.isRunning)
     Task.executeTask(c)
     assert(c.isRunning)
 
-    val d = genTask(0, 2)
+    val d = genTaskF(0, 2)
     assert(c.isRunning)
     assert(!d.isRunning)
     Task.executeTask(d)
@@ -73,10 +79,10 @@ class TaskDepsTest extends FunSuite with BeforeAndAfter {
     assert(!c.isRunning)
     assert(!d.isRunning)
 
-    val e = genTask(0)
-    val f = genTask(1)
-    val g = genTask(2)
-    val h = genTask(3)
+    val e = genTaskF(0)
+    val f = genTaskC(1)
+    val g = genTaskC(2)
+    val h = genTaskF(3)
 
     assert(!e.isRunning)
     assert(!f.isRunning)
@@ -102,7 +108,7 @@ class TaskDepsTest extends FunSuite with BeforeAndAfter {
     assert(f.isRunning)
     assert(g.isRunning)
     assert(!h.isRunning)
-    Task.abortTask(g)
+    Task.abortTaskUsing(dummyComps(2))
     assert(!e.isRunning)
     assert(f.isRunning)
     assert(!g.isRunning)
