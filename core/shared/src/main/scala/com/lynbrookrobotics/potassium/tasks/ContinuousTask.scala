@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.tasks
 
+import com.lynbrookrobotics.potassium.Component
 import com.lynbrookrobotics.potassium.clock.Clock
 import squants.Time
 
@@ -44,5 +45,7 @@ object ContinuousTask {
     override protected def onStart(): Unit = {}
 
     override protected def onEnd(): Unit = {}
+
+    override val dependencies: Set[Component[_]] = Set()
   }
 }

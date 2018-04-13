@@ -1,4 +1,5 @@
 package com.lynbrookrobotics.potassium.tasks
+import com.lynbrookrobotics.potassium.Component
 
 /**
   * A continuous task where two subtasks are run in parallel
@@ -16,4 +17,6 @@ class ParallelContinuousTask private[tasks](first: ContinuousTask, second: Conti
     first.abort()
     second.abort()
   }
+
+  override val dependencies: Set[Component[_]] = first.dependencies ++ second.dependencies
 }

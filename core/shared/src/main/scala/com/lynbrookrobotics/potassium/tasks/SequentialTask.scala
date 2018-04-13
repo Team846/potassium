@@ -1,4 +1,5 @@
 package com.lynbrookrobotics.potassium.tasks
+import com.lynbrookrobotics.potassium.Component
 
 sealed trait SequentialPhase
 case object Stopped extends SequentialPhase
@@ -41,4 +42,6 @@ class SequentialTask private[tasks] (first: FiniteTask, second: FiniteTask)
 
     currentPhase = Stopped
   }
+
+  override val dependencies: Set[Component[_]] = first.dependencies ++ second.dependencies
 }

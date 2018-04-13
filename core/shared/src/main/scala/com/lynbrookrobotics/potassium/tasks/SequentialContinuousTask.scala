@@ -1,4 +1,5 @@
 package com.lynbrookrobotics.potassium.tasks
+import com.lynbrookrobotics.potassium.Component
 
 /**
   * A continuous task where two subtasks are run sequentially
@@ -31,4 +32,6 @@ class SequentialContinuousTask private[tasks] (first: FiniteTask, second: Contin
 
     currentPhase = Stopped
   }
+
+  override val dependencies: Set[Component[_]] = first.dependencies ++ second.dependencies
 }
