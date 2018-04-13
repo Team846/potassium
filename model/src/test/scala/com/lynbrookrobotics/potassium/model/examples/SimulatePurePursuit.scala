@@ -8,6 +8,7 @@ import com.lynbrookrobotics.potassium.commons.drivetrain.{ForwardPositionGains, 
 import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit.{Auto, BackwardsOnly, ForwardBackwardMode, MathUtilities}
 import com.lynbrookrobotics.potassium.commons.drivetrain.twoSided.TwoSidedDriveProperties
 import com.lynbrookrobotics.potassium.control.PIDConfig
+import com.lynbrookrobotics.potassium.model.examples.SimulateDrivetrain.props
 import com.lynbrookrobotics.potassium.model.simulations.{SimulatedTwoSidedHardware, TwoSidedDriveContainerSimulator}
 import com.lynbrookrobotics.potassium.units.GenericValue._
 import com.lynbrookrobotics.potassium.units.{Point, _}
@@ -81,7 +82,9 @@ class SimulatePurePursuit extends FunSuite {
       Percent(30),
       FeetPerSecond(10),
       targetTicksWithingTolerance = 20,
-      forwardBackwardMode = forwardBackwardMode
+      forwardBackwardMode = forwardBackwardMode,
+      maxAcceleration = props.get.maxAcceleration,
+      maxDeceleration = props.get.maxDeceleration
     )(drivetrain)
 
     task.init()
