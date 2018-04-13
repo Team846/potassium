@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.frc
 
+import com.lynbrookrobotics.potassium.Component
 import com.lynbrookrobotics.potassium.tasks.ContinuousTask
 import edu.wpi.first.wpilibj.Joystick
 
@@ -14,4 +15,5 @@ class SetOutput(joystick: Joystick, port: Int, power: Boolean) extends Continuou
   override def onEnd(): Unit = {
     joystick.setOutput(port, false)
   }
+  override val dependencies: Set[Component[_]] = Set()
 }

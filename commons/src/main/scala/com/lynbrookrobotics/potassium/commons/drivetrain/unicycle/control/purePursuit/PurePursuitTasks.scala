@@ -1,6 +1,6 @@
 package com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.purePursuit
 
-import com.lynbrookrobotics.potassium.Signal
+import com.lynbrookrobotics.potassium.{Component, Signal}
 import com.lynbrookrobotics.potassium.commons.cartesianPosition.XYPosition
 import com.lynbrookrobotics.potassium.commons.drivetrain.unicycle.control.UnicycleCoreTasks
 import com.lynbrookrobotics.potassium.streams.Stream
@@ -65,6 +65,8 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
 
       absoluteFollow = null
     }
+
+    override val dependencies: Set[Component[_]] = Set(drive)
   }
 
   class FollowWayPointsWithPosition(wayPoints: Seq[Point],
@@ -108,5 +110,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
     override def onEnd(): Unit = {
       drive.resetToDefault()
     }
+
+    override val dependencies: Set[Component[_]] = Set(drive)
   }
 }

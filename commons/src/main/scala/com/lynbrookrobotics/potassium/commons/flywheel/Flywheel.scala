@@ -56,6 +56,8 @@ abstract class Flywheel {
       override def onEnd(): Unit = {
         flywheel.resetToDefault()
       }
+
+      override val dependencies: Set[Component[_]] = Set(flywheel)
     }
   }
 
