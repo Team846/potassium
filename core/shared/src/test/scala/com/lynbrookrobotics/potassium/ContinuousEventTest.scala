@@ -65,6 +65,8 @@ class ContinuousEventTest extends FunSuite {
       override def onEnd(): Unit = {
         taskEnded = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     })
 
     assert(!taskStarted && !taskEnded)

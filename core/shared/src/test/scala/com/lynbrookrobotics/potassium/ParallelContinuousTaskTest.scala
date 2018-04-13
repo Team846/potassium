@@ -5,7 +5,7 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 
 class ParallelContinuousTaskTest extends FunSuite with BeforeAndAfter {
   after {
-    Task.abortCurrentTask()
+    Task.abortCurrentTasks()
   }
 
   test("Parallel continuous task goes through correct flow") {
@@ -23,6 +23,8 @@ class ParallelContinuousTaskTest extends FunSuite with BeforeAndAfter {
       override def onEnd(): Unit = {
         task1Ended = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     val task2 = new ContinuousTask {
@@ -33,6 +35,8 @@ class ParallelContinuousTaskTest extends FunSuite with BeforeAndAfter {
       override def onEnd(): Unit = {
         task2Ended = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     val parallel = task1 and task2

@@ -67,6 +67,8 @@ class OffloadedLiftTaskTest extends FunSuite {
       }
 
       override protected def onEnd() = Unit
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     val task = new lift.positionTasks.WhileAbovePosition(
@@ -145,6 +147,8 @@ class OffloadedLiftTaskTest extends FunSuite {
       }
 
       override protected def onEnd() = Unit
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     val task = new lift.positionTasks.WhileBelowPosition(

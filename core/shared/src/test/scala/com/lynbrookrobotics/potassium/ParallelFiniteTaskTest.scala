@@ -5,7 +5,7 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 
 class ParallelFiniteTaskTest extends FunSuite with BeforeAndAfter {
   after {
-    Task.abortCurrentTask()
+    Task.abortCurrentTasks()
   }
 
   test("Parallel task goes through correct flow") {
@@ -27,6 +27,8 @@ class ParallelFiniteTaskTest extends FunSuite with BeforeAndAfter {
         task1Ended = true
       }
 
+      override val dependencies: Set[Component[_]] = Set()
+
       task1FinishTrigger = Some(() => finished())
     }
 
@@ -38,6 +40,8 @@ class ParallelFiniteTaskTest extends FunSuite with BeforeAndAfter {
       override def onEnd(): Unit = {
         task2Ended = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
 
       task2FinishTrigger = Some(() => finished())
     }
@@ -75,6 +79,8 @@ class ParallelFiniteTaskTest extends FunSuite with BeforeAndAfter {
       override def onEnd(): Unit = {
         task1Ended = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     val task2 = new FiniteTask {
@@ -85,6 +91,8 @@ class ParallelFiniteTaskTest extends FunSuite with BeforeAndAfter {
       override def onEnd(): Unit = {
         task2Ended = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     val parallel = task1 and task2

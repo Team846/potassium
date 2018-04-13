@@ -5,7 +5,7 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 
 class TaskTest extends FunSuite with BeforeAndAfter {
   after {
-    Task.abortCurrentTask()
+    Task.abortCurrentTasks()
   }
 
   test("Single task execute and abort") {
@@ -20,6 +20,8 @@ class TaskTest extends FunSuite with BeforeAndAfter {
       override def abort(): Unit = {
         aborted = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     assert(!started && !aborted)
@@ -47,6 +49,8 @@ class TaskTest extends FunSuite with BeforeAndAfter {
       override def abort(): Unit = {
         firstAborted = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     val second = new Task {
@@ -57,6 +61,8 @@ class TaskTest extends FunSuite with BeforeAndAfter {
       override def abort(): Unit = {
         secondAborted = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     assert(!firstStarted && !firstAborted && !secondStarted && !secondAborted)
@@ -69,7 +75,7 @@ class TaskTest extends FunSuite with BeforeAndAfter {
 
     assert(firstStarted && firstAborted && secondStarted && !secondAborted)
 
-    Task.abortCurrentTask()
+    Task.abortCurrentTasks()
 
     assert(firstStarted && firstAborted && secondStarted && secondAborted)
   }
