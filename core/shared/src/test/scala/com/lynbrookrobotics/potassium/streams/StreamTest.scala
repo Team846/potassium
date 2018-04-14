@@ -104,9 +104,9 @@ class StreamTest extends FunSuite {
 
   test("Sliding over a stream produces correct values") {
     val (str, pub) = Stream.manual[Int]
-    var lastValue: Seq[Int] = null
+    var lastValue: List[Int] = null
     val slid = str.sliding(2)
-    slid.foreach(lastValue = _)
+    slid.foreach(s => lastValue = s.toList)
 
     assert(lastValue == null)
 
@@ -116,11 +116,11 @@ class StreamTest extends FunSuite {
 
     pub(2)
 
-    assert(lastValue == Seq(1, 2))
+    assert(lastValue == List(1, 2))
 
     pub(3)
 
-    assert(lastValue == Seq(2, 3))
+    assert(lastValue == List(2, 3))
   }
 
   test("Derivative of constant values is always zero") {
