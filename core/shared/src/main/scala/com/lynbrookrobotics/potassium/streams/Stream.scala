@@ -8,6 +8,7 @@ import scala.collection.immutable.Queue
 import com.lynbrookrobotics.potassium.events.ContinuousEvent
 
 import scala.annotation.unchecked.uncheckedVariance
+import scala.collection.mutable
 
 abstract class Stream[+T] { self =>
   private[potassium] var lastPublishTime = 0L
@@ -37,6 +38,10 @@ abstract class Stream[+T] { self =>
       }
     }
     // TODO: more stuff maybe
+  }
+
+  def tryFix(): Unit = {
+    println(s"No fix available for stream of type $streamType")
   }
 
   /**
@@ -197,41 +202,8 @@ abstract class Stream[+T] { self =>
     * @param size the size of the window
     * @return a stream returning complete windows
     */
-  def sliding(size: Int): Stream[Queue[T]] = {
-    new Stream[Queue[T]] {
-      override private[potassium] val parents = Seq(self)
-      override private[potassium] val streamType = "sliding"
-
-      var unsubscribe: Cancel = null
-      var last = Queue.empty[T]
-
-      override def subscribeToParents(): Unit = {
-        unsubscribe = self.foreach { v =>
-          if (last.size == size) {
-            last = last.tail
-          }
-
-          last = last :+ v
-
-          if (last.size == size) {
-            this.publishValue(last)
-          }
-        }
-      }
-
-      override def unsubscribeFromParents(): Unit = {
-        unsubscribe.cancel(); unsubscribe = null
-      }
-
-      override def checkRelaunch(): Unit = {
-        throw new IllegalStateException("Sliding streams cannot be relaunched")
-      }
-
-      override val expectedPeriodicity = self.expectedPeriodicity
-      override val originTimeStream = self.originTimeStream.map { o =>
-        o.sliding(size).map(_.last)
-      }
-    }
+  def sliding(size: Int): Stream[Seq[T]] = {
+    new SlidingStream[T](this, size)
   }
 
   /**
@@ -537,8 +509,6 @@ object Stream {
     def recurse(currentStream: Stream[_]): Option[Stream[_]] = {
       if (currentStream.lastPublishTime != 0) {
         None // we got data so this isn't the source of lost data
-      } else if (currentStream.parents.nonEmpty) {
-        Some(currentStream)
       } else {
         // if our parents also have lost data we pick the first parent, otherwise it's us
         currentStream.parents.flatMap(recurse).headOption.orElse(Some(currentStream))
@@ -546,7 +516,8 @@ object Stream {
     }
 
     recurse(stream).map { str =>
-      println(s"------ DETECTED LOST DATA in stream of type $str -------")
+      println(s"------ DETECTED LOST DATA in stream of type ${str.streamType} -------")
+      str.tryFix()
       true
     }.getOrElse {
       println(s"------ COULD NOT TRACE LOST DATA TO A STREAM -------")

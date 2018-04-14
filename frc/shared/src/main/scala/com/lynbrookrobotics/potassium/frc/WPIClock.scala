@@ -1,36 +1,29 @@
 package com.lynbrookrobotics.potassium.frc
 
 import com.lynbrookrobotics.potassium.clock.Clock
-import edu.wpi.first.wpilibj.{Notifier, Utility}
+import edu.wpi.first.wpilibj.{Notifier, RobotController, Utility}
 import squants.Time
 import squants.time.{Microseconds, Seconds}
 
 private[frc] class WPIClockShared(stopOnException: Boolean) extends Clock {
-  override def apply(period: Time)(thunk: (Time) => Unit): Cancel = {
-    var lastTime: Option[Time] = None
-    var running = false
+  override def apply(period: Time)(thunk: Time => Unit): Cancel = {
+    var lastTime: Time = Microseconds(RobotController.getFPGATime)
 
     val notifier = new Notifier(new Runnable {
       override def run(): Unit = {
-        if (!running) {
-          running = true
-          val currentTime = Microseconds(Utility.getFPGATime)
-          lastTime.foreach { l =>
-            if (stopOnException) {
-              thunk(currentTime - l)
-            } else {
-              try {
-                thunk(currentTime - l)
-              } catch {
-                case e: Throwable =>
-                  e.printStackTrace()
-              }
-            }
+        val currentTime = Microseconds(RobotController.getFPGATime)
+        if (stopOnException) {
+          thunk(currentTime - lastTime)
+        } else {
+          try {
+            thunk(currentTime - lastTime)
+          } catch {
+            case e: Throwable =>
+              e.printStackTrace()
           }
-
-          lastTime = Some(currentTime)
-          running = false
         }
+
+        lastTime = currentTime
       }
     })
 
@@ -49,7 +42,7 @@ private[frc] class WPIClockShared(stopOnException: Boolean) extends Clock {
     () => notifier.stop()
   }
 
-  override def currentTime: Time = Microseconds(Utility.getFPGATime)
+  override def currentTime: Time = Microseconds(RobotController.getFPGATime)
 }
 
 object WPIClock extends WPIClockShared(stopOnException = false)

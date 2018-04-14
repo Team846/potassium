@@ -12,12 +12,6 @@ abstract class MappedStream[T, U](parent: Stream[T]) extends Stream[U] {
     publishValue(applyTransform(value))
   }
 
-  override def tryFix() = {
-    val newSub = parent.foreach(v => this.receiveValue(v))
-    unsubscribe.cancel()
-    unsubscribe = newSub
-  }
-
   override def subscribeToParents(): Unit = {
     unsubscribe = parent.foreach(v => this.receiveValue(v))
   }
