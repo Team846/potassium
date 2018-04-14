@@ -16,10 +16,6 @@ abstract class Stream[+T] { self =>
 
   private[potassium] val streamType: String
 
-  def tryFix() = {
-    println(s"Oh noes trying to fix an unfixable $streamType stream")
-  }
-
   val expectedPeriodicity: ExpectedPeriodicity
 
   val originTimeStream: Option[Stream[Time]]
@@ -537,7 +533,7 @@ object Stream {
     (stream, stream.publishValue)
   }
 
-  def traceBrokenStream(stream: Stream[_]): Unit = {
+  def traceBrokenStream(stream: Stream[_]): Boolean = {
     def recurse(currentStream: Stream[_]): Option[Stream[_]] = {
       if (currentStream.lastPublishTime != 0) {
         None // we got data so this isn't the source of lost data
@@ -550,10 +546,11 @@ object Stream {
     }
 
     recurse(stream).map { str =>
-      println(s"------ DETECTED LOST DATA -------")
-      str.tryFix()
+      println(s"------ DETECTED LOST DATA in stream of type $str -------")
+      true
     }.getOrElse {
       println(s"------ COULD NOT TRACE LOST DATA TO A STREAM -------")
+      false
     }
   }
 }
