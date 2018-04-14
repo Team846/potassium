@@ -5,7 +5,6 @@ import squants.motion.{FeetPerSecond, Velocity}
 import squants.space.{Feet, Length}
 import squants.time.{Milliseconds, Nanoseconds}
 
-import scala.collection.immutable.Queue
 import com.lynbrookrobotics.potassium.{ClockMocking, Platform}
 
 import scala.concurrent.duration.Duration
@@ -105,7 +104,7 @@ class StreamTest extends FunSuite {
 
   test("Sliding over a stream produces correct values") {
     val (str, pub) = Stream.manual[Int]
-    var lastValue: Queue[Int] = null
+    var lastValue: Seq[Int] = null
     val slid = str.sliding(2)
     slid.foreach(lastValue = _)
 
@@ -117,11 +116,11 @@ class StreamTest extends FunSuite {
 
     pub(2)
 
-    assert(lastValue == Queue(1, 2))
+    assert(lastValue == Seq(1, 2))
 
     pub(3)
 
-    assert(lastValue == Queue(2, 3))
+    assert(lastValue == Seq(2, 3))
   }
 
   test("Derivative of constant values is always zero") {
