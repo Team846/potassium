@@ -4,6 +4,7 @@ import squants.time.Time
 
 class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B], skipTimestampCheck: Boolean) extends Stream[(A, B)] {
   override private[potassium] val parents = Seq(parentA, parentB)
+  override private[potassium] val streamType = "zip"
 
   private[this] var parentAUnsubscribe: Cancel = null
   private[this] var parentBUnsubscribe: Cancel = null
@@ -48,10 +49,15 @@ class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B], skipTimestampCh
 
   private[this] var aSlot: Option[(A, Time)] = None
   private[this] var bSlot: Option[(B, Time)] = None
+  private[this] var ignoreBadTimestamp = false
+
+  override def tryFix(): Unit = {
+    ignoreBadTimestamp = true
+  }
 
   def attemptPublish(): Unit = {
     aSlot.zip(bSlot).foreach { case (a, b) =>
-      if (a._2 == b._2 || expectedPeriodicity == NonPeriodic) {
+      if (ignoreBadTimestamp || a._2 == b._2 || expectedPeriodicity == NonPeriodic) {
         publishValue((a._1, b._1))
         aSlot = None
         bSlot = None

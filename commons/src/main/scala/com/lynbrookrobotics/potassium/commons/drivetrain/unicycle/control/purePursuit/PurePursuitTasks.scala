@@ -92,7 +92,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         angleDeadband
       )
 
-      drive.setController(childVelocityControl(speedControl(unicycle.withCheckZipped(error) { e =>
+      drive.setController(childVelocityControl(speedControl(unicycle)).withCheckZipped(error) { e =>
         if (e.exists(_ < tolerance)) {
           ticksWithinTolerance += 1
 
@@ -102,7 +102,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
         } else {
           ticksWithinTolerance = 0
         }
-      })))
+      })
     }
 
     override def onEnd(): Unit = {

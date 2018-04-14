@@ -8,18 +8,14 @@ import scala.collection.immutable.Queue
 import com.lynbrookrobotics.potassium.events.ContinuousEvent
 
 import scala.annotation.unchecked.uncheckedVariance
+import scala.collection.mutable
 
 abstract class Stream[+T] { self =>
   private[potassium] var lastPublishTime = 0L
 
   private[potassium] val parents: Seq[Stream[_]]
 
-  private[potassium] val streamCreationTrace: Throwable = try {
-    throw new Exception("Stream creation trace")
-    null
-  } catch {
-    case t: Throwable => t
-  }
+  private[potassium] val streamType: String
 
   val expectedPeriodicity: ExpectedPeriodicity
 
@@ -42,6 +38,10 @@ abstract class Stream[+T] { self =>
       }
     }
     // TODO: more stuff maybe
+  }
+
+  def tryFix(): Unit = {
+    println(s"No fix available for stream of type $streamType")
   }
 
   /**
@@ -100,28 +100,11 @@ abstract class Stream[+T] { self =>
     * @tparam O the type of values in the new stream
     * @return a stream with values transformed by the given function
     */
-  def map[O](f: T => O, allowRestart: Boolean = true): Stream[O] = {
-    new Stream[O] {
-      override private[potassium] val parents = Seq(self)
-
-      var unsubscribe: Cancel = null
-
-      override def subscribeToParents(): Unit = {
-        unsubscribe = self.foreach(v => this.publishValue(f(v)))
+  def map[O](f: T => O): Stream[O] = {
+    new MappedStream[T, O](this) {
+      override def applyTransform(in: T): O = {
+        f(in)
       }
-
-      override def unsubscribeFromParents(): Unit = {
-        unsubscribe.cancel(); unsubscribe = null
-      }
-
-      override def checkRelaunch(): Unit = {
-        if (!allowRestart) {
-          throw new IllegalStateException("This mapped stream has been marked as non-relaunchable. You may want to use .preserve to prevent stream shutdown.")
-        }
-      }
-
-      override val expectedPeriodicity = self.expectedPeriodicity
-      override val originTimeStream = self.originTimeStream
     }
   }
 
@@ -137,14 +120,21 @@ abstract class Stream[+T] { self =>
     * @return a new stream with values relativized against the next value from this stream
     */
   def relativize[O](f: (T, T) => O): Stream[O] = {
-    var firstValue: Option[T] = None
-    map({ v =>
-      if (firstValue.isEmpty) {
-        firstValue = Some(v)
+    new MappedStream[T, O](this) {
+      var firstValue: Option[T] = None
+
+      override def applyTransform(in: T): O = {
+        if (firstValue.isEmpty) {
+          firstValue = Some(in)
+        }
+
+        f(firstValue.get, in)
       }
 
-      f(firstValue.get, v)
-    }, allowRestart = false)
+      override def checkRelaunch(): Unit = {
+        throw new IllegalStateException("Relativized streams cannot be relaunched")
+      }
+    }
   }
 
   /**
@@ -212,40 +202,8 @@ abstract class Stream[+T] { self =>
     * @param size the size of the window
     * @return a stream returning complete windows
     */
-  def sliding(size: Int): Stream[Queue[T]] = {
-    new Stream[Queue[T]] {
-      override private[potassium] val parents = Seq(self)
-
-      var unsubscribe: Cancel = null
-      var last = Queue.empty[T]
-
-      override def subscribeToParents(): Unit = {
-        unsubscribe = self.foreach { v =>
-          if (last.size == size) {
-            last = last.tail
-          }
-
-          last = last :+ v
-
-          if (last.size == size) {
-            this.publishValue(last)
-          }
-        }
-      }
-
-      override def unsubscribeFromParents(): Unit = {
-        unsubscribe.cancel(); unsubscribe = null
-      }
-
-      override def checkRelaunch(): Unit = {
-        throw new IllegalStateException("Sliding streams cannot be relaunched")
-      }
-
-      override val expectedPeriodicity = self.expectedPeriodicity
-      override val originTimeStream = self.originTimeStream.map { o =>
-        o.sliding(size).map(_.last)
-      }
-    }
+  def sliding(size: Int): Stream[Seq[T]] = {
+    new SlidingStream[T](this, size)
   }
 
   /**
@@ -257,12 +215,18 @@ abstract class Stream[+T] { self =>
     * @return a stream accumulating according to the given function
     */
   def scanLeft[U](initialValue: U)(f: (U, T) => U): Stream[U] = {
-    var latest = initialValue
+    new MappedStream[T, U](this) {
+      var latest = initialValue
 
-    map({ v =>
-      latest = f(latest, v)
-      latest
-    }, allowRestart = false)
+      override def applyTransform(in: T): U = {
+        latest = f(latest, in)
+        latest
+      }
+
+      override def checkRelaunch(): Unit = {
+        throw new IllegalStateException("Scanleft streams cannot be relaunched")
+      }
+    }
   }
 
   /**
@@ -386,6 +350,7 @@ abstract class Stream[+T] { self =>
   def filter(condition: T => Boolean): Stream[T] = {
     new Stream[T] {
       override private[potassium] val parents = Seq(self)
+      override private[potassium] val streamType = "filter"
 
       var unsubscribe: Cancel = null
 
@@ -427,6 +392,7 @@ object Stream {
   def periodic[T](period: Time)(value: => T)(implicit clock: Clock): Stream[T] = {
     new Stream[T] { self =>
       override private[potassium] val parents = Seq.empty
+      override private[potassium] val streamType = "periodic"
 
       override def subscribeToParents(): Unit = {}
       override def unsubscribeFromParents(): Unit = {}
@@ -435,6 +401,7 @@ object Stream {
 
       override val originTimeStream = Some(new Stream[Time] {
         override private[potassium] val parents = Seq()
+        override private[potassium] val streamType = "periodic"
 
         override def subscribeToParents(): Unit = {}
         override def unsubscribeFromParents(): Unit = {}
@@ -461,6 +428,7 @@ object Stream {
   def manual[T](periodicity: ExpectedPeriodicity): (Stream[T], T => Unit) = {
     val stream = new Stream[T] {
       override private[potassium] val parents = Seq.empty
+      override private[potassium] val streamType = "manual"
 
       override def subscribeToParents(): Unit = {}
       override def unsubscribeFromParents(): Unit = {}
@@ -480,6 +448,7 @@ object Stream {
   def manualWithTime[T](implicit clock: Clock): (Stream[T], T => Unit) = {
     val stream = new Stream[T] {
       override private[potassium] val parents = Seq.empty
+      override private[potassium] val streamType = "manual"
 
       override def subscribeToParents(): Unit = {}
       override def unsubscribeFromParents(): Unit = {}
@@ -488,6 +457,7 @@ object Stream {
 
       override val originTimeStream = Some(new Stream[Time] {
         override private[potassium] val parents = Seq.empty
+        override private[potassium] val streamType = "manual"
 
         override def subscribeToParents(): Unit = {}
         override def unsubscribeFromParents(): Unit = {}
@@ -508,6 +478,7 @@ object Stream {
   def manualWithTime[T](period: Time)(implicit clock: Clock): (Stream[T], T => Unit) = {
     val stream = new Stream[T] { self =>
       override private[potassium] val parents = Seq.empty
+      override private[potassium] val streamType = "manual"
 
       override def subscribeToParents(): Unit = {}
       override def unsubscribeFromParents(): Unit = {}
@@ -516,6 +487,7 @@ object Stream {
 
       override val originTimeStream = Some(new Stream[Time] {
         override private[potassium] val parents = Seq.empty
+        override private[potassium] val streamType = "manual"
 
         override def subscribeToParents(): Unit = {}
         override def unsubscribeFromParents(): Unit = {}
@@ -533,12 +505,10 @@ object Stream {
     (stream, stream.publishValue)
   }
 
-  def traceNoDataSince(timestamp: Long, stream: Stream[_]): Unit = {
+  def traceBrokenStream(stream: Stream[_]): Boolean = {
     def recurse(currentStream: Stream[_]): Option[Stream[_]] = {
-      if (currentStream.lastPublishTime >= timestamp) {
-        None // we got data more recently so this isn't the source of lost data
-      } else if (currentStream.parents.nonEmpty) {
-        Some(currentStream)
+      if (currentStream.lastPublishTime != 0) {
+        None // we got data so this isn't the source of lost data
       } else {
         // if our parents also have lost data we pick the first parent, otherwise it's us
         currentStream.parents.flatMap(recurse).headOption.orElse(Some(currentStream))
@@ -546,11 +516,12 @@ object Stream {
     }
 
     recurse(stream).map { str =>
-      println(s"------ DETECTED LOST DATA, last publish was ${str.lastPublishTime} but we were looking for data after ${timestamp} -------")
-      str.streamCreationTrace.printStackTrace()
-      println(s"------ DETECTED LOST DATA, last publish was ${str.lastPublishTime} but we were looking for data after ${timestamp} -------")
+      println(s"------ DETECTED LOST DATA in stream of type ${str.streamType} -------")
+      str.tryFix()
+      true
     }.getOrElse {
       println(s"------ COULD NOT TRACE LOST DATA TO A STREAM -------")
+      false
     }
   }
 }
