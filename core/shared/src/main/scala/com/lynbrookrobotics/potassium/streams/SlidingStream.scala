@@ -7,12 +7,15 @@ class SlidingStream[T](parent: Stream[T], size: Int) extends Stream[Seq[T]] {
   override private[potassium] val streamType = "sliding"
 
   private var unsubscribe: Cancel = null
-  private val currentData = mutable.Queue.empty[T]
+  private var currentData = mutable.Queue.empty[T]
   private var valuesLeft = size // start from 1
 
   override def tryFix(): Unit = {
-    currentData.clear()
+    currentData = mutable.Queue.empty[T]
     valuesLeft = size
+    val origUnsubscribe = unsubscribe
+    subscribeToParents()
+    origUnsubscribe.cancel()
   }
 
   override def subscribeToParents(): Unit = {
