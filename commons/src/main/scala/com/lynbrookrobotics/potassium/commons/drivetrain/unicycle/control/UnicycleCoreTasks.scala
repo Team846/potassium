@@ -372,11 +372,11 @@ trait UnicycleCoreTasks {
                                  props: Signal[DrivetrainProperties],
                                  clock: Clock) extends FiniteTask {
 
-    val positionSlide: Stream[Queue[(Angle, Time)]] = hardware.turnPosition.zipWithTime.sliding(20)
+    val positionSlide: Stream[Seq[(Angle, Time)]] = hardware.turnPosition.zipWithTime.sliding(20)
 
     private def calculateTargetFromOffsetWithLatency[T <: Quantity[T]]
     (timestampedOffset: Stream[(T, Time)],
-     positionSlide: Stream[Queue[(T, Time)]]) = {
+     positionSlide: Stream[Seq[(T, Time)]]) = {
       positionSlide.zip(timestampedOffset).map { t =>
         val (positionHistory, (offset, offsetTime)) = t
         val closestTimeSoFar = positionHistory.minBy{ case (position, positionTime) =>
