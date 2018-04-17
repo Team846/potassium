@@ -195,6 +195,8 @@ trait PurePursuitControllers extends UnicycleCoreControllers with UnicycleMotion
                                 turnPosition: Stream[Angle],
                                 maxTurnOutput: Dimensionless,
                                 cruisingVelocity: Velocity,
+                                maxAcceleration: Acceleration,
+                                maxDeceleration: Acceleration,
                                 forwardBackwardMode: ForwardBackwardMode,
                                 angleDeadband: Angle = Degrees(0))
                                 (implicit hardware: DrivetrainHardware,
