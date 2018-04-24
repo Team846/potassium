@@ -23,15 +23,14 @@ object Implicits {
     def z: Dimensionless = Each(joystick.getZ())
 
     /**
-      *
-      * @param buttonId the id of the button to check
-      * @param updateSource update the status of the button event with each update
-      *                     of the updateSource stream
-      * @return a ContinuousEvent true whenever a button is pressed at the
-      *         buttonId of this joystick
-      */
-    def buttonPressedEvent(buttonId: Int,
-                           updateSource: Stream[Unit]): ContinuousEvent = {
+     *
+     * @param buttonId the id of the button to check
+     * @param updateSource update the status of the button event with each update
+     *                     of the updateSource stream
+     * @return a ContinuousEvent true whenever a button is pressed at the
+     *         buttonId of this joystick
+     */
+    def buttonPressedEvent(buttonId: Int, updateSource: Stream[Unit]): ContinuousEvent = {
       updateSource.map(_ => joystick.getRawButton(buttonId)).eventWhen(down => down)
     }
   }

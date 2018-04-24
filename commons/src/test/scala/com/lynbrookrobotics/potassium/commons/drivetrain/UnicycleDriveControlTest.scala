@@ -21,7 +21,6 @@ class UnicycleDriveControlTest extends FunSuite {
 
   implicit val hardware: UnicycleHardware = new UnicycleHardware {
 
-
     override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))(clock)
     override val turnVelocity: Stream[AngularVelocity] = Stream.periodic(period)(DegreesPerSecond(0))(clock)
 
@@ -38,12 +37,12 @@ class UnicycleDriveControlTest extends FunSuite {
 
     override protected def unicycleToOpenLoopSignal(uni: UnicycleSignal): DriveSignal = uni
 
-    override protected def controlMode(implicit hardware: Hardware,
-                                       props: Properties): UnicycleControlMode = NoOperation
+    override protected def controlMode(implicit hardware: Hardware, props: Properties): UnicycleControlMode =
+      NoOperation
 
-    override protected def driveClosedLoop(signal: Stream[UnicycleSignal])
-                                          (implicit hardware: UnicycleHardware,
-                                           props: Signal[UnicycleProperties]): Stream[UnicycleSignal] = signal
+    override protected def driveClosedLoop(
+      signal: Stream[UnicycleSignal]
+    )(implicit hardware: UnicycleHardware, props: Signal[UnicycleProperties]): Stream[UnicycleSignal] = signal
 
     override protected def openLoopToDriveSignal(openLoop: UnicycleSignal): UnicycleSignal = openLoop
 
@@ -99,7 +98,7 @@ class UnicycleDriveControlTest extends FunSuite {
       trigggerClock.apply(period)
 
       (math.abs(forwardOut.toEach - (fwd.toMetersPerSecond / 10)) <= 0.01) &&
-        (math.abs(turnOut.toEach - (turn.toDegreesPerSecond / 10)) <= 0.01)
+      (math.abs(turnOut.toEach - (turn.toDegreesPerSecond / 10)) <= 0.01)
     })
   }
 
@@ -133,8 +132,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val turnPosition: Stream[Angle] = null
     }
 
-    val out = drive.UnicycleControllers.
-      forwardPositionControl(Meters(5))(hardware, props)._1
+    val out = drive.UnicycleControllers.forwardPositionControl(Meters(5))(hardware, props)._1
 
     var forwardOut = Percent(-10)
     var turnOut = Percent(-10)
@@ -179,8 +177,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val turnPosition: Stream[Angle] = null
     }
 
-    val out = drive.UnicycleControllers.
-      forwardPositionControl(Meters(5))(hardware, props)._1
+    val out = drive.UnicycleControllers.forwardPositionControl(Meters(5))(hardware, props)._1
 
     var forwardOut = Percent(-10)
     var turnOut = Percent(-10)
@@ -225,8 +222,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val turnPosition: Stream[Angle] = null
     }
 
-    val out = drive.UnicycleControllers.
-      forwardPositionControl(Meters(-5))(hardware, props)._1
+    val out = drive.UnicycleControllers.forwardPositionControl(Meters(-5))(hardware, props)._1
 
     var forwardOut = Percent(-10)
     var turnOut = Percent(-10)
@@ -271,8 +267,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(5))
     }
 
-    val out = drive.UnicycleControllers.
-      turnPositionControl(Degrees(5))(hardware, props)._1
+    val out = drive.UnicycleControllers.turnPositionControl(Degrees(5))(hardware, props)._1
 
     var forwardOut = Percent(-10)
     var turnOut = Percent(-10)
@@ -317,8 +312,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(0))
     }
 
-    val out = drive.UnicycleControllers.
-      turnPositionControl(Degrees(5))(hardware, props)._1
+    val out = drive.UnicycleControllers.turnPositionControl(Degrees(5))(hardware, props)._1
 
     var forwardOut = Percent(-10)
     var turnOut = Percent(-10)
@@ -363,8 +357,7 @@ class UnicycleDriveControlTest extends FunSuite {
       override val turnPosition: Stream[Angle] = Stream.periodic(period)(Degrees(0))
     }
 
-    val out = drive.UnicycleControllers.
-      turnPositionControl(Degrees(-5))(hardware, props)._1
+    val out = drive.UnicycleControllers.turnPositionControl(Degrees(-5))(hardware, props)._1
 
     var forwardOut = Percent(-10)
     var turnOut = Percent(-10)

@@ -1,12 +1,13 @@
 package com.lynbrookrobotics.potassium.tasks
 
 /**
-  * A continuous task where two subtasks are run sequentially
-  * @param first the first task to run
-  * @param second the task to run after the first task
-  */
+ * A continuous task where two subtasks are run sequentially
+ * @param first the first task to run
+ * @param second the task to run after the first task
+ */
 class SequentialContinuousTask private[tasks] (first: FiniteTask, second: ContinuousTask)
-  extends ContinuousTask with FiniteTaskFinishedListener {
+    extends ContinuousTask
+    with FiniteTaskFinishedListener {
   private var currentPhase: SequentialPhase = Stopped
 
   override def onFinished(task: FiniteTask): Unit = {

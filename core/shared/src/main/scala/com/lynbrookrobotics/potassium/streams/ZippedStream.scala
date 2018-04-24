@@ -11,7 +11,7 @@ class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B], skipTimestampCh
 
   override def subscribeToParents(): Unit = {
     if (skipTimestampCheck || expectedPeriodicity == NonPeriodic
-      || parentA.originTimeStream.isEmpty || parentB.originTimeStream.isEmpty) {
+        || parentA.originTimeStream.isEmpty || parentB.originTimeStream.isEmpty) {
       parentAUnsubscribe = parentA.foreach(t => this.receiveA(t, null))
       parentBUnsubscribe = parentB.foreach(t => this.receiveB(t, null))
     } else {
@@ -25,16 +25,17 @@ class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B], skipTimestampCh
     parentBUnsubscribe.cancel(); parentBUnsubscribe = null
   }
 
-  override val expectedPeriodicity: ExpectedPeriodicity = (parentA.expectedPeriodicity, parentB.expectedPeriodicity) match {
-    case (Periodic(a, s1), Periodic(b, s2)) =>
-      if (a == b && s1 == s2) {
-        Periodic(a, s1)
-      } else {
-        NonPeriodic
-      }
+  override val expectedPeriodicity: ExpectedPeriodicity =
+    (parentA.expectedPeriodicity, parentB.expectedPeriodicity) match {
+      case (Periodic(a, s1), Periodic(b, s2)) =>
+        if (a == b && s1 == s2) {
+          Periodic(a, s1)
+        } else {
+          NonPeriodic
+        }
 
-    case _ => NonPeriodic
-  }
+      case _ => NonPeriodic
+    }
 
   override val originTimeStream = (parentA.expectedPeriodicity, parentB.expectedPeriodicity) match {
     case (Periodic(a, s1), Periodic(b, s2)) =>
@@ -56,12 +57,13 @@ class ZippedStream[A, B](parentA: Stream[A], parentB: Stream[B], skipTimestampCh
   }
 
   def attemptPublish(): Unit = {
-    aSlot.zip(bSlot).foreach { case (a, b) =>
-      if (ignoreBadTimestamp || a._2 == b._2 || expectedPeriodicity == NonPeriodic) {
-        publishValue((a._1, b._1))
-        aSlot = None
-        bSlot = None
-      }
+    aSlot.zip(bSlot).foreach {
+      case (a, b) =>
+        if (ignoreBadTimestamp || a._2 == b._2 || expectedPeriodicity == NonPeriodic) {
+          publishValue((a._1, b._1))
+          aSlot = None
+          bSlot = None
+        }
     }
   }
 

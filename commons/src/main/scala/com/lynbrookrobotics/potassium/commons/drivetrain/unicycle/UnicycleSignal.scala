@@ -20,8 +20,6 @@ case class UnicycleSignal(forward: Dimensionless, turn: Dimensionless) {
 case class UnicycleVelocity(forward: Velocity, turn: AngularVelocity) {
   def toUnicycleSignal(implicit p: Signal[UnicycleProperties]): UnicycleSignal = {
     val curProps = p.get
-    UnicycleSignal(
-      Each(forward / curProps.maxForwardVelocity),
-      Each(turn / curProps.maxTurnVelocity))
+    UnicycleSignal(Each(forward / curProps.maxForwardVelocity), Each(turn / curProps.maxTurnVelocity))
   }
 }

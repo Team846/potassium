@@ -56,9 +56,10 @@ trait AsyncLogger {
     toLog.+=(new InfoLog(msg))
   }
 
-  clock.apply(gapBetweenFlush)( _ =>
-    while (toLog.nonEmpty) {
-      toLog.dequeue().log()
+  clock.apply(gapBetweenFlush)(
+    _ =>
+      while (toLog.nonEmpty) {
+        toLog.dequeue().log()
     }
   )
 }

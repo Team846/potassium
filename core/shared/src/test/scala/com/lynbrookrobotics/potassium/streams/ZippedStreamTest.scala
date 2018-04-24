@@ -10,8 +10,9 @@ class ZippedStreamTest extends FunSuite {
 
     var lastValue = -1
 
-    zipped.foreach { case (aVal, bVal) =>
-      lastValue = aVal * bVal
+    zipped.foreach {
+      case (aVal, bVal) =>
+        lastValue = aVal * bVal
     }
 
     assert(lastValue == -1)
@@ -64,8 +65,9 @@ class ZippedStreamTest extends FunSuite {
 
     var lastValue = -1
 
-    zipped.foreach { case (aVal, bVal) =>
-      lastValue = aVal * bVal
+    zipped.foreach {
+      case (aVal, bVal) =>
+        lastValue = aVal * bVal
     }
 
     assert(lastValue == -1)
@@ -106,8 +108,9 @@ class ZippedStreamTest extends FunSuite {
 
     var lastValue = -1
 
-    zipped.foreach { case (aVal, bVal) =>
-      lastValue = aVal * bVal
+    zipped.foreach {
+      case (aVal, bVal) =>
+        lastValue = aVal * bVal
     }
 
     assert(lastValue == -1)

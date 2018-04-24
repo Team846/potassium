@@ -15,13 +15,13 @@ trait UnicycleCoreControllers {
 
   def childOpenLoop(unicycle: Stream[UnicycleSignal]): Stream[DriveSignal]
 
-  def childVelocityControl(unicycle: Stream[UnicycleSignal])
-                          (implicit hardware: DrivetrainHardware,
-                           props: Signal[DrivetrainProperties]): Stream[DriveSignal]
+  def childVelocityControl(
+    unicycle: Stream[UnicycleSignal]
+  )(implicit hardware: DrivetrainHardware, props: Signal[DrivetrainProperties]): Stream[DriveSignal]
 
-  def velocityControl(target: Stream[UnicycleVelocity])
-                     (implicit hardware: DrivetrainHardware,
-                      props: Signal[DrivetrainProperties]): Stream[UnicycleSignal] = {
+  def velocityControl(
+    target: Stream[UnicycleVelocity]
+  )(implicit hardware: DrivetrainHardware, props: Signal[DrivetrainProperties]): Stream[UnicycleSignal] = {
     import hardware._
 
     val forwardControl = PIDF.pidf(
@@ -41,52 +41,61 @@ trait UnicycleCoreControllers {
     }
   }
 
-  def speedControl(unicycle: Stream[UnicycleSignal])
-                       (implicit hardware: DrivetrainHardware,
-                        props: Signal[DrivetrainProperties]): Stream[UnicycleSignal] =
+  def speedControl(
+    unicycle: Stream[UnicycleSignal]
+  )(implicit hardware: DrivetrainHardware, props: Signal[DrivetrainProperties]): Stream[UnicycleSignal] =
     velocityControl(unicycle.map(_.toUnicycleVelocity))
 
-  def forwardPositionControl(targetAbsolute: Length)
-                            (implicit hardware: DrivetrainHardware,
-                             props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Length]) = {
+  def forwardPositionControl(targetAbsolute: Length)(
+    implicit hardware: DrivetrainHardware,
+    props: Signal[DrivetrainProperties]
+  ): (Stream[UnicycleSignal], Stream[Length]) = {
     val error = hardware.forwardPosition.map(targetAbsolute - _)
 
-    val control = PIDF.pid(
-      hardware.forwardPosition,
-      hardware.forwardPosition.mapToConstant(targetAbsolute),
-      props.map(_.forwardPositionGains)
-    ).map(s => UnicycleSignal(s, Percent(0)))
+    val control = PIDF
+      .pid(
+        hardware.forwardPosition,
+        hardware.forwardPosition.mapToConstant(targetAbsolute),
+        props.map(_.forwardPositionGains)
+      )
+      .map(s => UnicycleSignal(s, Percent(0)))
 
     (control, error)
   }
 
-  def forwardPositionControl(targetAbsolute: Stream[Length])
-                            (implicit hardware: DrivetrainHardware,
-                             props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Length]) = {
+  def forwardPositionControl(targetAbsolute: Stream[Length])(
+    implicit hardware: DrivetrainHardware,
+    props: Signal[DrivetrainProperties]
+  ): (Stream[UnicycleSignal], Stream[Length]) = {
     val error: Stream[Length] = targetAbsolute.minus(hardware.forwardPosition)
 
-    val control = PIDF.pid(
-      hardware.forwardPosition,
-      targetAbsolute,
-      props.map(_.forwardPositionGains)
-    ).map(s => UnicycleSignal(s, Percent(0)))
+    val control = PIDF
+      .pid(
+        hardware.forwardPosition,
+        targetAbsolute,
+        props.map(_.forwardPositionGains)
+      )
+      .map(s => UnicycleSignal(s, Percent(0)))
 
     (control, error)
   }
 
-  def continuousTurnPositionControl(targetAbsolute: Stream[Angle])
-    (implicit hardware: DrivetrainHardware,
-      props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Angle]) = {
-    val error = targetAbsolute.zip(hardware.turnPosition).map{ t =>
+  def continuousTurnPositionControl(targetAbsolute: Stream[Angle])(
+    implicit hardware: DrivetrainHardware,
+    props: Signal[DrivetrainProperties]
+  ): (Stream[UnicycleSignal], Stream[Angle]) = {
+    val error = targetAbsolute.zip(hardware.turnPosition).map { t =>
       val (target: Angle, pos: Angle) = t
       target - pos
     }
 
-    val control = PIDF.pid(
-      hardware.turnPosition,
-      targetAbsolute,
-      props.map(_.turnPositionGains)
-    ).map(s => UnicycleSignal(Percent(0), s))
+    val control = PIDF
+      .pid(
+        hardware.turnPosition,
+        targetAbsolute,
+        props.map(_.turnPositionGains)
+      )
+      .map(s => UnicycleSignal(Percent(0), s))
 
     (control, error)
   }
@@ -101,34 +110,40 @@ trait UnicycleCoreControllers {
     }
   }
 
-  def turnPositionControl(targetAbsolute: Angle)
-                        (implicit hardware: DrivetrainHardware,
-      props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Angle]) = {
+  def turnPositionControl(targetAbsolute: Angle)(
+    implicit hardware: DrivetrainHardware,
+    props: Signal[DrivetrainProperties]
+  ): (Stream[UnicycleSignal], Stream[Angle]) = {
     val error = hardware.turnPosition.map(targetAbsolute - _)
 
-    val target = hardware.turnPosition.map{ pose =>
+    val target = hardware.turnPosition.map { pose =>
       limitToPlusMinus180(targetAbsolute - pose)
     }
 
-    val control = PIDF.pid(
-      hardware.turnPosition,
-      hardware.turnPosition.mapToConstant(targetAbsolute),
-      props.map(_.turnPositionGains)
-    ).map(s => UnicycleSignal(Percent(0), s))
+    val control = PIDF
+      .pid(
+        hardware.turnPosition,
+        hardware.turnPosition.mapToConstant(targetAbsolute),
+        props.map(_.turnPositionGains)
+      )
+      .map(s => UnicycleSignal(Percent(0), s))
 
     (control, error)
   }
 
-  def turnPositionControl(targetAbsolute: Stream[Angle])
-    (implicit hardware: DrivetrainHardware,
-      props: Signal[DrivetrainProperties]): (Stream[UnicycleSignal], Stream[Angle]) = {
+  def turnPositionControl(targetAbsolute: Stream[Angle])(
+    implicit hardware: DrivetrainHardware,
+    props: Signal[DrivetrainProperties]
+  ): (Stream[UnicycleSignal], Stream[Angle]) = {
     val error = hardware.turnPosition.zip(targetAbsolute).map(a => a._1 - a._2)
 
-    val control = PIDF.pid(
-      hardware.turnPosition,
-      targetAbsolute,
-      props.map(_.turnPositionGains)
-    ).map(s => UnicycleSignal(Percent(0), s))
+    val control = PIDF
+      .pid(
+        hardware.turnPosition,
+        targetAbsolute,
+        props.map(_.turnPositionGains)
+      )
+      .map(s => UnicycleSignal(Percent(0), s))
 
     (control, error)
   }

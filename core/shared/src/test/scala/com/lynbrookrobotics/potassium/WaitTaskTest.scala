@@ -15,7 +15,9 @@ class WaitTaskTest extends FunSuite {
     trigger(Seconds(5))
     val afterTrigger = waitTask.isRunning
 
-    assert(beforeTrigger == true &&
-            afterTrigger == false)
+    assert(
+      beforeTrigger == true &&
+      afterTrigger == false
+    )
   }
 }

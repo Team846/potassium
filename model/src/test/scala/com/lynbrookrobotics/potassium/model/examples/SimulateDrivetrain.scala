@@ -33,22 +33,23 @@ object SimulateDrivetrain extends App {
     override val turnVelocityGains: TurnVelocityGains = PIDConfig(
       Percent(100) / DegreesPerSecond(1),
       Percent(0) / Degrees(1),
-      Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)))
+      Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1))
+    )
 
     override val forwardPositionGains: ForwardPositionGains = PIDConfig(
       Percent(100) / Feet(4),
       Percent(0) / (Meters(1).toGeneric * Seconds(1)),
-      Percent(0) / MetersPerSecond(1))
+      Percent(0) / MetersPerSecond(1)
+    )
 
     override val turnPositionGains: TurnPositionGains = PIDConfig(
       Percent(5) / Degrees(1),
       Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
-      Percent(0) / DegreesPerSecond(1))
+      Percent(0) / DegreesPerSecond(1)
+    )
 
-    override val leftVelocityGains: ForwardVelocityGains = PIDConfig(
-      Percent(100) / FeetPerSecond(1),
-      Percent(0) / Meters(1),
-      Percent(0) / MetersPerSecondSquared(1))
+    override val leftVelocityGains: ForwardVelocityGains =
+      PIDConfig(Percent(100) / FeetPerSecond(1), Percent(0) / Meters(1), Percent(0) / MetersPerSecondSquared(1))
 
     override val rightVelocityGains: ForwardVelocityGains = leftVelocityGains
 
@@ -67,7 +68,8 @@ object SimulateDrivetrain extends App {
     Pounds(88),
     KilogramsMetersSquared(3.909),
     clock,
-    period)
+    period
+  )
 
   val simulatedComponent = new drivetrainContainer.Drivetrain
 
@@ -78,7 +80,9 @@ object SimulateDrivetrain extends App {
       log.println(s"Time\tx\ty\tvelocity\tangle")
     }
     if (itr % 10 == 0) {
-      log.println(s"${e.time.toSeconds}\t${e.position.x.toFeet}\t ${e.position.y.toFeet}\t${e.forwardVelocity.toFeetPerSecond}\t${e.angle.toDegrees}")
+      log.println(
+        s"${e.time.toSeconds}\t${e.position.x.toFeet}\t ${e.position.y.toFeet}\t${e.forwardVelocity.toFeetPerSecond}\t${e.angle.toDegrees}"
+      )
     }
 
     itr += 1
@@ -98,9 +102,7 @@ object SimulateDrivetrain extends App {
 //    Degrees(0)
 //  )(simulatedComponent)
 
-
   task.init()
-
 
   for (i <- 1 to (20D / period.toSeconds).round.toInt) {
 //    val startTime = System.nanoTime()

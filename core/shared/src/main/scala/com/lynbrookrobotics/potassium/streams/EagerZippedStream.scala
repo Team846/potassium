@@ -21,8 +21,8 @@ class EagerZippedStream[A, B](parentA: Stream[A], parentB: Stream[B]) extends St
 
   override val originTimeStream = null
 
-  private[this] var lastASlot : Option[A] = None
-  private[this] var lastBSlot : Option[B] = None
+  private[this] var lastASlot: Option[A] = None
+  private[this] var lastBSlot: Option[B] = None
 
   def attemptPublish(): Unit = {
     if (lastASlot.isDefined && lastBSlot.isDefined) {

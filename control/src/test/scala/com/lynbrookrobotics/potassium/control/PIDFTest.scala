@@ -30,17 +30,14 @@ class PIDFTest extends FunSuite {
     assert(lastOutput ~= Percent(50))
   }
 
-  test("test I control with error 1 foot/s and gain 50%/((foot/sec)/s)"){
+  test("test I control with error 1 foot/s and gain 50%/((foot/sec)/s)") {
     implicit val (mockedClock, triggerClock) = ClockMocking.mockedClockTicker
 
     val (targetAndCurrent, pubTargetAndCurrent) = Stream.manualWithTime[(Velocity, Velocity)](period)
     val target = targetAndCurrent.map(_._1)
     val current = targetAndCurrent.map(_._2)
 
-    val gain = Signal(
-      Ratio(
-        Percent(50),
-        FeetPerSecond(1) * Seconds(1)))
+    val gain = Signal(Ratio(Percent(50), FeetPerSecond(1) * Seconds(1)))
 
     val iControl = PIDF.integralControl(current, target, gain)
 

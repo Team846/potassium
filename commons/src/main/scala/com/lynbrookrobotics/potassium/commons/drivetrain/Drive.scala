@@ -4,8 +4,8 @@ import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.{Component, Signal}
 
 /**
-  * Represents a drivetrain container with a signal type, default controller, and component
-  */
+ * Represents a drivetrain container with a signal type, default controller, and component
+ */
 trait Drive {
   type DriveSignal
   type OpenLoopSignal
@@ -13,19 +13,18 @@ trait Drive {
   type Properties
 
   /**
-    * Drives with the signal with closed-loop control
-    *
-    * @param signal the signal to drive with
-    * @return
-    */
-  protected def driveClosedLoop(signal: Stream[OpenLoopSignal])
-                               (implicit hardware: Hardware,
-                                props: Signal[Properties]): Stream[DriveSignal]
+   * Drives with the signal with closed-loop control
+   *
+   * @param signal the signal to drive with
+   * @return
+   */
+  protected def driveClosedLoop(
+    signal: Stream[OpenLoopSignal]
+  )(implicit hardware: Hardware, props: Signal[Properties]): Stream[DriveSignal]
 
   protected def openLoopToDriveSignal(openLoop: OpenLoopSignal): DriveSignal
 
-  protected def defaultController(implicit hardware: Hardware,
-                                  props: Signal[Properties]): Stream[DriveSignal]
+  protected def defaultController(implicit hardware: Hardware, props: Signal[Properties]): Stream[DriveSignal]
 
   type Drivetrain <: Component[DriveSignal]
 }

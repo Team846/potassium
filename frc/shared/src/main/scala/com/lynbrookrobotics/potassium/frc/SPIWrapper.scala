@@ -8,7 +8,7 @@ class SPIWrapper(spi: SPI) extends SPITrait {
   override def read(initiate: Boolean, dataReceived: ByteBuffer, size: Int): Int = {
     spi.read(initiate, dataReceived, size)
   }
-  
+
   override def setClockRate(hz: Int): Unit = {
     spi.setClockRate(hz)
   }

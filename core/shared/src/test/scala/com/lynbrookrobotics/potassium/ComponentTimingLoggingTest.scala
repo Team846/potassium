@@ -17,15 +17,15 @@ class ComponentTimingLoggingTest extends FunSuite {
       receivedLog = false
     }
   }
-  
+
   class MockedTimingLoggingComponent(clock: Clock) extends Component[Unit] with TimingLoggingComponent[Unit] {
     override val logger: MockedAsyncLogger = new MockedAsyncLogger(clock)
 
     override def defaultController: Stream[Unit] = ???
-    
+
     override def applySignal(signal: Unit): Unit = {}
   }
-  
+
   test("Logging component whose controller updates at or approximately at expected periodicity does not log an alarm") {
     val (clock, triggerClock) = ClockMocking.mockedClockTicker
     val period = Seconds(1)

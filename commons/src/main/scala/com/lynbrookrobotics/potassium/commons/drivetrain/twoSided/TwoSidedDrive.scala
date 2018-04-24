@@ -7,12 +7,10 @@ import com.lynbrookrobotics.potassium.units._
 import squants.space.Length
 import squants.{Dimensionless, Percent, Velocity}
 
-
 /**
-  * A drivetrain with two side control (such as a tank drive)
-  */
-abstract class TwoSidedDrive
-  extends UnicycleDrive {
+ * A drivetrain with two side control (such as a tank drive)
+ */
+abstract class TwoSidedDrive extends UnicycleDrive {
   self =>
 
   type DriveSignal <: TwoSided[_]
@@ -21,25 +19,28 @@ abstract class TwoSidedDrive
   type Hardware <: TwoSidedDriveHardware
   type Properties <: TwoSidedDriveProperties
 
-  protected def driveClosedLoop(signal: Stream[OpenLoopSignal])
-                               (implicit hardware: Hardware,
-                                props: Signal[Properties]): Stream[DriveSignal] =
-    velocityControl(signal.map(d =>
-      TwoSided[Velocity](
-        props.get.maxLeftVelocity * d.left,
-        props.get.maxRightVelocity * d.right
-      ))
+  protected def driveClosedLoop(
+    signal: Stream[OpenLoopSignal]
+  )(implicit hardware: Hardware, props: Signal[Properties]): Stream[DriveSignal] =
+    velocityControl(
+      signal.map(
+        d =>
+          TwoSided[Velocity](
+            props.get.maxLeftVelocity * d.left,
+            props.get.maxRightVelocity * d.right
+        )
+      )
     )
 
-  def velocityControl(target: Stream[TwoSided[Velocity]])
-                     (implicit hardware: Hardware,
-                      props: Signal[Properties]): Stream[DriveSignal]
+  def velocityControl(
+    target: Stream[TwoSided[Velocity]]
+  )(implicit hardware: Hardware, props: Signal[Properties]): Stream[DriveSignal]
 
-  def blendedVelocityControl(arcadeSignal: Stream[UnicycleSignal],
-                             curvature: Stream[Ratio[Dimensionless, Length]],
-                             targetForwardVelocity: Stream[Velocity])
-                            (implicit hardware: Hardware,
-                             props: Signal[Properties]): Stream[DriveSignal] = {
+  def blendedVelocityControl(
+    arcadeSignal: Stream[UnicycleSignal],
+    curvature: Stream[Ratio[Dimensionless, Length]],
+    targetForwardVelocity: Stream[Velocity]
+  )(implicit hardware: Hardware, props: Signal[Properties]): Stream[DriveSignal] = {
     val twoSidedSignal = arcadeSignal.map(unicycleToOpenLoopSignal)
     val targetTankSpeeds = twoSidedSignal.map(expectedVelocity(_)(props.get))
 
@@ -53,11 +54,11 @@ abstract class TwoSidedDrive
   }
 
   /**
-    * Output the current signal to actuators with the hardware
-    *
-    * @param hardware the hardware to output with
-    * @param signal   the signal to output
-    */
+   * Output the current signal to actuators with the hardware
+   *
+   * @param hardware the hardware to output with
+   * @param signal   the signal to output
+   */
   protected def output(hardware: Hardware, signal: DriveSignal): Unit
 
   protected def expectedVelocity(drive: OpenLoopSignal)(implicit props: Properties): TwoSided[Velocity] = {

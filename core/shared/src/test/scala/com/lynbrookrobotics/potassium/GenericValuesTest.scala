@@ -23,16 +23,14 @@ class GenericValuesTest extends FunSuite {
   }
 
   test("Can compile integral of dimension with no squants integral") {
-    assertCompiles(
-      """
+    assertCompiles("""
         |import com.lynbrookrobotics.potassium.units.GenericValue.toGenericValue
         |val signal = Stream.manual[Angle]._1.integral
       """.stripMargin)
   }
 
   test("Can compile integral of dimension with squants integral") {
-    assertCompiles(
-      """
+    assertCompiles("""
         |import com.lynbrookrobotics.potassium.units.GenericValue.toGenericValue
         |val signal = Stream.manual[AngularVelocity]._1.integral
       """.stripMargin)

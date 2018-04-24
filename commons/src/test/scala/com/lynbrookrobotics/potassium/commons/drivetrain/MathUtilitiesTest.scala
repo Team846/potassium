@@ -56,14 +56,19 @@ class MathUtilitiesTest extends FunSuite {
   test("Circle and non intersecting segment do not intersect") {
     val secondPoint = new Point(Feet(1), Feet(0))
 
-    assert(MathUtilities.intersectionRayCircleFurthestFromStart(
-      Segment(origin, secondPoint),
-      new Point(Feet(0), Feet(1)),
-      Feet(0.5)
-    ).isEmpty, "Found non existent intersection!")
+    assert(
+      MathUtilities
+        .intersectionRayCircleFurthestFromStart(
+          Segment(origin, secondPoint),
+          new Point(Feet(0), Feet(1)),
+          Feet(0.5)
+        )
+        .isEmpty,
+      "Found non existent intersection!"
+    )
   }
 
-  test("find intersection segment from (0, 0) to (0, 2) with circle radius 1 with center (0, 1)"){
+  test("find intersection segment from (0, 0) to (0, 2) with circle radius 1 with center (0, 1)") {
     val segment = Segment(
       origin,
       new Point(Feet(2), Feet(0))

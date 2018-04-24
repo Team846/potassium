@@ -29,7 +29,8 @@ private[frc] class WPIClockShared(stopOnException: Boolean) extends Clock {
 
     notifier.startPeriodic(period.to(Seconds))
 
-    () => notifier.stop()
+    () =>
+      notifier.stop()
   }
 
   override def singleExecution(delay: Time)(thunk: => Unit): Cancel = {
@@ -42,7 +43,8 @@ private[frc] class WPIClockShared(stopOnException: Boolean) extends Clock {
     })
 
     notifier.startSingle(delay.to(Seconds))
-    () => notifier.stop()
+    () =>
+      notifier.stop()
   }
 
   override def currentTime: Time = Microseconds(RobotController.getFPGATime)

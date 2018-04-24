@@ -9,14 +9,8 @@ import squants.motion.Velocity
 import squants.space.Length
 import squants.{Dimensionless, Percent}
 
-
 trait LiftProperties {
-  def positionGains: PIDConfig[Length,
-    Length,
-    GenericValue[Length],
-    Velocity,
-    GenericIntegral[Length],
-    Dimensionless]
+  def positionGains: PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless]
 }
 
 trait LiftHardware {
@@ -29,46 +23,46 @@ abstract class Lift {
   type Hardware <: LiftHardware
   type Comp <: Component[LiftSignal]
 
-  def positionControl(target: Stream[Length])
-                     (implicit properties: Signal[Properties],
-                      hardware: Hardware): (Stream[Length], Stream[LiftSignal]) = (
-    hardware
-      .position
+  def positionControl(
+    target: Stream[Length]
+  )(implicit properties: Signal[Properties], hardware: Hardware): (Stream[Length], Stream[LiftSignal]) = (
+    hardware.position
       .zipAsync(target)
       .map(t => t._2 - t._1),
-
-    PIDF.pid(
-      hardware.position,
-      target,
-      properties.map(_.positionGains)
-    ).map(openLoopToLiftSignal)
+    PIDF
+      .pid(
+        hardware.position,
+        target,
+        properties.map(_.positionGains)
+      )
+      .map(openLoopToLiftSignal)
   )
 
-  def stayAbove(target: Stream[Length])
-               (implicit properties: Signal[Properties],
-                hardware: Hardware): Stream[LiftSignal] = hardware
-    .position
-    .zipAsync(target)
-    .map { case (p, t) => if (p < t) Percent(100) else Percent(0) }
-    .map(openLoopToLiftSignal)
+  def stayAbove(
+    target: Stream[Length]
+  )(implicit properties: Signal[Properties], hardware: Hardware): Stream[LiftSignal] =
+    hardware.position
+      .zipAsync(target)
+      .map { case (p, t) => if (p < t) Percent(100) else Percent(0) }
+      .map(openLoopToLiftSignal)
 
-  def stayBelow(target: Stream[Length])
-               (implicit properties: Signal[Properties],
-                hardware: Hardware): Stream[LiftSignal] = hardware
-    .position
-    .zipAsync(target)
-    .map { case (p, t) => if (p > t) Percent(-100) else Percent(0) }
-    .map(openLoopToLiftSignal)
+  def stayBelow(
+    target: Stream[Length]
+  )(implicit properties: Signal[Properties], hardware: Hardware): Stream[LiftSignal] =
+    hardware.position
+      .zipAsync(target)
+      .map { case (p, t) => if (p > t) Percent(-100) else Percent(0) }
+      .map(openLoopToLiftSignal)
 
   def openLoopToLiftSignal(x: Dimensionless): LiftSignal
 
   object positionTasks {
 
     //move lift to target using PID control. When the arm is at target (within the tolerance), run inner (finite) task.
-    class WhileAtPosition(target: Stream[Length], tolerance: Length)
-                         (lift: Comp)
-                         (implicit properties: Signal[Properties],
-                          hardware: Hardware) extends WrapperTask {
+    class WhileAtPosition(target: Stream[Length], tolerance: Length)(lift: Comp)(
+      implicit properties: Signal[Properties],
+      hardware: Hardware
+    ) extends WrapperTask {
       override def onStart(): Unit = {
         val (error, control) = positionControl(target)
 
@@ -85,10 +79,10 @@ abstract class Lift {
     }
 
     //move arm above target using bangbang control. When it is above target, run inner (finite) task.
-    class WhileAbovePosition(target: Stream[Length])
-                            (lift: Comp)
-                            (implicit properties: Signal[Properties],
-                             hardware: Hardware) extends WrapperTask {
+    class WhileAbovePosition(target: Stream[Length])(lift: Comp)(
+      implicit properties: Signal[Properties],
+      hardware: Hardware
+    ) extends WrapperTask {
       override def onStart(): Unit = {
         lift.setController(
           stayAbove(target)
@@ -102,10 +96,10 @@ abstract class Lift {
     }
 
     //move arm below target using bangbang control. When it is below target, run inner (finite) task.
-    class WhileBelowPosition(target: Stream[Length])
-                            (lift: Comp)
-                            (implicit properties: Signal[Properties],
-                             hardware: Hardware) extends WrapperTask {
+    class WhileBelowPosition(target: Stream[Length])(lift: Comp)(
+      implicit properties: Signal[Properties],
+      hardware: Hardware
+    ) extends WrapperTask {
       override def onStart(): Unit = {
         lift.setController(
           stayBelow(target)

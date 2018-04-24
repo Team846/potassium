@@ -24,18 +24,17 @@ class UnicycleDriveTaskTest extends FunSuite {
 
     override protected def unicycleToOpenLoopSignal(uni: UnicycleSignal): DriveSignal = uni
 
-    override protected def controlMode(implicit hardware: Hardware,
-                                       props: Properties): UnicycleControlMode = NoOperation
+    override protected def controlMode(implicit hardware: Hardware, props: Properties): UnicycleControlMode =
+      NoOperation
 
-    override protected def driveClosedLoop(signal: Stream[UnicycleSignal])
-                                          (implicit hardware: UnicycleHardware,
-                                           props: Signal[UnicycleProperties]): Stream[UnicycleSignal] = signal
+    override protected def driveClosedLoop(
+      signal: Stream[UnicycleSignal]
+    )(implicit hardware: UnicycleHardware, props: Signal[UnicycleProperties]): Stream[UnicycleSignal] = signal
 
     override protected def openLoopToDriveSignal(openLoop: UnicycleSignal): UnicycleSignal = openLoop
 
     override type Drivetrain = Component[DriveSignal]
   }
-
 
   val tickPeriod = Milliseconds(5)
   implicit val (clock, ticker) = ClockMocking.mockedClockTicker
@@ -103,7 +102,8 @@ class UnicycleDriveTaskTest extends FunSuite {
     }
 
     val task = new drive.unicycleTasks.DriveDistance(
-      Meters(5), Meters(0.1)
+      Meters(5),
+      Meters(0.1)
     )(drivetrain)(hardware, props)
 
     task.init()
@@ -186,7 +186,11 @@ class UnicycleDriveTaskTest extends FunSuite {
     }
 
     val task = new drive.unicycleTasks.DriveDistanceStraight(
-      Meters(5), Meters(0.1), Degrees(0.1), Percent(100), minStableTicks = 1
+      Meters(5),
+      Meters(0.1),
+      Degrees(0.1),
+      Percent(100),
+      minStableTicks = 1
     )(drivetrain)(
       hardware,
       props
@@ -198,24 +202,30 @@ class UnicycleDriveTaskTest extends FunSuite {
     ticker(Milliseconds(5))
     ticker(Milliseconds(5))
 
-    assert(lastAppliedSignal.forward.toPercent == 50 &&
-      lastAppliedSignal.turn.toPercent == 0)
+    assert(
+      lastAppliedSignal.forward.toPercent == 50 &&
+      lastAppliedSignal.turn.toPercent == 0
+    )
 
     currentPositionForward = Meters(7.5)
     currentPositionTurn = Degrees(10)
 
     ticker(Milliseconds(5))
 
-    assert(lastAppliedSignal.forward.toPercent == 25 &&
-      lastAppliedSignal.turn.toPercent == -50)
+    assert(
+      lastAppliedSignal.forward.toPercent == 25 &&
+      lastAppliedSignal.turn.toPercent == -50
+    )
 
     currentPositionForward = Meters(10)
     currentPositionTurn = Degrees(0)
 
     ticker(Milliseconds(5))
 
-    assert(lastAppliedSignal.forward.toPercent == 0 &&
-      lastAppliedSignal.turn.toPercent == 50)
+    assert(
+      lastAppliedSignal.forward.toPercent == 0 &&
+      lastAppliedSignal.turn.toPercent == 50
+    )
 
     currentPositionForward = Meters(10)
     currentPositionTurn = Degrees(5)
@@ -284,7 +294,11 @@ class UnicycleDriveTaskTest extends FunSuite {
     }
 
     val task = new drive.unicycleTasks.DriveDistanceAtAngle(
-      Meters(5), Meters(0.1), Degrees(45), Degrees(0.1), Percent(100)
+      Meters(5),
+      Meters(0.1),
+      Degrees(45),
+      Degrees(0.1),
+      Percent(100)
     )(drivetrain)(
       hardware,
       props
@@ -296,24 +310,30 @@ class UnicycleDriveTaskTest extends FunSuite {
     ticker(Milliseconds(5))
     ticker(Milliseconds(5))
 
-    assert(lastAppliedSignal.forward.toPercent == 50 &&
-      lastAppliedSignal.turn.toPercent == 0)
+    assert(
+      lastAppliedSignal.forward.toPercent == 50 &&
+      lastAppliedSignal.turn.toPercent == 0
+    )
 
     currentPositionForward = Meters(7.5)
     currentPositionTurn = Degrees(45 - 5)
 
     ticker(Milliseconds(5))
 
-    assert(lastAppliedSignal.forward.toPercent == 25 &&
-      lastAppliedSignal.turn.toPercent == 50)
+    assert(
+      lastAppliedSignal.forward.toPercent == 25 &&
+      lastAppliedSignal.turn.toPercent == 50
+    )
 
     currentPositionForward = Meters(10)
     currentPositionTurn = Degrees(45 + 5)
 
     ticker(Milliseconds(5))
 
-    assert(lastAppliedSignal.forward.toPercent == 0 &&
-      lastAppliedSignal.turn.toPercent == -50)
+    assert(
+      lastAppliedSignal.forward.toPercent == 0 &&
+      lastAppliedSignal.turn.toPercent == -50
+    )
 
     currentPositionForward = Meters(10)
     currentPositionTurn = Degrees(45)
@@ -377,7 +397,9 @@ class UnicycleDriveTaskTest extends FunSuite {
     }
 
     val task = new drive.unicycleTasks.RotateByAngle(
-      Degrees(5), Degrees(0.1), 1
+      Degrees(5),
+      Degrees(0.1),
+      1
     )(drivetrain)(
       hardware,
       props
@@ -468,7 +490,7 @@ class UnicycleDriveTaskTest extends FunSuite {
       Percent(15),
       Percent(20),
       Meters(1)
-    ) (hardware, props)
+    )(hardware, props)
 
     task.init()
 

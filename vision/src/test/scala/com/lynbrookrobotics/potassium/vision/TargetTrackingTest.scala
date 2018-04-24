@@ -25,9 +25,7 @@ class TargetTrackingTest extends FunSuite {
   test("Angle to target measured as 5 degrees for input of 10 degrees and offset of -5 degrees") {
     val (angle, pubAngle) = Stream.manual[Angle]
     val targeter = new VisionTargetTracking(
-      Signal.constant(VisionProperties(
-          Degrees(-5),
-          Feet(1)))
+      Signal.constant(VisionProperties(Degrees(-5), Feet(1)))
     )
     val angleToTarget = targeter.compassAngleToTarget(angle)
     var lastAngle = Degrees(0)

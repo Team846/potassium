@@ -44,11 +44,13 @@ object CoreBenchmarks extends App {
 
   runBenchmarkEvaluation("PID end-to-end")(Meters(math.random))(
     current => {
-      val gains = Signal.constant(PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless](
-        kp = Ratio(Percent(100), Meters(1)),
-        ki = Ratio(Percent(100), Meters(1).toGeneric * Seconds(1)),
-        kd = Ratio(Percent(100), Meters(1) / Seconds(1))
-      ))
+      val gains = Signal.constant(
+        PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless](
+          kp = Ratio(Percent(100), Meters(1)),
+          ki = Ratio(Percent(100), Meters(1).toGeneric * Seconds(1)),
+          kd = Ratio(Percent(100), Meters(1) / Seconds(1))
+        )
+      )
 
       PIDF.pid(
         current,

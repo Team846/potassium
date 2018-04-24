@@ -13,34 +13,38 @@ abstract class OffloadedDrive extends TwoSidedDrive {
   override type DriveSignal = TwoSided[OffloadedSignal]
   override type Properties <: OffloadedDriveProperties
 
-  override def velocityControl(target: Stream[TwoSided[Velocity]])
-                              (implicit hardware: Hardware,
-                               props: Signal[Properties]): Stream[DriveSignal] = target.map {
+  override def velocityControl(
+    target: Stream[TwoSided[Velocity]]
+  )(implicit hardware: Hardware, props: Signal[Properties]): Stream[DriveSignal] = target.map {
     case TwoSided(left, right) =>
       implicit val curProps: Properties = props.get
       implicit val c = curProps.escConfig
       TwoSided(
         VelocityPIDF(
-          forwardToAngularVelocityGains(curProps.leftVelocityGainsFull), ticks(left)
+          forwardToAngularVelocityGains(curProps.leftVelocityGainsFull),
+          ticks(left)
         ),
         VelocityPIDF(
-          forwardToAngularVelocityGains(curProps.rightVelocityGainsFull), ticks(right)
+          forwardToAngularVelocityGains(curProps.rightVelocityGainsFull),
+          ticks(right)
         )
       )
   }
 
-  def positionControl(target: Stream[TwoSided[Length]])
-                     (implicit hardware: Hardware,
-                      props: Signal[Properties]): Stream[DriveSignal] = target.map {
+  def positionControl(
+    target: Stream[TwoSided[Length]]
+  )(implicit hardware: Hardware, props: Signal[Properties]): Stream[DriveSignal] = target.map {
     case TwoSided(left, right) =>
       implicit val curProps: Properties = props.get
       implicit val c = curProps.escConfig
       TwoSided(
         PositionPID(
-          forwardToAngularPositionGains(curProps.forwardPositionGains), ticks(left)
+          forwardToAngularPositionGains(curProps.forwardPositionGains),
+          ticks(left)
         ),
         PositionPID(
-          forwardToAngularPositionGains(curProps.forwardPositionGains), ticks(right)
+          forwardToAngularPositionGains(curProps.forwardPositionGains),
+          ticks(right)
         )
       )
   }

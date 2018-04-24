@@ -28,7 +28,7 @@ class LimelightNetwork(val table: NetworkTable)(implicit clock: Clock) {
   val hasTarget: Stream[Boolean] = Stream.periodic(Milliseconds(5))(tvEntry.getDouble(0) == 1.0)
 }
 
-object LimelightNetwork{
+object LimelightNetwork {
   def apply(implicit clock: Clock): LimelightNetwork = {
     new LimelightNetwork(NetworkTableInstance.getDefault.getTable("/limelight"))
   }

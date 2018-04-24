@@ -30,13 +30,11 @@ class OffloadedDriveTests extends FunSuite {
       override val blendExponent: Double = 0
       override val track: Length = null
 
-
-
       /**
-        * 5pi inches / 1 wheel rotation
-        * 1 wheel rotation / 2 encoder rotations
-        * 1 encoder rotation / 100 encoder ticks
-        * => 5pi in / 200 tick
+       * 5pi inches / 1 wheel rotation
+       * 1 wheel rotation / 2 encoder rotations
+       * 1 encoder rotation / 100 encoder ticks
+       * => 5pi in / 200 tick
         **/
       override val wheelDiameter: Length = Inches(5)
       override val wheelOverEncoderGears: Ratio[Angle, Angle] = Ratio(Turns(1), Turns(2))

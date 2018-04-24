@@ -7,12 +7,9 @@ import com.lynbrookrobotics.potassium.tasks.{ContinuousTask, FiniteTask}
 import squants.Quantity
 import squants.time.{TimeDerivative, TimeIntegral}
 
-trait PositionProperties[S <: Quantity[S],
-                         SWithD <: Quantity[SWithD] with TimeIntegral[D],
-                         SWithI <: Quantity[SWithI] with TimeDerivative[I],
-                         D <: Quantity[D] with TimeDerivative[SWithD],
-                         I <: Quantity[I] with TimeIntegral[SWithI],
-                         U <: Quantity[U]] {
+trait PositionProperties[S <: Quantity[S], SWithD <: Quantity[SWithD] with TimeIntegral[D], SWithI <: Quantity[SWithI] with TimeDerivative[
+  I
+], D <: Quantity[D] with TimeDerivative[SWithD], I <: Quantity[I] with TimeIntegral[SWithI], U <: Quantity[U]] {
   def positionGains: PIDFConfig[S, SWithD, SWithI, D, I, U]
 }
 
@@ -20,34 +17,27 @@ trait PositionHardware[S <: Quantity[S]] {
   def position: Stream[S]
 }
 
-abstract class Position[S <: Quantity[S],
-               SWithD <: Quantity[SWithD] with TimeIntegral[D],
-               SWithI <: Quantity[SWithI] with TimeDerivative[I],
-               D <: Quantity[D] with TimeDerivative[SWithD],
-               I <: Quantity[I] with TimeIntegral[SWithI],
-               U <: Quantity[U]](implicit exD: S => SWithD, exI: S => SWithI) {
+abstract class Position[S <: Quantity[S], SWithD <: Quantity[SWithD] with TimeIntegral[D], SWithI <: Quantity[SWithI] with TimeDerivative[
+  I
+], D <: Quantity[D] with TimeDerivative[SWithD], I <: Quantity[I] with TimeIntegral[SWithI], U <: Quantity[U]](
+  implicit exD: S => SWithD,
+  exI: S => SWithI
+) {
   type Properties <: PositionProperties[S, SWithD, SWithI, D, I, U]
   type Hardware <: PositionHardware[S]
 
   object positionControllers {
-    def positionControl(target: S)
-                       (implicit properties: Signal[Properties],
-                        hardware: Hardware): (Stream[S], Stream[U]) = {
+    def positionControl(
+      target: S
+    )(implicit properties: Signal[Properties], hardware: Hardware): (Stream[S], Stream[U]) = {
       val error = hardware.position.map(target - _)
-      (
-        error,
-        PIDF.pidf(
-          hardware.position,
-          hardware.position.mapToConstant(target),
-          properties.map(_.positionGains)))
+      (error, PIDF.pidf(hardware.position, hardware.position.mapToConstant(target), properties.map(_.positionGains)))
     }
   }
 
   object positionTasks {
-    class MoveToPosition(pos: S,
-                         tolerance: S)
-                        (implicit properties: Signal[Properties],
-                         hardware: Hardware, comp: Comp) extends FiniteTask {
+    class MoveToPosition(pos: S, tolerance: S)(implicit properties: Signal[Properties], hardware: Hardware, comp: Comp)
+        extends FiniteTask {
       override def onStart(): Unit = {
         val (error, control) = positionControllers.positionControl(pos)
         comp.setController(control.withCheckZipped(error) { error =>
@@ -62,7 +52,8 @@ abstract class Position[S <: Quantity[S],
       }
     }
 
-    class HoldPosition(pos: S)(implicit properties: Signal[Properties], hardware: Hardware, comp: Comp) extends ContinuousTask {
+    class HoldPosition(pos: S)(implicit properties: Signal[Properties], hardware: Hardware, comp: Comp)
+        extends ContinuousTask {
       override def onStart(): Unit = {
         val (_, control) = positionControllers.positionControl(pos)
         comp.setController(control)

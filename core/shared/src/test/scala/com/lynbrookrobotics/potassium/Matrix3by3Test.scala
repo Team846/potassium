@@ -7,10 +7,7 @@ import squants.space.Meters
 class Matrix3by3Test extends FunSuite {
   test("Matrix multiplication functions correctly") {
     val original = Value3D(Meters(1.0), Meters(1.0), Meters(1.0))
-    val matrix = Matrix3by3(
-      Seq(1.0, 1.0, 1.0),
-      Seq(1.0, 1.0, 1.0),
-      Seq(1.0, 1.0, 1.0))
+    val matrix = Matrix3by3(Seq(1.0, 1.0, 1.0), Seq(1.0, 1.0, 1.0), Seq(1.0, 1.0, 1.0))
 
     val newVal = matrix * original
 

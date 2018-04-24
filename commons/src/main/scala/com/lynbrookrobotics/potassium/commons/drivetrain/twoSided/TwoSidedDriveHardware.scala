@@ -20,15 +20,14 @@ trait TwoSidedDriveHardware extends UnicycleHardware {
     leftVelocity.zip(rightVelocity).map(t => (t._1 + t._2) / 2)
 
   lazy val turnVelocity: Stream[AngularVelocity] = {
-    rightVelocity.zip(leftVelocity).map { case (r, l) =>
-      RadiansPerSecond(((l - r) * Seconds(1)) / track)
+    rightVelocity.zip(leftVelocity).map {
+      case (r, l) =>
+        RadiansPerSecond(((l - r) * Seconds(1)) / track)
     }
   }
 
   lazy val forwardPosition: Stream[Length] =
     leftPosition.zip(rightPosition).map(t => (t._1 + t._2) / 2)
 
-  lazy val turnPosition: Stream[Angle] = leftPosition.zip(rightPosition).map(t =>
-    Radians((t._1 - t._2) / track)
-  )
+  lazy val turnPosition: Stream[Angle] = leftPosition.zip(rightPosition).map(t => Radians((t._1 - t._2) / track))
 }

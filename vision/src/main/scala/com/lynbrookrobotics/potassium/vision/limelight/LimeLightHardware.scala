@@ -8,10 +8,7 @@ import edu.wpi.first.networktables.NetworkTableInstance
 import squants.Time
 import squants.space.{Degrees, Feet}
 
-
-class LimeLightHardware(upright: Boolean)
-                       (implicit clock: Clock,
-                        props: Signal[VisionProperties]) {
+class LimeLightHardware(upright: Boolean)(implicit clock: Clock, props: Signal[VisionProperties]) {
   val limelightInterface = LimelightNetwork(clock)
   val tracker = new VisionTargetTracking(props)
 

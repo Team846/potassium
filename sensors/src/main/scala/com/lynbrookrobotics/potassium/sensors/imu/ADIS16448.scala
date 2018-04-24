@@ -6,9 +6,10 @@ import com.lynbrookrobotics.potassium.sensors.SPITrait
 import com.lynbrookrobotics.potassium.units.Value3D
 import squants.Time
 import squants.motion.{AngularVelocity, DegreesPerSecond}
+
 /**
-  * An interface for communicating with the ADIS16448 IMU.
-  */
+ * An interface for communicating with the ADIS16448 IMU.
+ */
 class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePeriod) {
   // List of register addresses on the IMU
   private object Registers {
@@ -61,10 +62,10 @@ class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePer
   private var firstRun = true
 
   /**
-    * Returns data from register as short (16 bit integer)
-    * @param register register- hex
-    * @return short
-    */
+   * Returns data from register as short (16 bit integer)
+   * @param register register- hex
+   * @return short
+   */
   private def readGyroRegister(register: Byte): Short = {
     outBuffer.put(0, register) // Request data from register
     outBuffer.put(1, 0.asInstanceOf[Byte]) // Second byte must be 0
@@ -75,16 +76,16 @@ class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePer
     // Reads 2 bytes and puts them in inBuffer
     spi.read(firstRun, inBuffer, 2)
 
-    if(firstRun) firstRun = false
+    if (firstRun) firstRun = false
 
     inBuffer.getShort
   }
 
   /**
-    * Gets the current gyro data from the IMU.
-    * 2nd and 3rd parameters are null because accelerometer and magneto data not used.
-    * @return IMUValue
-    */
+   * Gets the current gyro data from the IMU.
+   * 2nd and 3rd parameters are null because accelerometer and magneto data not used.
+   * @return IMUValue
+   */
   def currentData: IMUValue = {
     val gyro: Value3D[AngularVelocity] = Value3D[AngularVelocity](
       DegreesPerSecond(readGyroRegister(ADIS16448Protocol.X_GYRO_REG)),
@@ -95,8 +96,8 @@ class ADIS16448(spi: SPITrait, updatePeriod: Time) extends DigitalGyro(updatePer
   }
 
   /**
-    * Retrieves 3-dimensional data from the gyro
-    */
+   * Retrieves 3-dimensional data from the gyro
+   */
   override def retrieveVelocity: Value3D[AngularVelocity] = {
     currentData.gyro
   }

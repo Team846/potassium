@@ -7,9 +7,10 @@ import squants.space.{Angle, Length}
 
 class VisionTargetTracking(props: Signal[VisionProperties]) {
   def distanceToTarget(percentArea: Stream[Option[Dimensionless]]): Stream[Option[Length]] = {
-    percentArea.map ( p =>
-      p.map { percentArea =>
-        props.get.reciprocalRootAreaToDistanceConversion / math.sqrt(percentArea.toPercent)
+    percentArea.map(
+      p =>
+        p.map { percentArea =>
+          props.get.reciprocalRootAreaToDistanceConversion / math.sqrt(percentArea.toPercent)
       }
     )
   }

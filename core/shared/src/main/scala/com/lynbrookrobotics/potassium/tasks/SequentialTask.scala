@@ -6,12 +6,13 @@ case object RunningFirst extends SequentialPhase
 case object RunningSecond extends SequentialPhase
 
 /**
-  * A finite task where two subtasks are run sequentially
-  * @param first the first task to run
-  * @param second the task to run after the first task
-  */
+ * A finite task where two subtasks are run sequentially
+ * @param first the first task to run
+ * @param second the task to run after the first task
+ */
 class SequentialTask private[tasks] (first: FiniteTask, second: FiniteTask)
-  extends FiniteTask with FiniteTaskFinishedListener {
+    extends FiniteTask
+    with FiniteTaskFinishedListener {
   private var currentPhase: SequentialPhase = Stopped
 
   override def onFinished(task: FiniteTask): Unit = {
@@ -23,8 +24,6 @@ class SequentialTask private[tasks] (first: FiniteTask, second: FiniteTask)
       finished()
     }
   }
-
-
 
   override def onStart(): Unit = {
     currentPhase = RunningFirst

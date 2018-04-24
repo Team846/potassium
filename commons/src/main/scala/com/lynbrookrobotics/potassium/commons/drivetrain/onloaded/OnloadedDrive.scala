@@ -11,8 +11,9 @@ abstract class OnloadedDrive extends TwoSidedDrive {
   type DriveSignal = TwoSided[Dimensionless]
   override type OpenLoopSignal = TwoSided[Dimensionless]
 
-  override def velocityControl(target: Stream[TwoSided[Velocity]])
-                              (implicit hardware: Hardware, props: Signal[Properties]): Stream[TwoSided[Dimensionless]] = {
+  override def velocityControl(
+    target: Stream[TwoSided[Velocity]]
+  )(implicit hardware: Hardware, props: Signal[Properties]): Stream[TwoSided[Dimensionless]] = {
     import hardware._
     val leftControl = PIDF.pidf(
       leftVelocity,

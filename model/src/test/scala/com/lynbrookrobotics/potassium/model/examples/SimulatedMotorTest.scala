@@ -29,7 +29,6 @@ class SimulatedMotorTest extends FunSuite {
     var lastOut = Percent(-10)
     simulatedMotor.outputStream.foreach(lastOut = _)
 
-
     val input = Percent(50)
     simulatedMotor.set(input)
     triggerClock.apply(period)

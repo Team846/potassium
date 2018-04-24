@@ -24,12 +24,12 @@ class PurePursuitTasksTest extends FunSuite {
 
     override protected def unicycleToOpenLoopSignal(uni: UnicycleSignal): DriveSignal = uni
 
-    override protected def controlMode(implicit hardware: Hardware,
-                                       props: Properties): UnicycleControlMode = NoOperation
+    override protected def controlMode(implicit hardware: Hardware, props: Properties): UnicycleControlMode =
+      NoOperation
 
-    override protected def driveClosedLoop(signal: Stream[UnicycleSignal])
-                                          (implicit hardware: UnicycleHardware,
-                                           props: Signal[UnicycleProperties]): Stream[UnicycleSignal] = signal
+    override protected def driveClosedLoop(
+      signal: Stream[UnicycleSignal]
+    )(implicit hardware: UnicycleHardware, props: Signal[UnicycleProperties]): Stream[UnicycleSignal] = signal
 
     override protected def openLoopToDriveSignal(openLoop: UnicycleSignal): UnicycleSignal = openLoop
 
@@ -152,7 +152,7 @@ class PurePursuitTasksTest extends FunSuite {
     assert(lastAppliedSignal.forward ~= Percent(100), s"actual forward ${lastAppliedSignal.forward.toPercent}%")
   }
 
-  test("Test that going left and back 1 foot does not result in full turn"){
+  test("Test that going left and back 1 foot does not result in full turn") {
     var lastAppliedSignal = zeroSignal
     val drivetrainComp = new TestDrivetrainComponent(lastAppliedSignal = _)
 
@@ -195,7 +195,6 @@ class PurePursuitTasksTest extends FunSuite {
     implicit val tolerance = Percent(0.01)
     val turn = lastAppliedSignal.turn
 
-
     assert(turn ~= Percent(0), s"Turn was actually $turn")
   }
 
@@ -234,4 +233,3 @@ class PurePursuitTasksTest extends FunSuite {
     assert(lastAppliedSignal.turn.abs <= Percent(1), s"Turn was ${lastAppliedSignal.turn.toPercent} %")
   }
 }
-

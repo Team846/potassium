@@ -54,6 +54,8 @@ class JSClockTest extends AsyncFunSuite {
       promise.success(true)
     }
 
-    promise.future.map { v => assert(v) }
+    promise.future.map { v =>
+      assert(v)
+    }
   }
 }
