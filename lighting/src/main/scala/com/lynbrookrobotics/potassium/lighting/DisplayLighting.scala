@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.lighting
 
+import com.lynbrookrobotics.potassium.Component
 import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.ContinuousTask
 
@@ -15,4 +16,6 @@ class DisplayLighting(signal: Stream[Int], lightingComponent: LightingComponent)
   override def onEnd(): Unit = {
     lightingComponent.resetToDefault()
   }
+
+  override val dependencies: Set[Component[_]] = Set(lightingComponent)
 }

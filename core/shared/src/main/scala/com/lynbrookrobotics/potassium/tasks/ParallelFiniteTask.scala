@@ -1,4 +1,5 @@
 package com.lynbrookrobotics.potassium.tasks
+import com.lynbrookrobotics.potassium.Component
 
 /**
   * A finite task where two subtasks are run in parallel
@@ -30,4 +31,6 @@ class ParallelFiniteTask private[tasks] (first: FiniteTask, second: FiniteTask)
       second.abort()
     }
   }
+
+  override val dependencies: Set[Component[_]] = first.dependencies ++ second.dependencies
 }

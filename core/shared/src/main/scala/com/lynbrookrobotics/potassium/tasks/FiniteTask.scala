@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.tasks
 
+import com.lynbrookrobotics.potassium.Component
 import com.lynbrookrobotics.potassium.clock.Clock
 import squants.Time
 
@@ -112,6 +113,8 @@ abstract class FiniteTask extends Task { self =>
     override def onStart() = self.init()
 
     override def onEnd() = self.abort()
+
+    override val dependencies: Set[Component[_]] = self.dependencies
   }
 }
 
@@ -120,5 +123,7 @@ object FiniteTask {
     override def onStart(): Unit = finished()
 
     override def onEnd(): Unit = {}
+
+    override val dependencies: Set[Component[_]] = Set()
   }
 }

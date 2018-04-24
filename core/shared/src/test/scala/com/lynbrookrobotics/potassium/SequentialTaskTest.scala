@@ -23,6 +23,8 @@ class SequentialTaskTest extends FunSuite {
         task1Ended = true
       }
 
+      override val dependencies: Set[Component[_]] = Set()
+
       task1FinishTrigger = Some(() => finished())
     }
 
@@ -34,6 +36,8 @@ class SequentialTaskTest extends FunSuite {
       override def onEnd(): Unit = {
         task2Ended = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
 
       task2FinishTrigger = Some(() => finished())
     }
@@ -71,6 +75,8 @@ class SequentialTaskTest extends FunSuite {
       override def onEnd(): Unit = {
         task1Ended = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     val task2 = new FiniteTask {
@@ -81,6 +87,8 @@ class SequentialTaskTest extends FunSuite {
       override def onEnd(): Unit = {
         task2Ended = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     val sequential = task1 then task2
@@ -116,6 +124,8 @@ class SequentialTaskTest extends FunSuite {
         task1Ended = true
       }
 
+      override val dependencies: Set[Component[_]] = Set()
+
       task1FinishTrigger = Some(() => finished())
     }
 
@@ -127,6 +137,8 @@ class SequentialTaskTest extends FunSuite {
       override def onEnd(): Unit = {
         task2Ended = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     val sequential = task1 then task2
@@ -166,6 +178,8 @@ class SequentialTaskTest extends FunSuite {
         task1Ended = true
       }
 
+      override val dependencies: Set[Component[_]] = Set()
+
       task1FinishTrigger = Some(() => finished())
     }
 
@@ -177,6 +191,8 @@ class SequentialTaskTest extends FunSuite {
       override def onEnd(): Unit = {
         task2Ended = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     val sequential = task1 then task2
@@ -211,6 +227,8 @@ class SequentialTaskTest extends FunSuite {
       override def onEnd(): Unit = {
         task1Ended = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     val task2 = new ContinuousTask {
@@ -221,6 +239,8 @@ class SequentialTaskTest extends FunSuite {
       override def onEnd(): Unit = {
         task2Ended = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     val sequential = task1 then task2

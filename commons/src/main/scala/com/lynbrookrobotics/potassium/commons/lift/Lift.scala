@@ -82,6 +82,8 @@ abstract class Lift {
       override def onEnd(): Unit = {
         lift.resetToDefault()
       }
+
+      override val dependencies: Set[Component[_]] = Set(lift)
     }
 
     //move arm above target using bangbang control. When it is above target, run inner (finite) task.
@@ -99,6 +101,8 @@ abstract class Lift {
       }
 
       override def onEnd(): Unit = lift.resetToDefault()
+
+      override val dependencies: Set[Component[_]] = Set(lift)
     }
 
     //move arm below target using bangbang control. When it is below target, run inner (finite) task.
@@ -116,6 +120,8 @@ abstract class Lift {
       }
 
       override def onEnd(): Unit = lift.resetToDefault()
+
+      override val dependencies: Set[Component[_]] = Set(lift)
     }
 
   }

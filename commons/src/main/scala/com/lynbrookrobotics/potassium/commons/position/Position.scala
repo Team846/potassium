@@ -60,6 +60,8 @@ abstract class Position[S <: Quantity[S],
       override def onEnd(): Unit = {
         comp.resetToDefault()
       }
+
+      override val dependencies: Set[Component[_]] = Set(comp)
     }
 
     class HoldPosition(pos: S)(implicit properties: Signal[Properties], hardware: Hardware, comp: Comp) extends ContinuousTask {
@@ -71,6 +73,8 @@ abstract class Position[S <: Quantity[S],
       override def onEnd(): Unit = {
         comp.resetToDefault()
       }
+
+      override val dependencies: Set[Component[_]] = Set(comp)
     }
   }
 

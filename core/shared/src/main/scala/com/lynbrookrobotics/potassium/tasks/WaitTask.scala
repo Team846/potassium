@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.tasks
 
+import com.lynbrookrobotics.potassium.Component
 import com.lynbrookrobotics.potassium.clock.Clock
 import squants.Time
 
@@ -18,4 +19,6 @@ final class WaitTask(time: Time)(implicit clock: Clock) extends FiniteTask {
   }
 
   override def onEnd(): Unit = {}
+
+  override val dependencies: Set[Component[_]] = Set()
 }

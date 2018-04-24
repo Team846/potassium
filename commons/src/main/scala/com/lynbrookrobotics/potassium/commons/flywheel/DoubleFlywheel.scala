@@ -91,6 +91,8 @@ abstract class DoubleFlywheel {
       override def onEnd(): Unit = {
         doubleFlywheel.resetToDefault()
       }
+
+      override val dependencies: Set[Component[_]] = Set(doubleFlywheel)
     }
 
     class WhileAtDoubleVelocity(leftVel: Stream[Frequency], rightVel: Stream[Frequency], tolerance: Frequency)
@@ -110,6 +112,8 @@ abstract class DoubleFlywheel {
       override def onEnd(): Unit = {
         doubleFlywheel.resetToDefault()
       }
+
+      override val dependencies: Set[Component[_]] = Set(doubleFlywheel)
     }
   }
 

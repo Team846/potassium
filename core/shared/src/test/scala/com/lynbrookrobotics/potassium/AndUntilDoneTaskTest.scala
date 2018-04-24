@@ -22,6 +22,8 @@ class AndUntilDoneTaskTest extends FunSuite {
         task1Ended = true
       }
 
+      override val dependencies: Set[Component[_]] = Set()
+
       task1FinishTrigger = Some(() => finished())
     }
 
@@ -33,6 +35,8 @@ class AndUntilDoneTaskTest extends FunSuite {
       override def onEnd(): Unit = {
         task2Ended = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     val andUntilDone = task1 andUntilDone task2
@@ -64,6 +68,8 @@ class AndUntilDoneTaskTest extends FunSuite {
       override def onEnd(): Unit = {
         task1Ended = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     val task2 = new ContinuousTask {
@@ -74,6 +80,8 @@ class AndUntilDoneTaskTest extends FunSuite {
       override def onEnd(): Unit = {
         task2Ended = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     val andUntilDone = task1 andUntilDone task2

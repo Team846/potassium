@@ -31,6 +31,8 @@ trait UnicycleCoreTasks {
     override def onEnd(): Unit = {
       drive.resetToDefault()
     }
+
+    override val dependencies: Set[Component[_]] = Set(drive)
   }
 
 
@@ -46,6 +48,8 @@ trait UnicycleCoreTasks {
     override def onEnd(): Unit = {
       drive.resetToDefault()
     }
+
+    override val dependencies: Set[Component[_]] = Set(drive)
   }
 
   class ContinuousVelocityDrive(forward: Stream[Velocity], turn: Stream[AngularVelocity])
@@ -60,6 +64,8 @@ trait UnicycleCoreTasks {
     override def onEnd(): Unit = {
       drive.resetToDefault()
     }
+
+    override val dependencies: Set[Component[_]] = Set(drive)
   }
 
   class DriveDistance(distance: Length, tolerance: Length)
@@ -82,6 +88,8 @@ trait UnicycleCoreTasks {
     override def onEnd(): Unit = {
       drive.resetToDefault()
     }
+
+    override val dependencies: Set[Component[_]] = Set(drive)
   }
 
   class DriveDistanceWithTrapezoidalProfile(cruisingVelocity: Velocity,
@@ -128,6 +136,8 @@ trait UnicycleCoreTasks {
     override def onEnd(): Unit = {
       drive.resetToDefault()
     }
+
+    override val dependencies: Set[Component[_]] = Set(drive)
   }
 
   /**
@@ -198,6 +208,8 @@ trait UnicycleCoreTasks {
       stableTicks = 0
       drive.resetToDefault()
     }
+
+    override val dependencies: Set[Component[_]] = Set(drive)
   }
 
   class DriveDistanceAtAngle(distance: Length,
@@ -236,6 +248,8 @@ trait UnicycleCoreTasks {
     override def onEnd(): Unit = {
       drive.resetToDefault()
     }
+
+    override val dependencies: Set[Component[_]] = Set(drive)
   }
 
   class DriveBeyondStraight(distance: Length,
@@ -290,6 +304,8 @@ trait UnicycleCoreTasks {
     override def onEnd(): Unit = {
       drive.resetToDefault()
     }
+
+    override val dependencies: Set[Component[_]] = Set(drive)
   }
 
 
@@ -324,6 +340,8 @@ trait UnicycleCoreTasks {
     override def onEnd(): Unit = {
       drive.resetToDefault()
     }
+
+    override val dependencies: Set[Component[_]] = Set(drive)
   }
 
   class RotateToAngle(absoluteAngle: Angle, tolerance: Angle)
@@ -344,6 +362,8 @@ trait UnicycleCoreTasks {
     override def onEnd(): Unit = {
       drive.resetToDefault()
     }
+
+    override val dependencies: Set[Component[_]] = Set(drive)
   }
 
   class CorrectOffsetWithLatency(timestampedOffset: Stream[(Angle, Time)], tolerance: Angle)
@@ -384,9 +404,11 @@ trait UnicycleCoreTasks {
     override def onEnd(): Unit = {
       drive.resetToDefault()
     }
+
+    override val dependencies: Set[Component[_]] = Set(drive)
   }
 
-  class DriveToTargetWithConstantSpeed(drivetrainComponent: Drivetrain,
+  class DriveToTargetWithConstantSpeed(drive: Drivetrain,
                                        distanceToTarget: Stream[Option[Length]],
                                        angleToTarget: Stream[Angle],
                                        forwardVelocity: Dimensionless,
@@ -408,7 +430,7 @@ trait UnicycleCoreTasks {
         }
       )
 
-      drivetrainComponent.setController(out.withCheckZipped(distanceToTarget){
+      drive.setController(out.withCheckZipped(distanceToTarget){
         distanceToTarget => {
           if (distanceToTarget.exists(_ <= minDistance)) {
             finished()
@@ -418,7 +440,9 @@ trait UnicycleCoreTasks {
     }
 
     override def onEnd(): Unit = {
-      drivetrainComponent.resetToDefault()
+      drive.resetToDefault()
     }
+
+    override val dependencies: Set[Component[_]] = Set(drive)
   }
 }

@@ -20,6 +20,8 @@ class TimeoutFiniteTaskTest extends FunSuite {
         task1Ended = true
       }
 
+      override val dependencies: Set[Component[_]] = Set()
+
       task1FinishTrigger = Some(() => finished())
     }
 
@@ -50,6 +52,8 @@ class TimeoutFiniteTaskTest extends FunSuite {
       override def onEnd(): Unit = {
         task1Ended = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     implicit val (clock, trigger) = ClockMocking.mockedClockTicker

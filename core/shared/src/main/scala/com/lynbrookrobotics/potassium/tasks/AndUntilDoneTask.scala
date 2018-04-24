@@ -1,4 +1,5 @@
 package com.lynbrookrobotics.potassium.tasks
+import com.lynbrookrobotics.potassium.Component
 
 /**
   * A finite task where a continuous task is run while a finite task is running
@@ -28,4 +29,6 @@ class AndUntilDoneTask private[tasks](first: FiniteTask, second: ContinuousTask)
 
     second.abort()
   }
+
+  override val dependencies: Set[Component[_]] = first.dependencies ++ second.dependencies
 }

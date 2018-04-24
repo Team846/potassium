@@ -65,7 +65,6 @@ class ContinuousEvent {
     */
   def foreach(task: ContinuousTask): Unit = {
     onStart.foreach { () =>
-      Task.abortCurrentTask()
       Task.executeTask(task)
     }
 
@@ -80,8 +79,6 @@ class ContinuousEvent {
     var currentRunningTask: ContinuousTask = null
 
     onStart.foreach { () =>
-      Task.abortCurrentTask()
-
       currentRunningTask = task.get
 
       Task.executeTask(currentRunningTask)

@@ -1,4 +1,5 @@
 package com.lynbrookrobotics.potassium.tasks
+import com.lynbrookrobotics.potassium.Component
 
 sealed trait WrapperTaskState
 case object WrapperStopped extends WrapperTaskState
@@ -14,6 +15,7 @@ abstract class WrapperTask { self =>
 
   def onStart(): Unit
   def onEnd(): Unit
+  val dependencies: Set[Component[_]]
 
   def apply(inner: FiniteTask): FiniteTask = {
     new FiniteTask with FiniteTaskFinishedListener {
@@ -50,6 +52,8 @@ abstract class WrapperTask { self =>
           finished()
         }
       }
+
+      override val dependencies: Set[Component[_]] = inner.dependencies ++ self.dependencies
     }
   }
 
@@ -81,6 +85,8 @@ abstract class WrapperTask { self =>
 
         state = WrapperStopped
       }
+
+      override val dependencies: Set[Component[_]] = inner.dependencies ++ self.dependencies
     }
   }
 

@@ -1,5 +1,6 @@
 package com.lynbrookrobotics.potassium.tasks
 
+import com.lynbrookrobotics.potassium.Component
 import com.lynbrookrobotics.potassium.clock.Clock
 import squants.Time
 
@@ -34,4 +35,6 @@ class TimeoutFiniteTask private[tasks](task: FiniteTask, timeout: Time, clock: C
       task.abort()
     }
   }
+
+  override val dependencies: Set[Component[_]] = task.dependencies
 }

@@ -19,6 +19,8 @@ class WrapperTaskTest extends FunSuite {
         finiteTaskEnded = true
       }
 
+      override val dependencies: Set[Component[_]] = Set()
+
       finiteTaskFinishTrigger = Some(() => finished())
     }
 
@@ -35,6 +37,8 @@ class WrapperTaskTest extends FunSuite {
       override def onEnd() = {
         wrapperTaskEnded = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
 
       wrapperTaskFinishTrigger = Some(() => readyToRunInner())
     }
@@ -71,6 +75,8 @@ class WrapperTaskTest extends FunSuite {
         finiteTaskEnded = true
       }
 
+      override val dependencies: Set[Component[_]] = Set()
+
       finiteTaskFinishTrigger = Some(() => finished())
     }
 
@@ -87,6 +93,8 @@ class WrapperTaskTest extends FunSuite {
       override def onEnd() = {
         wrapperTaskEnded = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
 
       wrapperTaskFinishTrigger = Some(() => readyToRunInner())
     }
@@ -119,6 +127,8 @@ class WrapperTaskTest extends FunSuite {
         finiteTaskEnded = true
       }
 
+      override val dependencies: Set[Component[_]] = Set()
+
       finiteTaskFinishTrigger = Some(() => finished())
     }
 
@@ -135,6 +145,8 @@ class WrapperTaskTest extends FunSuite {
       override def onEnd() = {
         wrapperTaskEnded = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
 
       wrapperTaskFinishTrigger = Some(() => readyToRunInner())
     }
@@ -168,6 +180,8 @@ class WrapperTaskTest extends FunSuite {
       override def onEnd(): Unit = {
         innerTaskEnded = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     var wrapperTaskFinishTrigger: Option[() => Unit] = None
@@ -183,6 +197,8 @@ class WrapperTaskTest extends FunSuite {
       override def onEnd() = {
         wrapperTaskEnded = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
 
       wrapperTaskFinishTrigger = Some(() => readyToRunInner())
     }
@@ -216,6 +232,8 @@ class WrapperTaskTest extends FunSuite {
       override def onEnd(): Unit = {
         innerTaskEnded = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     var wrapperTaskFinishTrigger: Option[() => Unit] = None
@@ -231,6 +249,8 @@ class WrapperTaskTest extends FunSuite {
       override def onEnd() = {
         wrapperTaskEnded = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
 
       wrapperTaskFinishTrigger = Some(() => readyToRunInner())
     }

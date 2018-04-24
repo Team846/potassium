@@ -59,6 +59,8 @@ abstract class Arm {
       override def onEnd(): Unit = {
         arm.resetToDefault()
       }
+
+      override val dependencies: Set[Component[_]] = Set(arm)
     }
 
     //move arm above target using bangbang control. When it is above target, run inner (finite) task.
@@ -76,6 +78,8 @@ abstract class Arm {
         })
       }
       override def onEnd(): Unit = arm.resetToDefault()
+
+      override val dependencies: Set[Component[_]] = Set(arm)
     }
 
     //move arm below target using bangbang control. When it is below target, run inner (finite) task.
@@ -92,6 +96,8 @@ abstract class Arm {
         })
       }
       override def onEnd(): Unit = arm.resetToDefault()
+
+      override val dependencies: Set[Component[_]] = Set(arm)
     }
   }
 }

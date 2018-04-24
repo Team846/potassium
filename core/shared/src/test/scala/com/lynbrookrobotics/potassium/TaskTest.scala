@@ -5,7 +5,7 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 
 class TaskTest extends FunSuite with BeforeAndAfter {
   after {
-    Task.abortCurrentTask()
+    Task.abortCurrentTasks()
   }
 
   test("Single task execute and abort") {
@@ -20,6 +20,8 @@ class TaskTest extends FunSuite with BeforeAndAfter {
       override def abort(): Unit = {
         aborted = true
       }
+
+      override val dependencies: Set[Component[_]] = Set()
     }
 
     assert(!started && !aborted)
@@ -31,47 +33,6 @@ class TaskTest extends FunSuite with BeforeAndAfter {
     task.abort()
 
     assert(started && aborted)
-  }
-
-  test("Single task execute, replace, then abort") {
-    var firstStarted = false
-    var firstAborted = false
-    var secondStarted = false
-    var secondAborted = false
-
-    val first = new Task {
-      override def init(): Unit = {
-        firstStarted = true
-      }
-
-      override def abort(): Unit = {
-        firstAborted = true
-      }
-    }
-
-    val second = new Task {
-      override def init(): Unit = {
-        secondStarted = true
-      }
-
-      override def abort(): Unit = {
-        secondAborted = true
-      }
-    }
-
-    assert(!firstStarted && !firstAborted && !secondStarted && !secondAborted)
-
-    Task.executeTask(first)
-
-    assert(firstStarted && !firstAborted && !secondStarted && !secondAborted)
-
-    Task.executeTask(second)
-
-    assert(firstStarted && firstAborted && secondStarted && !secondAborted)
-
-    Task.abortCurrentTask()
-
-    assert(firstStarted && firstAborted && secondStarted && secondAborted)
   }
 
   test("FiniteTask.empty immediately finishes"){

@@ -29,7 +29,7 @@ class LightingTest extends FunSuite {
     comm.dataToLog()
     assertResult("2")(comm.pullLog())
 
-    Task.abortCurrentTask()
+    Task.abortCurrentTasks()
     trigger(period)
     comm.dataToLog()
     assertResult("0")(comm.pullLog())
@@ -56,7 +56,7 @@ class LightingTest extends FunSuite {
     comm.dataToLog()
     assertResult("No data to show")(comm.pullLog())
 
-    Task.abortCurrentTask()
+    Task.abortCurrentTasks()
     trigger(period)
     comm.dataToLog()
     assertResult("No data to show")(comm.pullLog())
