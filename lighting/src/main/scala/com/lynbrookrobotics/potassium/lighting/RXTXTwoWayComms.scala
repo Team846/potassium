@@ -38,7 +38,7 @@ class RXTXTwoWayComms extends TwoWayComm{
   def newData(int: Int): Unit = data = int
 
   class SerialReader(var in: InputStream) extends Runnable {
-    def run() {
+    def run(): Unit = {
       val buffer = new Array[Byte](1024)
       var len = -1
       try{
@@ -59,7 +59,7 @@ class RXTXTwoWayComms extends TwoWayComm{
   }
 
   class SerialWriter(var out: OutputStream) extends Runnable {
-    def run() {
+    def run(): Unit = {
       try {
         while (true) {
           out.write(data)
@@ -73,7 +73,7 @@ class RXTXTwoWayComms extends TwoWayComm{
 
   override def connect(): Unit = connect(systemPort)
 
-  def connect(portName: String) {
+  def connect(portName: String): Unit = {
     logQueue.enqueue("Connecting on port " + portName + "\n")
     val portIdentifier = CommPortIdentifier.getPortIdentifier(portName)
     if (portIdentifier.isCurrentlyOwned) {

@@ -33,7 +33,7 @@ class LazyTalon(
   private def setPeakAndNominalOutputs(
                                         peakOutputReverse: Double = defaultPeakOutputReverse,
                                         peakOutputForward: Double = defaultPeakOutputForward
-                                      ) {
+                                      ): Unit = {
     if (lastPeakOutputReverse != peakOutputReverse) {
       t.configPeakOutputReverse(peakOutputReverse, timeout)
       lastPeakOutputReverse = peakOutputReverse

@@ -9,7 +9,7 @@ class Histogram(min: Time, max: Time, binCount: Int, asyncLogger: AsyncLogger) {
   // bins and "less than min" and "greater than max"
   val bins = new Array[Long](binCount + 2)
 
-  def apply(value: Time) {
+  def apply(value: Time): Unit = {
     if (value < min) {
       bins(0) += 1
     } else if (value > max) {
