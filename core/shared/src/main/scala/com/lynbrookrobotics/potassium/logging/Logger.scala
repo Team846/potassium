@@ -1,6 +1,5 @@
 package com.lynbrookrobotics.potassium.logging
 
-
 object Logger {
   def info(message: String): Unit = {
     Console.out.println("[INFO] " + message)

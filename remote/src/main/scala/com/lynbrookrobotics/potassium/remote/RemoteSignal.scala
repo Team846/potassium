@@ -8,11 +8,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 sealed trait RemoteSignalMessage
 case object Subscribe extends RemoteSignalMessage
-case class Result[T] (data: T) extends RemoteSignalMessage
+case class Result[T](data: T) extends RemoteSignalMessage
 
 case class RemoteHost(actorSystemName: String, host: String)
 
-class RemoteSignalProviderActor[T] (source: Signal[T]) extends Actor {
+class RemoteSignalProviderActor[T](source: Signal[T]) extends Actor {
   case object SendLatestValue
 
   def receive = {
@@ -31,12 +31,12 @@ class RemoteSignalProviderActor[T] (source: Signal[T]) extends Actor {
   }
 }
 
-class RemoteSignalProvider[T] (name: String, source: Signal[T])(implicit actorSystem: ActorSystem) {
+class RemoteSignalProvider[T](name: String, source: Signal[T])(implicit actorSystem: ActorSystem) {
   val actor = actorSystem.actorOf(Props(new RemoteSignalProviderActor[T](source)), name)
   println(actor.path)
 }
 
-class RemoteSignalActor[T] (update: T => Unit, hostRef: ActorRef) extends Actor {
+class RemoteSignalActor[T](update: T => Unit, hostRef: ActorRef) extends Actor {
   def receive = {
     case Result(data: T) =>
       update(data)
@@ -46,7 +46,7 @@ class RemoteSignalActor[T] (update: T => Unit, hostRef: ActorRef) extends Actor 
   Unit
 }
 
-class RemoteSignal[T] (name: String, hostRef: ActorRef)(implicit actorSystem: ActorSystem) extends Signal[T] {
+class RemoteSignal[T](name: String, hostRef: ActorRef)(implicit actorSystem: ActorSystem) extends Signal[T] {
   private var signalValue: Option[T] = None
   override def get(): T = signalValue.get
   def getOptional(): Option[T] = signalValue

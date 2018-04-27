@@ -9,7 +9,6 @@ import com.lynbrookrobotics.potassium.units.Point
 import squants.{Dimensionless, Velocity}
 import squants.space.{Angle, Degrees, Length}
 
-
 trait PurePursuitTasks extends UnicycleCoreTasks {
   import controllers._
 
@@ -17,16 +16,19 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
     Degrees(90) - angle
   }
 
-  class FollowWayPoints(wayPoints: Seq[Point],
-                        tolerance: Length,
-                        maxTurnOutput: Dimensionless,
-                        cruisingVelocity: Velocity,
-                        angleDeadband: Angle = Degrees(0),
-                        targetTicksWithingTolerance: Int = 1,
-                        forwardBackwardMode: ForwardBackwardMode = Auto)
-                       (drive: Drivetrain)
-                       (implicit properties: Signal[controllers.DrivetrainProperties],
-                        hardware: controllers.DrivetrainHardware) extends FiniteTask with FiniteTaskFinishedListener {
+  class FollowWayPoints(
+    wayPoints: Seq[Point],
+    tolerance: Length,
+    maxTurnOutput: Dimensionless,
+    cruisingVelocity: Velocity,
+    angleDeadband: Angle = Degrees(0),
+    targetTicksWithingTolerance: Int = 1,
+    forwardBackwardMode: ForwardBackwardMode = Auto
+  )(drive: Drivetrain)(
+    implicit properties: Signal[controllers.DrivetrainProperties],
+    hardware: controllers.DrivetrainHardware
+  ) extends FiniteTask
+      with FiniteTaskFinishedListener {
     private var absoluteFollow: FollowWayPointsWithPosition = _
 
     override def onFinished(task: FiniteTask): Unit = {
@@ -34,8 +36,7 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
     }
 
     override def onStart(): Unit = {
-      val turnPosition = hardware.turnPosition.relativize(
-        (initialTurnPosition, curr) => curr - initialTurnPosition)
+      val turnPosition = hardware.turnPosition.relativize((initialTurnPosition, curr) => curr - initialTurnPosition)
 
       val position = XYPosition(
         turnPosition.map(compassToTrigonometric),
@@ -67,18 +68,18 @@ trait PurePursuitTasks extends UnicycleCoreTasks {
     }
   }
 
-  class FollowWayPointsWithPosition(wayPoints: Seq[Point],
-                                    tolerance: Length,
-                                    position: Stream[Point],
-                                    turnPosition: Stream[Angle],
-                                    maxTurnOutput: Dimensionless,
-                                    cruisingVelocity: Velocity,
-                                    angleDeadband: Angle = Degrees(0),
-                                    targetTicksWithingTolerance: Int = 1,
-                                    forwardBackwardMode: ForwardBackwardMode = Auto)
-                                   (drive: Drivetrain)
-                                   (implicit properties: Signal[DrivetrainProperties],
-                                    hardware: DrivetrainHardware) extends FiniteTask {
+  class FollowWayPointsWithPosition(
+    wayPoints: Seq[Point],
+    tolerance: Length,
+    position: Stream[Point],
+    turnPosition: Stream[Angle],
+    maxTurnOutput: Dimensionless,
+    cruisingVelocity: Velocity,
+    angleDeadband: Angle = Degrees(0),
+    targetTicksWithingTolerance: Int = 1,
+    forwardBackwardMode: ForwardBackwardMode = Auto
+  )(drive: Drivetrain)(implicit properties: Signal[DrivetrainProperties], hardware: DrivetrainHardware)
+      extends FiniteTask {
     override def onStart(): Unit = {
       var ticksWithinTolerance = 0
 

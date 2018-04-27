@@ -4,9 +4,9 @@ import com.lynbrookrobotics.potassium.streams.Stream
 import com.lynbrookrobotics.potassium.tasks.ContinuousTask
 
 /**
-  * Continuous Task that you feed a communicator and an rgb value.
-  * Defaults to black onEnd
-  */
+ * Continuous Task that you feed a communicator and an rgb value.
+ * Defaults to black onEnd
+ */
 class DisplayLighting(signal: Stream[Int], lightingComponent: LightingComponent) extends ContinuousTask {
   override def onStart(): Unit = {
     lightingComponent.setController(signal)

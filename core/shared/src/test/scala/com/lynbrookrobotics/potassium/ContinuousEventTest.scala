@@ -111,7 +111,6 @@ class ContinuousEventTest extends FunSuite {
   test("Opposite event from Stream fired correctly") {
     val (streamOfCondition, publishCondition) = Stream.manual[Boolean]
 
-
     var callbackRun = false
 
     val event = streamOfCondition.eventWhen(identity)

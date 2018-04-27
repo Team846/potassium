@@ -8,9 +8,9 @@ import squants.Time
 import scala.collection.mutable
 
 /**
-  * Calibration, calculation for velocity
-  * @param tickPeriod tick period of robot
-  */
+ * Calibration, calculation for velocity
+ * @param tickPeriod tick period of robot
+ */
 abstract class DigitalGyro(tickPeriod: Time) {
   // Tick Period of the robot
   var currentDrift: Value3D[AngularVelocity] = null
@@ -24,14 +24,14 @@ abstract class DigitalGyro(tickPeriod: Time) {
   var calibrating: Boolean = true
 
   /**
-    * Gets the current velocity
-    * @return Value3D
-    */
+   * Gets the current velocity
+   * @return Value3D
+   */
   def retrieveVelocity: Value3D[AngularVelocity]
 
   /**
-    * End the collection of values used to calibrate
-    */
+   * End the collection of values used to calibrate
+   */
   def endCalibration(): Unit = {
     if (calibrating) {
       val sum = calibrationVelocities.reduceLeft { (acc, cur) =>

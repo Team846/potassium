@@ -6,22 +6,22 @@ import com.lynbrookrobotics.potassium.control.offload.OffloadedSignal
 import com.lynbrookrobotics.potassium.control.offload.OffloadedSignal._
 
 class LazyTalon(
-                 val t: TalonSRX,
-                 val idx: Int = 0,
-                 val timeout: Int = 0,
-                 val defaultPeakOutputReverse: Double = -1,
-                 val defaultPeakOutputForward: Double = 1
-               ) {
+  val t: TalonSRX,
+  val idx: Int = 0,
+  val timeout: Int = 0,
+  val defaultPeakOutputReverse: Double = -1,
+  val defaultPeakOutputForward: Double = 1
+) {
   private var last: Option[OffloadedSignal] = None
   def getLastCommand: Option[OffloadedSignal] = last
 
   def applyCommand(s: OffloadedSignal): Unit = s match {
-    case it: OpenLoop => applyCommand(it)
+    case it: OpenLoop         => applyCommand(it)
     case it: PositionBangBang => applyCommand(it)
     case it: VelocityBangBang => applyCommand(it)
-    case it: PositionPID => applyCommand(it)
-    case it: VelocityPIDF => applyCommand(it)
-    case _ => println(s"Unknown type $s")
+    case it: PositionPID      => applyCommand(it)
+    case it: VelocityPIDF     => applyCommand(it)
+    case _                    => println(s"Unknown type $s")
   }
 
   t.configPeakOutputReverse(defaultPeakOutputReverse, timeout)
@@ -31,9 +31,9 @@ class LazyTalon(
   private var lastPeakOutputForward = defaultPeakOutputForward
 
   private def setPeakAndNominalOutputs(
-                                        peakOutputReverse: Double = defaultPeakOutputReverse,
-                                        peakOutputForward: Double = defaultPeakOutputForward
-                                      ) {
+    peakOutputReverse: Double = defaultPeakOutputReverse,
+    peakOutputForward: Double = defaultPeakOutputForward
+  ): Unit = {
     if (lastPeakOutputReverse != peakOutputReverse) {
       t.configPeakOutputReverse(peakOutputReverse, timeout)
       lastPeakOutputReverse = peakOutputReverse

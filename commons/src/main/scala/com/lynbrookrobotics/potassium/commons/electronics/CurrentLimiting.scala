@@ -7,9 +7,11 @@ import squants.time.TimeDerivative
 import squants.{Dimensionless, Each, Percent, Time}
 
 object CurrentLimiting {
-  def slewRate(lastMotorCommand: Dimensionless,
-               input: Stream[Dimensionless],
-               slewRate: TimeDerivative[Dimensionless]): Stream[Dimensionless] = {
+  def slewRate(
+    lastMotorCommand: Dimensionless,
+    input: Stream[Dimensionless],
+    slewRate: TimeDerivative[Dimensionless]
+  ): Stream[Dimensionless] = {
     def limit(previousOutput: Dimensionless, target: Dimensionless, dt: Time) = {
       if (previousOutput < target) {
         previousOutput + (slewRate * dt)
@@ -18,19 +20,22 @@ object CurrentLimiting {
       }
     }
 
-    input.zipWithDt.scanLeft(lastMotorCommand) { case (acc, (target, dt)) =>
-      if (target < Percent(0)) {
-        -limit(-acc, -target, dt)
-      } else {
-        limit(acc, target, dt)
-      }
+    input.zipWithDt.scanLeft(lastMotorCommand) {
+      case (acc, (target, dt)) =>
+        if (target < Percent(0)) {
+          -limit(-acc, -target, dt)
+        } else {
+          limit(acc, target, dt)
+        }
     }
   }
 
-  def limitCurrentOutput(targetPower: Dimensionless,
-                         normalizedVelocity: Dimensionless,
-                         forwardCurrentLimit: Dimensionless,
-                         backwardsCurrentLimit: Dimensionless): Dimensionless = {
+  def limitCurrentOutput(
+    targetPower: Dimensionless,
+    normalizedVelocity: Dimensionless,
+    forwardCurrentLimit: Dimensionless,
+    backwardsCurrentLimit: Dimensionless
+  ): Dimensionless = {
     if (normalizedVelocity < Each(0)) {
       -limitCurrentOutput(-targetPower, -normalizedVelocity, forwardCurrentLimit, backwardsCurrentLimit)
     } else if (targetPower > normalizedVelocity) {
@@ -44,12 +49,16 @@ object CurrentLimiting {
   }
 
   def limitCurrentOutput(
-                          target: Velocity,
-                          currentSpeed: Velocity, maxSpeed: Velocity,
-                          forwardCurrentLimit: Dimensionless,
-                          backwardsCurrentLimit: Dimensionless
-                        ): Velocity =
+    target: Velocity,
+    currentSpeed: Velocity,
+    maxSpeed: Velocity,
+    forwardCurrentLimit: Dimensionless,
+    backwardsCurrentLimit: Dimensionless
+  ): Velocity =
     maxSpeed * limitCurrentOutput(
-      Each(target / maxSpeed), Each(currentSpeed / maxSpeed), forwardCurrentLimit, backwardsCurrentLimit
+      Each(target / maxSpeed),
+      Each(currentSpeed / maxSpeed),
+      forwardCurrentLimit,
+      backwardsCurrentLimit
     ).toEach
 }

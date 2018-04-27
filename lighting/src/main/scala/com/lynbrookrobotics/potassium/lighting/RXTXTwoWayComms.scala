@@ -9,10 +9,9 @@ import scala.collection.mutable
 import scala.collection.JavaConverters._
 
 /**
-  * RXTX communication protocol for communicating with serial devices.
-  */
-
-class RXTXTwoWayComms extends TwoWayComm{
+ * RXTX communication protocol for communicating with serial devices.
+ */
+class RXTXTwoWayComms extends TwoWayComm {
   protected var data: Int = -1
   protected val logQueue: mutable.Queue[String] = mutable.Queue[String]()
   protected var connected = false
@@ -22,13 +21,13 @@ class RXTXTwoWayComms extends TwoWayComm{
   def hasLog: Boolean = logQueue.nonEmpty
 
   def clearLog(): Unit = {
-    while(logQueue.nonEmpty) {
+    while (logQueue.nonEmpty) {
       logQueue.dequeue()
     }
   }
 
   def pullLog: String = {
-    if(logQueue.nonEmpty && data != -1) {
+    if (logQueue.nonEmpty && data != -1) {
       logQueue.dequeue()
     } else {
       "No data to show"
@@ -38,20 +37,19 @@ class RXTXTwoWayComms extends TwoWayComm{
   def newData(int: Int): Unit = data = int
 
   class SerialReader(var in: InputStream) extends Runnable {
-    def run() {
+    def run(): Unit = {
       val buffer = new Array[Byte](1024)
       var len = -1
-      try{
+      try {
         def helper: Boolean = {
           len = in.read(buffer)
           len > -1
         }
-        while(helper) {
+        while (helper) {
           val log = new String(buffer, 0, len)
           logQueue.enqueue(log)
         }
-      }
-      catch {
+      } catch {
         case e: IOException => e.printStackTrace()
 
       }
@@ -59,13 +57,12 @@ class RXTXTwoWayComms extends TwoWayComm{
   }
 
   class SerialWriter(var out: OutputStream) extends Runnable {
-    def run() {
+    def run(): Unit = {
       try {
         while (true) {
           out.write(data)
         }
-      }
-      catch {
+      } catch {
         case e: IOException => e.printStackTrace()
       }
     }
@@ -73,13 +70,12 @@ class RXTXTwoWayComms extends TwoWayComm{
 
   override def connect(): Unit = connect(systemPort)
 
-  def connect(portName: String) {
+  def connect(portName: String): Unit = {
     logQueue.enqueue("Connecting on port " + portName + "\n")
     val portIdentifier = CommPortIdentifier.getPortIdentifier(portName)
     if (portIdentifier.isCurrentlyOwned) {
       logQueue.enqueue("Error: Port is currently in use\n")
-    }
-    else {
+    } else {
       val commPort = portIdentifier.open(this.getClass.getName, 2000)
       commPort match {
         case serialPort: SerialPort =>
@@ -96,15 +92,13 @@ class RXTXTwoWayComms extends TwoWayComm{
     }
   }
 
-  private val PortNames = List[String](
-    "/dev/tty.usbserial-A9007UX1",
-    "/dev/ttyACM0",
-    "/dev/ttyUSB0",
-    "COM3")
+  private val PortNames = List[String]("/dev/tty.usbserial-A9007UX1", "/dev/ttyACM0", "/dev/ttyUSB0", "COM3")
 
   def systemPort: String = {
     val portEnum = CommPortIdentifier.getPortIdentifiers.asScala
-    portEnum.map(_.asInstanceOf[CommPortIdentifier].getName).
-      find(PortNames.contains).getOrElse(throw new NoSuchElementException("No ports found"))
+    portEnum
+      .map(_.asInstanceOf[CommPortIdentifier].getName)
+      .find(PortNames.contains)
+      .getOrElse(throw new NoSuchElementException("No ports found"))
   }
 }

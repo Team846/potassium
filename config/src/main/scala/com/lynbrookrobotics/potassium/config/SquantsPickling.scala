@@ -13,14 +13,13 @@ object SquantsPickling {
     override def encode(q: Q): Json = (q.value, q.unit.getClass.getSimpleName.replace("$", "")).jencode
   }
 
-  def dimension_impl[Q <: Quantity[Q] : c.WeakTypeTag](c: blackbox.Context): c.Expr[Dimension[Q]] = {
+  def dimension_impl[Q <: Quantity[Q]: c.WeakTypeTag](c: blackbox.Context): c.Expr[Dimension[Q]] = {
     import c.universe._
 
     c.Expr[Dimension[Q]](q"${weakTypeTag[Q].tpe.typeSymbol.companion}")
   }
 
-  def quantityReader_impl[Q <: Quantity[Q] : c.WeakTypeTag]
-  (c: blackbox.Context): c.Expr[DecodeJson[Q]] = {
+  def quantityReader_impl[Q <: Quantity[Q]: c.WeakTypeTag](c: blackbox.Context): c.Expr[DecodeJson[Q]] = {
     import c.universe._
 
     val dimension = dimension_impl[Q](c)
@@ -47,8 +46,9 @@ object SquantsPickling {
       (q.value, q.uom.getClass.getSimpleName.replace("$", "") + " / s").jencode
   }
 
-  def genericDerivativeReader_impl[Q <: Quantity[Q] : c.WeakTypeTag]
-  (c: blackbox.Context): c.Expr[DecodeJson[GenericDerivative[Q]]] = {
+  def genericDerivativeReader_impl[Q <: Quantity[Q]: c.WeakTypeTag](
+    c: blackbox.Context
+  ): c.Expr[DecodeJson[GenericDerivative[Q]]] = {
     import c.universe._
 
     val dimension = dimension_impl[Q](c)
@@ -69,14 +69,16 @@ object SquantsPickling {
   }
 
   implicit def genericDerivativeReader[Q <: Quantity[Q]]: DecodeJson[GenericDerivative[Q]] =
-  macro genericDerivativeReader_impl[Q]
+    macro genericDerivativeReader_impl[Q]
 
   implicit def genericIntegralWriter[Q <: Quantity[Q]] = new EncodeJson[GenericIntegral[Q]]() {
-    override def encode(q: GenericIntegral[Q]): Json = (q.value, q.uom.getClass.getSimpleName.replace("$", "") + " * s").jencode
+    override def encode(q: GenericIntegral[Q]): Json =
+      (q.value, q.uom.getClass.getSimpleName.replace("$", "") + " * s").jencode
   }
 
-  def genericIntegralReader_impl[Q <: Quantity[Q] : c.WeakTypeTag]
-  (c: blackbox.Context): c.Expr[DecodeJson[GenericIntegral[Q]]] = {
+  def genericIntegralReader_impl[Q <: Quantity[Q]: c.WeakTypeTag](
+    c: blackbox.Context
+  ): c.Expr[DecodeJson[GenericIntegral[Q]]] = {
     import c.universe._
 
     val dimension = dimension_impl[Q](c)
@@ -97,5 +99,5 @@ object SquantsPickling {
   }
 
   implicit def genericIntegralReader[Q <: Quantity[Q]]: DecodeJson[GenericIntegral[Q]] =
-  macro genericIntegralReader_impl[Q]
+    macro genericIntegralReader_impl[Q]
 }

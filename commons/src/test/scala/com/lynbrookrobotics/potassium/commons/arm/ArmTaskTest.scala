@@ -24,7 +24,8 @@ class ArmTaskTest extends FunSuite {
     }
 
     implicit val props = Signal.constant(new ArmProperties {
-      override def positionGains: PIDConfig[Angle, Angle, GenericValue[Angle], AngularVelocity, GenericIntegral[Angle], Dimensionless] =
+      override def positionGains
+        : PIDConfig[Angle, Angle, GenericValue[Angle], AngularVelocity, GenericIntegral[Angle], Dimensionless] =
         PIDConfig[Angle, Angle, GenericValue[Angle], AngularVelocity, GenericIntegral[Angle], Dimensionless](
           Percent(100) / Degrees(90),
           Percent(0) / (Degrees(5) * Milliseconds(5)),
@@ -75,7 +76,8 @@ class ArmTaskTest extends FunSuite {
     }
 
     implicit val props = Signal.constant(new ArmProperties {
-      override def positionGains: PIDConfig[Angle, Angle, GenericValue[Angle], AngularVelocity, GenericIntegral[Angle], Dimensionless] =
+      override def positionGains
+        : PIDConfig[Angle, Angle, GenericValue[Angle], AngularVelocity, GenericIntegral[Angle], Dimensionless] =
         PIDConfig[Angle, Angle, GenericValue[Angle], AngularVelocity, GenericIntegral[Angle], Dimensionless](
           Percent(100) / Degrees(90),
           Percent(0) / (Degrees(5) * Milliseconds(5)),
@@ -128,7 +130,8 @@ class ArmTaskTest extends FunSuite {
     }
 
     implicit val props = Signal.constant(new ArmProperties {
-      override def positionGains: PIDConfig[Angle, Angle, GenericValue[Angle], AngularVelocity, GenericIntegral[Angle], Dimensionless] =
+      override def positionGains
+        : PIDConfig[Angle, Angle, GenericValue[Angle], AngularVelocity, GenericIntegral[Angle], Dimensionless] =
         PIDConfig[Angle, Angle, GenericValue[Angle], AngularVelocity, GenericIntegral[Angle], Dimensionless](
           Percent(100) / Degrees(90),
           Percent(0) / (Degrees(5) * Milliseconds(5)),
@@ -152,7 +155,8 @@ class ArmTaskTest extends FunSuite {
       override val angle: Stream[Angle] = Stream.periodic(tickPeriod)(currentAngle)
     }
 
-    val task = new arm.positionTasks.WhileAtPosition(hardware.angle.mapToConstant(Degrees(90)), Degrees(5))(testArm).toFinite
+    val task =
+      new arm.positionTasks.WhileAtPosition(hardware.angle.mapToConstant(Degrees(90)), Degrees(5))(testArm).toFinite
 
     task.init()
 

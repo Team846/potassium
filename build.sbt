@@ -14,11 +14,11 @@ git.formattedShaVersion := git.gitHeadCommit.value map { sha =>
   if (isRelease) potassiumVersion else s"$potassiumVersion-${sha.take(8)}"
 }
 
-scalaVersion in ThisBuild := "2.12.1"
+scalaVersion in ThisBuild := "2.12.4"
 
 resolvers in ThisBuild += "Funky-Repo" at "http://lynbrookrobotics.com/repo"
 
-lazy val sharedDependencies = if (System.getenv("NATIVE_TARGET") == "ARM32") { 
+lazy val sharedDependencies = if (System.getenv("NATIVE_TARGET") == "ARM32") {
   Def.setting(Seq(
     "org.typelevel"  %%% "squants"  % "1.3.0"
   ))

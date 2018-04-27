@@ -6,7 +6,8 @@ import squants.time.{Seconds, Time, TimeDerivative, TimeIntegral}
 import scala.language.implicitConversions
 
 class GenericIntegral[T <: Quantity[T]](val value: Double, val uom: UnitOfMeasure[T])
-  extends Quantity[GenericIntegral[T]] with TimeIntegral[GenericValue[T]] {
+    extends Quantity[GenericIntegral[T]]
+    with TimeIntegral[GenericValue[T]] {
   override def unit: UnitOfMeasure[GenericIntegral[T]] = new UnitOfMeasure[GenericIntegral[T]] {
     override protected def converterFrom = identity
 
@@ -25,7 +26,8 @@ class GenericIntegral[T <: Quantity[T]](val value: Double, val uom: UnitOfMeasur
 }
 
 class GenericDerivative[T <: Quantity[T]](val value: Double, val uom: UnitOfMeasure[T])
-  extends Quantity[GenericDerivative[T]] with TimeDerivative[GenericValue[T]] {
+    extends Quantity[GenericDerivative[T]]
+    with TimeDerivative[GenericValue[T]] {
   override def unit: UnitOfMeasure[GenericDerivative[T]] = new UnitOfMeasure[GenericDerivative[T]] {
     override protected def converterFrom = identity
 
@@ -44,7 +46,9 @@ class GenericDerivative[T <: Quantity[T]](val value: Double, val uom: UnitOfMeas
 }
 
 class GenericValue[T <: Quantity[T]](val value: Double, val uom: UnitOfMeasure[T])
-  extends Quantity[GenericValue[T]] with TimeIntegral[GenericDerivative[T]] with TimeDerivative[GenericIntegral[T]] {
+    extends Quantity[GenericValue[T]]
+    with TimeIntegral[GenericDerivative[T]]
+    with TimeDerivative[GenericIntegral[T]] {
   override def unit: UnitOfMeasure[GenericValue[T]] = new UnitOfMeasure[GenericValue[T]] {
     override protected def converterFrom = identity
 

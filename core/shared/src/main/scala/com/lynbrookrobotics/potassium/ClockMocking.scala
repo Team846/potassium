@@ -29,17 +29,19 @@ object ClockMocking {
 
         thunks = (period, selfSchedulingThunk) :: thunks
 
-        () => thunks = thunks.filterNot(_._2 == selfSchedulingThunk)
+        () =>
+          thunks = thunks.filterNot(_._2 == selfSchedulingThunk)
       }
 
       private def scheduleAtTime(time: Time)(thunk: () => Unit): Cancel = {
         val newThunk = (time, thunk)
         thunks = newThunk :: thunks
-        () => {
-          if (currentTime <= time) {
-            thunks = thunks.filterNot(it => it == newThunk)
+        () =>
+          {
+            if (currentTime <= time) {
+              thunks = thunks.filterNot(it => it == newThunk)
+            }
           }
-        }
       }
 
       override def singleExecution(delay: Time)(thunk: => Unit): Cancel = {
@@ -52,14 +54,17 @@ object ClockMocking {
     (ticker, (period: Time) => {
       _currentTime += period
 
-      thunks.filter{ case (scheduledTime, _) =>
-        _currentTime >= scheduledTime
-      }.foreach{ case (_, thunk) =>
-        thunk()
+      thunks.filter {
+        case (scheduledTime, _) =>
+          _currentTime >= scheduledTime
+      }.foreach {
+        case (_, thunk) =>
+          thunk()
       }
 
-      thunks = thunks.filterNot{ case (scheduledTime, _) =>
-        _currentTime >= scheduledTime
+      thunks = thunks.filterNot {
+        case (scheduledTime, _) =>
+          _currentTime >= scheduledTime
       }
     })
   }

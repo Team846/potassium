@@ -11,21 +11,21 @@ import org.mockito.Mockito._
 import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 import squants.time.Milliseconds
 
-class CANifierTest extends FunSuite with MockitoSugar{
+class CANifierTest extends FunSuite with MockitoSugar {
 
-  test("Custom color class stores RGB values"){
+  test("Custom color class stores RGB values") {
     val color = Color.rgb(255, 255, 255)
     assert(color.red == 255 && color.blue == 255 && color.green == 255)
   }
 
-  test("Custom color class does not allow RGB values outside of valid range"){
+  test("Custom color class does not allow RGB values outside of valid range") {
     val lowerColor = Color.rgb(-10, -10, -10)
     assert(lowerColor == Color.rgb(0, 0, 0))
     val higherColor = Color.rgb(300, 300, 300)
     assert(higherColor == Color.rgb(255, 255, 255))
   }
 
-  test("HSV to RGB conversion works correctly"){
+  test("HSV to RGB conversion works correctly") {
     val color0 = Color.hsv(0, 1, 1)
     val color60 = Color.hsv(60, 1, 1)
     val color120 = Color.hsv(120, 1, 1)
@@ -42,7 +42,7 @@ class CANifierTest extends FunSuite with MockitoSugar{
     assert(color359 == Color.rgb(255, 0, 4))
   }
 
-  test("Setting LEDs to specific color outputs results in correct status"){
+  test("Setting LEDs to specific color outputs results in correct status") {
     val period = Milliseconds(10)
     implicit val (mockedClock, trigger) = ClockMocking.mockedClockTicker
     val mockedCanifier = mock[CANifier]
@@ -55,9 +55,12 @@ class CANifierTest extends FunSuite with MockitoSugar{
     trigger.apply(period)
     component.setController(Stream.periodic[Color](period)(Color.rgb(0, 255, 255)))
     trigger.apply(period)
-    verify(mockedCanifier, times(2)).setLEDOutput(argumentCaptor.capture(), ArgumentMatchers.eq(CANifier.LEDChannel.LEDChannelA))
-    verify(mockedCanifier, times(2)).setLEDOutput(argumentCaptor.capture(), ArgumentMatchers.eq(CANifier.LEDChannel.LEDChannelB))
-    verify(mockedCanifier, times(2)).setLEDOutput(argumentCaptor.capture(), ArgumentMatchers.eq(CANifier.LEDChannel.LEDChannelC))
+    verify(mockedCanifier, times(2))
+      .setLEDOutput(argumentCaptor.capture(), ArgumentMatchers.eq(CANifier.LEDChannel.LEDChannelA))
+    verify(mockedCanifier, times(2))
+      .setLEDOutput(argumentCaptor.capture(), ArgumentMatchers.eq(CANifier.LEDChannel.LEDChannelB))
+    verify(mockedCanifier, times(2))
+      .setLEDOutput(argumentCaptor.capture(), ArgumentMatchers.eq(CANifier.LEDChannel.LEDChannelC))
     val arguments = argumentCaptor.getAllValues
     assert(arguments.get(0) == 0.0)
     assert(arguments.get(1) == 1.0)

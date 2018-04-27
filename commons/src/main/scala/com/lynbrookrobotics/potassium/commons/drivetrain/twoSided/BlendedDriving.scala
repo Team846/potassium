@@ -7,31 +7,31 @@ import squants.motion.RadiansPerSecond
 import squants.{Dimensionless, Each, Length, Percent, Velocity}
 
 object BlendedDriving {
-  def driveWithRadius(radius: Stream[Length],
-                      velocity: Stream[Velocity])
-                     (implicit props: Signal[TwoSidedDriveProperties]): Stream[TwoSided[Velocity]] = {
-    velocity.zip(radius).map { case (velocity, radius) =>
-      if (radius.value == Double.PositiveInfinity || radius.value == Double.NegativeInfinity || radius.value == Double.NaN) {
-        TwoSided(velocity, velocity)
-      } else {
-        val angularVelocity = RadiansPerSecond(velocity.toFeetPerSecond / radius.toFeet)
+  def driveWithRadius(radius: Stream[Length], velocity: Stream[Velocity])(
+    implicit props: Signal[TwoSidedDriveProperties]
+  ): Stream[TwoSided[Velocity]] = {
+    velocity.zip(radius).map {
+      case (velocity, radius) =>
+        if (radius.value == Double.PositiveInfinity || radius.value == Double.NegativeInfinity || radius.value == Double.NaN) {
+          TwoSided(velocity, velocity)
+        } else {
+          val angularVelocity = RadiansPerSecond(velocity.toFeetPerSecond / radius.toFeet)
 
-        val left = angularVelocity onRadius (radius + props.get.track / 2)
-        val right = angularVelocity onRadius (radius - props.get.track / 2)
-        TwoSided(left, right)
-      }
+          val left = angularVelocity onRadius (radius + props.get.track / 2)
+          val right = angularVelocity onRadius (radius - props.get.track / 2)
+          TwoSided(left, right)
+        }
     }
   }
 
   /**
-    * Take the weighted average of the speed for tank like driving and for
-    * driving at a constant radius. The weight of the average is decided by
-    * the current, normalized speed
-    */
-  def blend(constantRadiusSpeed: Velocity,
-            tankSpeed: Velocity,
-            targetForward: Velocity)
-           (implicit props: Signal[TwoSidedDriveProperties]): Velocity = {
+   * Take the weighted average of the speed for tank like driving and for
+   * driving at a constant radius. The weight of the average is decided by
+   * the current, normalized speed
+   */
+  def blend(constantRadiusSpeed: Velocity, tankSpeed: Velocity, targetForward: Velocity)(
+    implicit props: Signal[TwoSidedDriveProperties]
+  ): Velocity = {
     val normalizedTargetForwardSpeed = targetForward / props.get.maxForwardVelocity
 
     val constantRadiusWeight = Each(
@@ -42,17 +42,20 @@ object BlendedDriving {
     tankWeight.toEach * tankSpeed + constantRadiusWeight.toEach * constantRadiusSpeed
   }
 
-  def blendedDrive(tankSpeed: Stream[TwoSided[Velocity]],
-                   targetForwardVelocity: Stream[Velocity],
-                   curvature: Stream[Ratio[Dimensionless, Length]])
-                  (implicit properties: Signal[TwoSidedDriveProperties]): Stream[TwoSided[Velocity]] = {
-    val constantRadiusSpeed = driveWithRadius(radius = curvature.map(curvature => curvature.den / curvature.num.toEach), targetForwardVelocity)
+  def blendedDrive(
+    tankSpeed: Stream[TwoSided[Velocity]],
+    targetForwardVelocity: Stream[Velocity],
+    curvature: Stream[Ratio[Dimensionless, Length]]
+  )(implicit properties: Signal[TwoSidedDriveProperties]): Stream[TwoSided[Velocity]] = {
+    val constantRadiusSpeed =
+      driveWithRadius(radius = curvature.map(curvature => curvature.den / curvature.num.toEach), targetForwardVelocity)
 
     tankSpeed.zip(constantRadiusSpeed).zip(targetForwardVelocity).map {
       case ((tankSpeed, carSpeed), targetForward) =>
         TwoSided(
           blend(carSpeed.left, tankSpeed.left, targetForward),
-          blend(carSpeed.right, tankSpeed.right, targetForward))
+          blend(carSpeed.right, tankSpeed.right, targetForward)
+        )
     }
   }
 }

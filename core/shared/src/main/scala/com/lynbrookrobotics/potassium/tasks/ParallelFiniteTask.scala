@@ -1,12 +1,13 @@
 package com.lynbrookrobotics.potassium.tasks
 
 /**
-  * A finite task where two subtasks are run in parallel
-  * @param first one of the tasks to run
-  * @param second the other task to run
-  */
+ * A finite task where two subtasks are run in parallel
+ * @param first one of the tasks to run
+ * @param second the other task to run
+ */
 class ParallelFiniteTask private[tasks] (first: FiniteTask, second: FiniteTask)
-  extends FiniteTask with FiniteTaskFinishedListener {
+    extends FiniteTask
+    with FiniteTaskFinishedListener {
   override def onFinished(task: FiniteTask): Unit = {
     if (!first.isRunning && !second.isRunning) {
       finished()

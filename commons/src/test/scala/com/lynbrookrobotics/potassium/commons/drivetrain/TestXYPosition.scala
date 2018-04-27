@@ -15,7 +15,6 @@ class TestXYPosition extends FunSuite {
   val periodsPerSecond = (1 / period.toSeconds).toInt
   val unitializedPose = Point(Feet(-10), Feet(-10))
 
-
   test("Test moving straight at 1 ft/s for 1 sec results in moving 1 ft forward") {
     implicit val (clock, clockTrigger) = ClockMocking.mockedClockTicker
 
@@ -28,9 +27,7 @@ class TestXYPosition extends FunSuite {
     val targetPosition = Point(Feet(0), Feet(1))
 
     val position = XYPosition(angle, distance)
-    val simpsonsPosition = XYPosition.positionWithSimpsons(
-      angle,
-      velocity)
+    val simpsonsPosition = XYPosition.positionWithSimpsons(angle, velocity)
     val circularPosition = XYPosition.circularTracking(angle, distance)
 
     var lastPosition = unitializedPose
@@ -41,7 +38,7 @@ class TestXYPosition extends FunSuite {
     simpsonsPosition.foreach(lastSimpsonPosition = _)
     circularPosition.foreach(lastCircularPosition = _)
 
-    for(_ <- 1 to periodsPerSecond){
+    for (_ <- 1 to periodsPerSecond) {
       clockTrigger.apply(period)
       pubVelocityAngle.apply((FeetPerSecond(1), Degrees(90)))
     }
@@ -60,16 +57,13 @@ class TestXYPosition extends FunSuite {
     val distance = velocity.integral
 
     val angle = velocityAngle.map(_._2)
-    val targetPosition = Point(
-      Feet(1 * Degrees(45).cos),
-      Feet(1 * Degrees(45).sin))
+    val targetPosition = Point(Feet(1 * Degrees(45).cos), Feet(1 * Degrees(45).sin))
 
     val position = XYPosition(angle, distance)
-    val simpsonsPosition = XYPosition.positionWithSimpsons(
-      angle,
-      velocity)
+    val simpsonsPosition = XYPosition.positionWithSimpsons(angle, velocity)
     val circularPosition = XYPosition.circularTracking(
-      angle, distance
+      angle,
+      distance
     )
 
     var lastPose = unitializedPose
@@ -91,8 +85,10 @@ class TestXYPosition extends FunSuite {
     assert(lastCircularPose ~= targetPosition)
   }
 
-  test("Test rotating 90 degrees/s with radius 1 starting angle 90 " +
-       "degrees for 1 sec results in (-1,1) ") {
+  test(
+    "Test rotating 90 degrees/s with radius 1 starting angle 90 " +
+      "degrees for 1 sec results in (-1,1) "
+  ) {
     implicit val (clock, clockTrigger) = ClockMocking.mockedClockTicker
 
     val initialAngle = Degrees(90)
@@ -106,14 +102,10 @@ class TestXYPosition extends FunSuite {
 
     val velocity = distance.derivative
 
-    val targetPosition = Point(
-      Feet(-1),
-      Feet(1))
+    val targetPosition = Point(Feet(-1), Feet(1))
 
     val position = XYPosition(angle, distance)
-    val simpsonsPosition = XYPosition.positionWithSimpsons(
-      angle,
-      velocity)
+    val simpsonsPosition = XYPosition.positionWithSimpsons(angle, velocity)
     val circularPosition = XYPosition.circularTracking(angle, distance)
 
     var lastPose = unitializedPose
@@ -124,7 +116,7 @@ class TestXYPosition extends FunSuite {
     simpsonsPosition.foreach(lastSimpPose = _)
     circularPosition.foreach(lastCircularPose = _)
 
-    for(_ <- 1 to periodsPerSecond) {
+    for (_ <- 1 to periodsPerSecond) {
       clockTrigger.apply(period)
       pubTurnSpeed(DegreesPerSecond(90))
     }

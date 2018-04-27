@@ -46,7 +46,7 @@ class PurePursuitControllerTests extends FunSuite {
     )
   })
 
-  private class TestDrivetrain extends UnicycleDrive with Drive{
+  private class TestDrivetrain extends UnicycleDrive with Drive {
     override type DriveSignal = UnicycleSignal
     override type OpenLoopSignal = UnicycleSignal
 
@@ -55,18 +55,17 @@ class PurePursuitControllerTests extends FunSuite {
 
     override protected def unicycleToOpenLoopSignal(uni: UnicycleSignal): DriveSignal = uni
 
-    override protected def controlMode(implicit hardware: Hardware,
-                                       props: Properties): UnicycleControlMode = NoOperation
+    override protected def controlMode(implicit hardware: Hardware, props: Properties): UnicycleControlMode =
+      NoOperation
 
-    override protected def driveClosedLoop(signal: Stream[UnicycleSignal])
-                                          (implicit hardware: UnicycleHardware,
-                                           props: Signal[UnicycleProperties]): Stream[UnicycleSignal] = signal
+    override protected def driveClosedLoop(
+      signal: Stream[UnicycleSignal]
+    )(implicit hardware: UnicycleHardware, props: Signal[UnicycleProperties]): Stream[UnicycleSignal] = signal
 
     override protected def openLoopToDriveSignal(openLoop: UnicycleSignal): UnicycleSignal = openLoop
 
     override type Drivetrain = Nothing
   }
-
 
   val origin = Point.origin
   val period = Milliseconds(5)
@@ -94,14 +93,16 @@ class PurePursuitControllerTests extends FunSuite {
 
     val position = hardware.turnPosition.mapToConstant(origin)
 
-    val output = controllers.purePursuitControllerTurn(
-      hardware.turnPosition.mapToConstant(Degrees(0)),
-      position,
-      path,
-      unlimitedTurnOutput,
-      Auto,
-      angleTolerance
-    )._1
+    val output = controllers
+      .purePursuitControllerTurn(
+        hardware.turnPosition.mapToConstant(Degrees(0)),
+        position,
+        path,
+        unlimitedTurnOutput,
+        Auto,
+        angleTolerance
+      )
+      ._1
 
     var lastOutput = Percent(-10)
     output.foreach(lastOutput = _)
@@ -131,14 +132,16 @@ class PurePursuitControllerTests extends FunSuite {
 
     val position = hardware.turnPosition.mapToConstant(Point(Feet(1), Feet(1)))
 
-    val output = controllers.purePursuitControllerTurn(
-      hardware.turnPosition.mapToConstant(Degrees(0)),
-      position,
-      path,
-      unlimitedTurnOutput,
-      Auto,
-      angleTolerance
-    )._1
+    val output = controllers
+      .purePursuitControllerTurn(
+        hardware.turnPosition.mapToConstant(Degrees(0)),
+        position,
+        path,
+        unlimitedTurnOutput,
+        Auto,
+        angleTolerance
+      )
+      ._1
 
     var out = Percent(-10)
 
@@ -198,14 +201,16 @@ class PurePursuitControllerTests extends FunSuite {
     val path: Stream[(Segment, Option[Segment])] =
       hardware.turnPosition.mapToConstant((Segment(origin, target), None))
 
-    val output = controllers.purePursuitControllerTurn(
-      hardware.turnPosition.mapToConstant(Degrees(-85)),
-      position,
-      path,
-      unlimitedTurnOutput,
-      Auto,
-      angleTolerance
-    )._1
+    val output = controllers
+      .purePursuitControllerTurn(
+        hardware.turnPosition.mapToConstant(Degrees(-85)),
+        position,
+        path,
+        unlimitedTurnOutput,
+        Auto,
+        angleTolerance
+      )
+      ._1
 
     var out = Percent(-10)
     output.foreach(out = _)
@@ -216,7 +221,7 @@ class PurePursuitControllerTests extends FunSuite {
     assert(out ~= Percent(-50), s"result is ${out.toPercent}")
   }
 
-  test("Test if overshooting target results not making full turn"){
+  test("Test if overshooting target results not making full turn") {
     val testDrivetrain = new TestDrivetrain
     implicit val hardware = new UnicycleHardware {
       override val forwardVelocity: Stream[Velocity] = Stream.periodic(period)(MetersPerSecond(0))
@@ -231,14 +236,16 @@ class PurePursuitControllerTests extends FunSuite {
     val position = hardware.turnPosition.mapToConstant(Point(Feet(2), Feet(2)))
     val path = hardware.turnPosition.mapToConstant((Segment(origin, target), None))
 
-    val output = controllers.purePursuitControllerTurn(
-      hardware.turnPosition.mapToConstant(Degrees(45)),
-      position,
-      path,
-      unlimitedTurnOutput,
-      Auto,
-      angleTolerance
-    )._1
+    val output = controllers
+      .purePursuitControllerTurn(
+        hardware.turnPosition.mapToConstant(Degrees(45)),
+        position,
+        path,
+        unlimitedTurnOutput,
+        Auto,
+        angleTolerance
+      )
+      ._1
 
     var out = Percent(-10)
     output.foreach(out = _)

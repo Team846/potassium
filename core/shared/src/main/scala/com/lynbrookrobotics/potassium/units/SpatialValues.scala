@@ -3,9 +3,7 @@ package com.lynbrookrobotics.potassium.units
 import squants.Angle
 import squants.space._
 
-class Point(override val x: Length,
-            override val y: Length,
-            override val z: Length = Feet(0)) extends Value3D(x, y, z) {
+class Point(override val x: Length, override val y: Length, override val z: Length = Feet(0)) extends Value3D(x, y, z) {
   def this(value3D: Value3D[Length]) = this(value3D.x, value3D.y, value3D.z)
 
   def distanceTo(other: Point): Length = Segment(this, other).length
@@ -22,22 +20,22 @@ class Point(override val x: Length,
 
   def ~=(other: Point)(implicit tolerance: Length): Boolean = {
     (other.x ~= this.x) &&
-      (other.y ~= this.y) &&
-      (other.z ~= this.z)
+    (other.y ~= this.y) &&
+    (other.z ~= this.z)
   }
 
   /**
-    * produce a point rotated about the z axis with the given
-    * angle of rotation
-    * @param angle the angle to rotate by
-    * @return a new point rotated about the z axis with given angle
-    */
+   * produce a point rotated about the z axis with the given
+   * angle of rotation
+   * @param angle the angle to rotate by
+   * @return a new point rotated about the z axis with given angle
+   */
   def rotateBy(angle: Angle): Point = {
     val rotationMatrix =
       Matrix3by3(
         Seq(angle.cos, -angle.sin, 0.0),
-        Seq(angle.sin,  angle.cos, 0.0),
-        Seq(0.0,        0.0,       1.0)
+        Seq(angle.sin, angle.cos, 0.0),
+        Seq(0.0, 0.0, 1.0)
       )
 
     Point(rotationMatrix * this)
@@ -107,16 +105,15 @@ case class Segment(start: Point, end: Point) {
   }
 
   /**
-    * see http://mathworld.wolfram.com/Circle-LineIntersection.html
-    * @param center center of circle to test for intersection
-    * @param radius radius of circle to test for intersection
-    * @return on Option of a tuple of points where the
-    *         infinitely long line and circle intersect
-    */
-  def intersectionWithCircle(center: Point,
-                             radius: Length): Option[(Point, Point)] = {
+   * see http://mathworld.wolfram.com/Circle-LineIntersection.html
+   * @param center center of circle to test for intersection
+   * @param radius radius of circle to test for intersection
+   * @return on Option of a tuple of points where the
+   *         infinitely long line and circle intersect
+   */
+  def intersectionWithCircle(center: Point, radius: Length): Option[(Point, Point)] = {
     import math._
-    val diffEnd   = end - center
+    val diffEnd = end - center
     val diffStart = start - center
 
     val dr_squared = (length * length).toSquareFeet
@@ -128,7 +125,8 @@ case class Segment(start: Point, end: Point) {
       throw new IllegalArgumentException("Segment is a point, so no line can be fit through it")
     }
 
-    if (discriminant < 0) None else {
+    if (discriminant < 0) None
+    else {
       val dy = this.dy.toFeet
       val dx = this.dx.toFeet
 

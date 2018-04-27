@@ -29,7 +29,8 @@ class OffloadedLiftTaskTest extends FunSuite {
     }
 
     implicit val props = Signal.constant(new OffloadedLiftProperties {
-      override def positionGains: PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless] =
+      override def positionGains
+        : PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless] =
         PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless](
           Percent(100) / Inches(100),
           Percent(0) / (Inches(5) * Milliseconds(5)),
@@ -79,19 +80,19 @@ class OffloadedLiftTaskTest extends FunSuite {
     task.init()
 
     ticker(Milliseconds(5))
-    assert(liftSignal == Each(9000) /* 90 inches & 100 ticks/inch*/)
+    assert(liftSignal == Each(9000) /* 90 inches & 100 ticks/inch*/ )
     currentLength = Inches(45)
     ticker(Milliseconds(5))
     assert(!innerCalled)
 
     ticker(Milliseconds(5))
-    assert(liftSignal == Each(9000) /* 90 inches & 100 ticks/inch*/)
+    assert(liftSignal == Each(9000) /* 90 inches & 100 ticks/inch*/ )
     currentLength = Inches(89)
     ticker(Milliseconds(5))
     assert(!innerCalled)
 
     ticker(Milliseconds(5))
-    assert(liftSignal == Each(9000) /* 90 inches & 100 ticks/inch*/)
+    assert(liftSignal == Each(9000) /* 90 inches & 100 ticks/inch*/ )
     currentLength = Inches(91)
     ticker(Milliseconds(5))
     assert(innerCalled)
@@ -107,7 +108,8 @@ class OffloadedLiftTaskTest extends FunSuite {
     }
 
     implicit val props = Signal.constant(new OffloadedLiftProperties {
-      override def positionGains: PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless] =
+      override def positionGains
+        : PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless] =
         PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless](
           Percent(100) / Inches(100),
           Percent(0) / (Inches(5) * Milliseconds(5)),
@@ -157,19 +159,19 @@ class OffloadedLiftTaskTest extends FunSuite {
     task.init()
 
     ticker(Milliseconds(5))
-    assert(liftSignal == Each(9000) /* 90 inches & 100 ticks/inch*/)
+    assert(liftSignal == Each(9000) /* 90 inches & 100 ticks/inch*/ )
     currentLength = Inches(140)
     ticker(Milliseconds(5))
     assert(!innerCalled)
 
     ticker(Milliseconds(5))
-    assert(liftSignal == Each(9000) /* 90 inches & 100 ticks/inch*/)
+    assert(liftSignal == Each(9000) /* 90 inches & 100 ticks/inch*/ )
     currentLength = Inches(91)
     ticker(Milliseconds(5))
     assert(!innerCalled)
 
     ticker(Milliseconds(5))
-    assert(liftSignal == Each(9000) /* 90 inches & 100 ticks/inch*/)
+    assert(liftSignal == Each(9000) /* 90 inches & 100 ticks/inch*/ )
     currentLength = Inches(89)
     ticker(Milliseconds(5))
     assert(innerCalled)

@@ -4,10 +4,10 @@ import java.nio.ByteBuffer
 import com.lynbrookrobotics.potassium.sensors.SPITrait
 
 /**
-  * Represents a register on the ADIS16448 IMU.
-  *
-  * @param register is ID of register on IMU
-  */
+ * Represents a register on the ADIS16448 IMU.
+ *
+ * @param register is ID of register on IMU
+ */
 class IMURegister(register: Byte) {
   private val readBuffer: ByteBuffer = ByteBuffer.allocateDirect(2)
   private val readMessage: ByteBuffer = ByteBuffer.allocateDirect(2)
@@ -17,10 +17,10 @@ class IMURegister(register: Byte) {
   private val writeMessage2: Byte = (register | 0x81).toByte
 
   /**
-    * Reads a value from the register.
-    * @param spi the interface to use for communication
-    * @return a single value from the register
-    */
+   * Reads a value from the register.
+   * @param spi the interface to use for communication
+   * @return a single value from the register
+   */
   def read(spi: SPITrait): Int = {
     readBuffer.clear()
     readBuffer.put(0.toByte)
@@ -36,11 +36,11 @@ class IMURegister(register: Byte) {
   val valueWriter2 = ByteBuffer.allocateDirect(2)
 
   /**
-    * Writes a single value to the register.
-    *
-    * @param value the value to write
-    * @param spi   the interface to use for communication
-    */
+   * Writes a single value to the register.
+   *
+   * @param value the value to write
+   * @param spi   the interface to use for communication
+   */
   def write(value: Int, spi: SPITrait): Unit = {
     valueWriter1.put(0, writeMessage1)
     valueWriter1.put(1, value.toByte)

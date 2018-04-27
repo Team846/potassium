@@ -12,19 +12,11 @@ trait DoubleFlywheelProperties {
   def maxVelocityLeft: Frequency
   def maxVelocityRight: Frequency
 
-  def velocityGainsLeft: PIDConfig[Frequency,
-                                   GenericValue[Frequency],
-                                   Frequency,
-                                   GenericDerivative[Frequency],
-                                   Dimensionless,
-                                   Dimensionless]
+  def velocityGainsLeft
+    : PIDConfig[Frequency, GenericValue[Frequency], Frequency, GenericDerivative[Frequency], Dimensionless, Dimensionless]
 
-  def velocityGainsRight: PIDConfig[Frequency,
-                                    GenericValue[Frequency],
-                                    Frequency,
-                                    GenericDerivative[Frequency],
-                                    Dimensionless,
-                                    Dimensionless]
+  def velocityGainsRight
+    : PIDConfig[Frequency, GenericValue[Frequency], Frequency, GenericDerivative[Frequency], Dimensionless, Dimensionless]
 
   lazy val velocityGainsLeftFull =
     velocityGainsLeft.withF(Ratio(Percent(100), maxVelocityLeft))
@@ -45,25 +37,28 @@ abstract class DoubleFlywheel {
   case class DoubleFlywheelSignal(left: Dimensionless, right: Dimensionless)
 
   object velocityControllers {
-    def velocityControl(leftTarget: Stream[Frequency],
-                        rightTarget: Stream[Frequency])
-                       (implicit properties: Signal[Properties],
-                        hardware: Hardware): (Stream[Frequency], Stream[Frequency],
-                                              Stream[DoubleFlywheelSignal]) = {
+    def velocityControl(leftTarget: Stream[Frequency], rightTarget: Stream[Frequency])(
+      implicit properties: Signal[Properties],
+      hardware: Hardware
+    ): (Stream[Frequency], Stream[Frequency], Stream[DoubleFlywheelSignal]) = {
       val errorLeft = hardware.leftVelocity.zipAsync(leftTarget).map(t => t._2 - t._1)
       val errorRight = hardware.rightVelocity.zipAsync(rightTarget).map(t => t._2 - t._1)
 
-      val controlLeft = PIDF.pidf(
-        hardware.leftVelocity,
-        leftTarget,
-        properties.map(_.velocityGainsLeftFull)
-      ).map(_ max Percent(0))
+      val controlLeft = PIDF
+        .pidf(
+          hardware.leftVelocity,
+          leftTarget,
+          properties.map(_.velocityGainsLeftFull)
+        )
+        .map(_ max Percent(0))
 
-      val controlRight = PIDF.pidf(
-        hardware.rightVelocity,
-        rightTarget,
-        properties.map(_.velocityGainsRightFull)
-      ).map(_ max Percent(0))
+      val controlRight = PIDF
+        .pidf(
+          hardware.rightVelocity,
+          rightTarget,
+          properties.map(_.velocityGainsRightFull)
+        )
+        .map(_ max Percent(0))
 
       (errorLeft, errorRight, controlLeft.zip(controlRight).map { t =>
         DoubleFlywheelSignal(t._1, t._2)
@@ -72,19 +67,20 @@ abstract class DoubleFlywheel {
   }
 
   object velocityTasks {
-    class WhileAtVelocity(vel: Stream[Frequency], tolerance: Frequency)
-                         (doubleFlywheel: Comp)
-                         (implicit properties: Signal[Properties],
-                          hardware: Hardware) extends WrapperTask {
+    class WhileAtVelocity(vel: Stream[Frequency], tolerance: Frequency)(doubleFlywheel: Comp)(
+      implicit properties: Signal[Properties],
+      hardware: Hardware
+    ) extends WrapperTask {
       override def onStart(): Unit = {
         val (errorLeft, errorRight, control) =
           velocityControllers.velocityControl(vel, vel)
 
         val zippedError = errorLeft.zip(errorRight)
-        doubleFlywheel.setController(control.withCheckZipped(zippedError) { case (eLeft, eRight) =>
-          if (eLeft.abs < tolerance && eRight.abs < tolerance) {
-            readyToRunInner()
-          }
+        doubleFlywheel.setController(control.withCheckZipped(zippedError) {
+          case (eLeft, eRight) =>
+            if (eLeft.abs < tolerance && eRight.abs < tolerance) {
+              readyToRunInner()
+            }
         })
       }
 
@@ -93,17 +89,18 @@ abstract class DoubleFlywheel {
       }
     }
 
-    class WhileAtDoubleVelocity(leftVel: Stream[Frequency], rightVel: Stream[Frequency], tolerance: Frequency)
-                               (doubleFlywheel: Comp)
-                               (implicit properties: Signal[Properties],
-                                hardware: Hardware) extends WrapperTask {
+    class WhileAtDoubleVelocity(leftVel: Stream[Frequency], rightVel: Stream[Frequency], tolerance: Frequency)(
+      doubleFlywheel: Comp
+    )(implicit properties: Signal[Properties], hardware: Hardware)
+        extends WrapperTask {
       override def onStart(): Unit = {
         val (errorLeft, errorRight, control) =
           velocityControllers.velocityControl(leftVel, rightVel)
-        doubleFlywheel.setController(control.withCheckZipped(errorLeft.zip(errorRight)){ case (eLeft, eRight) =>
-          if (eLeft.abs < tolerance && eRight.abs < tolerance) {
-            readyToRunInner()
-          }
+        doubleFlywheel.setController(control.withCheckZipped(errorLeft.zip(errorRight)) {
+          case (eLeft, eRight) =>
+            if (eLeft.abs < tolerance && eRight.abs < tolerance) {
+              readyToRunInner()
+            }
         })
       }
 

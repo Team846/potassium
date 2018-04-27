@@ -27,7 +27,8 @@ class LiftTaskTest extends FunSuite {
     }
 
     implicit val props = Signal.constant(new LiftProperties {
-      override def positionGains: PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless] =
+      override def positionGains
+        : PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless] =
         PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless](
           Percent(100) / Inches(90),
           Percent(0) / (Inches(5) * Milliseconds(5)),
@@ -92,7 +93,8 @@ class LiftTaskTest extends FunSuite {
     }
 
     implicit val props: Signal[LiftProperties] = Signal.constant(new LiftProperties {
-      override def positionGains: PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless] =
+      override def positionGains
+        : PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless] =
         PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless](
           Percent(100) / Inches(90),
           Percent(0) / (Inches(5) * Milliseconds(5)),
@@ -161,7 +163,8 @@ class LiftTaskTest extends FunSuite {
     }
 
     implicit val props = Signal.constant(new LiftProperties {
-      override def positionGains: PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless] =
+      override def positionGains
+        : PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless] =
         PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless](
           Percent(100) / Inches(90),
           Percent(0) / (Inches(5) * Milliseconds(5)),
@@ -185,7 +188,8 @@ class LiftTaskTest extends FunSuite {
       override val position: Stream[Length] = Stream.periodic(tickPeriod)(currentLength)
     }
 
-    val task = new lift.positionTasks.WhileAtPosition(hardware.position.mapToConstant(Inches(90)), Inches(5))(testLift).toFinite
+    val task =
+      new lift.positionTasks.WhileAtPosition(hardware.position.mapToConstant(Inches(90)), Inches(5))(testLift).toFinite
 
     task.init()
 

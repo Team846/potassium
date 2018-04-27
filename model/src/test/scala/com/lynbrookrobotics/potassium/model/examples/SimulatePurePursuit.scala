@@ -27,7 +27,9 @@ class SimulatePurePursuit extends FunSuite {
     override val maxLeftVelocity: Velocity = FeetPerSecond(17)
     override val maxRightVelocity: Velocity = FeetPerSecond(17)
 
-    override val maxTurnVelocity: AngularVelocity = RadiansPerSecond((((maxLeftVelocity + maxRightVelocity) * Seconds(1)) / Inches(21.75)) / 2)
+    override val maxTurnVelocity: AngularVelocity = RadiansPerSecond(
+      (((maxLeftVelocity + maxRightVelocity) * Seconds(1)) / Inches(21.75)) / 2
+    )
     override val maxAcceleration: Acceleration = FeetPerSecondSquared(16.5)
     override val maxDeceleration: Acceleration = FeetPerSecondSquared(16.5)
     override val defaultLookAheadDistance: Length = Feet(2)
@@ -35,22 +37,23 @@ class SimulatePurePursuit extends FunSuite {
     override val turnVelocityGains: TurnVelocityGains = PIDConfig(
       Percent(50) / DegreesPerSecond(360),
       Percent(0) / Degrees(1),
-      Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1)))
+      Percent(0) / (DegreesPerSecond(1).toGeneric / Seconds(1))
+    )
 
     override val forwardPositionGains: ForwardPositionGains = PIDConfig(
       Percent(17.5) / Feet(1),
       Percent(0) / (Meters(1).toGeneric * Seconds(1)),
-      Percent(0) / MetersPerSecond(1))
+      Percent(0) / MetersPerSecond(1)
+    )
 
     override val turnPositionGains: TurnPositionGains = PIDConfig(
       kp = Percent(200) / Degrees(90),
       ki = Percent(0) / (Degrees(1).toGeneric * Seconds(1)),
-      kd = Percent(0.5) / DegreesPerSecond(1))
+      kd = Percent(0.5) / DegreesPerSecond(1)
+    )
 
-    override val leftVelocityGains: ForwardVelocityGains = PIDConfig(
-      Percent(60) / FeetPerSecond(5),
-      Percent(0) / Meters(1),
-      Percent(0) / MetersPerSecondSquared(1))
+    override val leftVelocityGains: ForwardVelocityGains =
+      PIDConfig(Percent(60) / FeetPerSecond(5), Percent(0) / Meters(1), Percent(0) / MetersPerSecondSquared(1))
 
     override val rightVelocityGains: ForwardVelocityGains = leftVelocityGains
     override val track: Distance = Inches(21.75)
@@ -59,19 +62,22 @@ class SimulatePurePursuit extends FunSuite {
 
   implicit val props = Signal.constant(propsVal)
 
-  def testPurePursuitReachesDestination(wayPoints: Seq[Point],
-                                        timeOut: Time,
-                                        log: Boolean = false,
-                                        distanceTolerance: Length = Feet(0.5),
-                                        angleTolerance: Angle = Degrees(8),
-                                        forwardBackwardMode: ForwardBackwardMode = Auto): Unit = {
+  def testPurePursuitReachesDestination(
+    wayPoints: Seq[Point],
+    timeOut: Time,
+    log: Boolean = false,
+    distanceTolerance: Length = Feet(0.5),
+    angleTolerance: Angle = Degrees(8),
+    forwardBackwardMode: ForwardBackwardMode = Auto
+  ): Unit = {
     implicit val (clock, triggerClock) = mockedClockTicker
     implicit val hardware = new SimulatedTwoSidedHardware(
       Pounds(88) * MetersPerSecondSquared(1) / 2,
       Pounds(88),
       KilogramsMetersSquared(3.909),
       clock,
-      period)
+      period
+    )
 
     val drivetrain = new container.Drivetrain
 
@@ -92,15 +98,15 @@ class SimulatePurePursuit extends FunSuite {
       writer.println(s"Time\tx\ty\tvelocity\tangle\tturnSpeed")
 
       var i = 0
-      val handle = hardware.robotStateStream.foreach{ e =>
-        if(i % 2 == 0) {
+      val handle = hardware.robotStateStream.foreach { e =>
+        if (i % 2 == 0) {
           writer.println(
             s"${e.time.toSeconds}\t" +
-            s"${e.position.x.toFeet}\t" +
-            s"${e.position.y.toFeet}\t" +
-            s"${e.forwardVelocity.toFeetPerSecond}\t" +
-            s"${e.angle.toDegrees}\t" +
-            s"${e.turnSpeed.toDegreesPerSecond}"
+              s"${e.position.x.toFeet}\t" +
+              s"${e.position.y.toFeet}\t" +
+              s"${e.forwardVelocity.toFeetPerSecond}\t" +
+              s"${e.angle.toDegrees}\t" +
+              s"${e.turnSpeed.toDegreesPerSecond}"
           )
           writer.flush()
         }
@@ -133,7 +139,8 @@ class SimulatePurePursuit extends FunSuite {
     // this is an acceptable target angle if driving backwards is required
     assert(
       (angleDiff ~= Degrees(0)) || (angleDiff ~= Degrees(180)),
-      s"\nLast angle was off by ${angleDiff.toDegrees} degrees")
+      s"\nLast angle was off by ${angleDiff.toDegrees} degrees"
+    )
   }
 
   test("Reach destination with path from (0,0) to (-5, 5)") {
@@ -187,7 +194,6 @@ class SimulatePurePursuit extends FunSuite {
       log = true
     )
   }
-
 
   test("Reach destination with path from (0,0) to (0, -5)") {
     testPurePursuitReachesDestination(

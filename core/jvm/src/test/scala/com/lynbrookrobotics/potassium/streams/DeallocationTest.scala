@@ -11,21 +11,22 @@ import scala.ref.WeakReference
 class DeallocationTest extends FunSuite {
   type Cancel = () => Unit
   implicit val clock = new Clock {
+
     /**
-      * Schedules a periodic execution
-      *
-      * @param period the period between executions
-      * @param thunk  the block of code to execute
-      * @return a function to cancel the execution
-      */
+     * Schedules a periodic execution
+     *
+     * @param period the period between executions
+     * @param thunk  the block of code to execute
+     * @return a function to cancel the execution
+     */
     override def apply(period: Time)(thunk: (Time) => Unit): Cancel = ???
 
     /**
-      * Schedules a single execution of a function
-      *
-      * @param delay the initial delay before running the function
-      * @param thunk the function to execute after the delay
-      */
+     * Schedules a single execution of a function
+     *
+     * @param delay the initial delay before running the function
+     * @param thunk the function to execute after the delay
+     */
     override def singleExecution(delay: Time)(thunk: => Unit): Cancel = ???
 
     override def currentTime: Time = Seconds(0)

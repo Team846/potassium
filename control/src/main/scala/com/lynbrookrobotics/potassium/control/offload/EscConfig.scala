@@ -5,10 +5,12 @@ import com.lynbrookrobotics.potassium.units.{GenericIntegral, GenericValue, Rati
 import squants.time.{Milliseconds, Seconds}
 import squants.{Acceleration, Dimensionless, Length, Percent, Quantity, Time, Velocity}
 
-case class EscConfig[Base <: Quantity[Base]](maxNativeOutput: Int = 1023,
-                                             nativeTimeUnit: Time = Milliseconds(100),
-                                             loopTime: Time = Milliseconds(1),
-                                             ticksPerUnit: Ratio[Dimensionless, Base])
+case class EscConfig[Base <: Quantity[Base]](
+  maxNativeOutput: Int = 1023,
+  nativeTimeUnit: Time = Milliseconds(100),
+  loopTime: Time = Milliseconds(1),
+  ticksPerUnit: Ratio[Dimensionless, Base]
+)
 
 object EscConfig {
 
@@ -16,8 +18,9 @@ object EscConfig {
 
   case class NativePositionGains(p: Double, i: Double, d: Double)
 
-  def forwardToAngularVelocityGains(g: PIDProperUnitsConfig[Velocity, Acceleration, Length, Dimensionless]#Full)
-                                   (implicit c: EscConfig[Length]): NativeVelocityGains = {
+  def forwardToAngularVelocityGains(
+    g: PIDProperUnitsConfig[Velocity, Acceleration, Length, Dimensionless]#Full
+  )(implicit c: EscConfig[Length]): NativeVelocityGains = {
     val outOvrPercent = c.maxNativeOutput / Percent(100).toEach
     val ftOvrTicks = c.ticksPerUnit.den.toFeet / c.ticksPerUnit.num.toEach
     val escTimeOvrSec = 1 /*native time unit*/ / c.nativeTimeUnit.toSeconds
@@ -32,8 +35,9 @@ object EscConfig {
     )
   }
 
-  def forwardToAngularPositionGains(g: PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless])
-                                   (implicit c: EscConfig[Length]): NativePositionGains = {
+  def forwardToAngularPositionGains(
+    g: PIDConfig[Length, Length, GenericValue[Length], Velocity, GenericIntegral[Length], Dimensionless]
+  )(implicit c: EscConfig[Length]): NativePositionGains = {
     val outOvrPercent = c.maxNativeOutput / Percent(100).toEach
     val ftOvrTicks = c.ticksPerUnit.den.toFeet / c.ticksPerUnit.num.toEach
     val escTimeOvrSec = 1 /*native time unit*/ / c.nativeTimeUnit.toSeconds
